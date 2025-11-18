@@ -3,44 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>㋡꧁정빈777꧂ -  SNS</title>
+  <title>㋡꧁정빈777꧂ - SNS</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 2000 2000">
+  <defs>
+    <linearGradient id="linearGradient1" x1="1576.7" y1="1817" x2="423.3" y2="183" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="%233478f6" />
+      <stop offset="1" stop-color="%2353b6f9" />
+    </linearGradient>
+    <filter id="filter1" x="0" y="0" width="2000" height="2000" color-interpolation-filters="sRGB">
+      <feFlood flood-color="%23000000" flood-opacity="0.52" />
+      <feComposite in2="SourceGraphic" operator="out" />
+      <feGaussianBlur stdDeviation="43" />
+      <feOffset dx="35" dy="24" />
+      <feComposite in2="SourceGraphic" operator="atop" />
+    </filter>
+  </defs>
+  <path fill="url(%23linearGradient1)" d="M 2000 1000 C 2000 448 1552 0 1000 0 C 448 0 0 448 0 1000 C 0 1552 448 2000 1000 2000 C 1552 2000 2000 1552 2000 1000 Z"/>
+  <path fill="%23fff" filter="url(%23filter1)" d="M 1137 506 C 1252 449 1369 497 1427 625 L 1459 696 C 1484 752 1488 821 1471 878 L 1472 877 C 1535 891 1581 939 1608 997 L 1632 1052 C 1698 1199 1657 1324 1544 1381 L 1175 1565 L 972 1114 C 1002 1241 946 1377 834 1433 L 776 1462 C 654 1523 518 1467 449 1343 L 596 1269 C 625 1309 663 1331 708 1308 L 758 1283 C 813 1256 830 1185 802 1124 L 525 509 L 672 435 L 784 683 L 1137 506 Z M 1444 1232 C 1488 1210 1504 1149 1480 1095 L 1476 1085 C 1452 1033 1397 1007 1353 1029 L 1151 1130 L 1242 1333 L 1444 1232 Z M 1184 679 L 991 775 L 1084 981 L 1276 885 C 1319 864 1336 802 1312 749 L 1306 736 C 1283 684 1226 658 1184 679 Z"/>
+</svg>' />
+
+  <link rel="stylesheet" href="header.css">
+
   <style>
-    * {
+    body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #fafafa;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
       min-height: 100vh;
     }
 
     .container {
       display: flex;
-      height: 100vh;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
     }
 
     /* 사이드바 */
     .sidebar {
       width: 250px;
-      background: white;
-      border-right: 1px solid #dbdbdb;
+      background: #1e1e1e;
+      border-right: 1px solid #333;
       padding: 20px;
       display: flex;
       flex-direction: column;
       position: fixed;
-      height: 100vh;
+      height: calc(100vh - 60px);
       left: 0;
-      top: 0;
+      top: 60px;
+      overflow-y: auto;
     }
 
     .logo {
       font-size: 28px;
       font-weight: bold;
       margin-bottom: 40px;
-      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      background: linear-gradient(135deg, #00aaff, #0044ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -53,16 +75,19 @@
       margin-bottom: 8px;
       border-radius: 12px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       font-size: 16px;
+      color: #fff;
     }
 
     .nav-item:hover {
-      background: #f0f0f0;
+      background: #2c2c2c;
+      transform: translateY(-4px) scale(1.02);
     }
 
     .nav-item.active {
       font-weight: bold;
+      background: #3663FF;
     }
 
     .nav-item span {
@@ -71,11 +96,11 @@
     }
 
     .create-btn {
-      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      background: linear-gradient(135deg, #00aaff, #0044ff);
       color: white;
       border: none;
       padding: 12px 16px;
-      border-radius: 12px;
+      border-radius: 30px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
@@ -83,11 +108,15 @@
       align-items: center;
       justify-content: center;
       margin-top: 20px;
-      transition: transform 0.2s;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     .create-btn:hover {
-      transform: scale(1.02);
+      transform: translateY(-8px) scale(1.05);
+    }
+
+    .create-btn:active {
+      background: linear-gradient(135deg, #0088cc, #003388);
     }
 
     .create-btn span {
@@ -101,26 +130,34 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-top: 1px solid #dbdbdb;
+      border-top: 1px solid #333;
       padding-top: 20px;
     }
 
     .user-nickname {
       font-weight: 600;
       font-size: 14px;
+      color: #fff;
     }
 
     .logout-btn {
-      background: none;
+      background: #3663FF;
       border: none;
-      color: #0095f6;
+      color: #fff;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 20px;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     .logout-btn:hover {
-      color: #00376b;
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    .logout-btn:active {
+      background: #2952CC;
     }
 
     /* 메인 컨텐츠 */
@@ -140,9 +177,9 @@
 
     .verification-badge {
       display: inline-block;
-      width: 16px;
-      height: 16px;
-      margin-left: 4px;
+      width: 18px;
+      height: 18px;
+      margin-left: 5px;
       vertical-align: middle;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
       background-size: contain;
@@ -156,64 +193,55 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.85);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
       backdrop-filter: blur(5px);
-    }
-
-    .nickname-modal-content {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .nickname-modal h2 {
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
-
-    .nickname-modal input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #dbdbdb;
-      border-radius: 8px;
-      font-size: 16px;
+      color: #ffffff;
       margin-bottom: 10px;
     }
 
-    .nickname-modal input:focus {
+    .nickname-modal input {
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      width: 250px;
       outline: none;
-      border-color: #0095f6;
+      background: #2c2c2c;
+      color: #fff;
     }
 
     .nickname-modal button {
-      width: 100%;
-      background: #0095f6;
-      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
       border: none;
-      padding: 12px 16px;
-      border-radius: 8px;
       font-size: 16px;
-      font-weight: bold;
       cursor: pointer;
-      margin-top: 10px;
+      background: #3663FF;
+      color: #fff;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     .nickname-modal button:hover {
-      background: #0081d6;
+      transform: translateY(-8px) scale(1.05);
+    }
+
+    .nickname-modal button:active {
+      background: #2952CC;
     }
 
     .error-message {
-      color: #ed4956;
+      color: #ff6b6b;
       font-size: 14px;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     /* 게시글 작성 모달 */
@@ -223,11 +251,12 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.85);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 999;
+      backdrop-filter: blur(5px);
     }
 
     .create-modal.active {
@@ -235,17 +264,18 @@
     }
 
     .create-modal-content {
-      background: white;
+      background: #1e1e1e;
       border-radius: 16px;
       width: 90%;
       max-width: 600px;
       max-height: 90vh;
       overflow-y: auto;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
     }
 
     .create-modal-header {
       padding: 16px;
-      border-bottom: 1px solid #dbdbdb;
+      border-bottom: 1px solid #333;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -254,6 +284,7 @@
     .create-modal-header h3 {
       font-size: 18px;
       font-weight: 600;
+      color: #fff;
     }
 
     .close-btn {
@@ -261,7 +292,7 @@
       border: none;
       font-size: 24px;
       cursor: pointer;
-      color: #262626;
+      color: #fff;
     }
 
     .create-modal-body {
@@ -270,12 +301,20 @@
 
     .create-modal textarea {
       width: 100%;
-      border: none;
+      border: 2px solid #333;
       resize: vertical;
       min-height: 150px;
       font-size: 16px;
       font-family: inherit;
       outline: none;
+      background: #2c2c2c;
+      color: #fff;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .create-modal textarea:focus {
+      border-color: #3663FF;
     }
 
     .image-preview-container {
@@ -286,7 +325,7 @@
       width: 100%;
       max-height: 400px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 12px;
       display: none;
     }
 
@@ -295,45 +334,60 @@
     }
 
     .upload-btn {
-      background: #f0f0f0;
-      border: none;
+      background: #2c2c2c;
+      border: 2px solid #333;
       padding: 10px 20px;
-      border-radius: 8px;
+      border-radius: 30px;
       cursor: pointer;
       font-size: 14px;
       margin-top: 10px;
+      color: #fff;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     .upload-btn:hover {
-      background: #e0e0e0;
+      background: #3663FF;
+      transform: translateY(-4px) scale(1.05);
     }
 
     .post-btn {
-      background: #0095f6;
+      background: #3663FF;
       color: white;
       border: none;
       padding: 10px 24px;
-      border-radius: 8px;
+      border-radius: 30px;
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     .post-btn:hover {
-      background: #0081d6;
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    .post-btn:active {
+      background: #2952CC;
     }
 
     .post-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      transform: none;
     }
 
     /* 게시글 카드 */
     .post-card {
-      background: white;
-      border: 1px solid #dbdbdb;
-      border-radius: 8px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 16px;
       margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s;
+    }
+
+    .post-card:hover {
+      transform: translateY(-2px);
     }
 
     .post-header {
@@ -348,6 +402,7 @@
       font-size: 14px;
       display: flex;
       align-items: center;
+      color: #fff;
     }
 
     .post-image {
@@ -359,38 +414,46 @@
     .post-content {
       padding: 14px 16px;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
+      color: #fff;
     }
 
     .post-time {
       padding: 0 16px 16px;
       font-size: 12px;
-      color: #8e8e8e;
+      color: #aaa;
     }
 
     .loading {
       text-align: center;
       padding: 40px;
-      color: #8e8e8e;
+      color: #aaa;
     }
 
     .no-posts {
       text-align: center;
       padding: 60px 20px;
-      color: #8e8e8e;
+      color: #aaa;
     }
 
     .delete-btn {
-      background: none;
+      background: #ff4444;
       border: none;
-      color: #ed4956;
+      color: #fff;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 12px;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     .delete-btn:hover {
-      color: #c92f3a;
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    .delete-btn:active {
+      background: #cc0000;
     }
 
     @media (max-width: 768px) {
@@ -427,14 +490,15 @@
   </style>
 </head>
 <body>
+  <!-- 헤더 컨테이너 -->
+  <div id="header-container"></div>
+
   <!-- 닉네임 설정 모달 -->
   <div class="nickname-modal" id="nicknameModal">
-    <div class="nickname-modal-content">
-      <h2 id="nicknameModalTitle">✏️ 닉네임을 입력하세요</h2>
-      <input type="text" id="nicknameInput" placeholder="닉네임 (최대 20자)" maxlength="20">
-      <div class="error-message" id="errorMessage"></div>
-      <button id="nicknameBtn">확인</button>
-    </div>
+    <h2 id="nicknameModalTitle">✏️ 여기에서 사용할 닉네임을 입력해주세요</h2>
+    <input type="text" id="nicknameInput" placeholder="닉네임" maxlength="20">
+    <div class="error-message" id="errorMessage"></div>
+    <button id="nicknameBtn">확인</button>
   </div>
 
   <!-- 게시글 작성 모달 -->
@@ -462,7 +526,7 @@
   <div class="container">
     <!-- 사이드바 -->
     <div class="sidebar">
-      <div class="logo">SNS</div>
+      <div class="logo">📱 MySNS</div>
       
       <div class="nav-item active" onclick="showFeed()">
         <span>🏠</span>
@@ -490,6 +554,9 @@
     </div>
   </div>
 
+  <!-- 공통 헤더 JavaScript -->
+  <script src="header.js"></script>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue, serverTimestamp, remove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
@@ -511,7 +578,7 @@
     const cloudName = 'dretlhsrk';
     const uploadPreset = 'unsigned_preset';
 
-    let currentNickname = localStorage.getItem('userNickname');
+    let currentNickname = localStorage.getItem('snsNickname');
     let selectedImage = null;
     let verificationCode = "";
     let isVerifying = false;
@@ -522,7 +589,7 @@
 
     // 인증된 정빈777인지 확인
     function isVerifiedJungbin() {
-      return currentNickname === "정빈777" && localStorage.getItem("jungbin777_verified") === "true";
+      return currentNickname === "정빈777" && localStorage.getItem("jungbin777_verified_sns") === "true";
     }
 
     // 초기화
@@ -532,7 +599,7 @@
         showPermanentError("이 닉네임은 사용할 수 없습니다. 로그아웃 후 다시 닉네임을 바꿔주세요.");
       }
       // 정빈777인데 인증 데이터가 없는 경우
-      else if (currentNickname === "정빈777" && !localStorage.getItem("jungbin777_verified")) {
+      else if (currentNickname === "정빈777" && !localStorage.getItem("jungbin777_verified_sns")) {
         showPermanentError("제작자 인증이 불가합니다. 로그아웃 후 다시 시도해주세요.");
       } else {
         document.getElementById('nicknameModal').style.display = 'none';
@@ -549,14 +616,14 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: rgba(237, 73, 86, 0.95);
+        background: rgba(255, 0, 0, 0.95);
         color: white;
         padding: 20px 30px;
         border-radius: 12px;
         font-size: 16px;
         font-weight: bold;
         z-index: 10000;
-        box-shadow: 0 4px 20px rgba(237, 73, 86, 0.5);
+        box-shadow: 0 4px 20px rgba(255, 0, 0, 0.5);
         text-align: center;
       `;
       errorDiv.textContent = message;
@@ -571,10 +638,23 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             access_key: 'ee27178a-2f7b-4153-a2b4-01d5905a1280',
-            subject: '🔐 정빈777 닉네임 인증 코드',
-            from_name: 'MySNS',
+            subject: '🔐 정빈777 SNS 닉네임 인증 코드',
+            from_name: '정빈777 SNS',
             to_email: 'alexeom97@outlook.com',
-            message: `인증 코드: ${code}`
+            message: `
+━━━━━━━━━━━━━━━━━━━━
+  정빈777 닉네임 인증
+━━━━━━━━━━━━━━━━━━━━
+
+요청하신 인증 코드입니다:
+
+    ${code}
+
+이 코드를 SNS 사이트에 입력해주세요.
+
+━━━━━━━━━━━━━━━━━━━━
+본인이 요청하지 않았다면 이 메일을 무시하세요.
+            `
           })
         });
         
@@ -630,8 +710,8 @@
       if (isVerifying) {
         if (val === verificationCode) {
           currentNickname = "정빈777";
-          localStorage.setItem("userNickname", currentNickname);
-          localStorage.setItem("jungbin777_verified", "true");
+          localStorage.setItem("snsNickname", currentNickname);
+          localStorage.setItem("jungbin777_verified_sns", "true");
           document.getElementById('nicknameModal').style.display = 'none';
           document.getElementById('userNickname').innerHTML = currentNickname + '<span class="verification-badge"></span>';
           document.getElementById('userInfo').style.display = 'flex';
@@ -645,7 +725,7 @@
       }
       
       currentNickname = val;
-      localStorage.setItem("userNickname", currentNickname);
+      localStorage.setItem("snsNickname", currentNickname);
       document.getElementById('nicknameModal').style.display = 'none';
       document.getElementById('userNickname').textContent = currentNickname;
       document.getElementById('userInfo').style.display = 'flex';
@@ -655,8 +735,8 @@
 
     // 로그아웃
     document.getElementById('logoutBtn').onclick = () => {
-      localStorage.removeItem('userNickname');
-      localStorage.removeItem('jungbin777_verified');
+      localStorage.removeItem('snsNickname');
+      localStorage.removeItem('jungbin777_verified_sns');
       location.reload();
     };
 
@@ -719,7 +799,7 @@
       const postButton = document.getElementById('modalPostBtn');
 
       if (!content && !selectedImage) {
-        messageDiv.innerHTML = '<span style="color: #ed4956;">내용 또는 이미지를 추가해주세요.</span>';
+        messageDiv.innerHTML = '<span style="color: #ff6b6b;">내용 또는 이미지를 추가해주세요.</span>';
         return;
       }
 
@@ -728,19 +808,19 @@
         alert("이 닉네임은 사용할 수 없습니다. 로그아웃 후 다시 닉네임을 바꿔주세요.");
         return;
       }
-      if (currentNickname === "정빈777" && !localStorage.getItem("jungbin777_verified")) {
+      if (currentNickname === "정빈777" && !localStorage.getItem("jungbin777_verified_sns")) {
         alert("제작자 인증이 불가합니다. 로그아웃 후 다시 시도해주세요.");
         return;
       }
 
       postButton.disabled = true;
-      messageDiv.innerHTML = '<span style="color: #8e8e8e;">게시 중...</span>';
+      messageDiv.innerHTML = '<span style="color: #aaa;">게시 중...</span>';
 
       try {
         let imageUrl = null;
 
         if (selectedImage) {
-          messageDiv.innerHTML = '<span style="color: #8e8e8e;">이미지 업로드 중...</span>';
+          messageDiv.innerHTML = '<span style="color: #aaa;">이미지 업로드 중...</span>';
           imageUrl = await uploadImageToCloudinary(selectedImage);
         }
 
@@ -754,7 +834,7 @@
           timestamp: serverTimestamp()
         });
 
-        messageDiv.innerHTML = '<span style="color: #0095f6;">게시글이 작성되었습니다!</span>';
+        messageDiv.innerHTML = '<span style="color: #00ff00;">게시글이 작성되었습니다!</span>';
         
         setTimeout(() => {
           document.getElementById('createModal').classList.remove('active');
@@ -763,7 +843,7 @@
 
       } catch (error) {
         console.error('게시 오류:', error);
-        messageDiv.innerHTML = '<span style="color: #ed4956;">게시에 실패했습니다. 다시 시도해주세요.</span>';
+        messageDiv.innerHTML = '<span style="color: #ff6b6b;">게시에 실패했습니다. 다시 시도해주세요.</span>';
       } finally {
         postButton.disabled = false;
       }
