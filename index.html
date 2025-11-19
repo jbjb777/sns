@@ -186,40 +186,76 @@
       background-repeat: no-repeat;
     }
 
-    /* 닉네임 모달 */
-    .nickname-modal {
+    /* 로그인 모달 */
+    .auth-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.85);
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      backdrop-filter: blur(5px);
-      flex-direction: column;
-      gap: 12px;
+      backdrop-filter: blur(10px);
     }
 
-    .nickname-modal h2 {
-      color: #ffffff;
-      margin-bottom: 10px;
+    .auth-modal.active {
+      display: flex;
     }
 
-    .nickname-modal input {
-      padding: 12px 20px;
-      border-radius: 12px;
+    .auth-box {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+
+    .auth-close {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: none;
       border: none;
-      font-size: 16px;
-      width: 250px;
-      outline: none;
-      background: #2c2c2c;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+
+    .auth-close:hover {
+      color: #ff6b6b;
+    }
+
+    .auth-box h2 {
+      text-align: center;
+      margin-bottom: 30px;
       color: #fff;
     }
 
-    .nickname-modal button {
+    .auth-box input {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 2px solid #333;
+      font-size: 16px;
+      margin-bottom: 15px;
+      outline: none;
+      background: #2c2c2c;
+      color: #fff;
+      box-sizing: border-box;
+    }
+
+    .auth-box input:focus {
+      border-color: #3663FF;
+    }
+
+    .auth-box button {
+      width: 100%;
       padding: 12px 24px;
       border-radius: 30px;
       border: none;
@@ -228,20 +264,39 @@
       background: #3663FF;
       color: #fff;
       transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      margin-bottom: 10px;
     }
 
-    .nickname-modal button:hover {
-      transform: translateY(-8px) scale(1.05);
+    .auth-box button:hover {
+      transform: translateY(-4px) scale(1.02);
     }
 
-    .nickname-modal button:active {
+    .auth-box button:active {
       background: #2952CC;
+    }
+
+    .auth-box button.secondary {
+      background: #2c2c2c;
+    }
+
+    .auth-box button.secondary:hover {
+      background: #3c3c3c;
     }
 
     .error-message {
       color: #ff6b6b;
       font-size: 14px;
-      margin-top: 8px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .success-message {
+      color: #00ff00;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-align: center;
     }
 
     /* 게시글 작성 모달 */
@@ -311,6 +366,7 @@
       color: #fff;
       padding: 12px;
       border-radius: 12px;
+      box-sizing: border-box;
     }
 
     .create-modal textarea:focus {
@@ -416,6 +472,7 @@
       font-size: 14px;
       line-height: 1.6;
       color: #fff;
+      white-space: pre-wrap;
     }
 
     .post-time {
@@ -456,6 +513,38 @@
       background: #cc0000;
     }
 
+    /* Footer */
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 30px 20px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin-top: auto;
+    }
+
+    .footer-links {
+      margin-bottom: 15px;
+    }
+
+    .footer-links a {
+      color: #3663FF;
+      text-decoration: none;
+      margin: 0 15px;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #00aaff;
+      text-decoration: underline;
+    }
+
+    .footer-text {
+      color: #666;
+      font-size: 12px;
+    }
+
     @media (max-width: 768px) {
       .sidebar {
         width: 80px;
@@ -493,12 +582,34 @@
   <!-- 헤더 컨테이너 -->
   <div id="header-container"></div>
 
-  <!-- 닉네임 설정 모달 -->
-  <div class="nickname-modal" id="nicknameModal">
-    <h2 id="nicknameModalTitle">✏️ 여기에서 사용할 닉네임을 입력해주세요</h2>
-    <input type="text" id="nicknameInput" placeholder="닉네임" maxlength="20">
-    <div class="error-message" id="errorMessage"></div>
-    <button id="nicknameBtn">확인</button>
+  <!-- 로그인 모달 -->
+  <div class="auth-modal" id="loginModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeLoginModal()">✕</button>
+      <h2>로그인</h2>
+      <input type="text" id="loginId" placeholder="아이디">
+      <input type="password" id="loginPassword" placeholder="비밀번호">
+      <div class="error-message" id="loginError"></div>
+      <div class="success-message" id="loginSuccess"></div>
+      <button onclick="handleLogin()">로그인</button>
+      <button class="secondary" onclick="showSignup()">회원가입</button>
+    </div>
+  </div>
+
+  <!-- 회원가입 모달 -->
+  <div class="auth-modal" id="signupModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeSignupModal()">✕</button>
+      <h2>회원가입</h2>
+      <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
+      <input type="text" id="signupId" placeholder="아이디">
+      <div class="error-message" id="idError"></div>
+      <input type="password" id="signupPassword" placeholder="비밀번호">
+      <div class="error-message" id="signupError"></div>
+      <div class="success-message" id="signupSuccess"></div>
+      <button onclick="handleSignup()">가입</button>
+      <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
+    </div>
   </div>
 
   <!-- 게시글 작성 모달 -->
@@ -533,7 +644,7 @@
         <span class="nav-text">홈</span>
       </div>
       
-      <button class="create-btn" onclick="openCreateModal()">
+      <button class="create-btn" onclick="handleCreatePost()">
         <span>➕</span>
         <span class="btn-text">만들기</span>
       </button>
@@ -554,14 +665,39 @@
     </div>
   </div>
 
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-links">
+      <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
+      <a href="#" onclick="showTerms(); return false;">이용약관</a>
+      <a href="mailto:alexeom97@outlook.com">문의하기</a>
+    </div>
+    <div class="footer-text">
+      © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+    </div>
+  </div>
+
   <!-- 공통 헤더 JavaScript -->
   <script src="header.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, serverTimestamp, remove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+    import { getDatabase, ref, set, push, onValue, serverTimestamp, remove, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
-    const firebaseConfig = {
+    // 계정 정보용 Firebase
+    const accountConfig = {
+      apiKey: "AIzaSyB4WzIgCLIVewUywiKd61rAyIBtl6d0WdU",
+      authDomain: "idsns-6998a.firebaseapp.com",
+      databaseURL: "https://idsns-6998a-default-rtdb.firebaseio.com",
+      projectId: "idsns-6998a",
+      storageBucket: "idsns-6998a.firebasestorage.app",
+      messagingSenderId: "762902581394",
+      appId: "1:762902581394:web:a36c015a1c25f6996cd64b",
+      measurementId: "G-Q81RENZE48"
+    };
+
+    // 게시물용 Firebase
+    const postConfig = {
       apiKey: "AIzaSyAJoRlltz724dHrlcAYo5PwrHCT7ca7OAo",
       authDomain: "abcd-f48c0.firebaseapp.com",
       databaseURL: "https://abcd-f48c0-default-rtdb.firebaseio.com",
@@ -572,62 +708,75 @@
       measurementId: "G-63GJK50HR8"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
+    const accountApp = initializeApp(accountConfig, "accounts");
+    const postApp = initializeApp(postConfig, "posts");
+    const accountDb = getDatabase(accountApp);
+    const postDb = getDatabase(postApp);
 
     const cloudName = 'dretlhsrk';
     const uploadPreset = 'unsigned_preset';
 
-    let currentNickname = localStorage.getItem('snsNickname');
+    let currentUser = null;
     let selectedImage = null;
     let verificationCode = "";
     let isVerifying = false;
 
     // 전역 함수
     window.showFeed = showFeed;
-    window.openCreateModal = openCreateModal;
+    window.handleCreatePost = handleCreatePost;
+    window.closeLoginModal = closeLoginModal;
+    window.closeSignupModal = closeSignupModal;
+    window.showSignup = showSignup;
+    window.backToLogin = backToLogin;
+    window.handleLogin = handleLogin;
+    window.handleSignup = handleSignup;
+    window.showPrivacyPolicy = showPrivacyPolicy;
+    window.showTerms = showTerms;
 
-    // 인증된 정빈777인지 확인
-    function isVerifiedJungbin() {
-      return currentNickname === "정빈777" && localStorage.getItem("jungbin777_verified_sns") === "true";
+    // 로그인 상태 확인
+    const savedUser = localStorage.getItem('snsUser');
+    if (savedUser) {
+      currentUser = JSON.parse(savedUser);
+      updateUserUI();
     }
 
-    // 초기화
-    if (currentNickname) {
-      // 정빈777이 포함된 다른 닉네임 체크
-      if (currentNickname.includes("정빈777") && currentNickname !== "정빈777") {
-        showPermanentError("이 닉네임은 사용할 수 없습니다. 로그아웃 후 다시 닉네임을 바꿔주세요.");
-      }
-      // 정빈777인데 인증 데이터가 없는 경우
-      else if (currentNickname === "정빈777" && !localStorage.getItem("jungbin777_verified_sns")) {
-        showPermanentError("제작자 인증이 불가합니다. 로그아웃 후 다시 시도해주세요.");
-      } else {
-        document.getElementById('nicknameModal').style.display = 'none';
-        document.getElementById('userNickname').innerHTML = currentNickname + (currentNickname === "정빈777" ? '<span class="verification-badge"></span>' : '');
+    // 초기 게시물 로드
+    loadPosts();
+
+    function updateUserUI() {
+      if (currentUser) {
+        const badge = currentUser.nickname === "정빈777" ? '<span class="verification-badge"></span>' : '';
+        document.getElementById('userNickname').innerHTML = currentUser.nickname + badge;
         document.getElementById('userInfo').style.display = 'flex';
-        loadPosts();
       }
     }
 
-    function showPermanentError(message) {
-      const errorDiv = document.createElement("div");
-      errorDiv.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(255, 0, 0, 0.95);
-        color: white;
-        padding: 20px 30px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: bold;
-        z-index: 10000;
-        box-shadow: 0 4px 20px rgba(255, 0, 0, 0.5);
-        text-align: center;
-      `;
-      errorDiv.textContent = message;
-      document.body.appendChild(errorDiv);
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+      document.getElementById('loginId').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginError').textContent = '';
+      document.getElementById('loginSuccess').textContent = '';
+    }
+
+    function closeSignupModal() {
+      document.getElementById('signupModal').classList.remove('active');
+      document.getElementById('signupNickname').value = '';
+      document.getElementById('signupId').value = '';
+      document.getElementById('signupPassword').value = '';
+      document.getElementById('idError').textContent = '';
+      document.getElementById('signupError').textContent = '';
+      document.getElementById('signupSuccess').textContent = '';
+    }
+
+    function showSignup() {
+      closeLoginModal();
+      document.getElementById('signupModal').classList.add('active');
+    }
+
+    function backToLogin() {
+      closeSignupModal();
+      document.getElementById('loginModal').classList.add('active');
     }
 
     // 인증 이메일 발송
@@ -638,12 +787,12 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             access_key: 'ee27178a-2f7b-4153-a2b4-01d5905a1280',
-            subject: '🔐 정빈777 SNS 닉네임 인증 코드',
+            subject: '🔐 정빈777 개발자 인증 코드',
             from_name: '정빈777 SNS',
             to_email: 'alexeom97@outlook.com',
             message: `
 ━━━━━━━━━━━━━━━━━━━━
-  정빈777 닉네임 인증
+  정빈777 개발자 인증
 ━━━━━━━━━━━━━━━━━━━━
 
 요청하신 인증 코드입니다:
@@ -673,75 +822,157 @@
       }
     }
 
-    // 닉네임 설정
-    document.getElementById('nicknameBtn').onclick = async () => {
-      const val = document.getElementById('nicknameInput').value.trim();
-      const errorMsg = document.getElementById('errorMessage');
-      
-      if (!val) {
-        errorMsg.textContent = "닉네임을 입력하세요!";
+    // 로그인 처리
+    async function handleLogin() {
+      const id = document.getElementById('loginId').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const errorDiv = document.getElementById('loginError');
+      const successDiv = document.getElementById('loginSuccess');
+
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+
+      if (!id || !password) {
+        errorDiv.textContent = '아이디와 비밀번호를 입력하세요.';
         return;
       }
-      if (val.length > 20) {
-        errorMsg.textContent = "닉네임은 20자 이하로 입력하세요!";
-        return;
-      }
-      
-      if (val.includes("정빈777") && val !== "정빈777") {
-        errorMsg.textContent = "이 닉네임은 사용할 수 없습니다.";
-        return;
-      }
-      
-      if (val === "정빈777" && !isVerifying) {
-        isVerifying = true;
-        verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        document.getElementById('nicknameInput').placeholder = "인증 코드 6자리";
-        document.getElementById('nicknameInput').value = "";
-        errorMsg.textContent = "";
-        
-        document.getElementById('nicknameModalTitle').textContent = "제작자 이메일로 메일 보냈습니다. 인증번호를 적어주세요";
-        
-        await sendVerificationEmail(verificationCode);
-        console.log("Generated code for 정빈777:", verificationCode);
-        return;
-      }
-      
-      if (isVerifying) {
-        if (val === verificationCode) {
-          currentNickname = "정빈777";
-          localStorage.setItem("snsNickname", currentNickname);
-          localStorage.setItem("jungbin777_verified_sns", "true");
-          document.getElementById('nicknameModal').style.display = 'none';
-          document.getElementById('userNickname').innerHTML = currentNickname + '<span class="verification-badge"></span>';
-          document.getElementById('userInfo').style.display = 'flex';
-          isVerifying = false;
-          errorMsg.textContent = "";
-          loadPosts();
+
+      // 정빈777 개발자 인증
+      if (id === "정빈777" && password === "정빈777") {
+        if (!isVerifying) {
+          isVerifying = true;
+          verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+          
+          document.getElementById('loginId').placeholder = "인증 코드 6자리";
+          document.getElementById('loginId').value = "";
+          document.getElementById('loginPassword').style.display = "none";
+          successDiv.textContent = "제작자 이메일로 인증번호를 보냈습니다.";
+          
+          await sendVerificationEmail(verificationCode);
+          console.log("Generated code for 정빈777:", verificationCode);
+          return;
         } else {
-          errorMsg.textContent = "인증번호가 맞지 않습니다.";
+          if (id === verificationCode) {
+            currentUser = {
+              id: "정빈777",
+              nickname: "정빈777",
+              isVerified: true
+            };
+            localStorage.setItem('snsUser', JSON.stringify(currentUser));
+            updateUserUI();
+            closeLoginModal();
+            isVerifying = false;
+            document.getElementById('loginPassword').style.display = "block";
+            successDiv.textContent = '';
+          } else {
+            errorDiv.textContent = "인증번호가 맞지 않습니다.";
+          }
+          return;
         }
+      }
+
+      // 일반 사용자 로그인
+      try {
+        const userSnapshot = await get(ref(accountDb, `users/${id}`));
+        
+        if (!userSnapshot.exists()) {
+          errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
+          return;
+        }
+
+        const userData = userSnapshot.val();
+        if (userData.password !== password) {
+          errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
+          return;
+        }
+
+        currentUser = {
+          id: id,
+          nickname: userData.nickname,
+          isVerified: false
+        };
+        localStorage.setItem('snsUser', JSON.stringify(currentUser));
+        updateUserUI();
+        closeLoginModal();
+        successDiv.textContent = '';
+      } catch (error) {
+        console.error('로그인 오류:', error);
+        errorDiv.textContent = '로그인에 실패했습니다. 다시 시도해주세요.';
+      }
+    }
+
+    // 회원가입 처리
+    async function handleSignup() {
+      const nickname = document.getElementById('signupNickname').value.trim();
+      const id = document.getElementById('signupId').value.trim();
+      const password = document.getElementById('signupPassword').value.trim();
+      const idErrorDiv = document.getElementById('idError');
+      const errorDiv = document.getElementById('signupError');
+      const successDiv = document.getElementById('signupSuccess');
+
+      idErrorDiv.textContent = '';
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+
+      if (!nickname || !id || !password) {
+        errorDiv.textContent = '모든 필드를 입력하세요.';
         return;
       }
-      
-      currentNickname = val;
-      localStorage.setItem("snsNickname", currentNickname);
-      document.getElementById('nicknameModal').style.display = 'none';
-      document.getElementById('userNickname').textContent = currentNickname;
-      document.getElementById('userInfo').style.display = 'flex';
-      errorMsg.textContent = "";
-      loadPosts();
-    };
+
+      if (nickname.length > 20) {
+        errorDiv.textContent = '닉네임은 20자 이하로 입력하세요.';
+        return;
+      }
+
+      // 정빈777 닉네임 체크
+      if (nickname.includes("정빈777")) {
+        errorDiv.textContent = '이 닉네임은 사용할 수 없습니다.';
+        return;
+      }
+
+      // 아이디 중복 체크
+      try {
+        const userSnapshot = await get(ref(accountDb, `users/${id}`));
+        
+        if (userSnapshot.exists()) {
+          idErrorDiv.textContent = '아이디가 겹치는 사용자가 있습니다.';
+          return;
+        }
+
+        // 회원가입 처리
+        await set(ref(accountDb, `users/${id}`), {
+          nickname: nickname,
+          password: password,
+          createdAt: Date.now()
+        });
+
+        successDiv.textContent = '회원가입이 완료되었습니다!';
+        
+        setTimeout(() => {
+          closeSignupModal();
+          document.getElementById('loginModal').classList.add('active');
+        }, 1500);
+
+      } catch (error) {
+        console.error('회원가입 오류:', error);
+        errorDiv.textContent = '회원가입에 실패했습니다. 다시 시도해주세요.';
+      }
+    }
 
     // 로그아웃
     document.getElementById('logoutBtn').onclick = () => {
-      localStorage.removeItem('snsNickname');
-      localStorage.removeItem('jungbin777_verified_sns');
+      localStorage.removeItem('snsUser');
+      currentUser = null;
+      document.getElementById('userInfo').style.display = 'none';
       location.reload();
     };
 
-    // 모달 관련
-    function openCreateModal() {
+    // 게시글 작성 버튼
+    function handleCreatePost() {
+      if (!currentUser) {
+        document.getElementById('loginModal').classList.add('active');
+        return;
+      }
       document.getElementById('createModal').classList.add('active');
       document.getElementById('postContent').value = '';
       document.getElementById('imagePreview').classList.remove('show');
@@ -803,16 +1034,6 @@
         return;
       }
 
-      // 정빈777 닉네임 체크
-      if (currentNickname.includes("정빈777") && currentNickname !== "정빈777") {
-        alert("이 닉네임은 사용할 수 없습니다. 로그아웃 후 다시 닉네임을 바꿔주세요.");
-        return;
-      }
-      if (currentNickname === "정빈777" && !localStorage.getItem("jungbin777_verified_sns")) {
-        alert("제작자 인증이 불가합니다. 로그아웃 후 다시 시도해주세요.");
-        return;
-      }
-
       postButton.disabled = true;
       messageDiv.innerHTML = '<span style="color: #aaa;">게시 중...</span>';
 
@@ -824,11 +1045,12 @@
           imageUrl = await uploadImageToCloudinary(selectedImage);
         }
 
-        const postsRef = ref(database, 'posts');
+        const postsRef = ref(postDb, 'posts');
         const newPostRef = push(postsRef);
         
         await set(newPostRef, {
-          author: currentNickname,
+          author: currentUser.nickname,
+          authorId: currentUser.id,
           content: content,
           imageUrl: imageUrl,
           timestamp: serverTimestamp()
@@ -856,7 +1078,7 @@
 
     // 게시글 불러오기
     function loadPosts() {
-      const postsRef = ref(database, 'posts');
+      const postsRef = ref(postDb, 'posts');
       
       onValue(postsRef, (snapshot) => {
         const feedDiv = document.getElementById('postsFeed');
@@ -888,7 +1110,9 @@
             `${post.author}<span class="verification-badge"></span>` : 
             post.author;
 
-          const deleteButton = isVerifiedJungbin() ? 
+          // 정빈777만 모든 게시물 삭제 가능
+          const canDelete = currentUser && currentUser.nickname === "정빈777" && currentUser.isVerified;
+          const deleteButton = canDelete ? 
             `<button class="delete-btn" onclick="deletePost('${post.id}')">삭제</button>` : '';
           
           postCard.innerHTML = `
@@ -897,7 +1121,7 @@
               ${deleteButton}
             </div>
             ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="게시글 이미지">` : ''}
-            ${post.content ? `<div class="post-content">${post.content}</div>` : ''}
+            ${post.content ? `<div class="post-content">${escapeHtml(post.content)}</div>` : ''}
             <div class="post-time">${timeStr}</div>
           `;
           
@@ -906,17 +1130,77 @@
       });
     }
 
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
     // 게시글 삭제
     window.deletePost = async (postId) => {
       if (confirm('이 게시물을 삭제하시겠습니까?')) {
         try {
-          await remove(ref(database, `posts/${postId}`));
+          await remove(ref(postDb, `posts/${postId}`));
         } catch (error) {
           console.error('삭제 오류:', error);
           alert('삭제에 실패했습니다.');
         }
       }
     };
+
+    // 개인정보처리방침
+    function showPrivacyPolicy() {
+      alert(`개인정보처리방침
+
+㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
+
+1. 수집하는 개인정보 항목
+- 필수항목: 아이디, 비밀번호, 닉네임
+
+2. 개인정보의 수집 및 이용목적
+- 회원 관리, 서비스 제공, 게시물 관리
+
+3. 개인정보의 보유 및 이용기간
+- 회원 탈퇴 시까지
+
+4. 개인정보 파기절차 및 방법
+- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
+
+5. 이용자의 권리
+- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+
+    // 이용약관
+    function showTerms() {
+      alert(`이용약관
+
+제1조 (목적)
+이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
+
+제2조 (용어의 정의)
+1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
+2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
+
+제3조 (서비스의 제공)
+1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
+2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
+
+제4조 (회원의 의무)
+1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
+2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
+
+제5조 (서비스 이용의 제한)
+운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
   </script>
 </body>
 </html>
