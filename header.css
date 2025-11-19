@@ -1,0 +1,186 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+  background-color: #1e1e1e;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  width: 100px;
+  height: 100px;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+}
+
+/* 상단 버튼 스타일 */
+.top-button {
+  background: #3663FF;
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  white-space: nowrap;
+}
+
+.top-button:hover {
+  transform: translateY(-8px) scale(1.05);
+}
+
+.top-button:active {
+  background: #2952CC;
+}
+
+/* 햄버거 버튼 */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  display: block;
+  height: 4px;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* 메뉴 열릴 때 햄버거 → X로 변환 */
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translateY(9px);
+}
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-9px);
+}
+
+/* 모바일 모드 */
+@media (max-width: 800px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  nav {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    background-color: #1e1e1e;
+    align-items: center;
+    gap: 15px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  nav.active {
+    max-height: 500px;
+    opacity: 1;
+  }
+
+  .top-button {
+    width: 80%;
+  }
+}
+  padding: 12px 24px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  white-space: nowrap;
+}
+
+.top-button:hover {
+  transform: translateY(-8px) scale(1.05);
+}
+
+.top-button:active {
+  background: #2952CC;
+}
+
+/* 햄버거 버튼 */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  display: block;
+  height: 4px;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* 메뉴 열릴 때 햄버거 → X로 변환 */
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translateY(9px);
+}
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-9px);
+}
+
+/* 모바일 모드 */
+@media (max-width: 800px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  nav {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    background-color: #1e1e1e;
+    align-items: center;
+    gap: 15px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  nav.active {
+    max-height: 500px;
+    opacity: 1;
+  }
+
+  .top-button {
+    width: 80%;
+  }
+}
