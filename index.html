@@ -913,13 +913,15 @@
       const nickname = document.getElementById('signupNickname').value.trim();
       const id = document.getElementById('signupId').value.trim();
       const password = document.getElementById('signupPassword').value.trim();
-      const idErrorDiv = document.getElementById('idError');
+	      const idErrorDiv = document.getElementById('idError');
+	      const nicknameErrorDiv = document.getElementById('nicknameError');
       const errorDiv = document.getElementById('signupError');
       const successDiv = document.getElementById('signupSuccess');
 
-      idErrorDiv.textContent = '';
-      errorDiv.textContent = '';
-      successDiv.textContent = '';
+	      idErrorDiv.textContent = '';
+	      errorDiv.textContent = '';
+	      successDiv.textContent = '';
+	      nicknameErrorDiv.textContent = ''; // 닉네임 에러 메시지 초기화 추가
 
       if (!nickname || !id || !password) {
         errorDiv.textContent = '모든 필드를 입력하세요.';
@@ -945,10 +947,10 @@
             }
           });
 
-          if (isNicknameDuplicate) {
-            document.getElementById('nicknameError').textContent = '겹치는 닉네임이 있습니다.';
-            return;
-          }
+	          if (isNicknameDuplicate) {
+	            nicknameErrorDiv.textContent = '겹치는 닉네임이 있습니다.';
+	            return;
+	          }
         }
       } catch (error) {
         console.error('닉네임 중복 확인 오류:', error);
