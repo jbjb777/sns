@@ -690,7 +690,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-	    import { getDatabase, ref, set, push, onValue, serverTimestamp, remove, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+	    import { getDatabase, ref, set, push, onValue, serverTimestamp, remove, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
     // 계정 정보용 Firebase
     const accountConfig = {
@@ -933,13 +933,22 @@
 
       // 닉네임 중복 체크
       try {
-        const nicknameSnapshot = await get(query(ref(accountDb, 'users'), orderByChild('nickname'), equalTo(nickname)));
+        const usersSnapshot = await get(ref(accountDb, 'users'));
         
-        if (nicknameSnapshot.exists()) {
-          // 닉네임이 이미 존재하는 경우, 현재 로그인하려는 사용자의 ID와 닉네임이 일치하는지 확인하는 복잡한 로직은 필요 없으므로 단순하게 처리
-          // 닉네임 중복 오류 메시지를 표시할 div가 필요함. HTML에서 'nicknameError'를 사용하도록 되어 있음.
-          document.getElementById('nicknameError').textContent = '겹치는 닉네임이 있습니다.';
-          return;
+        if (usersSnapshot.exists()) {
+          let isNicknameDuplicate = false;
+          usersSnapshot.forEach((childSnapshot) => {
+            const userData = childSnapshot.val();
+            if (userData.nickname === nickname) {
+              isNicknameDuplicate = true;
+              return true; // forEach 루프 중단
+            }
+          });
+
+          if (isNicknameDuplicate) {
+            document.getElementById('nicknameError').textContent = '겹치는 닉네임이 있습니다.';
+            return;
+          }
         }
       } catch (error) {
         console.error('닉네임 중복 확인 오류:', error);
