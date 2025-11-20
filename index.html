@@ -26,37 +26,41 @@
   <link rel="stylesheet" href="header.css">
 
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+	    body {
+	      margin: 0;
+	      padding: 0;
+	      font-family: 'Segoe UI', sans-serif;
+	      background: #121212;
+	      color: #fff;
+	      display: flex;
+	      flex-direction: column;
+	      min-height: 100vh;
+	      /* 화면 잘림 오류 수정: body에 min-height: 100vh를 유지하고,
+	         메인 컨텐츠가 스크롤되도록 하는 대신 body 전체가 스크롤되도록 구조를 수정합니다. */
+	    }
 
-    .container {
-      display: flex;
-      height: calc(100vh - 60px);
-      margin-top: 60px;
-    }
+	    .container {
+	      display: flex;
+	      /* height: calc(100vh - 60px); - 이 부분을 제거하여 내용 길이에 따라 유연하게 늘어나도록 함 */
+	      flex: 1; /* 메인 컨텐츠가 footer 위에 위치하도록 flex 속성 추가 */
+	      margin-top: 60px;
+	    }
 
     /* 사이드바 */
-    .sidebar {
-      width: 250px;
-      background: #1e1e1e;
-      border-right: 1px solid #333;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      height: calc(100vh - 60px);
-      left: 0;
-      top: 60px;
-      overflow-y: auto;
-    }
+	    .sidebar {
+	      width: 250px;
+	      background: #1e1e1e;
+	      border-right: 1px solid #333;
+	      padding: 20px;
+	      display: flex;
+	      flex-direction: column;
+	      position: fixed;
+	      height: calc(100vh - 60px);
+	      left: 0;
+	      top: 60px;
+	      overflow-y: auto;
+	      z-index: 500; /* 헤더와 겹치지 않도록 z-index 추가 */
+	    }
 
     .logo {
       font-size: 28px;
@@ -161,14 +165,14 @@
     }
 
     /* 메인 컨텐츠 */
-    .main-content {
-      margin-left: 250px;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-      overflow-y: auto;
-    }
+	    .main-content {
+	      margin-left: 250px;
+	      flex: 1;
+	      display: flex;
+	      justify-content: center;
+	      padding: 20px;
+	      /* overflow-y: auto; - 이 부분을 제거하여 body의 스크롤을 사용하도록 함 */
+	    }
 
     .feed-container {
       max-width: 600px;
@@ -514,15 +518,16 @@
     }
 
     /* Footer */
-    .footer {
-      background: #1e1e1e;
-      border-top: 1px solid #333;
-      padding: 30px 20px;
-      text-align: center;
-      color: #aaa;
-      font-size: 14px;
-      margin-top: auto;
-    }
+	    .footer {
+	      background: #1e1e1e;
+	      border-top: 1px solid #333;
+	      padding: 30px 20px;
+	      text-align: center;
+	      color: #aaa;
+	      font-size: 14px;
+	      margin-top: auto;
+	      /* 화면 잘림 오류 수정: footer가 항상 맨 아래에 위치하도록 margin-top: auto 유지 */
+	    }
 
     .footer-links {
       margin-bottom: 15px;
@@ -545,11 +550,13 @@
       font-size: 12px;
     }
 
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 80px;
-        padding: 10px;
-      }
+	    @media (max-width: 768px) {
+	      .sidebar {
+	        width: 80px;
+	        padding: 10px;
+	        /* 모바일에서 사이드바가 닫히지 않도록 z-index 유지 */
+	        z-index: 500;
+	      }
 
       .logo {
         font-size: 20px;
@@ -683,7 +690,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, serverTimestamp, remove, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+	    import { getDatabase, ref, set, push, onValue, serverTimestamp, remove, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
     // 계정 정보용 Firebase
     const accountConfig = {
@@ -872,8 +879,7 @@
         }
       }
 
-      // 일반 사용자 로그인
-      try {
+       // 아이디 중복 체크
         const userSnapshot = await get(ref(accountDb, `users/${id}`));
         
         if (!userSnapshot.exists()) {
@@ -925,6 +931,22 @@
         return;
       }
 
+      // 닉네임 중복 체크
+      try {
+        const nicknameSnapshot = await get(query(ref(accountDb, 'users'), orderByChild('nickname'), equalTo(nickname)));
+        
+        if (nicknameSnapshot.exists()) {
+          // 닉네임이 이미 존재하는 경우, 현재 로그인하려는 사용자의 ID와 닉네임이 일치하는지 확인하는 복잡한 로직은 필요 없으므로 단순하게 처리
+          // 닉네임 중복 오류 메시지를 표시할 div가 필요함. HTML에서 'nicknameError'를 사용하도록 되어 있음.
+          document.getElementById('nicknameError').textContent = '겹치는 닉네임이 있습니다.';
+          return;
+        }
+      } catch (error) {
+        console.error('닉네임 중복 확인 오류:', error);
+        errorDiv.textContent = '닉네임 중복 확인 중 오류가 발생했습니다.';
+        return;
+      }
+
       // 정빈777 닉네임 체크
       if (nickname.includes("정빈777")) {
         errorDiv.textContent = '이 닉네임은 사용할 수 없습니다.';
@@ -932,7 +954,6 @@
       }
 
       // 아이디 중복 체크
-      try {
         const userSnapshot = await get(ref(accountDb, `users/${id}`));
         
         if (userSnapshot.exists()) {
