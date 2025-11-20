@@ -39,8 +39,9 @@
 
     .container {
       display: flex;
-      height: calc(100vh - 60px);
-      margin-top: 60px;
+      /* height: calc(100vh - 60px); REMOVED: 콘텐츠 잘림 방지 */
+      /* margin-top: 60px; MOVED to .main-content */
+      flex-grow: 1; /* 추가 */
     }
 
     /* 사이드바 */
@@ -168,6 +169,7 @@
       justify-content: center;
       padding: 20px;
       overflow-y: auto;
+      margin-top: 60px; /* ADDED: 헤더 아래에 콘텐츠 시작 */
     }
 
     .feed-container {
@@ -579,10 +581,8 @@
   </style>
 </head>
 <body>
-  <!-- 헤더 컨테이너 -->
   <div id="header-container"></div>
 
-  <!-- 로그인 모달 -->
   <div class="auth-modal" id="loginModal">
     <div class="auth-box">
       <button class="auth-close" onclick="closeLoginModal()">✕</button>
@@ -596,14 +596,12 @@
     </div>
   </div>
 
-  <!-- 회원가입 모달 -->
   <div class="auth-modal" id="signupModal">
     <div class="auth-box">
       <button class="auth-close" onclick="closeSignupModal()">✕</button>
       <h2>회원가입</h2>
       <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
-      <div class="error-message" id="nicknameError"></div>
-      <input type="text" id="signupId" placeholder="아이디">
+      <div class="error-message" id="nicknameError"></div> <input type="text" id="signupId" placeholder="아이디">
       <div class="error-message" id="idError"></div>
       <input type="password" id="signupPassword" placeholder="비밀번호">
       <div class="error-message" id="signupError"></div>
@@ -613,7 +611,6 @@
     </div>
   </div>
 
-  <!-- 게시글 작성 모달 -->
   <div class="create-modal" id="createModal">
     <div class="create-modal-content">
       <div class="create-modal-header">
@@ -636,7 +633,6 @@
   </div>
 
   <div class="container">
-    <!-- 사이드바 -->
     <div class="sidebar">
       <div class="logo">📱 MySNS</div>
       
@@ -656,7 +652,6 @@
       </div>
     </div>
 
-    <!-- 메인 컨텐츠 -->
     <div class="main-content">
       <div class="feed-container">
         <div id="postsFeed">
@@ -666,7 +661,6 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <div class="footer">
     <div class="footer-links">
       <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
@@ -678,7 +672,6 @@
     </div>
   </div>
 
-  <!-- 공통 헤더 JavaScript -->
   <script src="header.js"></script>
 
   <script type="module">
@@ -766,6 +759,7 @@
       document.getElementById('signupId').value = '';
       document.getElementById('signupPassword').value = '';
       document.getElementById('idError').textContent = '';
+      document.getElementById('nicknameError').textContent = ''; // ADDED: 닉네임 에러 초기화
       document.getElementById('signupError').textContent = '';
       document.getElementById('signupSuccess').textContent = '';
     }
@@ -863,6 +857,7 @@
             updateUserUI();
             closeLoginModal();
             isVerifying = false;
+            document.getElementById('loginId').placeholder = "아이디"; // Placeholder 복구
             document.getElementById('loginPassword').style.display = "block";
             successDiv.textContent = '';
           } else {
@@ -908,10 +903,12 @@
       const id = document.getElementById('signupId').value.trim();
       const password = document.getElementById('signupPassword').value.trim();
       const idErrorDiv = document.getElementById('idError');
+      const nicknameErrorDiv = document.getElementById('nicknameError'); // ADDED
       const errorDiv = document.getElementById('signupError');
       const successDiv = document.getElementById('signupSuccess');
 
       idErrorDiv.textContent = '';
+      nicknameErrorDiv.textContent = ''; // ADDED
       errorDiv.textContent = '';
       successDiv.textContent = '';
 
@@ -921,22 +918,43 @@
       }
 
       if (nickname.length > 20) {
-        errorDiv.textContent = '닉네임은 20자 이하로 입력하세요.';
+        nicknameErrorDiv.textContent = '닉네임은 20자 이하로 입력하세요.';
         return;
       }
 
       // 정빈777 닉네임 체크
       if (nickname.includes("정빈777")) {
-        errorDiv.textContent = '이 닉네임은 사용할 수 없습니다.';
+        nicknameErrorDiv.textContent = '이 닉네임은 사용할 수 없습니다.';
         return;
       }
 
-      // 아이디 중복 체크
+      // 아이디 및 닉네임 중복 체크
       try {
-        const userSnapshot = await get(ref(accountDb, `users/${id}`));
-        
-        if (userSnapshot.exists()) {
+        const usersSnapshot = await get(ref(accountDb, `users`));
+        const usersData = usersSnapshot.val() || {};
+        let isIdDuplicate = false;
+        let isNicknameDuplicate = false;
+
+        // 아이디 중복 체크
+        if (usersData[id]) {
+          isIdDuplicate = true;
+        }
+
+        // 닉네임 중복 체크 (모든 사용자 순회)
+        for (const userId in usersData) {
+          if (usersData[userId].nickname === nickname) {
+            isNicknameDuplicate = true;
+            break;
+          }
+        }
+
+        if (isIdDuplicate) {
           idErrorDiv.textContent = '아이디가 겹치는 사용자가 있습니다.';
+          return;
+        }
+
+        if (isNicknameDuplicate) {
+          nicknameErrorDiv.textContent = '겹치는 닉네임이 있습니다.'; // MODIFIED: 닉네임 중복 메시지
           return;
         }
 
