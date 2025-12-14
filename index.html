@@ -664,7 +664,7 @@
           <path fill="url(#linearGradient1)" d="M 2000 1000 C 2000 448 1552 0 1000 0 C 448 0 0 448 0 1000 C 0 1552 448 2000 1000 2000 C 1552 2000 2000 1552 2000 1000 Z"/>
           <path fill="#fff" filter="url(#filter1)" d="M 1137 506 C 1252 449 1369 497 1427 625 L 1459 696 C 1484 752 1488 821 1471 878 L 1472 877 C 1535 891 1581 939 1608 997 L 1632 1052 C 1698 1199 1657 1324 1544 1381 L 1175 1565 L 972 1114 C 1002 1241 946 1377 834 1433 L 776 1462 C 654 1523 518 1467 449 1343 L 596 1269 C 625 1309 663 1331 708 1308 L 758 1283 C 813 1256 830 1185 802 1124 L 525 509 L 672 435 L 784 683 L 1137 506 Z M 1444 1232 C 1488 1210 1504 1149 1480 1095 L 1476 1085 C 1452 1033 1397 1007 1353 1029 L 1151 1130 L 1242 1333 L 1444 1232 Z M 1184 679 L 991 775 L 1084 981 L 1276 885 C 1319 864 1336 802 1312 749 L 1306 736 C 1283 684 1226 658 1184 679 Z"/>
         </svg>
-        <span class="logo-text">㋡꧁정빈777꧂</span>
+        <span class="logo-text">정빈777</span>
       </div>
       
       <div class="nav-item active" onclick="showFeed()">
@@ -744,15 +744,105 @@
     let verificationCode = "";
     let isVerifying = false;
 
-    // 전역 함수
+    // 전역 함수 선언
+    function showFeed() {
+      loadPosts();
+    }
+
+    function handleCreatePost() {
+      if (!currentUser) {
+        document.getElementById('loginModal').classList.add('active');
+        return;
+      }
+      document.getElementById('createModal').classList.add('active');
+      document.getElementById('postContent').value = '';
+      document.getElementById('imagePreview').classList.remove('show');
+      selectedImage = null;
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+      document.getElementById('loginId').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginError').textContent = '';
+      document.getElementById('loginSuccess').textContent = '';
+    }
+
+    function closeSignupModal() {
+      document.getElementById('signupModal').classList.remove('active');
+      document.getElementById('signupNickname').value = '';
+      document.getElementById('signupId').value = '';
+      document.getElementById('signupPassword').value = '';
+      document.getElementById('idError').textContent = '';
+      document.getElementById('nicknameError').textContent = '';
+      document.getElementById('signupError').textContent = '';
+      document.getElementById('signupSuccess').textContent = '';
+    }
+
+    function showSignup() {
+      closeLoginModal();
+      document.getElementById('signupModal').classList.add('active');
+    }
+
+    function backToLogin() {
+      closeSignupModal();
+      document.getElementById('loginModal').classList.add('active');
+    }
+
+    function showPrivacyPolicy() {
+      alert(`개인정보처리방침
+
+㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
+
+1. 수집하는 개인정보 항목
+- 필수항목: 아이디, 비밀번호, 닉네임
+
+2. 개인정보의 수집 및 이용목적
+- 회원 관리, 서비스 제공, 게시물 관리
+
+3. 개인정보의 보유 및 이용기간
+- 회원 탈퇴 시까지
+
+4. 개인정보 파기절차 및 방법
+- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
+
+5. 이용자의 권리
+- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+
+    function showTerms() {
+      alert(`이용약관
+
+제1조 (목적)
+이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
+
+제2조 (용어의 정의)
+1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
+2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
+
+제3조 (서비스의 제공)
+1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
+2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
+
+제4조 (회원의 의무)
+1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
+2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
+
+제5조 (서비스 이용의 제한)
+운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+
+    // 전역 함수 등록
     window.showFeed = showFeed;
     window.handleCreatePost = handleCreatePost;
     window.closeLoginModal = closeLoginModal;
     window.closeSignupModal = closeSignupModal;
     window.showSignup = showSignup;
     window.backToLogin = backToLogin;
-    window.handleLogin = handleLogin;
-    window.handleSignup = handleSignup;
     window.showPrivacyPolicy = showPrivacyPolicy;
     window.showTerms = showTerms;
 
@@ -847,7 +937,7 @@
     }
 
     // 로그인 처리
-    async function handleLogin() {
+    window.handleLogin = async function() {
       const id = document.getElementById('loginId').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
       const errorDiv = document.getElementById('loginError');
@@ -927,7 +1017,7 @@
     }
 
     // 회원가입 처리
-    async function handleSignup() {
+    window.handleSignup = async function() {
       const nickname = document.getElementById('signupNickname').value.trim();
       const id = document.getElementById('signupId').value.trim();
       const password = document.getElementById('signupPassword').value.trim();
@@ -1200,55 +1290,6 @@
         }
       }
     };
-
-    // 개인정보처리방침
-    function showPrivacyPolicy() {
-      alert(`개인정보처리방침
-
-㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
-
-1. 수집하는 개인정보 항목
-- 필수항목: 아이디, 비밀번호, 닉네임
-
-2. 개인정보의 수집 및 이용목적
-- 회원 관리, 서비스 제공, 게시물 관리
-
-3. 개인정보의 보유 및 이용기간
-- 회원 탈퇴 시까지
-
-4. 개인정보 파기절차 및 방법
-- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
-
-5. 이용자의 권리
-- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
-
-문의사항: alexeom97@outlook.com`);
-    }
-
-    // 이용약관
-    function showTerms() {
-      alert(`이용약관
-
-제1조 (목적)
-이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
-
-제2조 (용어의 정의)
-1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
-2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
-
-제3조 (서비스의 제공)
-1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
-2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
-
-제4조 (회원의 의무)
-1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
-2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
-
-제5조 (서비스 이용의 제한)
-운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
-
-문의사항: alexeom97@outlook.com`);
-    }
   </script>
 </body>
 </html>
