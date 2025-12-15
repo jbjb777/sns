@@ -1119,12 +1119,12 @@
           
           const timeStr = post.timestamp ? new Date(post.timestamp).toLocaleString('ko-KR') : '방금 전';
           
-          const isVerified = post.author === "정빈777";
+          const isVerified = post.author === "JB777";
           const authorDisplay = isVerified ? 
             `${post.author}<span class="verification-badge"></span>` : 
             post.author;
 
-          const canDelete = currentUser && currentUser.nickname === "정빈777" && currentUser.isVerified;
+          const canDelete = currentUser && currentUser.nickname === "JB777" && currentUser.isVerified;
           const deleteButton = canDelete ? 
             `<button class="delete-btn" onclick="deletePost('${post.id}')">삭제</button>` : '';
           
