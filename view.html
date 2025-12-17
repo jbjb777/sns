@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시물 - ㋡꧁정빈777꧂ SNS</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 2000 2000">
+  <defs>
+    <linearGradient id="linearGradient1" x1="1576.7" y1="1817" x2="423.3" y2="183" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="%233478f6" />
+      <stop offset="1" stop-color="%2353b6f9" />
+    </linearGradient>
+    <filter id="filter1" x="0" y="0" width="2000" height="2000" color-interpolation-filters="sRGB">
+      <feFlood flood-color="%23000000" flood-opacity="0.52" />
+      <feComposite in2="SourceGraphic" operator="out" />
+      <feGaussianBlur stdDeviation="43" />
+      <feOffset dx="35" dy="24" />
+      <feComposite in2="SourceGraphic" operator="atop" />
+    </filter>
+  </defs>
+  <path fill="url(%23linearGradient1)" d="M 2000 1000 C 2000 448 1552 0 1000 0 C 448 0 0 448 0 1000 C 0 1552 448 2000 1000 2000 C 1552 2000 2000 1552 2000 1000 Z"/>
+  <path fill="%23fff" filter="url(%23filter1)" d="M 1137 506 C 1252 449 1369 497 1427 625 L 1459 696 C 1484 752 1488 821 1471 878 L 1472 877 C 1535 891 1581 939 1608 997 L 1632 1052 C 1698 1199 1657 1324 1544 1381 L 1175 1565 L 972 1114 C 1002 1241 946 1377 834 1433 L 776 1462 C 654 1523 518 1467 449 1343 L 596 1269 C 625 1309 663 1331 708 1308 L 758 1283 C 813 1256 830 1185 802 1124 L 525 509 L 672 435 L 784 683 L 1137 506 Z M 1444 1232 C 1488 1210 1504 1149 1480 1095 L 1476 1085 C 1452 1033 1397 1007 1353 1029 L 1151 1130 L 1242 1333 L 1444 1232 Z M 1184 679 L 991 775 L 1084 981 L 1276 885 C 1319 864 1336 802 1312 749 L 1306 736 C 1283 684 1226 658 1184 679 Z"/>
+</svg>' />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    .back-btn:hover {
+      transform: translateX(-4px);
+      color: #3663FF;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      flex: 1;
+    }
+
+    .post-detail-card {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .post-detail-header {
+      padding: 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .author-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .author-name {
+      font-weight: 600;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .post-timestamp {
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    .verification-badge {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    .delete-btn {
+      background: #ff4444;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .delete-btn:hover {
+      background: #cc0000;
+      transform: translateY(-2px);
+    }
+
+    .post-detail-image {
+      width: 100%;
+      max-height: 700px;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .post-detail-content {
+      padding: 24px;
+    }
+
+    .post-text {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #fff;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: 20px;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #333;
+      border-top-color: #3663FF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: #aaa;
+      font-size: 16px;
+    }
+
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: 20px;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .error-icon {
+      font-size: 64px;
+    }
+
+    .error-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .error-message {
+      font-size: 16px;
+      color: #aaa;
+    }
+
+    .home-btn {
+      background: #3663FF;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .home-btn:hover {
+      background: #2952CC;
+      transform: translateY(-4px);
+    }
+
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 30px 20px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin-top: auto;
+    }
+
+    .footer-links {
+      margin-bottom: 15px;
+    }
+
+    .footer-links a {
+      color: #3663FF;
+      text-decoration: none;
+      margin: 0 15px;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #00aaff;
+      text-decoration: underline;
+    }
+
+    .footer-text {
+      color: #666;
+      font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+
+      .post-detail-header {
+        padding: 16px;
+      }
+
+      .post-detail-content {
+        padding: 20px;
+      }
+
+      .author-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+
+      .author-name {
+        font-size: 15px;
+      }
+
+      .post-text {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div class="header-title">게시물</div>
+  </div>
+
+  <div class="container">
+    <div id="postContent">
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">게시물을 불러오는 중...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
+      <a href="#" onclick="showTerms(); return false;">이용약관</a>
+      <a href="mailto:alexeom97@outlook.com">문의하기</a>
+    </div>
+    <div class="footer-text">
+      © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+
+    const postConfig = {
+      apiKey: "AIzaSyAJoRlltz724dHrlcAYo5PwrHCT7ca7OAo",
+      authDomain: "abcd-f48c0.firebaseapp.com",
+      databaseURL: "https://abcd-f48c0-default-rtdb.firebaseio.com",
+      projectId: "abcd-f48c0",
+      storageBucket: "abcd-f48c0.firebasestorage.app",
+      messagingSenderId: "591387508866",
+      appId: "1:591387508866:web:ddf43ef96d03c44861f49b",
+      measurementId: "G-63GJK50HR8"
+    };
+
+    const postApp = initializeApp(postConfig, "posts");
+    const postDb = getDatabase(postApp);
+
+    let currentUser = null;
+    const savedUser = localStorage.getItem('snsUser');
+    if (savedUser) {
+      currentUser = JSON.parse(savedUser);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('id');
+
+    if (!postId) {
+      showError('게시물 ID가 없습니다.');
+    } else {
+      loadPost(postId);
+    }
+
+    async function loadPost(postId) {
+      try {
+        const postRef = ref(postDb, `posts/${postId}`);
+        const snapshot = await get(postRef);
+
+        if (!snapshot.exists()) {
+          showError('게시물을 찾을 수 없습니다.');
+          return;
+        }
+
+        const post = snapshot.val();
+        displayPost(post, postId);
+
+      } catch (error) {
+        console.error('게시물 로드 오류:', error);
+        showError('게시물을 불러오는 중 오류가 발생했습니다.');
+      }
+    }
+
+    function displayPost(post, postId) {
+      const contentDiv = document.getElementById('postContent');
+      const timeStr = post.timestamp ? new Date(post.timestamp).toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : '방금 전';
+
+      const isVerified = post.author === "JB777";
+      const authorBadge = isVerified ? '<span class="verification-badge"></span>' : '';
+      
+      const canDelete = currentUser && currentUser.nickname === "JB777" && currentUser.isVerified;
+      const deleteButton = canDelete ? 
+        `<button class="delete-btn" onclick="deletePost('${postId}')">삭제</button>` : '';
+
+      const firstLetter = post.author ? post.author.charAt(0).toUpperCase() : '?';
+
+      contentDiv.innerHTML = `
+        <div class="post-detail-card">
+          <div class="post-detail-header">
+            <div class="author-info">
+              <div class="author-avatar">${firstLetter}</div>
+              <div class="author-details">
+                <div class="author-name">
+                  ${escapeHtml(post.author)}
+                  ${authorBadge}
+                </div>
+                <div class="post-timestamp">${timeStr}</div>
+              </div>
+            </div>
+            ${deleteButton}
+          </div>
+          ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-detail-image" alt="게시글 이미지">` : ''}
+          ${post.content ? `
+            <div class="post-detail-content">
+              <div class="post-text">${escapeHtml(post.content)}</div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      const contentDiv = document.getElementById('postContent');
+      contentDiv.innerHTML = `
+        <div class="error-container">
+          <div class="error-icon">😕</div>
+          <div class="error-title">게시물을 불러올 수 없습니다</div>
+          <div class="error-message">${escapeHtml(message)}</div>
+          <button class="home-btn" onclick="goToHome()">홈으로 돌아가기</button>
+        </div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    window.goBack = function() {
+      if (document.referrer && document.referrer.includes(window.location.origin)) {
+        window.history.back();
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
+    window.goToHome = function() {
+      window.location.href = 'index.html';
+    }
+
+    window.deletePost = async function(postId) {
+      if (!confirm('이 게시물을 삭제하시겠습니까?')) {
+        return;
+      }
+
+      try {
+        await remove(ref(postDb, `posts/${postId}`));
+        alert('게시물이 삭제되었습니다.');
+        window.location.href = 'index.html';
+      } catch (error) {
+        console.error('삭제 오류:', error);
+        alert('삭제에 실패했습니다.');
+      }
+    }
+
+    window.showPrivacyPolicy = function() {
+      alert(`개인정보처리방침
+
+㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
+
+1. 수집하는 개인정보 항목
+- 필수항목: 아이디, 비밀번호, 닉네임
+
+2. 개인정보의 수집 및 이용목적
+- 회원 관리, 서비스 제공, 게시물 관리
+
+3. 개인정보의 보유 및 이용기간
+- 회원 탈퇴 시까지
+
+4. 개인정보 파기절차 및 방법
+- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
+
+5. 이용자의 권리
+- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+
+    window.showTerms = function() {
+      alert(`이용약관
+
+제1조 (목적)
+이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
+
+제2조 (용어의 정의)
+1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
+2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
+
+제3조 (서비스의 제공)
+1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
+2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
+
+제4조 (회원의 의무)
+1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
+2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
+
+제5조 (서비스 이용의 제한)
+운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+  </script>
+</body>
+</html>
