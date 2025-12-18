@@ -339,7 +339,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+    import { getDatabase, ref, get, remove, set, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
     const postConfig = {
       apiKey: "AIzaSyAJoRlltz724dHrlcAYo5PwrHCT7ca7OAo",
@@ -356,6 +356,7 @@
     const postDb = getDatabase(postApp);
 
     let currentUser = null;
+    let currentPostId = null;
     const savedUser = localStorage.getItem('snsUser');
     if (savedUser) {
       currentUser = JSON.parse(savedUser);
@@ -363,11 +364,15 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
+    currentPostId = postId;
 
     if (!postId) {
       showError('게시물 ID가 없습니다.');
     } else {
       loadPost(postId);
+      if (currentUser) {
+        setupLikeListener(postId);
+      }
     }
 
     async function loadPost(postId) {
@@ -388,6 +393,63 @@
         showError('게시물을 불러오는 중 오류가 발생했습니다.');
       }
     }
+
+    function setupLikeListener(postId) {
+      const likesRef = ref(postDb, `posts/${postId}/likes`);
+      onValue(likesRef, (snapshot) => {
+        const likes = snapshot.val() || {};
+        updateLikeButton(likes);
+      });
+    }
+
+    function updateLikeButton(likes) {
+      const likeBtn = document.getElementById('likeBtn');
+      const likeCount = document.getElementById('likeCount');
+      
+      if (!likeBtn || !likeCount) return;
+
+      const likesArray = Object.keys(likes);
+      const totalLikes = likesArray.length;
+      const userLiked = currentUser && likesArray.includes(currentUser.id);
+
+      likeCount.textContent = totalLikes;
+      
+      if (userLiked) {
+        likeBtn.classList.add('liked');
+        likeBtn.querySelector('.like-icon').textContent = '❤️';
+      } else {
+        likeBtn.classList.remove('liked');
+        likeBtn.querySelector('.like-icon').textContent = '🤍';
+      }
+    }
+
+    async function toggleLike() {
+      if (!currentUser) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      try {
+        const likeRef = ref(postDb, `posts/${currentPostId}/likes/${currentUser.id}`);
+        const snapshot = await get(likeRef);
+
+        if (snapshot.exists()) {
+          // 좋아요 취소
+          await set(likeRef, null);
+        } else {
+          // 좋아요 추가
+          await set(likeRef, {
+            nickname: currentUser.nickname,
+            timestamp: Date.now()
+          });
+        }
+      } catch (error) {
+        console.error('좋아요 오류:', error);
+        alert('좋아요 처리에 실패했습니다.');
+      }
+    }
+
+    window.toggleLike = toggleLike;
 
     function displayPost(post, postId) {
       const contentDiv = document.getElementById('postContent');
@@ -414,6 +476,15 @@
 
       const firstLetter = post.author ? post.author.charAt(0).toUpperCase() : '?';
 
+      // 좋아요 수 계산
+      const likes = post.likes || {};
+      const likesArray = Object.keys(likes);
+      const totalLikes = likesArray.length;
+      const userLiked = currentUser && likesArray.includes(currentUser.id);
+      const likeIcon = userLiked ? '❤️' : '🤍';
+      const likedClass = userLiked ? 'liked' : '';
+      const likeDisabled = !currentUser ? 'disabled' : '';
+
       contentDiv.innerHTML = `
         <div class="post-detail-card">
           <div class="post-detail-header">
@@ -435,6 +506,13 @@
               <div class="post-text">${escapeHtml(post.content)}</div>
             </div>
           ` : ''}
+          <div class="post-actions">
+            <button class="like-btn ${likedClass}" id="likeBtn" onclick="toggleLike()" ${likeDisabled}>
+              <span class="like-icon">${likeIcon}</span>
+              <span>좋아요</span>
+            </button>
+            <span class="like-count"><span id="likeCount">${totalLikes}</span>명이 좋아합니다</span>
+          </div>
         </div>
       `;
     }
