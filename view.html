@@ -394,6 +394,7 @@
     function updateLikeButton(likes) {
       const likeBtn = document.getElementById('likeBtn');
       const likeCount = document.getElementById('likeCount');
+      const likeIcon = likeBtn ? likeBtn.querySelector('.like-icon') : null;
       
       if (!likeBtn || !likeCount) return;
 
@@ -405,10 +406,10 @@
       
       if (userLiked) {
         likeBtn.classList.add('liked');
-        likeBtn.querySelector('.like-icon').textContent = '❤️';
+        if (likeIcon) likeIcon.textContent = '❤️';
       } else {
         likeBtn.classList.remove('liked');
-        likeBtn.querySelector('.like-icon').textContent = '🤍';
+        if (likeIcon) likeIcon.textContent = '🤍';
       }
     }
 
