@@ -98,6 +98,12 @@
       justify-content: space-between;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .author-info {
       display: flex;
       align-items: center;
@@ -498,7 +504,13 @@
                 <div class="post-timestamp">${timeStr}</div>
               </div>
             </div>
-            ${deleteButton}
+            <div class="header-actions">
+              <button class="like-btn ${likedClass}" id="likeBtn" onclick="toggleLike()" ${likeDisabled}>
+                <span class="like-icon">${likeIcon}</span>
+                <span>좋아요: <span id="likeCount">${totalLikes}</span></span>
+              </button>
+              ${deleteButton}
+            </div>
           </div>
           ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-detail-image" alt="게시글 이미지">` : ''}
           ${post.content ? `
@@ -506,12 +518,6 @@
               <div class="post-text">${escapeHtml(post.content)}</div>
             </div>
           ` : ''}
-          <div class="post-actions">
-            <button class="like-btn ${likedClass}" id="likeBtn" onclick="toggleLike()" ${likeDisabled}>
-              <span class="like-icon">${likeIcon}</span>
-            </button>
-            <span class="like-count"><span id="likeCount">${totalLikes}</span></span>
-          </div>
         </div>
       `;
     }
