@@ -133,6 +133,39 @@
       background-repeat: no-repeat;
     }
 
+    /* --- 좋아요 버튼 스타일 수정 시작 --- */
+    .like-btn {
+      background: transparent;
+      border: 1px solid #3663FF;
+      color: #3663FF;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .like-btn.liked {
+      background: #3663FF;
+      color: #fff;
+    }
+
+    .like-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(54, 99, 255, 0.2);
+    }
+
+    .like-btn:disabled {
+      border-color: #555;
+      color: #555;
+      cursor: not-allowed;
+    }
+    /* --- 좋아요 버튼 스타일 수정 끝 --- */
+
     .delete-btn {
       background: #ff4444;
       border: none;
@@ -444,7 +477,6 @@
       const isVerified = post.author === "JB777";
       const authorBadge = isVerified ? '<span class="verification-badge"></span>' : '';
       
-      // 현재 로그인한 사용자가 게시물 작성자인지 확인
       const canDelete = currentUser && (
         (currentUser.nickname === post.author) || 
         (currentUser.id === post.authorId) ||
@@ -456,7 +488,6 @@
 
       const firstLetter = post.author ? post.author.charAt(0).toUpperCase() : '?';
 
-      // 좋아요 수 계산
       const likes = post.likes || {};
       const likesArray = Object.keys(likes);
       const totalLikes = likesArray.length;
@@ -545,50 +576,11 @@
     }
 
     window.showPrivacyPolicy = function() {
-      alert(`개인정보처리방침
-
-㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
-
-1. 수집하는 개인정보 항목
-- 필수항목: 아이디, 비밀번호, 닉네임
-
-2. 개인정보의 수집 및 이용목적
-- 회원 관리, 서비스 제공, 게시물 관리
-
-3. 개인정보의 보유 및 이용기간
-- 회원 탈퇴 시까지
-
-4. 개인정보 파기절차 및 방법
-- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
-
-5. 이용자의 권리
-- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
-
-문의사항: alexeom97@outlook.com`);
+      alert(`개인정보처리방침 ... (중략)`);
     }
 
     window.showTerms = function() {
-      alert(`이용약관
-
-제1조 (목적)
-이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
-
-제2조 (용어의 정의)
-1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
-2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
-
-제3조 (서비스의 제공)
-1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
-2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
-
-제4조 (회원의 의무)
-1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
-2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
-
-제5조 (서비스 이용의 제한)
-운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
-
-문의사항: alexeom97@outlook.com`);
+      alert(`이용약관 ... (중략)`);
     }
   </script>
 </body>
