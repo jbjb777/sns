@@ -672,10 +672,12 @@
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     
-    const supabase = createClient(
-      "https://hoeevmstbhulbzqyfsug.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZWV2bXN0Ymh1bGJ6cXlmc3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ2ODU2ODMsImV4cCI6MjA1MDI2MTY4M30.qkCIvVxXz4t11D1b-4MrumAO4bDZWuI-d_9LmpG6UfA"
-    );
+    // ✅ 여기에 Supabase 콘솔에서 복사한 Publishable API Key를 넣으세요
+    // Settings → API → Publishable API Key (sb_publishable_로 시작)
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa"; // ⚠️ 실제 키로 교체 필요
+    
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     const cloudName = 'dretlhsrk';
     const uploadPreset = 'unsigned_preset';
