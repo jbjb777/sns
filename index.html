@@ -6,7 +6,6 @@
   <title>홈 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
 
-
   <style>
     body {
       margin: 0;
@@ -54,6 +53,8 @@
       width: 40px;
       height: 40px;
       margin-right: 12px;
+      background: linear-gradient(135deg, #00aaff, #0044ff);
+      border-radius: 8px;
     }
 
     .logo-text {
@@ -627,12 +628,11 @@
 
   <div class="container">
     <div class="sidebar">
-      <div class="logo-container" onclick="window.location.href='index.html'">
-        <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
+      <div class="logo-container" onclick="location.reload()">
+        <div class="logo-svg"></div>
         <span class="logo-text">Sharer</span>
       </div>
 
-      
       <div class="nav-item active" onclick="showFeed()">
         <span>🏠</span>
         <span class="nav-text">홈</span>
@@ -670,38 +670,12 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, serverTimestamp, remove, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
-
-    const accountConfig = {
-      apiKey: "AIzaSyB4WzIgCLIVewUywiKd61rAyIBtl6d0WdU",
-      authDomain: "idsns-6998a.firebaseapp.com",
-      databaseURL: "https://idsns-6998a-default-rtdb.firebaseio.com",
-      projectId: "idsns-6998a",
-      storageBucket: "idsns-6998a.firebasestorage.app",
-      messagingSenderId: "762902581394",
-      appId: "1:762902581394:web:a36c015a1c25f6996cd64b",
-      measurementId: "G-Q81RENZE48"
-    };
-
-    const postConfig = {
-      apiKey: "AIzaSyAJoRlltz724dHrlcAYo5PwrHCT7ca7OAo",
-      authDomain: "abcd-f48c0.firebaseapp.com",
-      databaseURL: "https://abcd-f48c0-default-rtdb.firebaseio.com",
-      projectId: "abcd-f48c0",
-      storageBucket: "abcd-f48c0.firebasestorage.app",
-      messagingSenderId: "591387508866",
-      appId: "1:591387508866:web:ddf43ef96d03c44861f49b",
-      measurementId: "G-63GJK50HR8"
-    };
-
-    const accountApp = initializeApp(accountConfig, "accounts");
-    const postApp = initializeApp(postConfig, "posts");
-    const accountAuth = getAuth(accountApp);
-    const postAuth = getAuth(postApp);
-    const accountDb = getDatabase(accountApp);
-    const postDb = getDatabase(postApp);
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    
+    const supabase = createClient(
+      "https://hoeevmstbhulbzqyfsug.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhvZWV2bXN0Ymh1bGJ6cXlmc3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ2ODU2ODMsImV4cCI6MjA1MDI2MTY4M30.qkCIvVxXz4t11D1b-4MrumAO4bDZWuI-d_9LmpG6UfA"
+    );
 
     const cloudName = 'dretlhsrk';
     const uploadPreset = 'unsigned_preset';
@@ -710,41 +684,15 @@
     let selectedImage = null;
     let verificationCode = "";
     let isVerifying = false;
-    let accountAuthReady = false;
-    let postAuthReady = false;
 
-    // Firebase 익명 인증 초기화
-    onAuthStateChanged(accountAuth, (user) => {
-      if (user) {
-        accountAuthReady = true;
-        checkAuthReady();
-      } else {
-        signInAnonymously(accountAuth).catch((error) => {
-          console.error("Account auth error:", error);
-        });
+    // 앱 초기화
+    async function initApp() {
+      const savedUser = localStorage.getItem('snsUser');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        updateUserUI();
       }
-    });
-
-    onAuthStateChanged(postAuth, (user) => {
-      if (user) {
-        postAuthReady = true;
-        checkAuthReady();
-      } else {
-        signInAnonymously(postAuth).catch((error) => {
-          console.error("Post auth error:", error);
-        });
-      }
-    });
-
-    function checkAuthReady() {
-      if (accountAuthReady && postAuthReady) {
-        const savedUser = localStorage.getItem('snsUser');
-        if (savedUser) {
-          currentUser = JSON.parse(savedUser);
-          updateUserUI();
-        }
-        loadPosts();
-      }
+      loadPosts();
     }
 
     function updateUserUI() {
@@ -873,22 +821,25 @@
       }
 
       try {
-        const userSnapshot = await get(ref(accountDb, `users/${id}`));
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', id)
+          .single();
         
-        if (!userSnapshot.exists()) {
+        if (error || !data) {
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
           return;
         }
 
-        const userData = userSnapshot.val();
-        if (userData.password !== password) {
+        if (data.password !== password) {
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
           return;
         }
 
         currentUser = {
           id: id,
-          nickname: userData.nickname,
+          nickname: data.nickname,
           isVerified: false
         };
         localStorage.setItem('snsUser', JSON.stringify(currentUser));
@@ -931,37 +882,43 @@
       }
 
       try {
-        const usersSnapshot = await get(ref(accountDb, `users`));
-        const usersData = usersSnapshot.val() || {};
-        let isIdDuplicate = false;
-        let isNicknameDuplicate = false;
+        // 아이디 중복 체크
+        const { data: idCheck } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', id)
+          .single();
 
-        if (usersData[id]) {
-          isIdDuplicate = true;
-        }
-
-        for (const userId in usersData) {
-          if (usersData[userId].nickname === nickname) {
-            isNicknameDuplicate = true;
-            break;
-          }
-        }
-
-        if (isIdDuplicate) {
+        if (idCheck) {
           idErrorDiv.textContent = '아이디가 겹치는 사용자가 있습니다.';
           return;
         }
 
-        if (isNicknameDuplicate) {
+        // 닉네임 중복 체크
+        const { data: nicknameCheck } = await supabase
+          .from('users')
+          .select('nickname')
+          .eq('nickname', nickname)
+          .single();
+
+        if (nicknameCheck) {
           nicknameErrorDiv.textContent = '겹치는 닉네임이 있습니다.';
           return;
         }
 
-        await set(ref(accountDb, `users/${id}`), {
-          nickname: nickname,
-          password: password,
-          createdAt: Date.now()
-        });
+        // 회원가입
+        const { error } = await supabase
+          .from('users')
+          .insert([
+            {
+              id: id,
+              nickname: nickname,
+              password: password,
+              created_at: new Date().toISOString()
+            }
+          ]);
+
+        if (error) throw error;
 
         successDiv.textContent = '회원가입이 완료되었습니다!';
         
@@ -1058,22 +1015,26 @@
           imageUrl = await uploadImageToCloudinary(selectedImage);
         }
 
-        const postsRef = ref(postDb, 'posts');
-        const newPostRef = push(postsRef);
-        
-        await set(newPostRef, {
-          author: currentUser.nickname,
-          authorId: currentUser.id,
-          content: content,
-          imageUrl: imageUrl,
-          timestamp: serverTimestamp()
-        });
+        const { error } = await supabase
+          .from('posts')
+          .insert([
+            {
+              author: currentUser.nickname,
+              author_id: currentUser.id,
+              content: content,
+              image_url: imageUrl,
+              created_at: new Date().toISOString()
+            }
+          ]);
+
+        if (error) throw error;
 
         messageDiv.innerHTML = '<span style="color: #00ff00;">게시글이 작성되었습니다!</span>';
         
         setTimeout(() => {
           document.getElementById('createModal').classList.remove('active');
           messageDiv.innerHTML = '';
+          loadPosts();
         }, 1000);
 
       } catch (error) {
@@ -1088,38 +1049,30 @@
       loadPosts();
     }
 
-    function loadPosts() {
-      if (!postAuthReady) {
-        setTimeout(loadPosts, 100);
-        return;
-      }
+    async function loadPosts() {
+      const feedDiv = document.getElementById('postsFeed');
+      feedDiv.innerHTML = '<div class="loading">게시물을 불러오는 중...</div>';
 
-      const postsRef = ref(postDb, 'posts');
-      
-      onValue(postsRef, (snapshot) => {
-        const feedDiv = document.getElementById('postsFeed');
-        feedDiv.innerHTML = '';
+      try {
+        const { data: posts, error } = await supabase
+          .from('posts')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-        if (!snapshot.exists()) {
+        if (error) throw error;
+
+        if (!posts || posts.length === 0) {
           feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
           return;
         }
 
-        const posts = [];
-        snapshot.forEach((childSnapshot) => {
-          posts.push({
-            id: childSnapshot.key,
-            ...childSnapshot.val()
-          });
-        });
-
-        posts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        feedDiv.innerHTML = '';
 
         posts.forEach(post => {
           const postCard = document.createElement('div');
           postCard.className = 'post-card';
           
-          const timeStr = post.timestamp ? new Date(post.timestamp).toLocaleString('ko-KR') : '방금 전';
+          const timeStr = new Date(post.created_at).toLocaleString('ko-KR');
           
           const isVerified = post.author === "JB777";
           const authorDisplay = isVerified ? 
@@ -1135,18 +1088,21 @@
               <div class="post-author">${authorDisplay}</div>
               ${deleteButton}
             </div>
-            ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="게시글 이미지">` : ''}
+            ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
             ${post.content ? `<div class="post-content">${escapeHtml(post.content)}</div>` : ''}
             <div class="post-time">${timeStr}</div>
           `;
           
           postCard.onclick = () => {
-            window.location.href = `view.html?id=${post.id}`;
+            alert('게시물 상세보기 기능은 view.html에서 구현됩니다.');
           };
           
           feedDiv.appendChild(postCard);
         });
-      });
+      } catch (error) {
+        console.error('게시물 로드 오류:', error);
+        feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+      }
     }
 
     function escapeHtml(text) {
@@ -1163,7 +1119,14 @@
     window.deletePost = async (postId) => {
       if (confirm('이 게시물을 삭제하시겠습니까?')) {
         try {
-          await remove(ref(postDb, `posts/${postId}`));
+          const { error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('id', postId);
+
+          if (error) throw error;
+
+          loadPosts();
         } catch (error) {
           console.error('삭제 오류:', error);
           alert('삭제에 실패했습니다.');
@@ -1217,6 +1180,9 @@
 
 문의사항: alexeom97@outlook.com`);
     }
+
+    // 앱 초기화
+    initApp();
   </script>
 </body>
 </html>
