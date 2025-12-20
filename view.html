@@ -294,7 +294,7 @@
         div.innerHTML = `
           <div class="comment-header">
             <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
-            ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment(${comment.id})">삭제</button>` : ''}
+            ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}')">삭제</button>` : ''}
           </div>
           <div class="comment-content">${escapeHtml(comment.text)}</div>
           <div class="comment-date">${date}</div>
