@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프로필 - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+    
+    .header { background: #1e1e1e; border-bottom: 1px solid #333; padding: 16px 20px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 100; }
+    .back-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
+    .back-btn:hover { transform: translateX(-4px); color: #3663FF; }
+    .header-title { font-size: 20px; font-weight: 600; }
+    
+    .container { max-width: 800px; width: 100%; margin: 0 auto; padding: 20px; flex: 1; }
+    
+    .profile-card { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+    .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; flex-shrink: 0; }
+    .profile-info { flex: 1; }
+    .profile-name { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .profile-stats { display: flex; gap: 30px; color: #aaa; font-size: 14px; }
+    .stat-item { display: flex; flex-direction: column; align-items: center; }
+    .stat-number { font-size: 20px; font-weight: 600; color: #fff; }
+    .stat-label { font-size: 12px; margin-top: 4px; }
+    
+    .verification-badge { display: inline-block; width: 22px; height: 22px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
+    
+    .posts-section { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+    .section-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+    
+    .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+    .post-item { background: #252525; border: 1px solid #333; border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; }
+    .post-item:hover { transform: translateY(-4px); border-color: #3663FF; box-shadow: 0 4px 12px rgba(54, 99, 255, 0.3); }
+    .post-item-image { width: 100%; height: 200px; object-fit: cover; background: #000; }
+    .post-item-content { padding: 12px; }
+    .post-item-text { font-size: 14px; line-height: 1.5; color: #ddd; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; white-space: pre-wrap; }
+    .post-item-footer { padding: 0 12px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #666; }
+    .post-item-date { font-size: 11px; }
+    .post-item-likes { display: flex; align-items: center; gap: 4px; color: #3663FF; }
+    
+    .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; gap: 20px; }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid #333; border-top-color: #3663FF; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .no-posts { text-align: center; padding: 60px 20px; color: #aaa; font-size: 14px; }
+    
+    .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: 40px; }
+    .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; }
+    .footer-text { color: #666; font-size: 12px; margin-top: 10px; }
+
+    @media (max-width: 768px) {
+      .post-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+      .post-item-image { height: 150px; }
+      .profile-header { flex-direction: column; text-align: center; }
+      .profile-stats { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div class="header-title">프로필</div>
+  </div>
+
+  <div class="container">
+    <div id="profileContent">
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+
+    <div class="posts-section">
+      <div class="section-title">게시물</div>
+      <div id="userPosts">
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
+      <a href="#" onclick="showTerms(); return false;">이용약관</a>
+      <a href="mailto:alexeom97@outlook.com">문의하기</a>
+    </div>
+    <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
+    
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('id');
+    const userNickname = urlParams.get('nickname');
+
+    if (!userId && !userNickname) {
+      showError('사용자 정보가 없습니다.');
+    } else {
+      loadUserProfile();
+      loadUserPosts();
+    }
+
+    async function loadUserProfile() {
+      try {
+        let userData = null;
+
+        // 닉네임이 JB777인 경우 특별 처리
+        if (userNickname === "JB777") {
+          userData = {
+            nickname: "JB777",
+            id: "정빈777",
+            isVerified: true
+          };
+        } else {
+          // 일반 사용자는 DB에서 조회
+          const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('nickname', userNickname)
+            .single();
+
+          if (error || !data) {
+            showError('사용자를 찾을 수 없습니다.');
+            return;
+          }
+          userData = data;
+        }
+
+        displayProfile(userData);
+      } catch (e) {
+        console.error('프로필 로드 오류:', e);
+        showError('오류가 발생했습니다.');
+      }
+    }
+
+    async function displayProfile(user) {
+      const contentDiv = document.getElementById('profileContent');
+      const isVerified = user.nickname === "JB777";
+
+      // 게시물 수 계산
+      const { data: posts } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('author', user.nickname);
+
+      const postCount = posts ? posts.length : 0;
+
+      // 좋아요 수 계산
+      const { data: userPosts } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('author', user.nickname);
+
+      let totalLikes = 0;
+      if (userPosts && userPosts.length > 0) {
+        for (const post of userPosts) {
+          const { data: likes } = await supabase
+            .from('likes')
+            .select('id')
+            .eq('post_id', post.id);
+          
+          totalLikes += likes ? likes.length : 0;
+        }
+      }
+
+      contentDiv.innerHTML = `
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar">${user.nickname ? user.nickname[0].toUpperCase() : '?'}</div>
+            <div class="profile-info">
+              <div class="profile-name">
+                ${escapeHtml(user.nickname)}
+                ${isVerified ? '<span class="verification-badge"></span>' : ''}
+              </div>
+              <div class="profile-stats">
+                <div class="stat-item">
+                  <div class="stat-number">${postCount}</div>
+                  <div class="stat-label">게시물</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">${totalLikes}</div>
+                  <div class="stat-label">좋아요</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadUserPosts() {
+      const postsDiv = document.getElementById('userPosts');
+      
+      try {
+        const { data: posts, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('author', userNickname)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!posts || posts.length === 0) {
+          postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
+          return;
+        }
+
+        // 각 게시물의 좋아요 수 가져오기
+        const postsWithLikes = await Promise.all(
+          posts.map(async (post) => {
+            const { data: likes } = await supabase
+              .from('likes')
+              .select('id')
+              .eq('post_id', post.id);
+            
+            return {
+              ...post,
+              likeCount: likes ? likes.length : 0
+            };
+          })
+        );
+
+        displayPosts(postsWithLikes);
+      } catch (e) {
+        console.error('게시물 로드 오류:', e);
+        postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+      }
+    }
+
+    function displayPosts(posts) {
+      const postsDiv = document.getElementById('userPosts');
+      const gridDiv = document.createElement('div');
+      gridDiv.className = 'post-grid';
+
+      posts.forEach(post => {
+        const postItem = document.createElement('div');
+        postItem.className = 'post-item';
+        postItem.onclick = () => {
+          window.location.href = `view.html?id=${post.id}`;
+        };
+
+        const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
+
+        postItem.innerHTML = `
+          ${post.image_url ? `<img src="${post.image_url}" class="post-item-image" alt="게시글 이미지">` : ''}
+          ${post.content ? `<div class="post-item-content"><div class="post-item-text">${escapeHtml(post.content)}</div></div>` : ''}
+          <div class="post-item-footer">
+            <div class="post-item-date">${timeStr}</div>
+            <div class="post-item-likes">👍 ${post.likeCount}</div>
+          </div>
+        `;
+
+        gridDiv.appendChild(postItem);
+      });
+
+      postsDiv.innerHTML = '';
+      postsDiv.appendChild(gridDiv);
+    }
+
+    function showError(msg) {
+      document.getElementById('profileContent').innerHTML = `
+        <div class="loading-container">
+          <div style="color: #ff6b6b; font-size: 16px;">${msg}</div>
+          <button onclick="window.history.back()" style="background: #3663FF; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">돌아가기</button>
+        </div>
+      `;
+      document.getElementById('userPosts').innerHTML = '';
+    }
+
+    function escapeHtml(t) {
+      if (!t) return '';
+      return t.replace(/[&<>"']/g, m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[m]));
+    }
+
+    window.goBack = () => window.history.back();
+    window.showPrivacyPolicy = () => alert("개인정보처리방침...");
+    window.showTerms = () => alert("이용약관...");
+  </script>
+</body>
+</html>
