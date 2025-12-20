@@ -186,8 +186,24 @@
       }
     });
 
+    // 화면 크기에 따라 사이드바 모드 전환
+    function updateSidebarMode() {
+      const iframe = document.getElementById('sidebarFrame');
+      const narrow = window.innerWidth <= 768;
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'setNarrowMode',
+          narrow: narrow
+        }, '*');
+      }
+    }
+
     // 페이지 로드 시 초기화
     initCurrentUser();
+    updateSidebarMode();
+
+    // 리사이즈 감지
+    window.addEventListener('resize', updateSidebarMode);
 
     if (!userId && !userNickname) {
       showError('사용자 정보가 없습니다.');
