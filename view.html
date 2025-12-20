@@ -41,7 +41,6 @@
     .copy-btn { background: #3663FF; border: none; color: #fff; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; flex-shrink: 0; }
     .copy-btn.success { background: rgb(0, 204, 136) !important; }
 
-    /* --- 댓글 섹션 스타일 --- */
     .comment-section { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
     .comment-input-wrapper { display: flex; gap: 10px; margin-bottom: 20px; }
     .comment-input { flex: 1; background: #121212; border: 1px solid #444; border-radius: 12px; padding: 12px; color: #fff; font-size: 14px; resize: none; min-height: 44px; max-height: 150px; }
@@ -59,6 +58,8 @@
     .comment-del-btn { background: none; border: none; color: #ff4444; font-size: 12px; cursor: pointer; padding: 4px; }
 
     .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: 40px; }
+    .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; }
+    .footer-text { color: #666; font-size: 12px; margin-top: 10px; }
     .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; gap: 20px; }
     .loading-spinner { width: 40px; height: 40px; border: 3px solid #333; border-top-color: #3663FF; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -82,8 +83,7 @@
         <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
         <button class="comment-submit-btn" onclick="addComment()">업로드</button>
       </div>
-      <div id="commentList" class="comment-list">
-        </div>
+      <div id="commentList" class="comment-list"></div>
     </div>
   </div>
 
@@ -97,22 +97,13 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getDatabase, ref, get, remove, set, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
-
-    const postConfig = {
-      apiKey: "AIzaSyAJoRlltz724dHrlcAYo5PwrHCT7ca7OAo",
-      authDomain: "abcd-f48c0.firebaseapp.com",
-      databaseURL: "https://abcd-f48c0-default-rtdb.firebaseio.com",
-      projectId: "abcd-f48c0",
-      storageBucket: "abcd-f48c0.firebasestorage.app",
-      messagingSenderId: "591387508866",
-      appId: "1:591387508866:web:ddf43ef96d03c44861f49b",
-      measurementId: "G-63GJK50HR8"
-    };
-
-    const postApp = initializeApp(postConfig, "posts");
-    const postDb = getDatabase(postApp);
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    
+    // ✅ Supabase 설정 - Publishable API Key 사용
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa"; // ⚠️ 실제 키로 교체
+    
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
     const urlParams = new URLSearchParams(window.location.search);
@@ -127,20 +118,34 @@
 
     async function loadPost(postId) {
       try {
-        const postRef = ref(postDb, `posts/${postId}`);
-        const snapshot = await get(postRef);
-        if (!snapshot.exists()) { showError('게시물을 찾을 수 없습니다.'); return; }
-        displayPost(snapshot.val(), postId);
-        
-        onValue(ref(postDb, `posts/${postId}/likes`), (s) => updateLikeUI(s.val() || {}));
-      } catch (e) { showError('오류가 발생했습니다.'); }
+        const { data: post, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('id', postId)
+          .single();
+
+        if (error || !post) {
+          showError('게시물을 찾을 수 없습니다.');
+          return;
+        }
+
+        displayPost(post, postId);
+        loadLikes(postId);
+      } catch (e) {
+        console.error('게시물 로드 오류:', e);
+        showError('오류가 발생했습니다.');
+      }
     }
 
     function displayPost(post, postId) {
       const contentDiv = document.getElementById('postContent');
-      const timeStr = post.timestamp ? new Date(post.timestamp).toLocaleString() : '방금 전';
+      const timeStr = new Date(post.created_at).toLocaleString('ko-KR');
       const isVerified = post.author === "JB777";
-      const canDelete = currentUser && (currentUser.nickname === post.author || currentUser.id === post.authorId || (currentUser.nickname === "JB777" && currentUser.isVerified));
+      const canDelete = currentUser && (
+        currentUser.nickname === post.author || 
+        currentUser.id === post.author_id || 
+        (currentUser.nickname === "JB777" && currentUser.isVerified)
+      );
 
       contentDiv.innerHTML = `
         <div class="post-detail-card">
@@ -157,8 +162,8 @@
               ${canDelete ? `<button class="delete-btn" onclick="deletePost('${postId}')">삭제</button>` : ''}
             </div>
           </div>
-          ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-detail-image">` : ''}
-          <div class="post-detail-content"><div class="post-text">${escapeHtml(post.content)}</div></div>
+          ${post.image_url ? `<img src="${post.image_url}" class="post-detail-image">` : ''}
+          <div class="post-detail-content"><div class="post-text">${escapeHtml(post.content || '')}</div></div>
           <div class="share-container">
             <div class="share-label">게시물 공유하기</div>
             <div class="share-box-wrapper">
@@ -172,78 +177,180 @@
       `;
     }
 
-    // --- 댓글 기능 구현 ---
-    function listenComments(postId) {
-      const commentsRef = ref(postDb, `comments/${postId}`);
-      onValue(commentsRef, (snapshot) => {
-        const listDiv = document.getElementById('commentList');
-        listDiv.innerHTML = '';
-        const data = snapshot.val();
-        if (!data) {
-          listDiv.innerHTML = '<div style="text-align:center; color:#666; font-size:14px; padding:20px;">첫 댓글을 남겨보세요!</div>';
-          return;
-        }
-
-        Object.entries(data).reverse().forEach(([key, comment]) => {
-          const isMyComment = currentUser && (currentUser.id === comment.userId);
-          const date = comment.timestamp ? new Date(comment.timestamp).toLocaleString() : '';
-          const isCommentVerified = comment.userName === "JB777";
-          
-          const div = document.createElement('div');
-          div.className = 'comment-item';
-          div.innerHTML = `
-            <div class="comment-header">
-              <span class="comment-author">${escapeHtml(comment.userName)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
-              ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${key}')">삭제</button>` : ''}
-            </div>
-            <div class="comment-content">${escapeHtml(comment.text)}</div>
-            <div class="comment-date">${date}</div>
-          `;
-          listDiv.appendChild(div);
-        });
-      });
-    }
-
-    window.addComment = async function() {
-      const input = document.getElementById('commentInput');
-      const text = input.value.trim();
-      if (!currentUser) { alert('로그인이 필요합니다.'); return; }
-      if (!text) return;
-
+    // 좋아요 기능
+    async function loadLikes(postId) {
       try {
-        const commentsRef = ref(postDb, `comments/${postId}`);
-        await push(commentsRef, {
-          userId: currentUser.id,
-          userName: currentUser.nickname,
-          text: text,
-          timestamp: serverTimestamp()
-        });
-        input.value = '';
-      } catch (e) { alert('댓글 업로드 실패'); }
-    }
+        const { data: likes, error } = await supabase
+          .from('likes')
+          .select('*')
+          .eq('post_id', postId);
 
-    window.deleteComment = async function(commentId) {
-      if (!confirm('댓글을 삭제하시겠습니까?')) return;
-      try {
-        await remove(ref(postDb, `comments/${postId}/${commentId}`));
-      } catch (e) { alert('삭제 실패'); }
-    }
+        if (error) throw error;
 
-    // 기존 좋아요/공유/기타 함수들
-    window.toggleLike = async function() {
-      if (!currentUser) { alert('로그인이 필요합니다.'); return; }
-      const likeRef = ref(postDb, `posts/${postId}/likes/${currentUser.id}`);
-      const s = await get(likeRef);
-      if (s.exists()) await remove(likeRef); else await set(likeRef, true);
+        updateLikeUI(likes || []);
+      } catch (e) {
+        console.error('좋아요 로드 오류:', e);
+      }
     }
 
     function updateLikeUI(likes) {
       const btn = document.getElementById('likeBtn');
       const count = document.getElementById('likeCount');
       if (!btn) return;
-      const arr = Object.keys(likes);
-      count.textContent = arr.length;
-      if (currentUser && arr.includes(currentUser.id)) btn.classList.add('liked'); else btn.classList.remove('liked');
+
+      count.textContent = likes.length;
+      
+      if (currentUser && likes.some(like => like.user_id === currentUser.id)) {
+        btn.classList.add('liked');
+      } else {
+        btn.classList.remove('liked');
+      }
+    }
+
+    window.toggleLike = async function() {
+      if (!currentUser) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      try {
+        // 이미 좋아요를 눌렀는지 확인
+        const { data: existingLike } = await supabase
+          .from('likes')
+          .select('*')
+          .eq('post_id', postId)
+          .eq('user_id', currentUser.id)
+          .single();
+
+        if (existingLike) {
+          // 좋아요 취소
+          await supabase
+            .from('likes')
+            .delete()
+            .eq('post_id', postId)
+            .eq('user_id', currentUser.id);
+        } else {
+          // 좋아요 추가
+          await supabase
+            .from('likes')
+            .insert([{
+              post_id: postId,
+              user_id: currentUser.id
+            }]);
+        }
+
+        loadLikes(postId);
+      } catch (e) {
+        console.error('좋아요 오류:', e);
+      }
+    }
+
+    // 댓글 기능
+    async function listenComments(postId) {
+      try {
+        const { data: comments, error } = await supabase
+          .from('comments')
+          .select('*')
+          .eq('post_id', postId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        displayComments(comments || []);
+
+        // 실시간 구독
+        supabase
+          .channel(`comments:${postId}`)
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'comments',
+            filter: `post_id=eq.${postId}`
+          }, () => {
+            listenComments(postId);
+          })
+          .subscribe();
+      } catch (e) {
+        console.error('댓글 로드 오류:', e);
+      }
+    }
+
+    function displayComments(comments) {
+      const listDiv = document.getElementById('commentList');
+      listDiv.innerHTML = '';
+
+      if (!comments || comments.length === 0) {
+        listDiv.innerHTML = '<div style="text-align:center; color:#666; font-size:14px; padding:20px;">첫 댓글을 남겨보세요!</div>';
+        return;
+      }
+
+      comments.forEach(comment => {
+        const isMyComment = currentUser && (currentUser.id === comment.user_id);
+        const date = new Date(comment.created_at).toLocaleString('ko-KR');
+        const isCommentVerified = comment.user_name === "JB777";
+        
+        const div = document.createElement('div');
+        div.className = 'comment-item';
+        div.innerHTML = `
+          <div class="comment-header">
+            <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
+            ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment(${comment.id})">삭제</button>` : ''}
+          </div>
+          <div class="comment-content">${escapeHtml(comment.text)}</div>
+          <div class="comment-date">${date}</div>
+        `;
+        listDiv.appendChild(div);
+      });
+    }
+
+    window.addComment = async function() {
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      
+      if (!currentUser) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+      
+      if (!text) return;
+
+      try {
+        const { error } = await supabase
+          .from('comments')
+          .insert([{
+            post_id: postId,
+            user_id: currentUser.id,
+            user_name: currentUser.nickname,
+            text: text,
+            created_at: new Date().toISOString()
+          }]);
+
+        if (error) throw error;
+
+        input.value = '';
+        listenComments(postId);
+      } catch (e) {
+        console.error('댓글 업로드 오류:', e);
+        alert('댓글 업로드 실패');
+      }
+    }
+
+    window.deleteComment = async function(commentId) {
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
+      
+      try {
+        const { error } = await supabase
+          .from('comments')
+          .delete()
+          .eq('id', commentId);
+
+        if (error) throw error;
+
+        listenComments(postId);
+      } catch (e) {
+        console.error('댓글 삭제 오류:', e);
+        alert('삭제 실패');
+      }
     }
 
     window.copyShareLink = function() {
@@ -255,14 +362,45 @@
     }
 
     window.deletePost = async function(pid) {
-      if (confirm('삭제하시겠습니까?')) {
-        await remove(ref(postDb, `posts/${pid}`));
-        await remove(ref(postDb, `comments/${pid}`)); // 댓글도 함께 삭제
+      if (!confirm('삭제하시겠습니까?')) return;
+      
+      try {
+        // 댓글 먼저 삭제
+        await supabase.from('comments').delete().eq('post_id', pid);
+        
+        // 좋아요 삭제
+        await supabase.from('likes').delete().eq('post_id', pid);
+        
+        // 게시물 삭제
+        await supabase.from('posts').delete().eq('id', pid);
+        
         window.location.href = 'index.html';
+      } catch (e) {
+        console.error('삭제 오류:', e);
+        alert('삭제에 실패했습니다.');
       }
     }
 
-    function escapeHtml(t) { return t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+    function showError(msg) {
+      document.getElementById('postContent').innerHTML = `
+        <div class="loading-container">
+          <div style="color: #ff6b6b; font-size: 16px;">${msg}</div>
+          <button onclick="window.history.back()" style="background: #3663FF; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">돌아가기</button>
+        </div>
+      `;
+    }
+
+    function escapeHtml(t) {
+      if (!t) return '';
+      return t.replace(/[&<>"']/g, m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[m]));
+    }
+
     window.goBack = () => window.history.back();
     window.showPrivacyPolicy = () => alert("개인정보처리방침...");
     window.showTerms = () => alert("이용약관...");
