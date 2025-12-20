@@ -670,10 +670,8 @@
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     
-    // ✅ 여기에 Supabase 콘솔에서 복사한 Publishable API Key를 넣으세요
-    // Settings → API → Publishable API Key (sb_publishable_로 시작)
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa"; // ⚠️ 실제 키로 교체 필요
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
     
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
@@ -685,7 +683,6 @@
     let verificationCode = "";
     let isVerifying = false;
 
-    // 앱 초기화
     async function initApp() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -882,7 +879,6 @@
       }
 
       try {
-        // 아이디 중복 체크
         const { data: idCheck } = await supabase
           .from('users')
           .select('id')
@@ -894,7 +890,6 @@
           return;
         }
 
-        // 닉네임 중복 체크
         const { data: nicknameCheck } = await supabase
           .from('users')
           .select('nickname')
@@ -906,7 +901,6 @@
           return;
         }
 
-        // 회원가입
         const { error } = await supabase
           .from('users')
           .insert([
@@ -1181,7 +1175,6 @@
 문의사항: alexeom97@outlook.com`);
     }
 
-    // 앱 초기화
     initApp();
   </script>
 </body>
