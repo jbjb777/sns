@@ -671,6 +671,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, serverTimestamp, remove, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
     const accountConfig = {
@@ -697,6 +698,8 @@
 
     const accountApp = initializeApp(accountConfig, "accounts");
     const postApp = initializeApp(postConfig, "posts");
+    const accountAuth = getAuth(accountApp);
+    const postAuth = getAuth(postApp);
     const accountDb = getDatabase(accountApp);
     const postDb = getDatabase(postApp);
 
@@ -707,14 +710,42 @@
     let selectedImage = null;
     let verificationCode = "";
     let isVerifying = false;
+    let accountAuthReady = false;
+    let postAuthReady = false;
 
-    const savedUser = localStorage.getItem('snsUser');
-    if (savedUser) {
-      currentUser = JSON.parse(savedUser);
-      updateUserUI();
+    // Firebase 익명 인증 초기화
+    onAuthStateChanged(accountAuth, (user) => {
+      if (user) {
+        accountAuthReady = true;
+        checkAuthReady();
+      } else {
+        signInAnonymously(accountAuth).catch((error) => {
+          console.error("Account auth error:", error);
+        });
+      }
+    });
+
+    onAuthStateChanged(postAuth, (user) => {
+      if (user) {
+        postAuthReady = true;
+        checkAuthReady();
+      } else {
+        signInAnonymously(postAuth).catch((error) => {
+          console.error("Post auth error:", error);
+        });
+      }
+    });
+
+    function checkAuthReady() {
+      if (accountAuthReady && postAuthReady) {
+        const savedUser = localStorage.getItem('snsUser');
+        if (savedUser) {
+          currentUser = JSON.parse(savedUser);
+          updateUserUI();
+        }
+        loadPosts();
+      }
     }
-
-    loadPosts();
 
     function updateUserUI() {
       if (currentUser) {
@@ -1058,6 +1089,11 @@
     }
 
     function loadPosts() {
+      if (!postAuthReady) {
+        setTimeout(loadPosts, 100);
+        return;
+      }
+
       const postsRef = ref(postDb, 'posts');
       
       onValue(postsRef, (snapshot) => {
