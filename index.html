@@ -883,7 +883,7 @@
           .from('users')
           .select('id')
           .eq('id', id)
-          .single();
+          .maybeSingle();
 
         if (idCheck) {
           idErrorDiv.textContent = '아이디가 겹치는 사용자가 있습니다.';
@@ -894,7 +894,7 @@
           .from('users')
           .select('nickname')
           .eq('nickname', nickname)
-          .single();
+          .maybeSingle();
 
         if (nicknameCheck) {
           nicknameErrorDiv.textContent = '겹치는 닉네임이 있습니다.';
@@ -922,8 +922,8 @@
         }, 1500);
 
       } catch (error) {
-        console.error('회원가입 오류:', error);
-        errorDiv.textContent = '회원가입에 실패했습니다. 다시 시도해주세요.';
+        console.error('회원가입 오류 원인:', error);
+        errorDiv.textContent = error.message || '회원가입에 실패했습니다. 다시 시도해주세요.';
       }
     }
 
