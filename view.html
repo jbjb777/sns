@@ -67,7 +67,7 @@
 </head>
 <body>
   <div class="header">
-    <button class="back-btn" onclick="goBack()">←</button>
+    <button class="back-btn" onclick="goHome()">←</button>
     <div class="header-title">게시물</div>
   </div>
 
@@ -101,7 +101,7 @@
     
     // ✅ Supabase 설정 - Publishable API Key 사용
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa"; // ⚠️ 실제 키로 교체
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa"; // 키노출되어도 도메인제한으로 안전
     
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
@@ -401,7 +401,7 @@
       }[m]));
     }
 
-    window.goBack = () => window.history.back();
+    window.goHome = () => window.location.href = "https://sharer.jbjb.r-e.kr";
     window.showPrivacyPolicy = () => alert("개인정보처리방침...");
     window.showTerms = () => alert("이용약관...");
   </script>
