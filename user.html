@@ -22,10 +22,13 @@
     .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; flex-shrink: 0; }
     .profile-info { flex: 1; }
     .profile-name { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .profile-stats { display: flex; gap: 30px; color: #aaa; font-size: 14px; }
+    .profile-stats { display: flex; gap: 30px; color: #aaa; font-size: 14px; align-items: center; }
     .stat-item { display: flex; flex-direction: column; align-items: center; }
     .stat-number { font-size: 20px; font-weight: 600; color: #fff; }
     .stat-label { font-size: 12px; margin-top: 4px; }
+    .share-btn { background: #3663FF; border: none; color: #fff; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; margin-left: auto; flex-shrink: 0; }
+    .share-btn:hover { background: #2952CC; transform: translateY(-2px); }
+    .share-btn.success { background: rgb(0, 204, 136) !important; }
     
     .verification-badge { display: inline-block; width: 22px; height: 22px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
     
@@ -192,6 +195,12 @@
                   <div class="stat-number">${totalLikes}</div>
                   <div class="stat-label">좋아요</div>
                 </div>
+                <button class="share-btn" id="shareBtn" onclick="copyProfileLink()" title="프로필 링크 복사">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -292,6 +301,17 @@
     window.goBack = () => window.history.back();
     window.showPrivacyPolicy = () => alert("개인정보처리방침...");
     window.showTerms = () => alert("이용약관...");
+    
+    window.copyProfileLink = function() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        const btn = document.getElementById('shareBtn');
+        btn.classList.add('success');
+        setTimeout(() => btn.classList.remove('success'), 1500);
+      }).catch(err => {
+        console.error('복사 실패:', err);
+        alert('링크 복사에 실패했습니다.');
+      });
+    }
   </script>
 </body>
 </html>
