@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=250">
+
   <style>
     body {
       margin: 0;
@@ -233,8 +234,6 @@
   </div>
 
   <script>
-    let currentUser = null;
-
     // 부모 페이지로 이벤트 전달
     document.getElementById('logoContainer').onclick = () => {
       window.parent.postMessage({ type: 'navigateHome' }, '*');
@@ -244,15 +243,8 @@
       window.parent.postMessage({ type: 'showFeed' }, '*');
     };
 
-    // 만들기 버튼 - 부모 페이지에 모달 열기 요청
     document.getElementById('createBtn').onclick = () => {
-      if (!currentUser) {
-        // 로그인 안 되어 있으면 로그인 모달 열기
-        window.parent.postMessage({ type: 'openLoginModal' }, '*');
-        return;
-      }
-      // 로그인 되어 있으면 게시물 작성 모달 열기
-      window.parent.postMessage({ type: 'openCreateModal' }, '*');
+      window.parent.postMessage({ type: 'createPost' }, '*');
     };
 
     document.getElementById('logoutBtn').onclick = () => {
@@ -263,7 +255,6 @@
     window.addEventListener('message', (event) => {
       if (event.data.type === 'updateUser') {
         const user = event.data.user;
-        currentUser = user;
         if (user) {
           const badge = user.nickname === "JB777" ? '<span class="verification-badge"></span>' : '';
           document.getElementById('userNickname').innerHTML = user.nickname + badge;
@@ -274,15 +265,18 @@
       }
       
       if (event.data.type === 'setActivePage') {
+        // 모든 nav-item에서 active 클래스 제거
         document.querySelectorAll('.nav-item').forEach(item => {
           item.classList.remove('active');
         });
         
+        // 현재 페이지에 해당하는 nav-item에 active 클래스 추가
         if (event.data.page === 'home') {
           document.getElementById('homeNav').classList.add('active');
         }
       }
 
+      // 모바일 모드 전환 메시지 수신
       if (event.data.type === 'setNarrowMode') {
         const sidebar = document.querySelector('.sidebar');
         if (event.data.narrow) {
@@ -293,8 +287,18 @@
       }
     });
 
+    // 화면 크기 감지 및 부모에게 알림
+    function checkWidth() {
+      const narrow = window.innerWidth < 150;
+      window.parent.postMessage({ type: 'sidebarNarrow', narrow: narrow }, '*');
+    }
+
     // 초기 로드 시 부모 페이지에 사용자 정보 요청
     window.parent.postMessage({ type: 'requestUserInfo' }, '*');
+    checkWidth();
+
+    // 리사이즈 감지
+    window.addEventListener('resize', checkWidth);
   </script>
 </body>
 </html>
