@@ -69,9 +69,16 @@
     .post-item-date { font-size: 11px; }
     .post-item-likes { display: flex; align-items: center; gap: 4px; color: #3663FF; }
     
-    .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; gap: 20px; }
-    .loading-spinner { width: 40px; height: 40px; border: 3px solid #333; border-top-color: #3663FF; border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Skeleton UI Styles */
+    .skeleton { background: linear-gradient(90deg, #252525 25%, #2a2a2a 50%, #252525 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    
+    .skeleton-avatar { width: 80px; height: 80px; border-radius: 50%; }
+    .skeleton-text { height: 24px; border-radius: 6px; margin-bottom: 8px; }
+    .skeleton-text-small { height: 16px; border-radius: 4px; }
+    .skeleton-stat { width: 60px; height: 40px; border-radius: 8px; }
+    .skeleton-post-image { width: 100%; height: 200px; border-radius: 12px 12px 0 0; }
+    .skeleton-post-text { height: 14px; border-radius: 4px; margin-bottom: 6px; }
     
     .no-posts { text-align: center; padding: 60px 20px; color: #aaa; font-size: 14px; }
     
@@ -116,16 +123,50 @@
 
     <div class="container">
       <div id="profileContent">
-        <div class="loading-container">
-          <div class="loading-spinner"></div>
+        <!-- Profile Skeleton -->
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="profile-info" style="flex: 1;">
+              <div class="skeleton skeleton-text" style="width: 200px;"></div>
+              <div class="profile-stats">
+                <div class="skeleton skeleton-stat"></div>
+                <div class="skeleton skeleton-stat"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="posts-section">
         <div class="section-title">게시물</div>
         <div id="userPosts">
-          <div class="loading-container">
-            <div class="loading-spinner"></div>
+          <!-- Posts Skeleton -->
+          <div class="post-grid">
+            <div class="post-item">
+              <div class="skeleton skeleton-post-image"></div>
+              <div class="post-item-content">
+                <div class="skeleton skeleton-post-text"></div>
+                <div class="skeleton skeleton-post-text" style="width: 80%;"></div>
+                <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
+              </div>
+            </div>
+            <div class="post-item">
+              <div class="skeleton skeleton-post-image"></div>
+              <div class="post-item-content">
+                <div class="skeleton skeleton-post-text"></div>
+                <div class="skeleton skeleton-post-text" style="width: 80%;"></div>
+                <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
+              </div>
+            </div>
+            <div class="post-item">
+              <div class="skeleton skeleton-post-image"></div>
+              <div class="post-item-content">
+                <div class="skeleton skeleton-post-text"></div>
+                <div class="skeleton skeleton-post-text" style="width: 80%;"></div>
+                <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -392,9 +433,11 @@
 
     function showError(msg) {
       document.getElementById('profileContent').innerHTML = `
-        <div class="loading-container">
-          <div style="color: #ff6b6b; font-size: 16px;">${msg}</div>
-          <button onclick="window.history.back()" style="background: #3663FF; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">돌아가기</button>
+        <div class="profile-card">
+          <div style="text-align: center; padding: 40px 20px;">
+            <div style="color: #ff6b6b; font-size: 16px; margin-bottom: 20px;">${msg}</div>
+            <button onclick="window.history.back()" style="background: #3663FF; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">돌아가기</button>
+          </div>
         </div>
       `;
       document.getElementById('userPosts').innerHTML = '';
