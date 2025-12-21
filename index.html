@@ -58,6 +58,68 @@
       background-repeat: no-repeat;
     }
 
+    /* Skeleton UI Styles */
+    .skeleton {
+      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-post {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      padding: 16px;
+    }
+
+    .skeleton-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .skeleton-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+
+    .skeleton-author {
+      width: 120px;
+      height: 16px;
+    }
+
+    .skeleton-image {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+    }
+
+    .skeleton-content {
+      width: 100%;
+      height: 16px;
+      margin-bottom: 8px;
+    }
+
+    .skeleton-content:last-of-type {
+      width: 60%;
+    }
+
+    .skeleton-time {
+      width: 100px;
+      height: 14px;
+      margin-top: 8px;
+    }
+
     .auth-modal {
       position: fixed;
       top: 0;
@@ -353,12 +415,6 @@
       color: #aaa;
     }
 
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #aaa;
-    }
-
     .no-posts {
       text-align: center;
       padding: 60px 20px;
@@ -499,7 +555,38 @@
     <div class="main-content">
       <div class="feed-container">
         <div id="postsFeed">
-          <div class="loading">게시물을 불러오는 중...</div>
+          <!-- Skeleton Loading UI -->
+          <div class="skeleton-post">
+            <div class="skeleton-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-author"></div>
+            </div>
+            <div class="skeleton skeleton-image"></div>
+            <div class="skeleton skeleton-content"></div>
+            <div class="skeleton skeleton-content"></div>
+            <div class="skeleton skeleton-content"></div>
+            <div class="skeleton skeleton-time"></div>
+          </div>
+          
+          <div class="skeleton-post">
+            <div class="skeleton-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-author"></div>
+            </div>
+            <div class="skeleton skeleton-content"></div>
+            <div class="skeleton skeleton-content"></div>
+            <div class="skeleton skeleton-time"></div>
+          </div>
+          
+          <div class="skeleton-post">
+            <div class="skeleton-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-author"></div>
+            </div>
+            <div class="skeleton skeleton-image"></div>
+            <div class="skeleton skeleton-content"></div>
+            <div class="skeleton skeleton-time"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -928,7 +1015,6 @@
 
     async function loadPosts() {
       const feedDiv = document.getElementById('postsFeed');
-      feedDiv.innerHTML = '<div class="loading">게시물을 불러오는 중...</div>';
 
       try {
         const { data: posts, error } = await supabase
