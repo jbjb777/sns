@@ -234,6 +234,9 @@
   </div>
 
   <script>
+    // 현재 로그인 상태를 저장하는 변수
+    let isLoggedIn = false;
+
     // 부모 페이지로 이벤트 전달
     document.getElementById('logoContainer').onclick = () => {
       window.parent.postMessage({ type: 'navigateHome' }, '*');
@@ -244,7 +247,11 @@
     };
 
     document.getElementById('createBtn').onclick = () => {
-      window.parent.postMessage({ type: 'createPost' }, '*');
+      if (isLoggedIn) {
+        window.parent.postMessage({ type: 'navigateToMake' }, '*');
+      } else {
+        window.parent.postMessage({ type: 'navigateToLogin' }, '*');
+      }
     };
 
     document.getElementById('logoutBtn').onclick = () => {
@@ -256,10 +263,12 @@
       if (event.data.type === 'updateUser') {
         const user = event.data.user;
         if (user) {
+          isLoggedIn = true;
           const badge = user.nickname === "JB777" ? '<span class="verification-badge"></span>' : '';
           document.getElementById('userNickname').innerHTML = user.nickname + badge;
           document.getElementById('userInfo').style.display = 'flex';
         } else {
+          isLoggedIn = false;
           document.getElementById('userInfo').style.display = 'none';
         }
       }
