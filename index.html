@@ -7,154 +7,34 @@
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
 
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #fff;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; }
+    
+    .sidebar-container {
+      width: 250px;
+      min-width: 250px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+    }
+
+    .sidebar-container iframe {
+      width: 250px !important;
+      height: 100%;
+      border: none;
+    }
+
+    .main-wrapper {
+      margin-left: 250px;
+      width: calc(100% - 250px);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
 
-    .container {
-      display: flex;
-      flex-grow: 1;
-    }
-
-    .sidebar {
-      width: 250px;
-      background: #1e1e1e;
-      border-right: 1px solid #333;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      height: 100vh;
-      left: 0;
-      top: 0;
-      overflow-y: auto;
-    }
-
-    .logo-container {
-      display: flex;
-      align-items: center;
-      margin-bottom: 40px;
-      cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    .logo-container:hover {
-      transform: translateY(-4px) scale(1.02);
-    }
-
-    .logo-svg {
-      width: 40px;
-      height: 40px;
-      margin-right: 12px;
-    }
-
-    .logo-text {
-      font-size: 24px;
-      font-weight: bold;
-      color: #fff;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 16px;
-      margin-bottom: 8px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      font-size: 16px;
-      color: #fff;
-    }
-
-    .nav-item:hover {
-      background: #2c2c2c;
-      transform: translateY(-4px) scale(1.02);
-    }
-
-    .nav-item.active {
-      font-weight: bold;
-      background: #3663FF;
-    }
-
-    .nav-item span {
-      font-size: 24px;
-      margin-right: 16px;
-    }
-
-    .create-btn {
-      background: linear-gradient(135deg, #00aaff, #0044ff);
-      color: white;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 30px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 20px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    .create-btn:hover {
-      transform: translateY(-8px) scale(1.05);
-    }
-
-    .create-btn:active {
-      background: linear-gradient(135deg, #0088cc, #003388);
-    }
-
-    .create-btn span {
-      font-size: 24px;
-      margin-right: 8px;
-    }
-
-    .user-info {
-      margin-top: auto;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid #333;
-      padding-top: 20px;
-    }
-
-    .user-nickname {
-      font-weight: 600;
-      font-size: 14px;
-      color: #fff;
-    }
-
-    .logout-btn {
-      background: #3663FF;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 6px 16px;
-      border-radius: 20px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    .logout-btn:hover {
-      transform: translateY(-4px) scale(1.05);
-    }
-
-    .logout-btn:active {
-      background: #2952CC;
-    }
-
     .main-content {
-      margin-left: 250px;
       flex: 1;
       display: flex;
       justify-content: center;
@@ -537,116 +417,85 @@
     }
 
     @media (max-width: 768px) {
-      .sidebar {
-        width: 80px;
-        padding: 10px;
+      .sidebar-container { 
+        width: 80px; 
+        min-width: 80px;
       }
-
-      .logo-text {
-        display: none;
+      .sidebar-container iframe {
+        width: 80px !important;
       }
-
-      .logo-svg {
-        margin-right: 0;
-      }
-
-      .nav-item span {
-        margin-right: 0;
-      }
-
-      .nav-item .nav-text {
-        display: none;
-      }
-
-      .create-btn .btn-text {
-        display: none;
-      }
-
-      .user-info {
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .main-content {
-        margin-left: 80px;
-      }
+      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
     }
   </style>
 </head>
 <body>
-  <div class="auth-modal" id="loginModal">
-    <div class="auth-box">
-      <button class="auth-close" onclick="closeLoginModal()">✕</button>
-      <h2>로그인</h2>
-      <input type="text" id="loginId" placeholder="아이디">
-      <input type="password" id="loginPassword" placeholder="비밀번호">
-      <div class="error-message" id="loginError"></div>
-      <div class="success-message" id="loginSuccess"></div>
-      <button onclick="handleLogin()">로그인</button>
-      <button class="secondary" onclick="showSignup()">회원가입</button>
-    </div>
+  <!-- 사이드바 iframe -->
+  <div class="sidebar-container">
+    <iframe 
+      src="sidebar.html" 
+      id="sidebarFrame"
+      width="250"
+      height="100%"
+      frameborder="0"
+    ></iframe>
   </div>
 
-  <div class="auth-modal" id="signupModal">
-    <div class="auth-box">
-      <button class="auth-close" onclick="closeSignupModal()">✕</button>
-      <h2>회원가입</h2>
-      <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
-      <div class="error-message" id="nicknameError"></div>
-      <input type="text" id="signupId" placeholder="아이디">
-      <div class="error-message" id="idError"></div>
-      <input type="password" id="signupPassword" placeholder="비밀번호">
-      <div class="error-message" id="signupError"></div>
-      <div class="success-message" id="signupSuccess"></div>
-      <button onclick="handleSignup()">가입</button>
-      <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
+  <!-- 메인 컨텐츠 -->
+  <div class="main-wrapper">
+    <!-- 로그인 모달 -->
+    <div class="auth-modal" id="loginModal">
+      <div class="auth-box">
+        <button class="auth-close" onclick="closeLoginModal()">✕</button>
+        <h2>로그인</h2>
+        <input type="text" id="loginId" placeholder="아이디">
+        <input type="password" id="loginPassword" placeholder="비밀번호">
+        <div class="error-message" id="loginError"></div>
+        <div class="success-message" id="loginSuccess"></div>
+        <button onclick="handleLogin()">로그인</button>
+        <button class="secondary" onclick="showSignup()">회원가입</button>
+      </div>
     </div>
-  </div>
 
-  <div class="create-modal" id="createModal">
-    <div class="create-modal-content">
-      <div class="create-modal-header">
-        <h3>새 게시물 만들기</h3>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <button class="post-btn" id="modalPostBtn">공유하기</button>
-          <button class="close-btn" id="closeModal">&times;</button>
+    <!-- 회원가입 모달 -->
+    <div class="auth-modal" id="signupModal">
+      <div class="auth-box">
+        <button class="auth-close" onclick="closeSignupModal()">✕</button>
+        <h2>회원가입</h2>
+        <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
+        <div class="error-message" id="nicknameError"></div>
+        <input type="text" id="signupId" placeholder="아이디">
+        <div class="error-message" id="idError"></div>
+        <input type="password" id="signupPassword" placeholder="비밀번호">
+        <div class="error-message" id="signupError"></div>
+        <div class="success-message" id="signupSuccess"></div>
+        <button onclick="handleSignup()">가입</button>
+        <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
+      </div>
+    </div>
+
+    <!-- 게시글 작성 모달 -->
+    <div class="create-modal" id="createModal">
+      <div class="create-modal-content">
+        <div class="create-modal-header">
+          <h3>새 게시물 만들기</h3>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="post-btn" id="modalPostBtn">공유하기</button>
+            <button class="close-btn" id="closeModal">&times;</button>
+          </div>
+        </div>
+        <div class="create-modal-body">
+          <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
+          <div class="image-preview-container">
+            <img id="imagePreview" class="image-preview">
+          </div>
+          <input type="file" id="imageInput" accept="image/*" style="display: none;">
+          <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
+          <div id="postMessage" style="margin-top: 10px; font-size: 14px;"></div>
         </div>
       </div>
-      <div class="create-modal-body">
-        <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
-        <div class="image-preview-container">
-          <img id="imagePreview" class="image-preview">
-        </div>
-        <input type="file" id="imageInput" accept="image/*" style="display: none;">
-        <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
-        <div id="postMessage" style="margin-top: 10px; font-size: 14px;"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="sidebar">
-      <div class="logo-container" onclick="location.reload()">
-        <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
-        <span class="logo-text">Sharer</span>
-      </div>
-
-      <div class="nav-item active" onclick="showFeed()">
-        <span>🏠</span>
-        <span class="nav-text">홈</span>
-      </div>
-      
-      <button class="create-btn" onclick="handleCreatePost()">
-        <span>➕</span>
-        <span class="btn-text">만들기</span>
-      </button>
-      
-      <div class="user-info" id="userInfo" style="display: none;">
-        <div class="user-nickname" id="userNickname"></div>
-        <button class="logout-btn" id="logoutBtn">로그아웃</button>
-      </div>
     </div>
 
+    <!-- 피드 -->
     <div class="main-content">
       <div class="feed-container">
         <div id="postsFeed">
@@ -654,16 +503,17 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="footer">
-    <div class="footer-links">
-      <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
-      <a href="#" onclick="showTerms(); return false;">이용약관</a>
-      <a href="mailto:alexeom97@outlook.com">문의하기</a>
-    </div>
-    <div class="footer-text">
-      © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+    <!-- 푸터 -->
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
+        <a href="#" onclick="showTerms(); return false;">이용약관</a>
+        <a href="mailto:alexeom97@outlook.com">문의하기</a>
+      </div>
+      <div class="footer-text">
+        © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+      </div>
     </div>
   </div>
 
@@ -683,22 +533,66 @@
     let verificationCode = "";
     let isVerifying = false;
 
-    async function initApp() {
+    // 현재 로그인된 사용자 정보 로드
+    function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        updateUserUI();
+        updateSidebar();
       }
-      loadPosts();
     }
 
-    function updateUserUI() {
-      if (currentUser) {
-        const badge = currentUser.nickname === "JB777" ? '<span class="verification-badge"></span>' : '';
-        document.getElementById('userNickname').innerHTML = currentUser.nickname + badge;
-        document.getElementById('userInfo').style.display = 'flex';
+    // 사이드바에 사용자 정보 전달
+    function updateSidebar() {
+      const iframe = document.getElementById('sidebarFrame');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'updateUser',
+          user: currentUser
+        }, '*');
       }
     }
+
+    // 사이드바로부터 메시지 수신
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'navigateHome') {
+        location.reload();
+      }
+      if (event.data.type === 'showFeed') {
+        loadPosts();
+      }
+      if (event.data.type === 'createPost') {
+        handleCreatePost();
+      }
+      if (event.data.type === 'logout') {
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        location.reload();
+      }
+      if (event.data.type === 'requestUserInfo') {
+        updateSidebar();
+      }
+    });
+
+    // 화면 크기에 따라 사이드바 모드 전환
+    function updateSidebarMode() {
+      const iframe = document.getElementById('sidebarFrame');
+      const narrow = window.innerWidth <= 768;
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'setNarrowMode',
+          narrow: narrow
+        }, '*');
+      }
+    }
+
+    // 페이지 로드 시 초기화
+    initCurrentUser();
+    updateSidebarMode();
+    loadPosts();
+
+    // 리사이즈 감지
+    window.addEventListener('resize', updateSidebarMode);
 
     window.closeLoginModal = function() {
       document.getElementById('loginModal').classList.remove('active');
@@ -804,7 +698,7 @@
               isVerified: true
             };
             localStorage.setItem('snsUser', JSON.stringify(currentUser));
-            updateUserUI();
+            updateSidebar();
             closeLoginModal();
             isVerifying = false;
             document.getElementById('loginId').placeholder = "아이디";
@@ -840,7 +734,7 @@
           isVerified: false
         };
         localStorage.setItem('snsUser', JSON.stringify(currentUser));
-        updateUserUI();
+        updateSidebar();
         closeLoginModal();
         successDiv.textContent = '';
       } catch (error) {
@@ -927,14 +821,7 @@
       }
     }
 
-    document.getElementById('logoutBtn').onclick = () => {
-      localStorage.removeItem('snsUser');
-      currentUser = null;
-      document.getElementById('userInfo').style.display = 'none';
-      location.reload();
-    };
-
-    window.handleCreatePost = function() {
+    function handleCreatePost() {
       if (!currentUser) {
         document.getElementById('loginModal').classList.add('active');
         return;
@@ -1038,10 +925,6 @@
         postButton.disabled = false;
       }
     };
-
-    window.showFeed = function() {
-      loadPosts();
-    }
 
     async function loadPosts() {
       const feedDiv = document.getElementById('postsFeed');
@@ -1174,8 +1057,6 @@
 
 문의사항: alexeom97@outlook.com`);
     }
-
-    initApp();
   </script>
 </body>
 </html>
