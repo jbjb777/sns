@@ -279,7 +279,7 @@
       const savedUser = localStorage.getItem('snsUser');
       if (!savedUser) {
         alert('로그인이 필요합니다.');
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
         return;
       }
       currentUser = JSON.parse(savedUser);
