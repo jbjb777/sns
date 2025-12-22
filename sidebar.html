@@ -217,16 +217,10 @@
       <span class="logo-text">Sharer</span>
     </div>
 
-    <div class="nav-item" id="homeNav">
+    <div class="nav-item active" id="homeNav">
       <span class="nav-icon">🏠</span>
       <span class="nav-text">홈</span>
     </div>
-
-    <div class="nav-item" id="exploreNav">
-      <span class="nav-icon">🔍</span>
-      <span class="nav-text">탐색</span>
-    </div>
-
     
     <button class="create-btn" id="createBtn">
       <span class="btn-icon">➕</span>
@@ -249,38 +243,14 @@
     };
 
     document.getElementById('homeNav').onclick = () => {
-      try {
-        window.parent.postMessage({ type: 'showFeed' }, '*');
-      } catch (e) {
-        window.parent.location.href = 'index.html';
-      }
-    
-      // 💡 부모가 메시지 안 받아도 대비
-      setTimeout(() => {
-        if (!document.hasFocus()) return;
-        window.parent.location.href = 'index.html';
-      }, 50);
-    };
-    
-    document.getElementById('exploreNav').onclick = () => {
-      try {
-        window.parent.postMessage({ type: 'showExplore' }, '*');
-      } catch (e) {
-        window.parent.location.href = 'explore.html';
-      }
-    
-      // 👉 부모가 메시지 처리 안 하면 그냥 이동
-      setTimeout(() => {
-        window.parent.location.href = 'explore.html';
-      }, 50);
+      window.parent.postMessage({ type: 'showFeed' }, '*');
     };
 
-    
     document.getElementById('createBtn').onclick = () => {
       if (isLoggedIn) {
-        window.parent.location.href = 'make.html';
+        window.parent.postMessage({ type: 'navigateToMake' }, '*');
       } else {
-        window.parent.location.href = 'login.html';
+        window.parent.postMessage({ type: 'navigateToLogin' }, '*');
       }
     };
 
@@ -288,56 +258,56 @@
       window.parent.postMessage({ type: 'logout' }, '*');
     };
 
- 
-    let isLoggedIn = false;
-  
-    // ===== 클릭 이벤트 =====
-    document.getElementById('logoContainer').onclick = () => {
-      window.parent.postMessage({ type: 'showFeed' }, '*');
-    };
-  
-    document.getElementById('homeNav').onclick = () => {
-      window.parent.postMessage({ type: 'showFeed' }, '*');
-    };
-  
-    document.getElementById('exploreNav').onclick = () => {
-      window.parent.postMessage({ type: 'showExplore' }, '*');
-    };
-  
-    document.getElementById('createBtn').onclick = () => {
-      window.parent.location.href = isLoggedIn ? 'make.html' : 'login.html';
-    };
-  
-    document.getElementById('logoutBtn').onclick = () => {
-      window.parent.postMessage({ type: 'logout' }, '*');
-    };
-  
-    // ===== active 표시 =====
+    // 부모 페이지로부터 사용자 정보 업데이트 받기
     window.addEventListener('message', (event) => {
+      if (event.data.type === 'updateUser') {
+        const user = event.data.user;
+        if (user) {
+          isLoggedIn = true;
+          const badge = user.nickname === "JB777" ? '<span class="verification-badge"></span>' : '';
+          document.getElementById('userNickname').innerHTML = user.nickname + badge;
+          document.getElementById('userInfo').style.display = 'flex';
+        } else {
+          isLoggedIn = false;
+          document.getElementById('userInfo').style.display = 'none';
+        }
+      }
+      
       if (event.data.type === 'setActivePage') {
-        document.querySelectorAll('.nav-item')
-          .forEach(el => el.classList.remove('active'));
-  
+        // 모든 nav-item에서 active 클래스 제거
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        
+        // 현재 페이지에 해당하는 nav-item에 active 클래스 추가
         if (event.data.page === 'home') {
           document.getElementById('homeNav').classList.add('active');
         }
-  
-        if (event.data.page === 'explore') {
-          document.getElementById('exploreNav').classList.add('active');
+      }
+
+      // 모바일 모드 전환 메시지 수신
+      if (event.data.type === 'setNarrowMode') {
+        const sidebar = document.querySelector('.sidebar');
+        if (event.data.narrow) {
+          sidebar.classList.add('narrow');
+        } else {
+          sidebar.classList.remove('narrow');
         }
       }
     });
-  
-    // ===== 사이드바 폭 감지 =====
+
+    // 화면 크기 감지 및 부모에게 알림
     function checkWidth() {
       const narrow = window.innerWidth < 150;
-      window.parent.postMessage({ type: 'sidebarNarrow', narrow }, '*');
+      window.parent.postMessage({ type: 'sidebarNarrow', narrow: narrow }, '*');
     }
-  
+
+    // 초기 로드 시 부모 페이지에 사용자 정보 요청
     window.parent.postMessage({ type: 'requestUserInfo' }, '*');
     checkWidth();
+
+    // 리사이즈 감지
     window.addEventListener('resize', checkWidth);
   </script>
-
 </body>
 </html>
