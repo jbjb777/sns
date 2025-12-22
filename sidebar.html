@@ -237,18 +237,18 @@
       <button class="logout-btn" id="logoutBtn">로그아웃</button>
     </div>
   </div>
-
   <script>
-    // 현재 로그인 상태를 저장하는 변수
+    // ===== DOM =====
+    const homeNav = document.getElementById('homeNav');
+    const exploreNav = document.getElementById('exploreNav');
+    const createBtn = document.getElementById('createBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userInfo = document.getElementById('userInfo');
+    const userNickname = document.getElementById('userNickname');
+  
     let isLoggedIn = false;
-
-    // 부모 페이지로 이벤트 전달
-    document.getElementById('logoContainer').onclick = () => {
-      window.parent.postMessage({ type: 'navigateHome' }, '*');
-    };
-
-
-  // 클릭 시 부모에게 이동 요청
+  
+    // ===== 클릭 =====
     homeNav.onclick = () => {
       parent.postMessage({ type: 'navigate', page: 'home' }, '*');
     };
@@ -257,78 +257,44 @@
       parent.postMessage({ type: 'navigate', page: 'explore' }, '*');
     };
   
-    // 🔥 active 변경은 "신호 받았을 때만"
+    createBtn.onclick = () => {
+      parent.postMessage({
+        type: isLoggedIn ? 'navigateToMake' : 'navigateToLogin'
+      }, '*');
+    };
+  
+    logoutBtn.onclick = () => {
+      parent.postMessage({ type: 'logout' }, '*');
+    };
+  
+    // ===== 메시지 수신 (하나만!) =====
     window.addEventListener('message', (e) => {
-      if (e.data?.type !== 'activateExplore') return;
+      const data = e.data;
+      if (!data?.type) return;
   
-      document.getElementById('homeNav').classList.remove('active');
-      document.getElementById('exploreNav').classList.add('active');
-    });
-  
-      
-    
-    document.getElementById('createBtn').onclick = () => {
-      if (isLoggedIn) {
-        window.parent.postMessage({ type: 'navigateToMake' }, '*');
-      } else {
-        window.parent.postMessage({ type: 'navigateToLogin' }, '*');
+      // 🔵 explore.html에서만 보내는 신호
+      if (data.type === 'activateExplore') {
+        homeNav.classList.remove('active');
+        exploreNav.classList.add('active');
       }
-    };
-
-    document.getElementById('logoutBtn').onclick = () => {
-      window.parent.postMessage({ type: 'logout' }, '*');
-    };
-
-    // 부모 페이지로부터 사용자 정보 업데이트 받기
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'updateUser') {
-        const user = event.data.user;
-        if (user) {
+  
+      // 🔵 유저 정보
+      if (data.type === 'updateUser') {
+        if (data.user) {
           isLoggedIn = true;
-          const badge = user.nickname === "JB777" ? '<span class="verification-badge"></span>' : '';
-          document.getElementById('userNickname').innerHTML = user.nickname + badge;
-          document.getElementById('userInfo').style.display = 'flex';
+          userNickname.innerHTML = data.user.nickname;
+          userInfo.style.display = 'flex';
         } else {
           isLoggedIn = false;
-          document.getElementById('userInfo').style.display = 'none';
-        }
-      }
-      
-      if (event.data.type === 'setActivePage') {
-        // 모든 nav-item에서 active 클래스 제거
-        document.querySelectorAll('.nav-item').forEach(item => {
-          item.classList.remove('active');
-        });
-        
-        // 현재 페이지에 해당하는 nav-item에 active 클래스 추가
-        if (event.data.page === 'home') {
-          document.getElementById('homeNav').classList.add('active');
-        }
-      }
-
-      // 모바일 모드 전환 메시지 수신
-      if (event.data.type === 'setNarrowMode') {
-        const sidebar = document.querySelector('.sidebar');
-        if (event.data.narrow) {
-          sidebar.classList.add('narrow');
-        } else {
-          sidebar.classList.remove('narrow');
+          userInfo.style.display = 'none';
         }
       }
     });
-
-    // 화면 크기 감지 및 부모에게 알림
-    function checkWidth() {
-      const narrow = window.innerWidth < 150;
-      window.parent.postMessage({ type: 'sidebarNarrow', narrow: narrow }, '*');
-    }
-
-    // 초기 로드 시 부모 페이지에 사용자 정보 요청
-    window.parent.postMessage({ type: 'requestUserInfo' }, '*');
-    checkWidth();
-
-    // 리사이즈 감지
-    window.addEventListener('resize', checkWidth);
+  
+    // ===== 기본 상태 =====
+    // 아무 신호 없으면 홈 active 유지
+    parent.postMessage({ type: 'requestUserInfo' }, '*');
   </script>
+
 </body>
 </html>
