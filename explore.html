@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -46,6 +45,24 @@
     .feed-container {
       max-width: 600px;
       width: 100%;
+      /* 중앙 정렬을 위한 스타일 추가 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* 추가된 문구 스타일 */
+    .explore-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .explore-subtitle {
+      font-size: 18px;
+      color: #aaa;
     }
 
     .verification-badge {
@@ -233,215 +250,6 @@
       text-align: center;
     }
 
-    .create-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-      backdrop-filter: blur(5px);
-    }
-
-    .create-modal.active {
-      display: flex;
-    }
-
-    .create-modal-content {
-      background: #1e1e1e;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
-    }
-
-    .create-modal-header {
-      padding: 16px;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .create-modal-header h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #fff;
-    }
-
-    .create-modal-body {
-      padding: 20px;
-    }
-
-    .create-modal textarea {
-      width: 100%;
-      border: 2px solid #333;
-      resize: vertical;
-      min-height: 150px;
-      font-size: 16px;
-      font-family: inherit;
-      outline: none;
-      background: #2c2c2c;
-      color: #fff;
-      padding: 12px;
-      border-radius: 12px;
-      box-sizing: border-box;
-    }
-
-    .create-modal textarea:focus {
-      border-color: #3663FF;
-    }
-
-    .image-preview-container {
-      margin-top: 15px;
-    }
-
-    .image-preview {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      border-radius: 12px;
-      display: none;
-    }
-
-    .image-preview.show {
-      display: block;
-    }
-
-    .upload-btn {
-      background: #2c2c2c;
-      border: 2px solid #333;
-      padding: 10px 20px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: 10px;
-      color: #fff;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    .upload-btn:hover {
-      background: #3663FF;
-      transform: translateY(-4px) scale(1.05);
-    }
-
-    .post-btn {
-      background: #3663FF;
-      color: white;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    .post-btn:hover {
-      transform: translateY(-4px) scale(1.05);
-    }
-
-    .post-btn:active {
-      background: #2952CC;
-    }
-
-    .post-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .post-card {
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .post-card:hover {
-      transform: translateY(-2px);
-      border-color: #3663FF;
-      box-shadow: 0 4px 12px rgba(54, 99, 255, 0.3);
-    }
-
-    .post-header {
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .post-author {
-      font-weight: 600;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      color: #fff;
-    }
-
-    .post-image {
-      width: 100%;
-      max-height: 600px;
-      object-fit: cover;
-    }
-
-    .post-content {
-      padding: 14px 16px;
-      font-size: 14px;
-      line-height: 1.6;
-      color: #fff;
-      white-space: pre-wrap;
-    }
-
-    .post-time {
-      padding: 0 16px 16px;
-      font-size: 12px;
-      color: #aaa;
-    }
-
-    .no-posts {
-      text-align: center;
-      padding: 60px 20px;
-      color: #aaa;
-    }
-
-    .delete-btn {
-      background: #ff4444;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 12px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    .delete-btn:hover {
-      transform: translateY(-4px) scale(1.05);
-    }
-
-    .delete-btn:active {
-      background: #cc0000;
-    }
-
     .footer {
       background: #1e1e1e;
       border-top: 1px solid #333;
@@ -486,7 +294,6 @@
   </style>
 </head>
 <body>
-  <!-- 사이드바 iframe -->
   <div class="sidebar-container">
     <iframe 
       src="sidebar.html" 
@@ -497,8 +304,14 @@
     ></iframe>
   </div>
 
+  <div class="main-wrapper">
+    <div class="main-content">
+      <div class="feed-container">
+        <h1 class="explore-title">탐색하기</h1>
+        <p class="explore-subtitle">제작중입니다 잠시만 기다려주세요</p>
+      </div>
+    </div>
 
-    <!-- 푸터 -->
     <div class="footer">
       <div class="footer-links">
         <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
@@ -519,15 +332,8 @@
     
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-    const cloudName = 'dretlhsrk';
-    const uploadPreset = 'unsigned_preset';
-
     let currentUser = null;
-    let selectedImage = null;
-    let verificationCode = "";
-    let isVerifying = false;
 
-    // 현재 로그인된 사용자 정보 로드
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -536,7 +342,6 @@
       }
     }
 
-    // 사이드바에 사용자 정보 전달
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
@@ -547,16 +352,9 @@
       }
     }
 
-    // 사이드바로부터 메시지 수신
     window.addEventListener('message', (event) => {
       if (event.data.type === 'navigateHome') {
-        location.reload();
-      }
-      if (event.data.type === 'showFeed') {
-        loadPosts();
-      }
-      if (event.data.type === 'createPost') {
-        handleCreatePost();
+        location.href = 'index.html';
       }
       if (event.data.type === 'logout') {
         localStorage.removeItem('snsUser');
@@ -566,9 +364,11 @@
       if (event.data.type === 'requestUserInfo') {
         updateSidebar();
       }
+      if (event.data.type === 'showExplore') {
+        location.href = 'explore.html';
+      }
     });
 
-    // 화면 크기에 따라 사이드바 모드 전환
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
@@ -580,127 +380,25 @@
       }
     }
 
-    // 페이지 로드 시 초기화
     initCurrentUser();
     updateSidebarMode();
-    loadPosts();
-
-    // 리사이즈 감지
     window.addEventListener('resize', updateSidebarMode);
 
-    window.closeLoginModal = function() {
-      document.getElementById('loginModal').classList.remove('active');
-      document.getElementById('loginId').value = '';
-      document.getElementById('loginPassword').value = '';
-      document.getElementById('loginError').textContent = '';
-      document.getElementById('loginSuccess').textContent = '';
-    }
-
-    window.closeSignupModal = function() {
-      document.getElementById('signupModal').classList.remove('active');
-      document.getElementById('signupNickname').value = '';
-      document.getElementById('signupId').value = '';
-      document.getElementById('signupPassword').value = '';
-      document.getElementById('idError').textContent = '';
-      document.getElementById('nicknameError').textContent = '';
-      document.getElementById('signupError').textContent = '';
-      document.getElementById('signupSuccess').textContent = '';
-    }
-
-    window.showSignup = function() {
-      closeLoginModal();
-      document.getElementById('signupModal').classList.add('active');
-    }
-
-    window.backToLogin = function() {
-      closeSignupModal();
-      document.getElementById('loginModal').classList.add('active');
-    }
-
-    window.showPrivacyPolicy = function() {
-      alert(`개인정보처리방침
-
-㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
-
-1. 수집하는 개인정보 항목
-- 필수항목: 아이디, 비밀번호, 닉네임
-
-2. 개인정보의 수집 및 이용목적
-- 회원 관리, 서비스 제공, 게시물 관리
-
-3. 개인정보의 보유 및 이용기간
-- 회원 탈퇴 시까지
-
-4. 개인정보 파기절차 및 방법
-- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
-
-5. 이용자의 권리
-- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
-
-문의사항: alexeom97@outlook.com`);
-    }
-
-    window.showTerms = function() {
-      alert(`이용약관
-
-제1조 (목적)
-이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
-
-제2조 (용어의 정의)
-1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
-2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
-
-제3조 (서비스의 제공)
-1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
-2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
-
-제4조 (회원의 의무)
-1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
-2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
-
-제5조 (서비스 이용의 제한)
-운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
-
-문의사항: alexeom97@outlook.com`);
-    }
-  </script>
-
-
-
-
-
-  <script>
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'showFeed') {
-        location.href = 'index.html';
-      }
-  
-      if (event.data.type === 'showExplore') {
-        location.href = 'explore.html';
-      }
-    });
-  </script>
-
-  <script>
     const sidebarFrame = document.getElementById('sidebarFrame');
-  
     sidebarFrame.addEventListener('load', () => {
       sidebarFrame.contentWindow.postMessage({
         type: 'setActivePage',
         page: 'explore'
       }, '*');
     });
+
+    window.showPrivacyPolicy = function() {
+      alert(`개인정보처리방침...`);
+    }
+
+    window.showTerms = function() {
+      alert(`이용약관...`);
+    }
   </script>
-
-  <script>
-    window.addEventListener('load', () => {
-      document.getElementById('sidebar').contentWindow.postMessage({
-        type: 'setActivePage',
-        page: 'home'
-      }, '*');
-    });
-  </script>
-
-
 </body>
 </html>
