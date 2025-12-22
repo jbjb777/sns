@@ -249,13 +249,31 @@
     };
 
     document.getElementById('homeNav').onclick = () => {
-      window.parent.postMessage({ type: 'showFeed' }, '*');
+      try {
+        window.parent.postMessage({ type: 'showFeed' }, '*');
+      } catch (e) {
+        window.parent.location.href = 'index.html';
+      }
+    
+      // 💡 부모가 메시지 안 받아도 대비
+      setTimeout(() => {
+        if (!document.hasFocus()) return;
+        window.parent.location.href = 'index.html';
+      }, 50);
     };
     
     document.getElementById('exploreNav').onclick = () => {
-      window.parent.postMessage({ type: 'showExplore' }, '*');
+      try {
+        window.parent.postMessage({ type: 'showExplore' }, '*');
+      } catch (e) {
+        window.parent.location.href = 'explore.html';
+      }
+    
+      // 👉 부모가 메시지 처리 안 하면 그냥 이동
+      setTimeout(() => {
+        window.parent.location.href = 'explore.html';
+      }, 50);
     };
-
 
     
     document.getElementById('createBtn').onclick = () => {
