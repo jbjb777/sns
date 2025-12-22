@@ -250,7 +250,9 @@
     document.getElementById('homeNav').onclick = () => {
       window.parent.postMessage({ type: 'showFeed' }, '*');
     };
-
+    document.getElementById('exploreNav').onclick = () => {
+      window.parent.postMessage({ type: 'showFeed' }, '*');
+    };
     document.getElementById('createBtn').onclick = () => {
       if (isLoggedIn) {
         window.parent.postMessage({ type: 'navigateToMake' }, '*');
