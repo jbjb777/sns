@@ -251,9 +251,9 @@
 
     document.getElementById('createBtn').onclick = () => {
       if (isLoggedIn) {
-        window.parent.postMessage({ type: 'navigateToMake' }, '*');
+        window.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
       } else {
-        window.parent.postMessage({ type: 'navigateToLogin' }, '*');
+        window.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
       }
     };
 
