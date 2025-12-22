@@ -217,7 +217,7 @@
       <span class="logo-text">Sharer</span>
     </div>
 
-    <div class="nav-item active" id="homeNav">
+    <div class="nav-item" id="homeNav">
       <span class="nav-icon">🏠</span>
       <span class="nav-text">홈</span>
     </div>
@@ -288,49 +288,19 @@
       window.parent.postMessage({ type: 'logout' }, '*');
     };
 
-    // 부모 페이지로부터 사용자 정보 업데이트 받기
-window.addEventListener('message', (event) => {
-  if (event.data.type === 'updateUser') {
-    const user = event.data.user;
-    if (user) {
-      isLoggedIn = true;
-      const badge =
-        user.nickname === "JB777"
-          ? '<span class="verification-badge"></span>'
-          : '';
-      document.getElementById('userNickname').innerHTML =
-        user.nickname + badge;
-      document.getElementById('userInfo').style.display = 'flex';
-    } else {
-      isLoggedIn = false;
-      document.getElementById('userInfo').style.display = 'none';
-    }
-  }
-
-  if (event.data.type === 'setActivePage') {
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.classList.remove('active');
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'setActivePage') {
+        document.querySelectorAll('.nav-item')
+          .forEach(i => i.classList.remove('active'));
+    
+        if (event.data.page === 'explore') {
+          document.getElementById('exploreNav')?.classList.add('active');
+        }
+        if (event.data.page === 'home') {
+          document.getElementById('homeNav')?.classList.add('active');
+        }
+      }
     });
-
-    if (event.data.page === 'home') {
-      document.getElementById('homeNav').classList.add('active');
-    }
-
-    if (event.data.page === 'explore') {
-      document.getElementById('exploreNav').classList.add('active');
-    }
-  } // ✅ 이 중괄호가 핵심
-
-  if (event.data.type === 'setNarrowMode') {
-    const sidebar = document.querySelector('.sidebar');
-    if (event.data.narrow) {
-      sidebar.classList.add('narrow');
-    } else {
-      sidebar.classList.remove('narrow');
-    }
-  }
-});
-
 
     // 화면 크기 감지 및 부모에게 알림
     function checkWidth() {
