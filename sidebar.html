@@ -221,6 +221,12 @@
       <span class="nav-icon">🏠</span>
       <span class="nav-text">홈</span>
     </div>
+
+    <div class="nav-item" id="exploreNav">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-text">탐색</span>
+    </div>
+
     
     <button class="create-btn" id="createBtn">
       <span class="btn-icon">➕</span>
@@ -246,6 +252,12 @@
       window.parent.postMessage({ type: 'showFeed' }, '*');
     };
 
+    document.getElementById('exploreNav').onclick = () => {
+      window.parent.location.href = 'explore.html';
+    };
+
+
+    
     document.getElementById('createBtn').onclick = () => {
       if (isLoggedIn) {
         window.parent.location.href = 'make.html';
@@ -279,11 +291,13 @@
           item.classList.remove('active');
         });
         
-        // 현재 페이지에 해당하는 nav-item에 active 클래스 추가
+
         if (event.data.page === 'home') {
           document.getElementById('homeNav').classList.add('active');
         }
-      }
+        if (event.data.page === 'explore') {
+          document.getElementById('exploreNav').classList.add('active');
+        }
 
       // 모바일 모드 전환 메시지 수신
       if (event.data.type === 'setNarrowMode') {
