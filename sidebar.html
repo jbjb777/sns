@@ -289,34 +289,55 @@
     };
 
   <script>
+    let isLoggedIn = false;
+  
+    // ===== 클릭 이벤트 =====
+    document.getElementById('logoContainer').onclick = () => {
+      window.parent.postMessage({ type: 'showFeed' }, '*');
+    };
+  
+    document.getElementById('homeNav').onclick = () => {
+      window.parent.postMessage({ type: 'showFeed' }, '*');
+    };
+  
+    document.getElementById('exploreNav').onclick = () => {
+      window.parent.postMessage({ type: 'showExplore' }, '*');
+    };
+  
+    document.getElementById('createBtn').onclick = () => {
+      window.parent.location.href = isLoggedIn ? 'make.html' : 'login.html';
+    };
+  
+    document.getElementById('logoutBtn').onclick = () => {
+      window.parent.postMessage({ type: 'logout' }, '*');
+    };
+  
+    // ===== active 표시 =====
     window.addEventListener('message', (event) => {
       if (event.data.type === 'setActivePage') {
         document.querySelectorAll('.nav-item')
           .forEach(el => el.classList.remove('active'));
   
         if (event.data.page === 'home') {
-          document.getElementById('homeNav')?.classList.add('active');
+          document.getElementById('homeNav').classList.add('active');
         }
   
         if (event.data.page === 'explore') {
-          document.getElementById('exploreNav')?.classList.add('active');
+          document.getElementById('exploreNav').classList.add('active');
         }
       }
     });
- 
-
-    // 화면 크기 감지 및 부모에게 알림
+  
+    // ===== 사이드바 폭 감지 =====
     function checkWidth() {
       const narrow = window.innerWidth < 150;
-      window.parent.postMessage({ type: 'sidebarNarrow', narrow: narrow }, '*');
+      window.parent.postMessage({ type: 'sidebarNarrow', narrow }, '*');
     }
-
-    // 초기 로드 시 부모 페이지에 사용자 정보 요청
+  
     window.parent.postMessage({ type: 'requestUserInfo' }, '*');
     checkWidth();
-
-    // 리사이즈 감지
     window.addEventListener('resize', checkWidth);
   </script>
+
 </body>
 </html>
