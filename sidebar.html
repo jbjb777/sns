@@ -221,10 +221,7 @@
       <span class="nav-icon">🏠</span>
       <span class="nav-text">홈</span>
     </div>
-   <div class="nav-item" id="exploreNav">
-    <span class="nav-icon">🔍</span>
-    <span class="nav-text">탐색</span>
-    </div>   
+    
     <button class="create-btn" id="createBtn">
       <span class="btn-icon">➕</span>
       <span class="btn-text">만들기</span>
@@ -251,9 +248,9 @@
 
     document.getElementById('createBtn').onclick = () => {
       if (isLoggedIn) {
-        window.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
+        window.parent.postMessage({ type: 'navigateToMake' }, '*');
       } else {
-        window.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
+        window.parent.postMessage({ type: 'navigateToLogin' }, '*');
       }
     };
 
