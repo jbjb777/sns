@@ -60,24 +60,13 @@
       transform: scale(1.05);
     }
 
-    .logo-svg {
-      width: 32px;
-      height: 32px;
-      margin-right: 10px;
-    }
-
-    .logo-text {
-      font-size: 20px;
-      font-weight: bold;
-      color: #fff;
-    }
-
     .header-title {
       font-size: 18px;
       font-weight: 600;
       color: #fff;
     }
 
+    /* 버튼 및 스피너 스타일 */
     .post-btn {
       background: #3663FF;
       color: white;
@@ -87,21 +76,43 @@
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 100px;
+      position: relative;
     }
 
-    .post-btn:hover {
+    .post-btn:hover:not(:disabled) {
       transform: translateY(-4px) scale(1.05);
     }
 
-    .post-btn:active {
-      background: #2952CC;
+    .post-btn:disabled {
+      opacity: 0.8;
+      cursor: not-allowed;
     }
 
-    .post-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading .spinner {
+      display: block;
+    }
+
+    .loading .btn-text {
+      display: none;
     }
 
     .main-content {
@@ -186,19 +197,12 @@
       margin-top: 15px;
       font-size: 14px;
       text-align: center;
+      min-height: 20px;
     }
 
-    .message.error {
-      color: #ff6b6b;
-    }
-
-    .message.success {
-      color: #00ff00;
-    }
-
-    .message.info {
-      color: #aaa;
-    }
+    .message.error { color: #ff6b6b; }
+    .message.success { color: #00ff00; }
+    .message.info { color: #aaa; }
 
     .footer {
       background: #1e1e1e;
@@ -210,21 +214,9 @@
     }
 
     @media (max-width: 768px) {
-      .logo-text {
-        display: none;
-      }
-
-      .header-title {
-        font-size: 16px;
-      }
-
-      .create-container {
-        padding: 20px;
-      }
-
-      .create-container h2 {
-        font-size: 20px;
-      }
+      .header-title { font-size: 16px; }
+      .create-container { padding: 20px; }
+      .create-container h2 { font-size: 20px; }
     }
   </style>
 </head>
@@ -233,12 +225,13 @@
     <div class="header-left">
       <button class="back-btn" onclick="goBack()">←</button>
       <div class="logo-container" onclick="goHome()">
-   
-
-      </div>
+        </div>
       <span class="header-title">새 게시물 만들기</span>
     </div>
-    <button class="post-btn" id="postBtn">공유하기</button>
+    <button class="post-btn" id="postBtn">
+      <span class="btn-text">공유하기</span>
+      <div class="spinner"></div>
+    </button>
   </div>
 
   <div class="main-content">
@@ -323,7 +316,6 @@
         });
 
         if (!response.ok) throw new Error('이미지 업로드 실패');
-        
         const data = await response.json();
         return data.secure_url;
       } catch (error) {
@@ -343,15 +335,15 @@
         return;
       }
 
+      // 로딩 상태 시작
       postButton.disabled = true;
-      messageDiv.className = 'message info';
-      messageDiv.textContent = '게시 중...';
+      postButton.classList.add('loading');
+      messageDiv.textContent = ''; // 메시지창 비움 (버튼에 집중)
 
       try {
         let imageUrl = null;
 
         if (selectedImage) {
-          messageDiv.textContent = '이미지 업로드 중...';
           imageUrl = await uploadImageToCloudinary(selectedImage);
         }
 
@@ -369,18 +361,17 @@
 
         if (error) throw error;
 
-        messageDiv.className = 'message success';
-        messageDiv.textContent = '게시글이 작성되었습니다!';
-        
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1000);
+        // 성공 시 메인으로 바로 이동
+        window.location.href = 'index.html';
 
       } catch (error) {
         console.error('게시 오류:', error);
         messageDiv.className = 'message error';
         messageDiv.textContent = '게시에 실패했습니다. 다시 시도해주세요.';
+        
+        // 로딩 상태 해제
         postButton.disabled = false;
+        postButton.classList.remove('loading');
       }
     };
 
