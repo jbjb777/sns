@@ -247,12 +247,26 @@
       window.parent.postMessage({ type: 'navigateHome' }, '*');
     };
 
-    document.getElementById('homeNav').onclick = () => {
-      window.parent.postMessage({ type: 'showFeed' }, '*');
+
+  // 클릭 시 부모에게 이동 요청
+    homeNav.onclick = () => {
+      parent.postMessage({ type: 'navigate', page: 'home' }, '*');
     };
-    document.getElementById('exploreNav').onclick = () => {
-      window.parent.postMessage({ type: 'showFeed' }, '*');
+  
+    exploreNav.onclick = () => {
+      parent.postMessage({ type: 'navigate', page: 'explore' }, '*');
     };
+  
+    // 🔥 active 변경은 "신호 받았을 때만"
+    window.addEventListener('message', (e) => {
+      if (e.data?.type !== 'activateExplore') return;
+  
+      document.getElementById('homeNav').classList.remove('active');
+      document.getElementById('exploreNav').classList.add('active');
+    });
+  
+      
+    
     document.getElementById('createBtn').onclick = () => {
       if (isLoggedIn) {
         window.parent.postMessage({ type: 'navigateToMake' }, '*');
