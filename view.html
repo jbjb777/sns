@@ -83,6 +83,53 @@
     .comment-date { font-size: 12px; color: #666; }
     .comment-del-btn { background: none; border: none; color: #ff4444; font-size: 12px; cursor: pointer; padding: 4px; }
 
+    /* Login Alert Notification */
+    .login-alert {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #3663FF, #2952CC);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(54, 99, 255, 0.4);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 9999;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .login-alert.show {
+      top: 20px;
+      animation: bounce 0.6s ease;
+    }
+
+    .login-alert:hover {
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 12px 32px rgba(54, 99, 255, 0.6);
+    }
+
+    .login-alert-icon {
+      font-size: 20px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.1); }
+    }
+
     /* Skeleton UI Styles */
     .skeleton {
       background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
@@ -156,10 +203,21 @@
         width: 80px !important;
       }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
+      .login-alert {
+        max-width: 90%;
+        padding: 14px 24px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Login Alert Notification -->
+  <div class="login-alert" id="loginAlert">
+    <span class="login-alert-icon">🔐</span>
+    <span>로그인 후 사용 가능합니다</span>
+  </div>
+
   <!-- 사이드바 iframe -->
   <div class="sidebar-container">
     <iframe 
@@ -246,6 +304,23 @@
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
+    // 로그인 알림 표시 함수
+    function showLoginAlert() {
+      const alert = document.getElementById('loginAlert');
+      alert.classList.add('show');
+      
+      // 1초 후 자동으로 사라짐
+      const hideTimeout = setTimeout(() => {
+        alert.classList.remove('show');
+      }, 3000);
+
+      // 클릭 시 로그인 페이지로 이동
+      alert.onclick = () => {
+        clearTimeout(hideTimeout);
+        window.location.href = 'login.html';
+      };
+    }
+
     // 현재 로그인된 사용자 정보 로드
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
@@ -276,8 +351,7 @@
       }
       if (event.data.type === 'createPost') {
         if (!currentUser) {
-          alert('로그인이 필요합니다.');
-          window.location.href = 'index.html';
+          showLoginAlert();
         } else {
           window.location.href = 'index.html#create';
         }
@@ -303,6 +377,14 @@
         }, '*');
       }
     }
+
+    // 댓글 입력창 클릭 이벤트
+    document.getElementById('commentInput').addEventListener('focus', function() {
+      if (!currentUser) {
+        this.blur();
+        showLoginAlert();
+      }
+    });
 
     // 페이지 로드 시 초기화
     initCurrentUser();
@@ -416,7 +498,7 @@
 
     window.toggleLike = async function() {
       if (!currentUser) {
-        alert('로그인이 필요합니다.');
+        showLoginAlert();
         return;
       }
 
@@ -511,7 +593,7 @@
       const text = input.value.trim();
       
       if (!currentUser) {
-        alert('로그인이 필요합니다.');
+        showLoginAlert();
         return;
       }
       
