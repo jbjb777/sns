@@ -400,5 +400,27 @@
       alert(`이용약관...`);
     }
   </script>
+
+  <script>
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'showFeed') {
+        location.href = 'index.html';
+      }
+  
+      if (event.data.type === 'showExplore') {
+        location.href = 'explore.html';
+      }
+    });
+  </script>
+  <script>
+    window.addEventListener('load', () => {
+      document.getElementById('sidebar').contentWindow.postMessage({
+        type: 'setActivePage',
+        page: 'explore'
+      }, '*');
+    });
+  </script>
+
+
 </body>
 </html>
