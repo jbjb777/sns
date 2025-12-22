@@ -640,6 +640,22 @@
       }
     }
 
+      const sidebarFrame = document.getElementById('sidebarFrame');
+      
+      sidebarFrame.addEventListener('load', () => {
+        // 🔵 active 페이지 표시
+        sidebarFrame.contentWindow.postMessage({
+          type: 'setActivePage',
+          page: 'explore'
+        }, '*');
+      
+        // 👤 사용자 정보 전달
+        sidebarFrame.contentWindow.postMessage({
+          type: 'updateUser',
+          user: currentUser
+        }, '*');
+      });
+
     // 사이드바로부터 메시지 수신
     window.addEventListener('message', (event) => {
       if (event.data.type === 'navigateHome') {
