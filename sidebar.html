@@ -288,19 +288,22 @@
       window.parent.postMessage({ type: 'logout' }, '*');
     };
 
+  <script>
     window.addEventListener('message', (event) => {
       if (event.data.type === 'setActivePage') {
         document.querySelectorAll('.nav-item')
-          .forEach(i => i.classList.remove('active'));
-    
-        if (event.data.page === 'explore') {
-          document.getElementById('exploreNav')?.classList.add('active');
-        }
+          .forEach(el => el.classList.remove('active'));
+  
         if (event.data.page === 'home') {
           document.getElementById('homeNav')?.classList.add('active');
         }
+  
+        if (event.data.page === 'explore') {
+          document.getElementById('exploreNav')?.classList.add('active');
+        }
       }
     });
+  </script>
 
     // 화면 크기 감지 및 부모에게 알림
     function checkWidth() {
