@@ -271,44 +271,48 @@
     };
 
     // 부모 페이지로부터 사용자 정보 업데이트 받기
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'updateUser') {
-        const user = event.data.user;
-        if (user) {
-          isLoggedIn = true;
-          const badge = user.nickname === "JB777" ? '<span class="verification-badge"></span>' : '';
-          document.getElementById('userNickname').innerHTML = user.nickname + badge;
-          document.getElementById('userInfo').style.display = 'flex';
-        } else {
-          isLoggedIn = false;
-          document.getElementById('userInfo').style.display = 'none';
-        }
-      }
-      
-      if (event.data.type === 'setActivePage') {
-        // 모든 nav-item에서 active 클래스 제거
-        document.querySelectorAll('.nav-item').forEach(item => {
-          item.classList.remove('active');
-        });
-        
+window.addEventListener('message', (event) => {
+  if (event.data.type === 'updateUser') {
+    const user = event.data.user;
+    if (user) {
+      isLoggedIn = true;
+      const badge =
+        user.nickname === "JB777"
+          ? '<span class="verification-badge"></span>'
+          : '';
+      document.getElementById('userNickname').innerHTML =
+        user.nickname + badge;
+      document.getElementById('userInfo').style.display = 'flex';
+    } else {
+      isLoggedIn = false;
+      document.getElementById('userInfo').style.display = 'none';
+    }
+  }
 
-        if (event.data.page === 'home') {
-          document.getElementById('homeNav').classList.add('active');
-        }
-        if (event.data.page === 'explore') {
-          document.getElementById('exploreNav').classList.add('active');
-        }
-      }
-      // 모바일 모드 전환 메시지 수신
-      if (event.data.type === 'setNarrowMode') {
-        const sidebar = document.querySelector('.sidebar');
-        if (event.data.narrow) {
-          sidebar.classList.add('narrow');
-        } else {
-          sidebar.classList.remove('narrow');
-        }
-      }
+  if (event.data.type === 'setActivePage') {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
     });
+
+    if (event.data.page === 'home') {
+      document.getElementById('homeNav').classList.add('active');
+    }
+
+    if (event.data.page === 'explore') {
+      document.getElementById('exploreNav').classList.add('active');
+    }
+  } // ✅ 이 중괄호가 핵심
+
+  if (event.data.type === 'setNarrowMode') {
+    const sidebar = document.querySelector('.sidebar');
+    if (event.data.narrow) {
+      sidebar.classList.add('narrow');
+    } else {
+      sidebar.classList.remove('narrow');
+    }
+  }
+});
+
 
     // 화면 크기 감지 및 부모에게 알림
     function checkWidth() {
