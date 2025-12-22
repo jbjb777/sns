@@ -251,9 +251,9 @@
     document.getElementById('homeNav').onclick = () => {
       window.parent.postMessage({ type: 'showFeed' }, '*');
     };
-
+    
     document.getElementById('exploreNav').onclick = () => {
-      window.parent.location.href = 'explore.html';
+      window.parent.postMessage({ type: 'showExplore' }, '*');
     };
 
 
