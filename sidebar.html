@@ -3,53 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=250">
-
   <style>
     body {
       margin: 0;
-      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      width: 100%;
       height: 100vh;
       overflow: hidden;
     }
 
     .sidebar {
-      width: 100%;
       height: 100%;
       background: #1e1e1e;
       border-right: 1px solid #333;
       padding: 20px;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
       box-sizing: border-box;
     }
 
     .logo-container {
       display: flex;
       align-items: center;
-      margin-bottom: 40px;
       cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    .logo-container:hover {
-      transform: translateY(-4px) scale(1.02);
+      margin-bottom: 40px;
     }
 
     .logo-svg {
       width: 40px;
-      height: 40px;
       margin-right: 12px;
-      flex-shrink: 0;
     }
 
     .logo-text {
       font-size: 24px;
       font-weight: bold;
-      color: #fff;
-      white-space: nowrap;
+      color: white;
     }
 
     .nav-item {
@@ -59,161 +46,62 @@
       margin-bottom: 8px;
       border-radius: 12px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      font-size: 16px;
-      color: #fff;
-    }
-
-    .nav-item:hover {
-      background: #2c2c2c;
-      transform: translateY(-4px) scale(1.02);
+      color: white;
     }
 
     .nav-item.active {
-      font-weight: bold;
       background: #3663FF;
+      font-weight: bold;
     }
 
-    .nav-item .nav-icon {
-      font-size: 24px;
-      margin-right: 16px;
-      flex-shrink: 0;
-    }
-
-    .nav-text {
-      white-space: nowrap;
+    .nav-icon {
+      font-size: 22px;
+      margin-right: 14px;
     }
 
     .create-btn {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 30px;
+      border: none;
       background: linear-gradient(135deg, #00aaff, #0044ff);
       color: white;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 30px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 20px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      width: 100%;
-    }
-
-    .create-btn:hover {
-      transform: translateY(-8px) scale(1.05);
-    }
-
-    .create-btn:active {
-      background: linear-gradient(135deg, #0088cc, #003388);
-    }
-
-    .create-btn .btn-icon {
-      font-size: 24px;
-      margin-right: 8px;
-      flex-shrink: 0;
-    }
-
-    .btn-text {
-      white-space: nowrap;
     }
 
     .user-info {
       margin-top: auto;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding-top: 16px;
       border-top: 1px solid #333;
-      padding-top: 20px;
-      gap: 10px;
-    }
-
-    .user-nickname {
-      font-weight: 600;
-      font-size: 14px;
-      color: #fff;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex: 1;
-      min-width: 0;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
     }
 
     .logout-btn {
       background: #3663FF;
       border: none;
-      color: #fff;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
       cursor: pointer;
       font-size: 13px;
-      font-weight: 600;
-      padding: 6px 16px;
-      border-radius: 20px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      white-space: nowrap;
-      flex-shrink: 0;
     }
 
-    .logout-btn:hover {
-      transform: translateY(-4px) scale(1.05);
-    }
-
-    .logout-btn:active {
-      background: #2952CC;
-    }
-
-    .verification-badge {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      margin-left: 5px;
-      vertical-align: middle;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
-      background-size: contain;
-      background-repeat: no-repeat;
-      flex-shrink: 0;
-    }
-
-    /* 좁은 사이드바 모드 (클래스로 제어) */
-    .sidebar.narrow .logo-text {
-      display: none;
-    }
-
-    .sidebar.narrow .logo-svg {
-      margin-right: 0;
-    }
-
-    .sidebar.narrow .nav-item .nav-icon {
-      margin-right: 0;
-    }
-
+    .sidebar.narrow .logo-text,
     .sidebar.narrow .nav-text {
       display: none;
     }
-
-    .sidebar.narrow .create-btn .btn-icon {
-      margin-right: 0;
-    }
-
-    .sidebar.narrow .btn-text {
-      display: none;
-    }
-
-    .sidebar.narrow .user-info {
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .sidebar.narrow {
-      padding: 10px;
-    }
   </style>
 </head>
+
 <body>
-  <div class="sidebar">
-    <div class="logo-container" id="logoContainer">
-      <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
+  <div class="sidebar" id="sidebar">
+    <div class="logo-container" id="logo">
+      <img src="logo.svg" class="logo-svg">
       <span class="logo-text">Sharer</span>
     </div>
 
@@ -221,92 +109,82 @@
       <span class="nav-icon">🏠</span>
       <span class="nav-text">홈</span>
     </div>
-    
-    <button class="create-btn" id="createBtn">
-      <span class="btn-icon">➕</span>
-      <span class="btn-text">만들기</span>
-    </button>
-    
-    <div class="user-info" id="userInfo" style="display: none;">
-      <div class="user-nickname" id="userNickname"></div>
+
+    <button class="create-btn" id="createBtn">➕ 만들기</button>
+
+    <div class="user-info" id="userInfo">
+      <span id="userNickname"></span>
       <button class="logout-btn" id="logoutBtn">로그아웃</button>
     </div>
   </div>
 
   <script>
-    // 현재 로그인 상태를 저장하는 변수
     let isLoggedIn = false;
 
-    // 부모 페이지로 이벤트 전달
-    document.getElementById('logoContainer').onclick = () => {
-      window.parent.postMessage({ type: 'navigateHome' }, '*');
+    const sidebar = document.getElementById('sidebar');
+    const userInfo = document.getElementById('userInfo');
+    const userNickname = document.getElementById('userNickname');
+
+    // ===== 클릭 이벤트 =====
+    logo.onclick = () => {
+      parent.postMessage({ type: 'navigate', page: 'home' }, '*');
     };
 
-    document.getElementById('homeNav').onclick = () => {
-      window.parent.postMessage({ type: 'showFeed' }, '*');
+    homeNav.onclick = () => {
+      parent.postMessage({ type: 'navigate', page: 'home' }, '*');
     };
 
-    document.getElementById('createBtn').onclick = () => {
-      if (isLoggedIn) {
-        window.parent.postMessage({ type: 'navigateToMake' }, '*');
-      } else {
-        window.parent.postMessage({ type: 'navigateToLogin' }, '*');
-      }
+    createBtn.onclick = () => {
+      parent.postMessage({
+        type: 'navigate',
+        page: isLoggedIn ? 'make' : 'login'
+      }, '*');
     };
 
-    document.getElementById('logoutBtn').onclick = () => {
-      window.parent.postMessage({ type: 'logout' }, '*');
+    logoutBtn.onclick = () => {
+      parent.postMessage({ type: 'logout' }, '*');
     };
 
-    // 부모 페이지로부터 사용자 정보 업데이트 받기
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'updateUser') {
-        const user = event.data.user;
-        if (user) {
+    // ===== 부모 메시지 수신 =====
+    window.addEventListener('message', (e) => {
+      const { type } = e.data;
+
+      if (type === 'updateUser') {
+        if (e.data.user) {
           isLoggedIn = true;
-          const badge = user.nickname === "JB777" ? '<span class="verification-badge"></span>' : '';
-          document.getElementById('userNickname').innerHTML = user.nickname + badge;
-          document.getElementById('userInfo').style.display = 'flex';
+          userNickname.textContent = e.data.user.nickname;
+          userInfo.style.display = 'flex';
         } else {
           isLoggedIn = false;
-          document.getElementById('userInfo').style.display = 'none';
-        }
-      }
-      
-      if (event.data.type === 'setActivePage') {
-        // 모든 nav-item에서 active 클래스 제거
-        document.querySelectorAll('.nav-item').forEach(item => {
-          item.classList.remove('active');
-        });
-        
-        // 현재 페이지에 해당하는 nav-item에 active 클래스 추가
-        if (event.data.page === 'home') {
-          document.getElementById('homeNav').classList.add('active');
+          userInfo.style.display = 'none';
         }
       }
 
-      // 모바일 모드 전환 메시지 수신
-      if (event.data.type === 'setNarrowMode') {
-        const sidebar = document.querySelector('.sidebar');
-        if (event.data.narrow) {
-          sidebar.classList.add('narrow');
-        } else {
-          sidebar.classList.remove('narrow');
+      if (type === 'setActivePage') {
+        document.querySelectorAll('.nav-item')
+          .forEach(el => el.classList.remove('active'));
+
+        if (e.data.page === 'home') {
+          homeNav.classList.add('active');
         }
+      }
+
+      if (type === 'setNarrowMode') {
+        sidebar.classList.toggle('narrow', e.data.narrow);
       }
     });
 
-    // 화면 크기 감지 및 부모에게 알림
+    // ===== 초기 요청 =====
+    parent.postMessage({ type: 'requestUserInfo' }, '*');
+
     function checkWidth() {
-      const narrow = window.innerWidth < 150;
-      window.parent.postMessage({ type: 'sidebarNarrow', narrow: narrow }, '*');
+      parent.postMessage({
+        type: 'sidebarNarrow',
+        narrow: window.innerWidth < 150
+      }, '*');
     }
 
-    // 초기 로드 시 부모 페이지에 사용자 정보 요청
-    window.parent.postMessage({ type: 'requestUserInfo' }, '*');
     checkWidth();
-
-    // 리사이즈 감지
     window.addEventListener('resize', checkWidth);
   </script>
 </body>
