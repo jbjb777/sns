@@ -643,13 +643,11 @@
       const sidebarFrame = document.getElementById('sidebarFrame');
       
       sidebarFrame.addEventListener('load', () => {
-        // 🔵 active 페이지 표시
         sidebarFrame.contentWindow.postMessage({
           type: 'setActivePage',
-          page: 'explore'
+          page: 'home'   // ✅ 홈은 home
         }, '*');
       
-        // 👤 사용자 정보 전달
         sidebarFrame.contentWindow.postMessage({
           type: 'updateUser',
           user: currentUser
