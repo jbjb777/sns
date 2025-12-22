@@ -1144,5 +1144,24 @@
 문의사항: alexeom97@outlook.com`);
     }
   </script>
+
+
+
+
+
+  <script>
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'showFeed') {
+        location.href = 'index.html';
+      }
+  
+      if (event.data.type === 'showExplore') {
+        location.href = 'explore.html';
+      }
+    });
+  </script>
+
+
+
 </body>
 </html>
