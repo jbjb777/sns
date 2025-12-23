@@ -83,7 +83,6 @@
     .comment-date { font-size: 12px; color: #666; }
     .comment-del-btn { background: none; border: none; color: #ff4444; font-size: 12px; cursor: pointer; padding: 4px; }
 
-    /* Login Alert Notification */
     .login-alert {
       position: fixed;
       top: -100px;
@@ -130,7 +129,6 @@
       50% { opacity: 0.8; transform: scale(1.1); }
     }
 
-    /* Skeleton UI Styles */
     .skeleton {
       background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
       background-size: 200% 100%;
@@ -143,93 +141,37 @@
       100% { background-position: -200% 0; }
     }
 
-    .skeleton-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-    }
-
-    .skeleton-name {
-      width: 120px;
-      height: 16px;
-      margin-bottom: 6px;
-    }
-
-    .skeleton-time {
-      width: 150px;
-      height: 13px;
-    }
-
-    .skeleton-button {
-      width: 100px;
-      height: 38px;
-      border-radius: 12px;
-    }
-
-    .skeleton-image {
-      width: 100%;
-      height: 500px;
-    }
-
-    .skeleton-text {
-      width: 100%;
-      height: 16px;
-      margin-bottom: 10px;
-    }
-
-    .skeleton-share {
-      flex: 1;
-      height: 42px;
-      border-radius: 10px;
-    }
-
-    .skeleton-comment {
-      width: 100%;
-      height: 60px;
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
+    .skeleton-avatar { width: 48px; height: 48px; border-radius: 50%; }
+    .skeleton-name { width: 120px; height: 16px; margin-bottom: 6px; }
+    .skeleton-time { width: 150px; height: 13px; }
+    .skeleton-button { width: 100px; height: 38px; border-radius: 12px; }
+    .skeleton-image { width: 100%; height: 500px; }
+    .skeleton-text { width: 100%; height: 16px; margin-bottom: 10px; }
+    .skeleton-share { flex: 1; height: 42px; border-radius: 10px; }
+    .skeleton-comment { width: 100%; height: 60px; border-radius: 12px; margin-bottom: 16px; }
 
     .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: 40px; }
     .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; }
     .footer-text { color: #666; font-size: 12px; margin-top: 10px; }
 
     @media (max-width: 768px) {
-      .sidebar-container { 
-        width: 80px; 
-        min-width: 80px;
-      }
-      .sidebar-container iframe {
-        width: 80px !important;
-      }
+      .sidebar-container { width: 80px; min-width: 80px; }
+      .sidebar-container iframe { width: 80px !important; }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
-      .login-alert {
-        max-width: 90%;
-        padding: 14px 24px;
-        font-size: 14px;
-      }
+      .login-alert { max-width: 90%; padding: 14px 24px; font-size: 14px; }
     }
   </style>
 </head>
 <body>
-  <!-- Login Alert Notification -->
   <div class="login-alert" id="loginAlert">
     <span class="login-alert-icon">🔐</span>
     <span>로그인 후 사용 가능합니다</span>
   </div>
 
-  <!-- 사이드바 iframe -->
   <div class="sidebar-container">
-    <iframe 
-      src="sidebar.html" 
-      id="sidebarFrame"
-      width="250"
-      height="100%"
-      frameborder="0"
-    ></iframe>
+    <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
 
-  <!-- 메인 컨텐츠 -->
   <div class="main-wrapper">
     <div class="header">
       <button class="back-btn" onclick="goHome()">←</button>
@@ -238,7 +180,6 @@
 
     <div class="container">
       <div id="postContent">
-        <!-- Skeleton UI for Post -->
         <div class="post-detail-card">
           <div class="post-detail-header">
             <div class="author-info" style="pointer-events: none;">
@@ -274,7 +215,6 @@
           <button class="comment-submit-btn" onclick="addComment()">업로드</button>
         </div>
         <div id="commentList" class="comment-list">
-          <!-- Skeleton UI for Comments -->
           <div class="skeleton skeleton-comment"></div>
           <div class="skeleton skeleton-comment"></div>
           <div class="skeleton skeleton-comment"></div>
@@ -304,24 +244,20 @@
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
-    // 로그인 알림 표시 함수
     function showLoginAlert() {
       const alert = document.getElementById('loginAlert');
       alert.classList.add('show');
       
-      // 1초 후 자동으로 사라짐
       const hideTimeout = setTimeout(() => {
         alert.classList.remove('show');
       }, 3000);
 
-      // 클릭 시 로그인 페이지로 이동
       alert.onclick = () => {
         clearTimeout(hideTimeout);
         window.location.href = 'login.html';
       };
     }
 
-    // 현재 로그인된 사용자 정보 로드
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -330,7 +266,6 @@
       }
     }
 
-    // 사이드바에 사용자 정보 전달
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
@@ -341,32 +276,6 @@
       }
     }
 
-    // 사이드바로부터 메시지 수신
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'navigateHome') {
-        window.location.href = 'index.html';
-      }
-      if (event.data.type === 'showFeed') {
-        window.location.href = 'index.html';
-      }
-      if (event.data.type === 'createPost') {
-        if (!currentUser) {
-          showLoginAlert();
-        } else {
-          window.location.href = 'index.html#create';
-        }
-      }
-      if (event.data.type === 'logout') {
-        localStorage.removeItem('snsUser');
-        currentUser = null;
-        window.location.href = 'index.html';
-      }
-      if (event.data.type === 'requestUserInfo') {
-        updateSidebar();
-      }
-    });
-
-    // 화면 크기에 따라 사이드바 모드 전환
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
@@ -378,7 +287,26 @@
       }
     }
 
-    // 댓글 입력창 클릭 이벤트
+    // 🔥 사이드바 메시지 수신
+    window.addEventListener('message', (event) => {
+      const { type, page } = event.data || {};
+
+      if (type === 'navigate') {
+        if (page === 'home') location.href = 'index.html';
+        if (page === 'explore') location.href = 'explore.html';
+      }
+
+      if (type === 'logout') {
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        location.href = 'index.html';
+      }
+
+      if (type === 'requestUserInfo') {
+        updateSidebar();
+      }
+    });
+
     document.getElementById('commentInput').addEventListener('focus', function() {
       if (!currentUser) {
         this.blur();
@@ -386,11 +314,8 @@
       }
     });
 
-    // 페이지 로드 시 초기화
     initCurrentUser();
     updateSidebarMode();
-
-    // 리사이즈 감지
     window.addEventListener('resize', updateSidebarMode);
 
     if (!postId) {
@@ -453,7 +378,7 @@
             <div class="share-box-wrapper">
               <div class="share-url-box">${window.location.href}</div>
               <button class="copy-btn" id="copyBtn" onclick="copyShareLink()">
-                <span class="btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               </button>
             </div>
           </div>
@@ -461,12 +386,10 @@
       `;
     }
 
-    // 프로필 페이지로 이동하는 함수
     window.goToProfile = function(userId, nickname) {
       window.location.href = `user.html?id=${userId}&nickname=${nickname}`;
     }
 
-    // 좋아요 기능
     async function loadLikes(postId) {
       try {
         const { data: likes, error } = await supabase
@@ -475,7 +398,6 @@
           .eq('post_id', postId);
 
         if (error) throw error;
-
         updateLikeUI(likes || []);
       } catch (e) {
         console.error('좋아요 로드 오류:', e);
@@ -531,7 +453,6 @@
       }
     }
 
-    // 댓글 기능
     async function listenComments(postId) {
       try {
         const { data: comments, error } = await supabase
@@ -541,7 +462,6 @@
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-
         displayComments(comments || []);
 
         supabase
@@ -630,7 +550,6 @@
           .eq('id', commentId);
 
         if (error) throw error;
-
         listenComments(postId);
       } catch (e) {
         console.error('댓글 삭제 오류:', e);
