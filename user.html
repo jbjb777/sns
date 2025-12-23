@@ -69,7 +69,6 @@
     .post-item-date { font-size: 11px; }
     .post-item-likes { display: flex; align-items: center; gap: 4px; color: #3663FF; }
     
-    /* Skeleton UI Styles */
     .skeleton { background: linear-gradient(90deg, #252525 25%, #2a2a2a 50%, #252525 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     
@@ -103,7 +102,6 @@
   </style>
 </head>
 <body>
-  <!-- 사이드바 iframe -->
   <div class="sidebar-container">
     <iframe 
       src="sidebar.html" 
@@ -114,7 +112,6 @@
     ></iframe>
   </div>
 
-  <!-- 메인 컨텐츠 -->
   <div class="main-wrapper">
     <div class="header">
       <button class="back-btn" onclick="goBack()">←</button>
@@ -123,7 +120,6 @@
 
     <div class="container">
       <div id="profileContent">
-        <!-- Profile Skeleton -->
         <div class="profile-card">
           <div class="profile-header">
             <div class="skeleton skeleton-avatar"></div>
@@ -141,7 +137,6 @@
       <div class="posts-section">
         <div class="section-title">게시물</div>
         <div id="userPosts">
-          <!-- Posts Skeleton -->
           <div class="post-grid">
             <div class="post-item">
               <div class="skeleton skeleton-post-image"></div>
@@ -196,7 +191,6 @@
 
     let currentUser = null;
 
-    // 현재 로그인된 사용자 정보 로드
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -205,7 +199,6 @@
       }
     }
 
-    // 사이드바에 사용자 정보 전달
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
@@ -216,33 +209,6 @@
       }
     }
 
-    // 사이드바로부터 메시지 수신
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'navigateHome') {
-        window.location.href = 'index.html';
-      }
-      if (event.data.type === 'showFeed') {
-        window.location.href = 'index.html';
-      }
-      if (event.data.type === 'createPost') {
-        if (!currentUser) {
-          alert('로그인이 필요합니다.');
-          window.location.href = 'index.html';
-        } else {
-          window.location.href = 'index.html#create';
-        }
-      }
-      if (event.data.type === 'logout') {
-        localStorage.removeItem('snsUser');
-        currentUser = null;
-        window.location.href = 'index.html';
-      }
-      if (event.data.type === 'requestUserInfo') {
-        updateSidebar();
-      }
-    });
-
-    // 화면 크기에 따라 사이드바 모드 전환
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
@@ -254,11 +220,32 @@
       }
     }
 
-    // 페이지 로드 시 초기화
+    // 🔥 사이드바 메시지 수신 (홈/탐색 네비게이션 추가)
+    window.addEventListener('message', (event) => {
+      const { type, page } = event.data || {};
+
+      // 네비게이션 메시지
+      if (type === 'navigate') {
+        if (page === 'home') location.href = 'index.html';
+        if (page === 'explore') location.href = 'explore.html';
+      }
+
+      // 로그아웃
+      if (type === 'logout') {
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        location.href = 'index.html';
+      }
+
+      // 유저 정보 요청
+      if (type === 'requestUserInfo') {
+        updateSidebar();
+      }
+    });
+
     initCurrentUser();
     updateSidebarMode();
 
-    // 리사이즈 감지
     window.addEventListener('resize', updateSidebarMode);
 
     if (!userId && !userNickname) {
@@ -272,7 +259,6 @@
       try {
         let userData = null;
 
-        // 닉네임이 JB777인 경우 특별 처리
         if (userNickname === "JB777") {
           userData = {
             nickname: "JB777",
@@ -280,7 +266,6 @@
             isVerified: true
           };
         } else {
-          // 일반 사용자는 DB에서 조회
           const { data, error } = await supabase
             .from('users')
             .select('*')
@@ -305,7 +290,6 @@
       const contentDiv = document.getElementById('profileContent');
       const isVerified = user.nickname === "JB777";
 
-      // 게시물 수 계산
       const { data: posts } = await supabase
         .from('posts')
         .select('id')
@@ -313,7 +297,6 @@
 
       const postCount = posts ? posts.length : 0;
 
-      // 좋아요 수 계산
       const { data: userPosts } = await supabase
         .from('posts')
         .select('id')
@@ -379,7 +362,6 @@
           return;
         }
 
-        // 각 게시물의 좋아요 수 가져오기
         const postsWithLikes = await Promise.all(
           posts.map(async (post) => {
             const { data: likes } = await supabase
