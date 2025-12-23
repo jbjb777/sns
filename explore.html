@@ -393,18 +393,34 @@
   </script>
 
 
-<script type="module">
-  // 🔥 iframe 로드되면 탐색 활성화
-  const sidebarFrame = document.getElementById('sidebarFrame');
-
-  sidebarFrame.addEventListener('load', () => {
-    sidebarFrame.contentWindow.postMessage(
-      { type: 'activateExplore' },
-      '*'
-    );
+  <script type="module">
+    // 🔥 iframe 로드되면 탐색 활성화
+    const sidebarFrame = document.getElementById('sidebarFrame');
+  
+    sidebarFrame.addEventListener('load', () => {
+      sidebarFrame.contentWindow.postMessage(
+        { type: 'activateExplore' },
+        '*'
+      );
+    });
+  </script>
+  
+  <script>
+  window.addEventListener('message', (event) => {
+    const { type, page } = event.data || {};
+  
+    if (type === 'navigate') {
+      if (page === 'home') {
+        location.href = 'index.html';
+      }
+      if (page === 'explore') {
+        location.href = 'explore.html';
+      }
+    }
   });
-</script>
+  </script>
 
 
+  
 </body>
 </html>
