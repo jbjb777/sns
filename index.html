@@ -58,7 +58,6 @@
       background-repeat: no-repeat;
     }
 
-    /* Skeleton UI Styles */
     .skeleton {
       background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
       background-size: 200% 100%;
@@ -485,7 +484,6 @@
   </style>
 </head>
 <body>
-  <!-- 사이드바 iframe -->
   <div class="sidebar-container">
     <iframe 
       src="sidebar.html" 
@@ -496,9 +494,7 @@
     ></iframe>
   </div>
 
-  <!-- 메인 컨텐츠 -->
   <div class="main-wrapper">
-    <!-- 로그인 모달 -->
     <div class="auth-modal" id="loginModal">
       <div class="auth-box">
         <button class="auth-close" onclick="closeLoginModal()">✕</button>
@@ -512,7 +508,6 @@
       </div>
     </div>
 
-    <!-- 회원가입 모달 -->
     <div class="auth-modal" id="signupModal">
       <div class="auth-box">
         <button class="auth-close" onclick="closeSignupModal()">✕</button>
@@ -529,7 +524,6 @@
       </div>
     </div>
 
-    <!-- 게시글 작성 모달 -->
     <div class="create-modal" id="createModal">
       <div class="create-modal-content">
         <div class="create-modal-header">
@@ -551,11 +545,9 @@
       </div>
     </div>
 
-    <!-- 피드 -->
     <div class="main-content">
       <div class="feed-container">
         <div id="postsFeed">
-          <!-- Skeleton Loading UI -->
           <div class="skeleton-post">
             <div class="skeleton-header">
               <div class="skeleton skeleton-avatar"></div>
@@ -591,7 +583,6 @@
       </div>
     </div>
 
-    <!-- 푸터 -->
     <div class="footer">
       <div class="footer-links">
         <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
@@ -620,7 +611,6 @@
     let verificationCode = "";
     let isVerifying = false;
 
-    // 현재 로그인된 사용자 정보 로드
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -629,7 +619,6 @@
       }
     }
 
-    // 사이드바에 사용자 정보 전달
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
@@ -640,42 +629,6 @@
       }
     }
 
-      const sidebarFrame = document.getElementById('sidebarFrame');
-      
-      sidebarFrame.addEventListener('load', () => {
-        sidebarFrame.contentWindow.postMessage({
-          type: 'setActivePage',
-          page: 'home'   // ✅ 홈은 home
-        }, '*');
-      
-        sidebarFrame.contentWindow.postMessage({
-          type: 'updateUser',
-          user: currentUser
-        }, '*');
-      });
-
-    // 사이드바로부터 메시지 수신
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'navigateHome') {
-        location.reload();
-      }
-      if (event.data.type === 'showFeed') {
-        loadPosts();
-      }
-      if (event.data.type === 'createPost') {
-        handleCreatePost();
-      }
-      if (event.data.type === 'logout') {
-        localStorage.removeItem('snsUser');
-        currentUser = null;
-        location.reload();
-      }
-      if (event.data.type === 'requestUserInfo') {
-        updateSidebar();
-      }
-    });
-
-    // 화면 크기에 따라 사이드바 모드 전환
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
@@ -687,12 +640,34 @@
       }
     }
 
-    // 페이지 로드 시 초기화
+    // 🔥 메시지 수신 (단순화)
+    window.addEventListener('message', (event) => {
+      const { type, page } = event.data || {};
+
+      if (type === 'navigate') {
+        if (page === 'home') location.href = 'index.html';
+        if (page === 'explore') location.href = 'explore.html';
+      }
+
+      if (type === 'createPost') {
+        handleCreatePost();
+      }
+
+      if (type === 'logout') {
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        location.reload();
+      }
+
+      if (type === 'requestUserInfo') {
+        updateSidebar();
+      }
+    });
+
     initCurrentUser();
     updateSidebarMode();
     loadPosts();
 
-    // 리사이즈 감지
     window.addEventListener('resize', updateSidebarMode);
 
     window.closeLoginModal = function() {
@@ -1158,38 +1133,5 @@
 문의사항: alexeom97@outlook.com`);
     }
   </script>
-
-
-
-
-
-  <script>
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'showFeed') {
-        location.href = 'index.html';
-      }
-  
-      if (event.data.type === 'showExplore') {
-        location.href = 'explore.html';
-      }
-    });
-  </script>
-
-  <script>
-  window.addEventListener('message', (event) => {
-    const { type, page } = event.data || {};
-  
-    if (type === 'navigate') {
-      if (page === 'home') {
-        location.href = 'index.html';
-      }
-      if (page === 'explore') {
-        location.href = 'explore.html';
-      }
-    }
-  });
-  </script>
-
-
 </body>
 </html>
