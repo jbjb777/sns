@@ -1175,6 +1175,20 @@
     });
   </script>
 
+  <script>
+  window.addEventListener('message', (event) => {
+    const { type, page } = event.data || {};
+  
+    if (type === 'navigate') {
+      if (page === 'home') {
+        location.href = 'index.html';
+      }
+      if (page === 'explore') {
+        location.href = 'explore.html';
+      }
+    }
+  });
+  </script>
 
 
 </body>
