@@ -175,7 +175,6 @@
       flex-shrink: 0;
     }
 
-    /* 좁은 사이드바 모드 (클래스로 제어) */
     .sidebar.narrow .logo-text {
       display: none;
     }
@@ -226,7 +225,6 @@
       <span class="nav-text">탐색</span>
     </div>
 
-    
     <button class="create-btn" id="createBtn">
       <span class="btn-icon">➕</span>
       <span class="btn-text">만들기</span>
@@ -237,64 +235,73 @@
       <button class="logout-btn" id="logoutBtn">로그아웃</button>
     </div>
   </div>
+
   <script>
-    // ===== DOM =====
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
     const createBtn = document.getElementById('createBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const userInfo = document.getElementById('userInfo');
     const userNickname = document.getElementById('userNickname');
-  
+
     let isLoggedIn = false;
-  
-    // ===== 클릭 =====
+
+    // 🔥 클릭 시 부모에게 이동 요청
     homeNav.onclick = () => {
       parent.postMessage({ type: 'navigate', page: 'home' }, '*');
     };
-  
+
     exploreNav.onclick = () => {
       parent.postMessage({ type: 'navigate', page: 'explore' }, '*');
     };
-  
+
     createBtn.onclick = () => {
-      parent.postMessage({
-        type: isLoggedIn ? 'navigateToMake' : 'navigateToLogin'
-      }, '*');
+      parent.postMessage({ type: 'createPost' }, '*');
     };
-  
+
     logoutBtn.onclick = () => {
       parent.postMessage({ type: 'logout' }, '*');
     };
-  
-    // ===== 메시지 수신 (하나만!) =====
-    window.addEventListener('message', (e) => {
-      const data = e.data;
+
+    // 🔥 메시지 수신
+    window.addEventListener('message', (event) => {
+      const data = event.data;
       if (!data?.type) return;
-  
-      // 🔵 explore.html에서만 보내는 신호
+
+      // explore.html에서 보내는 active 신호
       if (data.type === 'activateExplore') {
         homeNav.classList.remove('active');
         exploreNav.classList.add('active');
       }
-  
-      // 🔵 유저 정보
+
+      // 유저 정보 업데이트
       if (data.type === 'updateUser') {
         if (data.user) {
           isLoggedIn = true;
           userNickname.innerHTML = data.user.nickname;
+          if (data.user.isVerified) {
+            userNickname.innerHTML += '<span class="verification-badge"></span>';
+          }
           userInfo.style.display = 'flex';
         } else {
           isLoggedIn = false;
           userInfo.style.display = 'none';
         }
       }
+
+      // narrow 모드 (모바일)
+      if (data.type === 'setNarrowMode') {
+        const sidebar = document.querySelector('.sidebar');
+        if (data.narrow) {
+          sidebar.classList.add('narrow');
+        } else {
+          sidebar.classList.remove('narrow');
+        }
+      }
     });
-  
-    // ===== 기본 상태 =====
-    // 아무 신호 없으면 홈 active 유지
+
+    // 기본 상태: 유저 정보 요청
     parent.postMessage({ type: 'requestUserInfo' }, '*');
   </script>
-
 </body>
 </html>
