@@ -240,25 +240,38 @@
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
     const createBtn = document.getElementById('createBtn');
+    const logoContainer = document.getElementById('logoContainer');
     const logoutBtn = document.getElementById('logoutBtn');
     const userInfo = document.getElementById('userInfo');
     const userNickname = document.getElementById('userNickname');
 
     let isLoggedIn = false;
 
-    // 🔥 클릭 시 부모에게 이동 요청
+    // 🔥 로고 클릭 → index.html
+    logoContainer.onclick = () => {
+      parent.location.href = 'index.html';
+    };
+
+    // 🔥 홈 클릭
     homeNav.onclick = () => {
       parent.postMessage({ type: 'navigate', page: 'home' }, '*');
     };
 
+    // 🔥 탐색 클릭
     exploreNav.onclick = () => {
       parent.postMessage({ type: 'navigate', page: 'explore' }, '*');
     };
 
+    // 🔥 만들기 클릭 → 로그인 여부에 따라 분기
     createBtn.onclick = () => {
-      parent.postMessage({ type: 'createPost' }, '*');
+      if (isLoggedIn) {
+        parent.location.href = 'make.html';
+      } else {
+        parent.location.href = 'login.html';
+      }
     };
 
+    // 🔥 로그아웃
     logoutBtn.onclick = () => {
       parent.postMessage({ type: 'logout' }, '*');
     };
