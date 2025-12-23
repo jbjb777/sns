@@ -8,7 +8,7 @@
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; overflow: hidden; }
     
     .sidebar-container {
       width: 250px;
@@ -31,67 +31,236 @@
       width: calc(100% - 250px);
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    .main-content {
+    .shorts-container {
       flex: 1;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-      overflow-y: auto;
+      position: relative;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
 
-    .feed-container {
-      max-width: 600px;
+    .shorts-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .short-item {
       width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      padding: 20px;
+    }
+
+    .short-content {
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      position: relative;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .short-image {
+      max-width: 100%;
+      max-height: 65vh;
+      width: auto;
+      height: auto;
+      border-radius: 16px;
+      object-fit: contain;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .short-text-only {
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 70vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
     }
 
-    .explore-title {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 10px;
+    .short-text-content {
+      font-size: 20px;
+      line-height: 1.6;
+      color: #fff;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
-    .explore-subtitle {
+    .short-caption {
+      padding: 16px 20px;
+      background: rgba(30, 30, 30, 0.9);
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      backdrop-filter: blur(10px);
+      border: 1px solid #333;
+    }
+
+    .short-caption-text {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #fff;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .short-info-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 80px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .short-author-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      background: rgba(30, 30, 30, 0.8);
+      padding: 8px 16px 8px 8px;
+      border-radius: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .short-author-info:hover {
+      background: rgba(54, 99, 255, 0.8);
+      border-color: #3663FF;
+      transform: scale(1.05);
+    }
+
+    .short-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      border: 2px solid #fff;
+      flex-shrink: 0;
+    }
+
+    .short-author-name {
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .verification-badge {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
+      background-size: contain;
+      background-repeat: no-repeat;
+      flex-shrink: 0;
+    }
+
+    .short-actions {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .action-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(30, 30, 30, 0.8);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #fff;
+      font-size: 24px;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.1);
+      background: rgba(54, 99, 255, 0.8);
+      border-color: #3663FF;
+    }
+
+    .action-btn.liked {
+      background: rgba(54, 99, 255, 0.8);
+      border-color: #3663FF;
+    }
+
+    .action-count {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .loading-spinner {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 18px;
       color: #aaa;
     }
 
-    .footer {
-      background: #1e1e1e;
-      border-top: 1px solid #333;
-      padding: 30px 20px;
+    .no-posts {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 40px;
       text-align: center;
+    }
+
+    .no-posts-icon {
+      font-size: 64px;
+    }
+
+    .no-posts-text {
+      font-size: 20px;
       color: #aaa;
-      font-size: 14px;
-      margin-top: auto;
-    }
-
-    .footer-links {
-      margin-bottom: 15px;
-    }
-
-    .footer-links a {
-      color: #3663FF;
-      text-decoration: none;
-      margin: 0 15px;
-      transition: color 0.3s;
-    }
-
-    .footer-links a:hover {
-      color: #00aaff;
-      text-decoration: underline;
-    }
-
-    .footer-text {
-      color: #666;
-      font-size: 12px;
+      line-height: 1.6;
     }
 
     @media (max-width: 768px) {
@@ -102,7 +271,60 @@
       .sidebar-container iframe {
         width: 80px !important;
       }
-      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
+      .main-wrapper { 
+        margin-left: 80px; 
+        width: calc(100% - 80px); 
+      }
+      .short-item {
+        padding: 10px;
+      }
+      .short-content {
+        max-width: 100%;
+        width: 100%;
+      }
+      .short-image {
+        max-height: 75vh;
+      }
+      .short-text-only {
+        max-width: 100%;
+        width: 100%;
+        padding: 30px 20px;
+      }
+      .short-text-content {
+        font-size: 18px;
+      }
+      .short-info-bar {
+        left: 10px;
+        right: 70px;
+        bottom: 10px;
+      }
+      .short-author-info {
+        padding: 6px 12px 6px 6px;
+      }
+      .short-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+      .short-author-name {
+        font-size: 14px;
+      }
+      .short-actions {
+        right: 10px;
+        bottom: 10px;
+        gap: 12px;
+      }
+      .action-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+      }
+      .short-caption {
+        padding: 12px 16px;
+      }
+      .short-caption-text {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -118,37 +340,54 @@
   </div>
 
   <div class="main-wrapper">
-    <div class="main-content">
-      <div class="feed-container">
-        <h1 class="explore-title">🔍 탐색하기</h1>
-        <p class="explore-subtitle">제작중입니다 잠시만 기다려주세요</p>
-      </div>
-    </div>
-
-    <div class="footer">
-      <div class="footer-links">
-        <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
-        <a href="#" onclick="showTerms(); return false;">이용약관</a>
-        <a href="mailto:alexeom97@outlook.com">문의하기</a>
-      </div>
-      <div class="footer-text">
-        © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+    <div class="shorts-container" id="shortsContainer">
+      <div class="loading-spinner">
+        게시물을 불러오는 중...
       </div>
     </div>
   </div>
 
-  <script>
-    // 🔥 iframe 로드되면 탐색 활성화
-    const sidebarFrame = document.getElementById('sidebarFrame');
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
+    
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-    sidebarFrame.addEventListener('load', () => {
-      sidebarFrame.contentWindow.postMessage(
-        { type: 'activateExplore' },
-        '*'
-      );
-    });
+    let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
+    let allPosts = [];
+    let displayedPosts = [];
 
-    // 🔥 이동 메시지 수신
+    function initCurrentUser() {
+      const savedUser = localStorage.getItem('snsUser');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        updateSidebar();
+      }
+    }
+
+    function updateSidebar() {
+      const iframe = document.getElementById('sidebarFrame');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'updateUser',
+          user: currentUser
+        }, '*');
+      }
+    }
+
+    function updateSidebarMode() {
+      const iframe = document.getElementById('sidebarFrame');
+      const narrow = window.innerWidth <= 768;
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'setNarrowMode',
+          narrow: narrow
+        }, '*');
+      }
+    }
+
     window.addEventListener('message', (event) => {
       const { type, page } = event.data || {};
 
@@ -156,15 +395,314 @@
         if (page === 'home') location.href = 'index.html';
         if (page === 'explore') location.href = 'explore.html';
       }
+
+      if (type === 'logout') {
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        location.reload();
+      }
+
+      if (type === 'requestUserInfo') {
+        updateSidebar();
+      }
     });
 
+    const sidebarFrame = document.getElementById('sidebarFrame');
+    sidebarFrame.addEventListener('load', () => {
+      sidebarFrame.contentWindow.postMessage(
+        { type: 'activateExplore' },
+        '*'
+      );
+    });
+
+    initCurrentUser();
+    updateSidebarMode();
+    window.addEventListener('resize', updateSidebarMode);
+
+    async function loadAllPosts() {
+      try {
+        const { data: posts, error } = await supabase
+          .from('posts')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!posts || posts.length === 0) {
+          showNoPosts();
+          return;
+        }
+
+        allPosts = posts;
+        shuffleAndDisplay();
+      } catch (error) {
+        console.error('게시물 로드 오류:', error);
+        showError();
+      }
+    }
+
+    function shuffleAndDisplay() {
+      displayedPosts = [...allPosts].sort(() => Math.random() - 0.5);
+      renderPosts();
+    }
+
+    function renderPosts() {
+      const container = document.getElementById('shortsContainer');
+      container.innerHTML = '';
+
+      displayedPosts.forEach((post, index) => {
+        const shortItem = createShortItem(post, index);
+        container.appendChild(shortItem);
+      });
+
+      loadLikesAndComments();
+    }
+
+    function createShortItem(post, index) {
+      const isVerified = post.author === "JB777";
+      const hasImage = post.image_url;
+      const hasContent = post.content && post.content.trim();
+
+      const shortItem = document.createElement('div');
+      shortItem.className = 'short-item';
+      shortItem.dataset.postId = post.id;
+      shortItem.dataset.index = index;
+
+      let contentHTML = '';
+
+      if (hasImage && hasContent) {
+        contentHTML = `
+          <div class="short-content">
+            <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
+            <div class="short-caption">
+              <div class="short-caption-text">${escapeHtml(post.content)}</div>
+            </div>
+          </div>
+        `;
+      } else if (hasImage && !hasContent) {
+        contentHTML = `
+          <div class="short-content">
+            <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
+          </div>
+        `;
+      } else if (!hasImage && hasContent) {
+        contentHTML = `
+          <div class="short-content">
+            <div class="short-text-only">
+              <div class="short-text-content">${escapeHtml(post.content)}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      shortItem.innerHTML = `
+        ${contentHTML}
+        <div class="short-info-bar">
+          <div class="short-author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
+            <div class="short-avatar">${post.author ? post.author[0].toUpperCase() : '?'}</div>
+            <div class="short-author-name">
+              ${escapeHtml(post.author)}
+              ${isVerified ? '<span class="verification-badge"></span>' : ''}
+            </div>
+          </div>
+        </div>
+        <div class="short-actions">
+          <div class="action-btn" onclick="toggleLike('${post.id}')" data-like-btn="${post.id}">
+            👍
+            <div class="action-count" data-like-count="${post.id}">0</div>
+          </div>
+          <div class="action-btn" onclick="goToPost('${post.id}')">
+            💬
+            <div class="action-count" data-comment-count="${post.id}">0</div>
+          </div>
+        </div>
+      `;
+
+      return shortItem;
+    }
+
+    async function loadLikesAndComments() {
+      try {
+        const { data: likes, error } = await supabase
+          .from('likes')
+          .select('*');
+
+        if (error) throw error;
+
+        displayedPosts.forEach(post => {
+          const postLikes = likes.filter(like => like.post_id === post.id);
+          updateLikeUI(post.id, postLikes);
+        });
+
+        const { data: comments, error: commentError } = await supabase
+          .from('comments')
+          .select('post_id');
+
+        if (!commentError) {
+          displayedPosts.forEach(post => {
+            const postComments = comments.filter(comment => comment.post_id === post.id);
+            const countEl = document.querySelector(`[data-comment-count="${post.id}"]`);
+            if (countEl) {
+              countEl.textContent = postComments.length;
+            }
+          });
+        }
+      } catch (error) {
+        console.error('좋아요/댓글 로드 오류:', error);
+      }
+    }
+
+    function updateLikeUI(postId, likes) {
+      const btn = document.querySelector(`[data-like-btn="${postId}"]`);
+      const count = document.querySelector(`[data-like-count="${postId}"]`);
+      
+      if (!btn || !count) return;
+
+      count.textContent = likes.length;
+      
+      if (currentUser && likes.some(like => like.user_id === currentUser.id)) {
+        btn.classList.add('liked');
+      } else {
+        btn.classList.remove('liked');
+      }
+    }
+
+    window.toggleLike = async function(postId) {
+      if (!currentUser) {
+        if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
+          window.location.href = 'index.html';
+        }
+        return;
+      }
+
+      try {
+        const { data: existingLike } = await supabase
+          .from('likes')
+          .select('*')
+          .eq('post_id', postId)
+          .eq('user_id', currentUser.id)
+          .single();
+
+        if (existingLike) {
+          await supabase
+            .from('likes')
+            .delete()
+            .eq('post_id', postId)
+            .eq('user_id', currentUser.id);
+        } else {
+          await supabase
+            .from('likes')
+            .insert([{
+              post_id: postId,
+              user_id: currentUser.id
+            }]);
+        }
+
+        const { data: likes } = await supabase
+          .from('likes')
+          .select('*')
+          .eq('post_id', postId);
+
+        updateLikeUI(postId, likes || []);
+      } catch (error) {
+        console.error('좋아요 오류:', error);
+      }
+    }
+
+    window.goToPost = function(postId) {
+      window.location.href = `view.html?id=${postId}`;
+    }
+
+    window.goToProfile = function(userId, nickname) {
+      window.location.href = `user.html?id=${userId}&nickname=${nickname}`;
+    }
+
+    function showNoPosts() {
+      const container = document.getElementById('shortsContainer');
+      container.innerHTML = `
+        <div class="no-posts">
+          <div class="no-posts-icon">📭</div>
+          <div class="no-posts-text">
+            아직 게시물이 없습니다.<br>
+            첫 번째 게시물을 작성해보세요!
+          </div>
+        </div>
+      `;
+    }
+
+    function showError() {
+      const container = document.getElementById('shortsContainer');
+      container.innerHTML = `
+        <div class="no-posts">
+          <div class="no-posts-icon">⚠️</div>
+          <div class="no-posts-text">
+            게시물을 불러오는데 실패했습니다.<br>
+            잠시 후 다시 시도해주세요.
+          </div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
     window.showPrivacyPolicy = function() {
-      alert(`개인정보처리방침...`);
+      alert(`개인정보처리방침
+
+㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
+
+1. 수집하는 개인정보 항목
+- 필수항목: 아이디, 비밀번호, 닉네임
+
+2. 개인정보의 수집 및 이용목적
+- 회원 관리, 서비스 제공, 게시물 관리
+
+3. 개인정보의 보유 및 이용기간
+- 회원 탈퇴 시까지
+
+4. 개인정보 파기절차 및 방법
+- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
+
+5. 이용자의 권리
+- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
     }
 
     window.showTerms = function() {
-      alert(`이용약관...`);
+      alert(`이용약관
+
+제1조 (목적)
+이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
+
+제2조 (용어의 정의)
+1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
+2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
+
+제3조 (서비스의 제공)
+1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
+2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
+
+제4조 (회원의 의무)
+1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
+2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
+
+제5조 (서비스 이용의 제한)
+운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
     }
+
+    loadAllPosts();
   </script>
 </body>
 </html>
