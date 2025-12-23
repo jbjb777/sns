@@ -323,7 +323,7 @@
       </div>
     </div>
   </div>
-
+  
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     
@@ -369,16 +369,7 @@
       }
     });
 
-    function updateSidebarMode() {
-      const iframe = document.getElementById('sidebarFrame');
-      const narrow = window.innerWidth <= 768;
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          type: 'setNarrowMode',
-          narrow: narrow
-        }, '*');
-      }
-    }
+  
 
     initCurrentUser();
     updateSidebarMode();
@@ -402,6 +393,17 @@
   </script>
 
 
+<script type="module">
+  // 🔥 iframe 로드되면 탐색 활성화
+  const sidebarFrame = document.getElementById('sidebarFrame');
+
+  sidebarFrame.addEventListener('load', () => {
+    sidebarFrame.contentWindow.postMessage(
+      { type: 'activateExplore' },
+      '*'
+    );
+  });
+</script>
 
 
 </body>
