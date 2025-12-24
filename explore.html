@@ -231,6 +231,164 @@
       margin-top: 2px;
     }
 
+    .comment-modal {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      right: 0;
+      height: 70vh;
+      background: #1e1e1e;
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      transition: bottom 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .comment-modal.active {
+      bottom: 0;
+    }
+
+    .comment-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 999;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+
+    .comment-modal-overlay.active {
+      display: block;
+    }
+
+    .comment-modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comment-modal-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .comment-close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .comment-modal-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .comment-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #333;
+    }
+
+    .comment-item:last-child {
+      border-bottom: none;
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comment-author {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .comment-content {
+      font-size: 14px;
+      color: #ddd;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .comment-date {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .comment-del-btn {
+      background: none;
+      border: none;
+      color: #ff4444;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    .comment-input-wrapper {
+      padding: 16px 20px;
+      border-top: 1px solid #333;
+      display: flex;
+      gap: 10px;
+      background: #1e1e1e;
+    }
+
+    .comment-input {
+      flex: 1;
+      background: #121212;
+      border: 1px solid #444;
+      border-radius: 20px;
+      padding: 10px 16px;
+      color: #fff;
+      font-size: 14px;
+      resize: none;
+      min-height: 40px;
+      max-height: 100px;
+    }
+
+    .comment-input:focus {
+      outline: none;
+      border-color: #3663FF;
+    }
+
+    .comment-submit-btn {
+      background: #3663FF;
+      border: none;
+      color: white;
+      padding: 0 20px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .comment-submit-btn:hover {
+      background: #2952CC;
+    }
+
+    .comment-submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .loading-spinner {
       width: 100%;
       height: 100vh;
@@ -347,6 +505,23 @@
     </div>
   </div>
 
+  <div class="comment-modal-overlay" id="commentOverlay" onclick="closeComments()"></div>
+  <div class="comment-modal" id="commentModal">
+    <div class="comment-modal-header">
+      <div class="comment-modal-title">댓글 <span id="commentCountTitle">0</span>개</div>
+      <button class="comment-close-btn" onclick="closeComments()">✕</button>
+    </div>
+    <div class="comment-modal-list" id="commentList">
+      <div style="text-align: center; color: #666; padding: 40px 20px;">
+        댓글을 불러오는 중...
+      </div>
+    </div>
+    <div class="comment-input-wrapper">
+      <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요..." maxlength="500"></textarea>
+      <button class="comment-submit-btn" id="commentSubmitBtn" onclick="submitComment()">등록</button>
+    </div>
+  </div>
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     
@@ -358,6 +533,9 @@
     let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
     let allPosts = [];
     let displayedPosts = [];
+    let currentPostIndex = 0;
+    let currentCommentPostId = null;
+    const POSTS_PER_LOAD = 10;
 
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
@@ -443,7 +621,60 @@
 
     function shuffleAndDisplay() {
       displayedPosts = [...allPosts].sort(() => Math.random() - 0.5);
-      renderPosts();
+      currentPostIndex = 0;
+      renderInitialPosts();
+      setupInfiniteScroll();
+    }
+
+    function renderInitialPosts() {
+      const container = document.getElementById('shortsContainer');
+      container.innerHTML = '';
+
+      const postsToRender = displayedPosts.slice(0, POSTS_PER_LOAD);
+      postsToRender.forEach((post, index) => {
+        const shortItem = createShortItem(post, index);
+        container.appendChild(shortItem);
+      });
+
+      currentPostIndex = POSTS_PER_LOAD;
+      loadLikesAndComments();
+    }
+
+    function setupInfiniteScroll() {
+      const container = document.getElementById('shortsContainer');
+      
+      container.addEventListener('scroll', () => {
+        const scrollPosition = container.scrollTop + container.clientHeight;
+        const scrollHeight = container.scrollHeight;
+        
+        if (scrollPosition >= scrollHeight - 1000 && currentPostIndex < displayedPosts.length) {
+          loadMorePosts();
+        }
+      });
+    }
+
+    function loadMorePosts() {
+      if (currentPostIndex >= displayedPosts.length) {
+        reshuffleAndAppend();
+        return;
+      }
+
+      const container = document.getElementById('shortsContainer');
+      const nextPosts = displayedPosts.slice(currentPostIndex, currentPostIndex + POSTS_PER_LOAD);
+      
+      nextPosts.forEach((post, index) => {
+        const shortItem = createShortItem(post, currentPostIndex + index);
+        container.appendChild(shortItem);
+      });
+
+      currentPostIndex += POSTS_PER_LOAD;
+      loadLikesAndComments();
+    }
+
+    function reshuffleAndAppend() {
+      const newShuffled = [...allPosts].sort(() => Math.random() - 0.5);
+      displayedPosts = [...displayedPosts, ...newShuffled];
+      loadMorePosts();
     }
 
     function renderPosts() {
@@ -511,7 +742,7 @@
             👍
             <div class="action-count" data-like-count="${post.id}">0</div>
           </div>
-          <div class="action-btn" onclick="goToPost('${post.id}')">
+          <div class="action-btn" onclick="openComments('${post.id}')">
             💬
             <div class="action-count" data-comment-count="${post.id}">0</div>
           </div>
@@ -611,6 +842,136 @@
 
     window.goToPost = function(postId) {
       window.location.href = `view.html?id=${postId}`;
+    }
+
+    window.openComments = async function(postId) {
+      currentCommentPostId = postId;
+      document.getElementById('commentOverlay').classList.add('active');
+      document.getElementById('commentModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      await loadComments(postId);
+    }
+
+    window.closeComments = function() {
+      document.getElementById('commentOverlay').classList.remove('active');
+      document.getElementById('commentModal').classList.remove('active');
+      document.body.style.overflow = '';
+      currentCommentPostId = null;
+      
+      document.getElementById('commentInput').value = '';
+      document.getElementById('commentList').innerHTML = '';
+    }
+
+    async function loadComments(postId) {
+      const listDiv = document.getElementById('commentList');
+      listDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 40px 20px;">댓글을 불러오는 중...</div>';
+
+      try {
+        const { data: comments, error } = await supabase
+          .from('comments')
+          .select('*')
+          .eq('post_id', postId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        document.getElementById('commentCountTitle').textContent = comments ? comments.length : 0;
+
+        if (!comments || comments.length === 0) {
+          listDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 40px 20px;">첫 댓글을 남겨보세요!</div>';
+          return;
+        }
+
+        listDiv.innerHTML = '';
+        comments.forEach(comment => {
+          const isMyComment = currentUser && (currentUser.id === comment.user_id);
+          const date = new Date(comment.created_at).toLocaleString('ko-KR');
+          const isCommentVerified = comment.user_name === "JB777";
+          
+          const div = document.createElement('div');
+          div.className = 'comment-item';
+          div.innerHTML = `
+            <div class="comment-header">
+              <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
+              ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}', '${postId}')">삭제</button>` : ''}
+            </div>
+            <div class="comment-content">${escapeHtml(comment.text)}</div>
+            <div class="comment-date">${date}</div>
+          `;
+          listDiv.appendChild(div);
+        });
+      } catch (e) {
+        console.error('댓글 로드 오류:', e);
+        listDiv.innerHTML = '<div style="text-align: center; color: #ff6b6b; padding: 40px 20px;">댓글을 불러오는데 실패했습니다.</div>';
+      }
+    }
+
+    window.submitComment = async function() {
+      if (!currentUser) {
+        if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
+          window.location.href = 'index.html';
+        }
+        return;
+      }
+
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      
+      if (!text) return;
+
+      const submitBtn = document.getElementById('commentSubmitBtn');
+      submitBtn.disabled = true;
+
+      try {
+        const { error } = await supabase
+          .from('comments')
+          .insert([{
+            post_id: currentCommentPostId,
+            user_id: currentUser.id,
+            user_name: currentUser.nickname,
+            text: text,
+            created_at: new Date().toISOString()
+          }]);
+
+        if (error) throw error;
+
+        input.value = '';
+        await loadComments(currentCommentPostId);
+        
+        const countEl = document.querySelector(`[data-comment-count="${currentCommentPostId}"]`);
+        if (countEl) {
+          countEl.textContent = parseInt(countEl.textContent) + 1;
+        }
+      } catch (e) {
+        console.error('댓글 업로드 오류:', e);
+        alert('댓글 업로드에 실패했습니다.');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    window.deleteComment = async function(commentId, postId) {
+      if (!confirm('댓글을 삭제하시겠습니까?')) return;
+      
+      try {
+        const { error } = await supabase
+          .from('comments')
+          .delete()
+          .eq('id', commentId);
+
+        if (error) throw error;
+        
+        await loadComments(postId);
+        
+        const countEl = document.querySelector(`[data-comment-count="${postId}"]`);
+        if (countEl) {
+          countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
+        }
+      } catch (e) {
+        console.error('댓글 삭제 오류:', e);
+        alert('삭제에 실패했습니다.');
+      }
     }
 
     window.goToProfile = function(userId, nickname) {
