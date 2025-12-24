@@ -57,7 +57,7 @@
       position: relative;
       scroll-snap-align: start;
       scroll-snap-stop: always;
-      padding: 20px;
+      padding: 20px 20px 120px 20px;
     }
 
     .short-content {
@@ -399,6 +399,79 @@
       color: #aaa;
     }
 
+    .skeleton {
+      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-short-item {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      padding: 20px 20px 120px 20px;
+    }
+
+    .skeleton-content {
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .skeleton-image {
+      width: 100%;
+      max-width: 500px;
+      height: 65vh;
+      border-radius: 16px;
+    }
+
+    .skeleton-caption {
+      width: 100%;
+      max-width: 500px;
+      height: 80px;
+      border-radius: 12px;
+    }
+
+    .skeleton-author-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 200px;
+      height: 56px;
+      border-radius: 30px;
+    }
+
+    .skeleton-actions {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .skeleton-action-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+    }
+
     .no-posts {
       width: 100%;
       height: 100vh;
@@ -434,14 +507,17 @@
         width: calc(100% - 80px); 
       }
       .short-item {
-        padding: 10px;
+        padding: 10px 10px 140px 10px;
+      }
+      .skeleton-short-item {
+        padding: 10px 10px 140px 10px;
       }
       .short-content {
         max-width: 100%;
         width: 100%;
       }
       .short-image {
-        max-height: 75vh;
+        max-height: 70vh;
       }
       .short-text-only {
         max-width: 100%;
@@ -453,8 +529,8 @@
       }
       .short-info-bar {
         left: 10px;
-        right: 70px;
-        bottom: 10px;
+        right: 75px;
+        bottom: 80px;
       }
       .short-author-info {
         padding: 6px 12px 6px 6px;
@@ -469,7 +545,7 @@
       }
       .short-actions {
         right: 10px;
-        bottom: 10px;
+        bottom: 80px;
         gap: 12px;
       }
       .action-btn {
@@ -482,6 +558,21 @@
       }
       .short-caption-text {
         font-size: 14px;
+      }
+      .skeleton-author-bar {
+        left: 10px;
+        bottom: 80px;
+        width: 180px;
+        height: 48px;
+      }
+      .skeleton-actions {
+        right: 10px;
+        bottom: 80px;
+        gap: 12px;
+      }
+      .skeleton-action-btn {
+        width: 48px;
+        height: 48px;
       }
     }
   </style>
@@ -499,8 +590,38 @@
 
   <div class="main-wrapper">
     <div class="shorts-container" id="shortsContainer">
-      <div class="loading-spinner">
-        게시물을 불러오는 중...
+      <div class="skeleton-short-item">
+        <div class="skeleton-content">
+          <div class="skeleton skeleton-image"></div>
+          <div class="skeleton skeleton-caption"></div>
+        </div>
+        <div class="skeleton skeleton-author-bar"></div>
+        <div class="skeleton-actions">
+          <div class="skeleton skeleton-action-btn"></div>
+          <div class="skeleton skeleton-action-btn"></div>
+        </div>
+      </div>
+      
+      <div class="skeleton-short-item">
+        <div class="skeleton-content">
+          <div class="skeleton skeleton-image"></div>
+        </div>
+        <div class="skeleton skeleton-author-bar"></div>
+        <div class="skeleton-actions">
+          <div class="skeleton skeleton-action-btn"></div>
+          <div class="skeleton skeleton-action-btn"></div>
+        </div>
+      </div>
+      
+      <div class="skeleton-short-item">
+        <div class="skeleton-content">
+          <div class="skeleton skeleton-caption" style="height: 300px;"></div>
+        </div>
+        <div class="skeleton skeleton-author-bar"></div>
+        <div class="skeleton-actions">
+          <div class="skeleton skeleton-action-btn"></div>
+          <div class="skeleton skeleton-action-btn"></div>
+        </div>
       </div>
     </div>
   </div>
