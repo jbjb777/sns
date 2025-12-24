@@ -726,13 +726,24 @@
       }
     });
 
-    const sidebarFrame = document.getElementById('sidebarFrame');
-    sidebarFrame.addEventListener('load', () => {
-      sidebarFrame.contentWindow.postMessage(
+window.addEventListener('DOMContentLoaded', () => {
+  const iframe = document.getElementById('sidebarFrame');
+
+  function activateExplore() {
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(
         { type: 'activateExplore' },
         '*'
       );
-    });
+    }
+  }
+
+  // 1️⃣ 이미 로드된 경우 (홈 → 탐색 이동)
+  activateExplore();
+
+  // 2️⃣ 혹시 iframe이 늦게 로드될 경우
+  iframe.addEventListener('load', activateExplore);
+});
 
     initCurrentUser();
     updateSidebarMode();
