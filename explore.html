@@ -8,7 +8,7 @@
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; overflow-y: auto; }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; }
     
     .sidebar-container {
       width: 250px;
@@ -31,18 +31,17 @@
       width: calc(100% - 250px);
       display: flex;
       flex-direction: column;
-      height: auto;
-      overflow: visible;
+      height: 100vh;
+      overflow: hidden;
     }
 
     .shorts-container {
       flex: 1;
       position: relative;
-      overflow-y: auto;
+      overflow-y: scroll;
       scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      height: auto;
     }
 
     .shorts-container::-webkit-scrollbar {
@@ -135,7 +134,6 @@
       align-items: center;
       gap: 12px;
       pointer-events: auto;
-      padding-bottom: env(safe-area-inset-bottom);
     }
 
     .short-author-info {
@@ -198,7 +196,6 @@
       flex-direction: column;
       gap: 16px;
       align-items: center;
-      padding-bottom: env(safe-area-inset-bottom);
     }
 
     .action-btn {
@@ -516,13 +513,11 @@
       }
       .short-item {
         height: auto;
-        min-height: 100svh;
         min-height: 100vh;
         padding: 10px 10px 100px 10px;
       }
       .skeleton-short-item {
         height: auto;
-        min-height: 100svh;
         min-height: 100vh;
         padding: 10px 10px 100px 10px;
       }
@@ -544,7 +539,7 @@
       .short-info-bar {
         left: 10px;
         right: 75px;
-        bottom: 24px;
+        bottom: 20px;
       }
       .short-author-info {
         padding: 6px 12px 6px 6px;
@@ -559,7 +554,7 @@
       }
       .short-actions {
         right: 10px;
-        bottom: 24px;
+        bottom: 20px;
         gap: 12px;
       }
       .action-btn {
@@ -575,13 +570,13 @@
       }
       .skeleton-author-bar {
         left: 10px;
-        bottom: 24px;
+        bottom: 20px;
         width: 180px;
         height: 48px;
       }
       .skeleton-actions {
         right: 10px;
-        bottom: 24px;
+        bottom: 20px;
         gap: 12px;
       }
       .skeleton-action-btn {
