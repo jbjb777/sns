@@ -45,6 +45,7 @@
       scrollbar-width: none;
       height: 100vh;
       height: 100svh;
+      scroll-behavior: smooth;
     }
 
     .shorts-container::-webkit-scrollbar {
@@ -235,6 +236,50 @@
       font-size: 11px;
       font-weight: 600;
       margin-top: 2px;
+    }
+
+    /* 네비게이션 버튼 스타일 */
+    .nav-buttons {
+      position: fixed;
+      right: 100px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 50;
+    }
+
+    .nav-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(30, 30, 30, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .nav-btn:hover {
+      background: rgba(54, 99, 255, 0.9);
+      border-color: #3663FF;
+      transform: scale(1.1);
+    }
+
+    .nav-btn:active {
+      transform: scale(0.95);
+    }
+
+    .nav-btn.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
     }
 
     .comment-modal {
@@ -594,6 +639,11 @@
       .comment-modal {
         height: 80vh;
       }
+      
+      /* 모바일에서 네비게이션 버튼 숨김 */
+      .nav-buttons {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -646,6 +696,16 @@
     </div>
   </div>
 
+  <!-- 네비게이션 버튼 (데스크탑 전용) -->
+  <div class="nav-buttons" id="navButtons">
+    <div class="nav-btn" id="navUpBtn" onclick="scrollToPrevious()">
+      ▲
+    </div>
+    <div class="nav-btn" id="navDownBtn" onclick="scrollToNext()">
+      ▼
+    </div>
+  </div>
+
   <div class="comment-modal-overlay" id="commentOverlay" onclick="closeComments()"></div>
   <div class="comment-modal" id="commentModal">
     <div class="comment-modal-header">
@@ -676,6 +736,7 @@
     let displayedPosts = [];
     let currentPostIndex = 0;
     let currentCommentPostId = null;
+    let currentScrollIndex = 0;
     const POSTS_PER_LOAD = 10;
 
     function initCurrentUser() {
@@ -726,28 +787,93 @@
       }
     });
 
-window.addEventListener('DOMContentLoaded', () => {
-  const iframe = document.getElementById('sidebarFrame');
+    window.addEventListener('DOMContentLoaded', () => {
+      const iframe = document.getElementById('sidebarFrame');
 
-  function activateExplore() {
-    if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage(
-        { type: 'activateExplore' },
-        '*'
-      );
-    }
-  }
+      function activateExplore() {
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage(
+            { type: 'activateExplore' },
+            '*'
+          );
+        }
+      }
 
-  // 1️⃣ 이미 로드된 경우 (홈 → 탐색 이동)
-  activateExplore();
-
-  // 2️⃣ 혹시 iframe이 늦게 로드될 경우
-  iframe.addEventListener('load', activateExplore);
-});
+      activateExplore();
+      iframe.addEventListener('load', activateExplore);
+    });
 
     initCurrentUser();
     updateSidebarMode();
     window.addEventListener('resize', updateSidebarMode);
+
+    // 네비게이션 버튼 함수
+    window.scrollToNext = function() {
+      const container = document.getElementById('shortsContainer');
+      const items = container.querySelectorAll('.short-item');
+      
+      if (currentScrollIndex < items.length - 1) {
+        currentScrollIndex++;
+        items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        updateNavButtons();
+      }
+    }
+
+    window.scrollToPrevious = function() {
+      const container = document.getElementById('shortsContainer');
+      const items = container.querySelectorAll('.short-item');
+      
+      if (currentScrollIndex > 0) {
+        currentScrollIndex--;
+        items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        updateNavButtons();
+      }
+    }
+
+    function updateNavButtons() {
+      const container = document.getElementById('shortsContainer');
+      const items = container.querySelectorAll('.short-item');
+      const upBtn = document.getElementById('navUpBtn');
+      const downBtn = document.getElementById('navDownBtn');
+      
+      if (upBtn && downBtn) {
+        if (currentScrollIndex === 0) {
+          upBtn.classList.add('disabled');
+        } else {
+          upBtn.classList.remove('disabled');
+        }
+        
+        if (currentScrollIndex >= items.length - 1) {
+          downBtn.classList.add('disabled');
+        } else {
+          downBtn.classList.remove('disabled');
+        }
+      }
+    }
+
+    // 스크롤 이벤트로 현재 인덱스 추적
+    function trackScrollPosition() {
+      const container = document.getElementById('shortsContainer');
+      const items = container.querySelectorAll('.short-item');
+      
+      container.addEventListener('scroll', () => {
+        const scrollPosition = container.scrollTop;
+        const windowHeight = container.clientHeight;
+        
+        items.forEach((item, index) => {
+          const itemTop = item.offsetTop;
+          const itemHeight = item.clientHeight;
+          
+          if (scrollPosition >= itemTop - windowHeight / 2 && 
+              scrollPosition < itemTop + itemHeight - windowHeight / 2) {
+            if (currentScrollIndex !== index) {
+              currentScrollIndex = index;
+              updateNavButtons();
+            }
+          }
+        });
+      });
+    }
 
     async function loadAllPosts() {
       try {
@@ -776,6 +902,8 @@ window.addEventListener('DOMContentLoaded', () => {
       currentPostIndex = 0;
       renderInitialPosts();
       setupInfiniteScroll();
+      trackScrollPosition();
+      updateNavButtons();
     }
 
     function renderInitialPosts() {
@@ -821,6 +949,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       currentPostIndex += POSTS_PER_LOAD;
       loadLikesAndComments();
+      updateNavButtons();
     }
 
     function reshuffleAndAppend() {
