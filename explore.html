@@ -737,7 +737,8 @@
     let currentPostIndex = 0;
     let currentCommentPostId = null;
     let currentScrollIndex = 0;
-    const POSTS_PER_LOAD = 10;
+    let loadedPostIndices = new Set();
+    const INITIAL_LOAD = 2;
 
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
@@ -816,6 +817,20 @@
         currentScrollIndex++;
         items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
         updateNavButtons();
+        
+        // 다음 게시물 미리 로드
+        preloadNextPost();
+      } else {
+        // 마지막 게시물인 경우 새 게시물 로드 후 이동
+        preloadNextPost();
+        setTimeout(() => {
+          const updatedItems = container.querySelectorAll('.short-item');
+          if (updatedItems.length > items.length) {
+            currentScrollIndex++;
+            updatedItems[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            updateNavButtons();
+          }
+        }, 100);
       }
     }
 
@@ -843,36 +858,9 @@
           upBtn.classList.remove('disabled');
         }
         
-        if (currentScrollIndex >= items.length - 1) {
-          downBtn.classList.add('disabled');
-        } else {
-          downBtn.classList.remove('disabled');
-        }
+        // 무한 스크롤이므로 항상 다운 버튼 활성화
+        downBtn.classList.remove('disabled');
       }
-    }
-
-    // 스크롤 이벤트로 현재 인덱스 추적
-    function trackScrollPosition() {
-      const container = document.getElementById('shortsContainer');
-      const items = container.querySelectorAll('.short-item');
-      
-      container.addEventListener('scroll', () => {
-        const scrollPosition = container.scrollTop;
-        const windowHeight = container.clientHeight;
-        
-        items.forEach((item, index) => {
-          const itemTop = item.offsetTop;
-          const itemHeight = item.clientHeight;
-          
-          if (scrollPosition >= itemTop - windowHeight / 2 && 
-              scrollPosition < itemTop + itemHeight - windowHeight / 2) {
-            if (currentScrollIndex !== index) {
-              currentScrollIndex = index;
-              updateNavButtons();
-            }
-          }
-        });
-      });
     }
 
     async function loadAllPosts() {
@@ -900,9 +888,10 @@
     function shuffleAndDisplay() {
       displayedPosts = [...allPosts].sort(() => Math.random() - 0.5);
       currentPostIndex = 0;
+      currentScrollIndex = 0;
+      loadedPostIndices.clear();
       renderInitialPosts();
-      setupInfiniteScroll();
-      trackScrollPosition();
+      setupScrollTracking();
       updateNavButtons();
     }
 
@@ -910,52 +899,68 @@
       const container = document.getElementById('shortsContainer');
       container.innerHTML = '';
 
-      const postsToRender = displayedPosts.slice(0, POSTS_PER_LOAD);
-      postsToRender.forEach((post, index) => {
-        const shortItem = createShortItem(post, index);
-        container.appendChild(shortItem);
-      });
+      // 처음 2개 게시물만 로드
+      for (let i = 0; i < INITIAL_LOAD; i++) {
+        const post = getNextPost();
+        if (post) {
+          const shortItem = createShortItem(post, i);
+          container.appendChild(shortItem);
+          loadedPostIndices.add(i);
+        }
+      }
 
-      currentPostIndex = POSTS_PER_LOAD;
       loadLikesAndComments();
     }
 
-    function setupInfiniteScroll() {
+    function getNextPost() {
+      if (currentPostIndex >= displayedPosts.length) {
+        // 모든 게시물을 본 경우 다시 섞기
+        const newShuffled = [...allPosts].sort(() => Math.random() - 0.5);
+        displayedPosts = [...displayedPosts, ...newShuffled];
+      }
+      return displayedPosts[currentPostIndex++];
+    }
+
+    function preloadNextPost() {
+      const container = document.getElementById('shortsContainer');
+      const nextIndex = container.children.length;
+      
+      if (!loadedPostIndices.has(nextIndex)) {
+        const post = getNextPost();
+        if (post) {
+          const shortItem = createShortItem(post, nextIndex);
+          container.appendChild(shortItem);
+          loadedPostIndices.add(nextIndex);
+          loadLikesAndComments();
+          updateNavButtons();
+        }
+      }
+    }
+
+    function setupScrollTracking() {
       const container = document.getElementById('shortsContainer');
       
       container.addEventListener('scroll', () => {
-        const scrollPosition = container.scrollTop + container.clientHeight;
-        const scrollHeight = container.scrollHeight;
+        const scrollPosition = container.scrollTop;
+        const windowHeight = container.clientHeight;
+        const items = container.querySelectorAll('.short-item');
         
-        if (scrollPosition >= scrollHeight - 1000 && currentPostIndex < displayedPosts.length) {
-          loadMorePosts();
-        }
+        items.forEach((item, index) => {
+          const itemTop = item.offsetTop;
+          const itemHeight = item.clientHeight;
+          
+          if (scrollPosition >= itemTop - windowHeight / 2 && 
+              scrollPosition < itemTop + itemHeight - windowHeight / 2) {
+            if (currentScrollIndex !== index) {
+              currentScrollIndex = index;
+              updateNavButtons();
+              
+              // 다음 게시물 미리 로드
+              preloadNextPost();
+            }
+          }
+        });
       });
-    }
-
-    function loadMorePosts() {
-      if (currentPostIndex >= displayedPosts.length) {
-        reshuffleAndAppend();
-        return;
-      }
-
-      const container = document.getElementById('shortsContainer');
-      const nextPosts = displayedPosts.slice(currentPostIndex, currentPostIndex + POSTS_PER_LOAD);
-      
-      nextPosts.forEach((post, index) => {
-        const shortItem = createShortItem(post, currentPostIndex + index);
-        container.appendChild(shortItem);
-      });
-
-      currentPostIndex += POSTS_PER_LOAD;
-      loadLikesAndComments();
-      updateNavButtons();
-    }
-
-    function reshuffleAndAppend() {
-      const newShuffled = [...allPosts].sort(() => Math.random() - 0.5);
-      displayedPosts = [...displayedPosts, ...newShuffled];
-      loadMorePosts();
     }
 
     function renderPosts() {
