@@ -59,6 +59,8 @@
     .post-detail-image { width: 100%; max-height: 700px; object-fit: contain; background: #000; }
     .post-detail-content { padding: 24px; }
     .post-text { font-size: 16px; line-height: 1.8; color: #fff; white-space: pre-wrap; word-wrap: break-word; }
+    .post-text a { color: #00bfff; text-decoration: underline; }
+    .post-text a:hover { color: #53b6f9; }
 
     .share-container { padding: 20px 24px; background: #252525; border-top: 1px solid #333; display: flex; flex-direction: column; gap: 10px; }
     .share-label { font-size: 13px; color: #aaa; font-weight: 600; }
@@ -80,6 +82,8 @@
     .comment-header { display: flex; justify-content: space-between; align-items: center; }
     .comment-author { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
     .comment-content { font-size: 14px; color: #ddd; line-height: 1.5; white-space: pre-wrap; }
+    .comment-content a { color: #00bfff; text-decoration: underline; }
+    .comment-content a:hover { color: #53b6f9; }
     .comment-date { font-size: 12px; color: #666; }
     .comment-del-btn { background: none; border: none; color: #ff4444; font-size: 12px; cursor: pointer; padding: 4px; }
 
@@ -244,6 +248,16 @@
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
+    // 링크 자동 감지 함수 (채팅 코드에서 가져옴)
+    function linkify(text) {
+      text = escapeHtml(text);
+      const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
+      return text.replace(urlRegex, url => {
+        let href = url.startsWith('http') ? url : 'https://' + url;
+        return `<a href="${href}" target="_blank">${url}</a>`;
+      });
+    }
+
     function showLoginAlert() {
       const alert = document.getElementById('loginAlert');
       alert.classList.add('show');
@@ -356,6 +370,9 @@
         (currentUser.nickname === "JB777" && currentUser.isVerified)
       );
 
+      // 링크 자동 감지 적용
+      const linkedContent = linkify(post.content || '');
+
       contentDiv.innerHTML = `
         <div class="post-detail-card">
           <div class="post-detail-header">
@@ -372,7 +389,7 @@
             </div>
           </div>
           ${post.image_url ? `<img src="${post.image_url}" class="post-detail-image">` : ''}
-          <div class="post-detail-content"><div class="post-text">${escapeHtml(post.content || '')}</div></div>
+          <div class="post-detail-content"><div class="post-text">${linkedContent}</div></div>
           <div class="share-container">
             <div class="share-label">게시물 공유하기</div>
             <div class="share-box-wrapper">
@@ -494,6 +511,9 @@
         const date = new Date(comment.created_at).toLocaleString('ko-KR');
         const isCommentVerified = comment.user_name === "JB777";
         
+        // 댓글에도 링크 자동 감지 적용
+        const linkedCommentText = linkify(comment.text);
+        
         const div = document.createElement('div');
         div.className = 'comment-item';
         div.innerHTML = `
@@ -501,7 +521,7 @@
             <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
             ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}')">삭제</button>` : ''}
           </div>
-          <div class="comment-content">${escapeHtml(comment.text)}</div>
+          <div class="comment-content">${linkedCommentText}</div>
           <div class="comment-date">${date}</div>
         `;
         listDiv.appendChild(div);
