@@ -80,6 +80,9 @@
     .comment-item { display: flex; flex-direction: column; gap: 6px; padding-bottom: 16px; border-bottom: 1px solid #333; }
     .comment-item:last-child { border-bottom: none; }
     .comment-header { display: flex; justify-content: space-between; align-items: center; }
+    .comment-author-wrapper { display: flex; align-items: center; gap: 8px; cursor: pointer; transition: opacity 0.3s ease; }
+    .comment-author-wrapper:hover { opacity: 0.8; }
+    .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; flex-shrink: 0; }
     .comment-author { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
     .comment-content { font-size: 14px; color: #ddd; line-height: 1.5; white-space: pre-wrap; }
     .comment-content a { color: #00bfff; text-decoration: underline; }
@@ -518,7 +521,10 @@
         div.className = 'comment-item';
         div.innerHTML = `
           <div class="comment-header">
-            <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
+            <div class="comment-author-wrapper" onclick="goToProfile('${comment.user_id}', '${escapeHtml(comment.user_name)}')">
+              <div class="comment-avatar">${comment.user_name ? comment.user_name[0].toUpperCase() : '?'}</div>
+              <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
+            </div>
             ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}')">삭제</button>` : ''}
           </div>
           <div class="comment-content">${linkedCommentText}</div>
