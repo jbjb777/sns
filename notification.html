@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>알림 - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; }
+    
+    .sidebar-container {
+      width: 250px;
+      min-width: 250px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+    }
+
+    .sidebar-container iframe {
+      width: 250px !important;
+      height: 100%;
+      border: none;
+    }
+
+    .main-wrapper {
+      margin-left: 250px;
+      width: calc(100% - 250px);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .notifications-container {
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .notification-item {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .notification-item:hover {
+      transform: translateY(-2px);
+      border-color: #3663FF;
+      box-shadow: 0 4px 12px rgba(54, 99, 255, 0.3);
+    }
+
+    .notification-detail {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .notification-time {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .notification-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3663FF, #2952CC);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: #666;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 16px;
+      color: #888;
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-notification {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .skeleton-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .skeleton-content {
+      flex: 1;
+    }
+
+    .skeleton-text {
+      width: 100%;
+      height: 16px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
+
+    .skeleton-text.short {
+      width: 40%;
+    }
+
+    .login-alert {
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #3663FF, #2952CC);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(54, 99, 255, 0.4);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 9999;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .login-alert.show {
+      top: 20px;
+      animation: bounce 0.6s ease;
+    }
+
+    .login-alert:hover {
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 12px 32px rgba(54, 99, 255, 0.6);
+    }
+
+    .login-alert-icon {
+      font-size: 20px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.1); }
+    }
+
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 30px 20px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin-top: auto;
+    }
+
+    .footer-links {
+      margin-bottom: 15px;
+    }
+
+    .footer-links a {
+      color: #3663FF;
+      text-decoration: none;
+      margin: 0 15px;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #00aaff;
+      text-decoration: underline;
+    }
+
+    .footer-text {
+      color: #666;
+      font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-container { 
+        width: 80px; 
+        min-width: 80px;
+      }
+      .sidebar-container iframe {
+        width: 80px !important;
+      }
+      .main-wrapper { 
+        margin-left: 80px; 
+        width: calc(100% - 80px); 
+      }
+      .header-title {
+        font-size: 20px;
+      }
+      .login-alert {
+        max-width: 90%;
+        padding: 14px 24px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-alert" id="loginAlert">
+    <span class="login-alert-icon">🔐</span>
+    <span>로그인 후 사용 가능합니다</span>
+  </div>
+
+  <div class="sidebar-container">
+    <iframe 
+      src="sidebar.html" 
+      id="sidebarFrame"
+      width="250"
+      height="100%"
+      frameborder="0"
+    ></iframe>
+  </div>
+
+  <div class="main-wrapper">
+    <div class="header">
+      <div class="header-title">🔔 알림</div>
+    </div>
+
+    <div class="main-content">
+      <div class="notifications-container" id="notificationsContainer">
+        <!-- 스켈레톤 로딩 -->
+        <div class="skeleton-notification">
+          <div class="skeleton skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text short"></div>
+          </div>
+        </div>
+        <div class="skeleton-notification">
+          <div class="skeleton skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text short"></div>
+          </div>
+        </div>
+        <div class="skeleton-notification">
+          <div class="skeleton skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text short"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
+        <a href="#" onclick="showTerms(); return false;">이용약관</a>
+        <a href="mailto:alexeom97@outlook.com">문의하기</a>
+      </div>
+      <div class="footer-text">
+        © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
+    
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    let currentUser = null;
+
+    function showLoginAlert() {
+      const alert = document.getElementById('loginAlert');
+      alert.classList.add('show');
+      
+      const hideTimeout = setTimeout(() => {
+        alert.classList.remove('show');
+      }, 3000);
+
+      alert.onclick = () => {
+        clearTimeout(hideTimeout);
+        window.location.href = 'login.html';
+      };
+    }
+
+    function initCurrentUser() {
+      const savedUser = localStorage.getItem('snsUser');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        updateSidebar();
+        loadNotifications();
+      } else {
+        showLoginAlert();
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+      }
+    }
+
+    function updateSidebar() {
+      const iframe = document.getElementById('sidebarFrame');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'updateUser',
+          user: currentUser
+        }, '*');
+      }
+    }
+
+    function updateSidebarMode() {
+      const iframe = document.getElementById('sidebarFrame');
+      const narrow = window.innerWidth <= 768;
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'setNarrowMode',
+          narrow: narrow
+        }, '*');
+      }
+    }
+
+    // 사이드바 메시지 수신
+    window.addEventListener('message', (event) => {
+      const { type, page } = event.data || {};
+
+      if (type === 'navigate') {
+        if (page === 'home') location.href = 'index.html';
+        if (page === 'explore') location.href = 'explore.html';
+        if (page === 'notifications') location.href = 'notifications.html';
+      }
+
+      if (type === 'logout') {
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        location.href = 'index.html';
+      }
+
+      if (type === 'requestUserInfo') {
+        updateSidebar();
+      }
+    });
+
+    async function loadNotifications() {
+      if (!currentUser) return;
+
+      const container = document.getElementById('notificationsContainer');
+
+      try {
+        const { data: notifications, error } = await supabase
+          .from('notification')
+          .select('*')
+          .eq('user', currentUser.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!notifications || notifications.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🔕</div>
+              <div class="empty-state-text">알림이 없습니다</div>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = '';
+
+        notifications.forEach(notification => {
+          const notifDiv = document.createElement('div');
+          notifDiv.className = 'notification-item';
+          
+          const timeStr = formatTime(notification.created_at);
+          const icon = getNotificationIcon(notification.detail);
+
+          notifDiv.innerHTML = `
+            <div class="notification-header">
+              <div class="notification-icon">${icon}</div>
+              <div class="notification-content">
+                <div class="notification-detail">${escapeHtml(notification.detail)}</div>
+                <div class="notification-time">${timeStr}</div>
+              </div>
+            </div>
+          `;
+
+          notifDiv.onclick = () => {
+            if (notification.link) {
+              window.location.href = notification.link;
+            }
+          };
+
+          container.appendChild(notifDiv);
+        });
+
+      } catch (error) {
+        console.error('알림 로드 오류:', error);
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚠️</div>
+            <div class="empty-state-text">알림을 불러오는데 실패했습니다</div>
+          </div>
+        `;
+      }
+    }
+
+    function getNotificationIcon(detail) {
+      if (!detail) return '🔔';
+      
+      const lowerDetail = detail.toLowerCase();
+      
+      if (lowerDetail.includes('댓글')) return '💬';
+      if (lowerDetail.includes('좋아요')) return '❤️';
+      if (lowerDetail.includes('팔로우')) return '👤';
+      if (lowerDetail.includes('게시물')) return '📝';
+      if (lowerDetail.includes('멘션') || lowerDetail.includes('@')) return '📢';
+      
+      return '🔔';
+    }
+
+    function formatTime(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return '방금 전';
+      if (diffMins < 60) return `${diffMins}분 전`;
+      if (diffHours < 24) return `${diffHours}시간 전`;
+      if (diffDays < 7) return `${diffDays}일 전`;
+      
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    window.showPrivacyPolicy = function() {
+      alert(`개인정보처리방침
+
+㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
+
+1. 수집하는 개인정보 항목
+- 필수항목: 아이디, 비밀번호, 닉네임
+
+2. 개인정보의 수집 및 이용목적
+- 회원 관리, 서비스 제공, 게시물 관리
+
+3. 개인정보의 보유 및 이용기간
+- 회원 탈퇴 시까지
+
+4. 개인정보 파기절차 및 방법
+- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
+
+5. 이용자의 권리
+- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+
+    window.showTerms = function() {
+      alert(`이용약관
+
+제1조 (목적)
+이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
+
+제2조 (용어의 정의)
+1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
+2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
+
+제3조 (서비스의 제공)
+1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
+2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
+
+제4조 (회원의 의무)
+1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
+2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
+
+제5조 (서비스 이용의 제한)
+운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+
+    initCurrentUser();
+    updateSidebarMode();
+    window.addEventListener('resize', updateSidebarMode);
+  </script>
+</body>
+</html>
