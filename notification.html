@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>게시물 - Sharer</title>
+  <title>알림 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
 
   <style>
@@ -34,61 +34,180 @@
       min-height: 100vh;
     }
 
-    .header { background: #1e1e1e; border-bottom: 1px solid #333; padding: 16px 20px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 50; }
-    .back-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
-    .back-btn:hover { transform: translateX(-4px); color: #3663FF; }
-    .header-title { font-size: 20px; font-weight: 600; }
-    .container { max-width: 800px; width: 100%; margin: 0 auto; padding: 20px; flex: 1; }
-    
-    .post-detail-card { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); margin-bottom: 20px; }
-    .post-detail-header { padding: 20px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
-    .header-actions { display: flex; align-items: center; gap: 10px; }
-    .author-info { display: flex; align-items: center; gap: 12px; cursor: pointer; transition: opacity 0.3s ease; }
-    .author-info:hover { opacity: 0.8; }
-    .author-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
-    .author-details { display: flex; flex-direction: column; gap: 4px; }
-    .author-name { font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 6px; }
-    .post-timestamp { font-size: 13px; color: #aaa; }
-    .verification-badge { display: inline-block; width: 18px; height: 18px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-    .like-btn { background: transparent; border: 1px solid #3663FF; color: #3663FF; cursor: pointer; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; }
-    .like-btn.liked { background: #3663FF; color: #fff; }
-    .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; }
-    .delete-btn:hover { background: #cc0000; transform: translateY(-2px); }
+    .header-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
 
-    .post-detail-image { width: 100%; max-height: 700px; object-fit: contain; background: #000; }
-    .post-detail-content { padding: 24px; }
-    .post-text { font-size: 16px; line-height: 1.8; color: #fff; white-space: pre-wrap; word-wrap: break-word; }
-    .post-text a { color: #00bfff; text-decoration: underline; }
-    .post-text a:hover { color: #53b6f9; }
+    .mark-all-read-btn {
+      background: #3663FF;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-    .share-container { padding: 20px 24px; background: #252525; border-top: 1px solid #333; display: flex; flex-direction: column; gap: 10px; }
-    .share-label { font-size: 13px; color: #aaa; font-weight: 600; }
-    .share-box-wrapper { display: flex; gap: 10px; align-items: center; }
-    .share-url-box { flex: 1; background: #121212; border: 1px solid #444; padding: 10px 14px; border-radius: 10px; font-size: 14px; color: #3663FF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .copy-btn { background: #3663FF; border: none; color: #fff; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; flex-shrink: 0; }
-    .copy-btn.success { background: rgb(0, 204, 136) !important; }
+    .mark-all-read-btn:hover {
+      background: #2952CC;
+      transform: translateY(-2px);
+    }
 
-    .comment-section { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-    .comment-input-wrapper { display: flex; gap: 10px; margin-bottom: 20px; }
-    .comment-input { flex: 1; background: #121212; border: 1px solid #444; border-radius: 12px; padding: 12px; color: #fff; font-size: 14px; resize: none; min-height: 44px; max-height: 150px; }
-    .comment-input:focus { outline: none; border-color: #3663FF; }
-    .comment-submit-btn { background: #3663FF; border: none; color: white; padding: 0 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-    .comment-submit-btn:hover { background: #2952CC; }
+    .mark-all-read-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-    .comment-list { display: flex; flex-direction: column; gap: 16px; }
-    .comment-item { display: flex; flex-direction: column; gap: 6px; padding-bottom: 16px; border-bottom: 1px solid #333; }
-    .comment-item:last-child { border-bottom: none; }
-    .comment-header { display: flex; justify-content: space-between; align-items: center; }
-    .comment-author-wrapper { display: flex; align-items: center; gap: 8px; cursor: pointer; transition: opacity 0.3s ease; }
-    .comment-author-wrapper:hover { opacity: 0.8; }
-    .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; flex-shrink: 0; }
-    .comment-author { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
-    .comment-content { font-size: 14px; color: #ddd; line-height: 1.5; white-space: pre-wrap; }
-    .comment-content a { color: #00bfff; text-decoration: underline; }
-    .comment-content a:hover { color: #53b6f9; }
-    .comment-date { font-size: 12px; color: #666; }
-    .comment-del-btn { background: none; border: none; color: #ff4444; font-size: 12px; cursor: pointer; padding: 4px; }
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .notifications-container {
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .notification-item {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .notification-item.read {
+      opacity: 0.5;
+      background: #1a1a1a;
+    }
+
+    .notification-item:hover {
+      transform: translateY(-2px);
+      border-color: #3663FF;
+      box-shadow: 0 4px 12px rgba(54, 99, 255, 0.3);
+    }
+
+    .notification-detail {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .notification-time {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .notification-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3663FF, #2952CC);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: #666;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 16px;
+      color: #888;
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-notification {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .skeleton-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .skeleton-content {
+      flex: 1;
+    }
+
+    .skeleton-text {
+      width: 100%;
+      height: 16px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+    }
+
+    .skeleton-text.short {
+      width: 40%;
+    }
 
     .login-alert {
       position: fixed;
@@ -136,36 +255,57 @@
       50% { opacity: 0.8; transform: scale(1.1); }
     }
 
-    .skeleton {
-      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s ease-in-out infinite;
-      border-radius: 4px;
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 30px 20px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin-top: auto;
     }
 
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+    .footer-links {
+      margin-bottom: 15px;
     }
 
-    .skeleton-avatar { width: 48px; height: 48px; border-radius: 50%; }
-    .skeleton-name { width: 120px; height: 16px; margin-bottom: 6px; }
-    .skeleton-time { width: 150px; height: 13px; }
-    .skeleton-button { width: 100px; height: 38px; border-radius: 12px; }
-    .skeleton-image { width: 100%; height: 500px; }
-    .skeleton-text { width: 100%; height: 16px; margin-bottom: 10px; }
-    .skeleton-share { flex: 1; height: 42px; border-radius: 10px; }
-    .skeleton-comment { width: 100%; height: 60px; border-radius: 12px; margin-bottom: 16px; }
+    .footer-links a {
+      color: #3663FF;
+      text-decoration: none;
+      margin: 0 15px;
+      transition: color 0.3s;
+    }
 
-    .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: 40px; }
-    .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; }
-    .footer-text { color: #666; font-size: 12px; margin-top: 10px; }
+    .footer-links a:hover {
+      color: #00aaff;
+      text-decoration: underline;
+    }
+
+    .footer-text {
+      color: #666;
+      font-size: 12px;
+    }
 
     @media (max-width: 768px) {
-      .sidebar-container { width: 80px; min-width: 80px; }
-      .sidebar-container iframe { width: 80px !important; }
-      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
-      .login-alert { max-width: 90%; padding: 14px 24px; font-size: 14px; }
+      .sidebar-container { 
+        width: 80px; 
+        min-width: 80px;
+      }
+      .sidebar-container iframe {
+        width: 80px !important;
+      }
+      .main-wrapper { 
+        margin-left: 80px; 
+        width: calc(100% - 80px); 
+      }
+      .header-title {
+        font-size: 20px;
+      }
+      .login-alert {
+        max-width: 90%;
+        padding: 14px 24px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -176,55 +316,46 @@
   </div>
 
   <div class="sidebar-container">
-    <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
+    <iframe 
+      src="sidebar.html" 
+      id="sidebarFrame"
+      width="250"
+      height="100%"
+      frameborder="0"
+    ></iframe>
   </div>
 
   <div class="main-wrapper">
     <div class="header">
-      <button class="back-btn" onclick="goHome()">←</button>
-      <div class="header-title">게시물</div>
+      <div class="header-title">🔔 알림</div>
+      <button class="mark-all-read-btn" id="markAllReadBtn" onclick="markAllAsRead()">
+        ✓ 모두 읽음
+      </button>
     </div>
 
-    <div class="container">
-      <div id="postContent">
-        <div class="post-detail-card">
-          <div class="post-detail-header">
-            <div class="author-info" style="pointer-events: none;">
-              <div class="skeleton skeleton-avatar"></div>
-              <div class="author-details" style="flex: 1;">
-                <div class="skeleton skeleton-name"></div>
-                <div class="skeleton skeleton-time"></div>
-              </div>
-            </div>
-            <div class="header-actions">
-              <div class="skeleton skeleton-button"></div>
-            </div>
-          </div>
-          <div class="skeleton skeleton-image"></div>
-          <div class="post-detail-content">
+    <div class="main-content">
+      <div class="notifications-container" id="notificationsContainer">
+        <!-- 스켈레톤 로딩 -->
+        <div class="skeleton-notification">
+          <div class="skeleton skeleton-icon"></div>
+          <div class="skeleton-content">
             <div class="skeleton skeleton-text"></div>
-            <div class="skeleton skeleton-text"></div>
-            <div class="skeleton skeleton-text" style="width: 70%;"></div>
-          </div>
-          <div class="share-container">
-            <div class="share-label">게시물 공유하기</div>
-            <div class="share-box-wrapper">
-              <div class="skeleton skeleton-share"></div>
-              <div class="skeleton" style="width: 42px; height: 42px; border-radius: 10px;"></div>
-            </div>
+            <div class="skeleton skeleton-text short"></div>
           </div>
         </div>
-      </div>
-
-      <div class="comment-section">
-        <div class="comment-input-wrapper">
-          <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
-          <button class="comment-submit-btn" onclick="addComment()">업로드</button>
+        <div class="skeleton-notification">
+          <div class="skeleton skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text short"></div>
+          </div>
         </div>
-        <div id="commentList" class="comment-list">
-          <div class="skeleton skeleton-comment"></div>
-          <div class="skeleton skeleton-comment"></div>
-          <div class="skeleton skeleton-comment"></div>
+        <div class="skeleton-notification">
+          <div class="skeleton skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text short"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -235,7 +366,9 @@
         <a href="#" onclick="showTerms(); return false;">이용약관</a>
         <a href="mailto:alexeom97@outlook.com">문의하기</a>
       </div>
-      <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
+      <div class="footer-text">
+        © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+      </div>
     </div>
   </div>
 
@@ -247,46 +380,7 @@
     
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-    let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
-    let currentPost = null; // 현재 게시물 정보 저장
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get('id');
-
-    // 알림 생성 함수
-    async function createNotification(targetUserId, detail, link) {
-      // 자기 자신에게는 알림 X, 아이디로 비교
-      if (!targetUserId || targetUserId === currentUser?.id) return; 
-      
-      try {
-        const { error } = await supabase
-          .from('notification')
-          .insert([{
-            user: targetUserId, // ✅ 아이디 저장
-            detail: detail,
-            link: link,
-            isread: 1,
-            created_at: new Date().toISOString()
-          }]);
-
-        if (error) {
-          console.error('알림 생성 오류:', error);
-        } else {
-          console.log('✅ 알림 생성 성공:', detail, '→', targetUserId);
-        }
-      } catch (e) {
-        console.error('알림 생성 예외:', e);
-      }
-    }
-
-    // 링크 자동 감지 함수
-    function linkify(text) {
-      text = escapeHtml(text);
-      const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
-      return text.replace(urlRegex, url => {
-        let href = url.startsWith('http') ? url : 'https://' + url;
-        return `<a href="${href}" target="_blank">${url}</a>`;
-      });
-    }
+    let currentUser = null;
 
     function showLoginAlert() {
       const alert = document.getElementById('loginAlert');
@@ -307,6 +401,12 @@
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
         updateSidebar();
+        loadNotifications();
+      } else {
+        showLoginAlert();
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
       }
     }
 
@@ -338,6 +438,7 @@
       if (type === 'navigate') {
         if (page === 'home') location.href = 'index.html';
         if (page === 'explore') location.href = 'explore.html';
+        if (page === 'notifications') location.href = 'notifications.html';
       }
 
       if (type === 'logout') {
@@ -351,332 +452,238 @@
       }
     });
 
-    document.getElementById('commentInput').addEventListener('focus', function() {
-      if (!currentUser) {
-        this.blur();
-        showLoginAlert();
-      }
-    });
+    async function loadNotifications() {
+      if (!currentUser) return;
 
-    initCurrentUser();
-    updateSidebarMode();
-    window.addEventListener('resize', updateSidebarMode);
-
-    if (!postId) {
-      showError('게시물 ID가 없습니다.');
-    } else {
-      loadPost(postId);
-      listenComments(postId);
-    }
-
-    async function loadPost(postId) {
-      try {
-        const { data: post, error } = await supabase
-          .from('posts')
-          .select('*')
-          .eq('id', postId)
-          .single();
-
-        if (error || !post) {
-          showError('게시물을 찾을 수 없습니다.');
-          return;
-        }
-
-        currentPost = post; // 현재 게시물 저장
-        displayPost(post, postId);
-        loadLikes(postId);
-      } catch (e) {
-        console.error('게시물 로드 오류:', e);
-        showError('오류가 발생했습니다.');
-      }
-    }
-
-    function displayPost(post, postId) {
-      const contentDiv = document.getElementById('postContent');
-      const timeStr = new Date(post.created_at).toLocaleString('ko-KR');
-      const isVerified = post.author === "JB777";
-      const canDelete = currentUser && (
-        currentUser.nickname === post.author || 
-        currentUser.id === post.author_id || 
-        (currentUser.nickname === "JB777" && currentUser.isVerified)
-      );
-
-      const linkedContent = linkify(post.content || '');
-
-      contentDiv.innerHTML = `
-        <div class="post-detail-card">
-          <div class="post-detail-header">
-            <div class="author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
-              <div class="author-avatar">${post.author ? post.author[0].toUpperCase() : '?'}</div>
-              <div class="author-details">
-                <div class="author-name">${escapeHtml(post.author)}${isVerified ? '<span class="verification-badge"></span>' : ''}</div>
-                <div class="post-timestamp">${timeStr}</div>
-              </div>
-            </div>
-            <div class="header-actions">
-              <button class="like-btn" id="likeBtn" onclick="toggleLike()">👍 좋아요: <span id="likeCount">0</span></button>
-              ${canDelete ? `<button class="delete-btn" onclick="deletePost('${postId}')">삭제</button>` : ''}
-            </div>
-          </div>
-          ${post.image_url ? `<img src="${post.image_url}" class="post-detail-image">` : ''}
-          <div class="post-detail-content"><div class="post-text">${linkedContent}</div></div>
-          <div class="share-container">
-            <div class="share-label">게시물 공유하기</div>
-            <div class="share-box-wrapper">
-              <div class="share-url-box">${window.location.href}</div>
-              <button class="copy-btn" id="copyBtn" onclick="copyShareLink()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    window.goToProfile = function(userId, nickname) {
-      window.location.href = `user.html?id=${userId}&nickname=${nickname}`;
-    }
-
-    async function loadLikes(postId) {
-      try {
-        const { data: likes, error } = await supabase
-          .from('likes')
-          .select('*')
-          .eq('post_id', postId);
-
-        if (error) throw error;
-        updateLikeUI(likes || []);
-      } catch (e) {
-        console.error('좋아요 로드 오류:', e);
-      }
-    }
-
-    function updateLikeUI(likes) {
-      const btn = document.getElementById('likeBtn');
-      const count = document.getElementById('likeCount');
-      if (!btn) return;
-
-      count.textContent = likes.length;
-      
-      if (currentUser && likes.some(like => like.user_id === currentUser.id)) {
-        btn.classList.add('liked');
-      } else {
-        btn.classList.remove('liked');
-      }
-    }
-
-    window.toggleLike = async function() {
-      if (!currentUser) {
-        showLoginAlert();
-        return;
-      }
-
-      if (!currentPost) return;
+      const container = document.getElementById('notificationsContainer');
 
       try {
-        const { data: existingLike } = await supabase
-          .from('likes')
+        const { data: notifications, error } = await supabase
+          .from('notification')
           .select('*')
-          .eq('post_id', postId)
-          .eq('user_id', currentUser.id)
-          .single();
-
-        if (existingLike) {
-          // 좋아요 취소
-          await supabase
-            .from('likes')
-            .delete()
-            .eq('post_id', postId)
-            .eq('user_id', currentUser.id);
-        } else {
-          // 좋아요 추가
-          await supabase
-            .from('likes')
-            .insert([{
-              post_id: postId,
-              user_id: currentUser.id
-            }]);
-
-          // 🔔 좋아요 알림 생성 (게시물 작성자에게)
-          await createNotification(
-            currentPost.author_id, // ✅ 아이디 사용
-            `${currentUser.nickname}님이 당신의 게시물에 좋아요를 남겼습니다`,
-            `view.html?id=${postId}`
-          );
-        }
-
-        loadLikes(postId);
-      } catch (e) {
-        console.error('좋아요 오류:', e);
-      }
-    }
-
-    async function listenComments(postId) {
-      try {
-        const { data: comments, error } = await supabase
-          .from('comments')
-          .select('*')
-          .eq('post_id', postId)
+          .eq('user', currentUser.id)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        displayComments(comments || []);
 
-        supabase
-          .channel(`comments:${postId}`)
-          .on('postgres_changes', {
-            event: '*',
-            schema: 'public',
-            table: 'comments',
-            filter: `post_id=eq.${postId}`
-          }, () => {
-            listenComments(postId);
-          })
-          .subscribe();
-      } catch (e) {
-        console.error('댓글 로드 오류:', e);
-      }
-    }
-
-    function displayComments(comments) {
-      const listDiv = document.getElementById('commentList');
-      listDiv.innerHTML = '';
-
-      if (!comments || comments.length === 0) {
-        listDiv.innerHTML = '<div style="text-align:center; color:#666; font-size:14px; padding:20px;">첫 댓글을 남겨보세요!</div>';
-        return;
-      }
-
-      comments.forEach(comment => {
-        const isMyComment = currentUser && (currentUser.id === comment.user_id);
-        const date = new Date(comment.created_at).toLocaleString('ko-KR');
-        const isCommentVerified = comment.user_name === "JB777";
-        
-        const linkedCommentText = linkify(comment.text);
-        
-        const div = document.createElement('div');
-        div.className = 'comment-item';
-        div.innerHTML = `
-          <div class="comment-header">
-            <div class="comment-author-wrapper" onclick="goToProfile('${comment.user_id}', '${escapeHtml(comment.user_name)}')">
-              <div class="comment-avatar">${comment.user_name ? comment.user_name[0].toUpperCase() : '?'}</div>
-              <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
+        if (!notifications || notifications.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🔕</div>
+              <div class="empty-state-text">알림이 없습니다</div>
             </div>
-            ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}')">삭제</button>` : ''}
+          `;
+          return;
+        }
+
+        container.innerHTML = '';
+
+        notifications.forEach(notification => {
+          const notifDiv = document.createElement('div');
+          notifDiv.className = 'notification-item';
+          
+          // isread 타입 변환 후 비교 (문자열 "2"와 숫자 2 둘 다 처리)
+          if (Number(notification.isread) === 2) {
+            notifDiv.classList.add('read');
+          }
+          
+          const timeStr = formatTime(notification.created_at);
+          const icon = getNotificationIcon(notification.detail);
+
+          notifDiv.innerHTML = `
+            <div class="notification-header">
+              <div class="notification-icon">${icon}</div>
+              <div class="notification-content">
+                <div class="notification-detail">${escapeHtml(notification.detail)}</div>
+                <div class="notification-time">${timeStr}</div>
+              </div>
+            </div>
+          `;
+
+          notifDiv.onclick = async () => {
+            // isread가 1일 때만 2로 업데이트
+            if (Number(notification.isread) === 1) {
+              // 즉시 화면에 투명도 적용 (UX 개선)
+              notifDiv.classList.add('read');
+              notification.isread = 2;
+
+              try {
+                // id가 없으면 user로 조건 검색
+                const updateCondition = notification.id 
+                  ? { id: notification.id }
+                  : { user: currentUser.id, created_at: notification.created_at };
+
+                const { data, error } = await supabase
+                  .from('notification')
+                  .update({ isread: 2 })
+                  .match(updateCondition);
+                
+                if (error) {
+                  console.error('알림 읽음 처리 실패:', error);
+                  console.error('에러 상세:', error.message);
+                  alert('알림 업데이트 실패: ' + error.message);
+                  // 실패 시 원래대로 복구
+                  notifDiv.classList.remove('read');
+                  notification.isread = 1;
+                } else {
+                  console.log('알림 읽음 처리 성공!', data);
+                }
+              } catch (error) {
+                console.error('알림 읽음 처리 오류:', error);
+                alert('오류 발생: ' + error.message);
+                // 실패 시 원래대로 복구
+                notifDiv.classList.remove('read');
+                notification.isread = 1;
+              }
+            }
+            
+            // 링크로 이동
+            if (notification.link) {
+              window.location.href = notification.link;
+            }
+          };
+
+          container.appendChild(notifDiv);
+        });
+
+      } catch (error) {
+        console.error('알림 로드 오류:', error);
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚠️</div>
+            <div class="empty-state-text">알림을 불러오는데 실패했습니다</div>
           </div>
-          <div class="comment-content">${linkedCommentText}</div>
-          <div class="comment-date">${date}</div>
         `;
-        listDiv.appendChild(div);
+      }
+    }
+
+    function getNotificationIcon(detail) {
+      if (!detail) return '🔔';
+      
+      const lowerDetail = detail.toLowerCase();
+      
+      if (lowerDetail.includes('댓글')) return '💬';
+      if (lowerDetail.includes('좋아요')) return '❤️';
+      if (lowerDetail.includes('팔로우')) return '👤';
+      if (lowerDetail.includes('게시물')) return '📝';
+      if (lowerDetail.includes('멘션') || lowerDetail.includes('@')) return '📢';
+      
+      return '🔔';
+    }
+
+    function formatTime(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return '방금 전';
+      if (diffMins < 60) return `${diffMins}분 전`;
+      if (diffHours < 24) return `${diffHours}시간 전`;
+      if (diffDays < 7) return `${diffDays}일 전`;
+      
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
     }
 
-    window.addComment = async function() {
-      const input = document.getElementById('commentInput');
-      const text = input.value.trim();
-      
-      if (!currentUser) {
-        showLoginAlert();
-        return;
-      }
-      
-      if (!text) return;
-      if (!currentPost) return;
-
-      try {
-        const { error } = await supabase
-          .from('comments')
-          .insert([{
-            post_id: postId,
-            user_id: currentUser.id,
-            user_name: currentUser.nickname,
-            text: text,
-            created_at: new Date().toISOString()
-          }]);
-
-        if (error) throw error;
-
-        // 🔔 댓글 알림 생성 (게시물 작성자에게)
-        await createNotification(
-          currentPost.author_id, // ✅ 아이디 사용
-          `${currentUser.nickname}님이 당신의 게시물에 댓글을 남겼습니다`,
-          `view.html?id=${postId}`
-        );
-
-        input.value = '';
-        listenComments(postId);
-      } catch (e) {
-        console.error('댓글 업로드 오류:', e);
-        alert('댓글 업로드 실패');
-      }
-    }
-
-    window.deleteComment = async function(commentId) {
-      if (!confirm('댓글을 삭제하시겠습니까?')) return;
-      
-      try {
-        const { error } = await supabase
-          .from('comments')
-          .delete()
-          .eq('id', commentId);
-
-        if (error) throw error;
-        listenComments(postId);
-      } catch (e) {
-        console.error('댓글 삭제 오류:', e);
-        alert('삭제 실패');
-      }
-    }
-
-    window.copyShareLink = function() {
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        const btn = document.getElementById('copyBtn');
-        btn.classList.add('success');
-        setTimeout(() => btn.classList.remove('success'), 1500);
-      });
-    }
-
-    window.deletePost = async function(pid) {
-      if (!confirm('삭제하시겠습니까?')) return;
-      
-      try {
-        await supabase.from('comments').delete().eq('post_id', pid);
-        await supabase.from('likes').delete().eq('post_id', pid);
-        await supabase.from('posts').delete().eq('id', pid);
-        
-        window.location.href = 'index.html';
-      } catch (e) {
-        console.error('삭제 오류:', e);
-        alert('삭제에 실패했습니다.');
-      }
-    }
-
-    function showError(msg) {
-      document.getElementById('postContent').innerHTML = `
-        <div class="post-detail-card" style="padding: 40px;">
-          <div style="text-align: center;">
-            <div style="color: #ff6b6b; font-size: 16px; margin-bottom: 20px;">${msg}</div>
-            <button onclick="window.history.back()" style="background: #3663FF; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer;">돌아가기</button>
-          </div>
-        </div>
-      `;
-      document.getElementById('commentList').innerHTML = '';
-    }
-
-    function escapeHtml(t) {
-      if (!t) return '';
-      return t.replace(/[&<>"']/g, m => ({
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = {
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
         "'": '&#039;'
-      }[m]));
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
     }
 
-    window.goHome = () => window.location.href = "index.html";
-    window.showPrivacyPolicy = () => alert("개인정보처리방침...");
-    window.showTerms = () => alert("이용약관...");
+    window.showPrivacyPolicy = function() {
+      alert(`개인정보처리방침
+
+㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
+
+1. 수집하는 개인정보 항목
+- 필수항목: 아이디, 비밀번호, 닉네임
+
+2. 개인정보의 수집 및 이용목적
+- 회원 관리, 서비스 제공, 게시물 관리
+
+3. 개인정보의 보유 및 이용기간
+- 회원 탈퇴 시까지
+
+4. 개인정보 파기절차 및 방법
+- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
+
+5. 이용자의 권리
+- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+
+    window.showTerms = function() {
+      alert(`이용약관
+
+제1조 (목적)
+이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
+
+제2조 (용어의 정의)
+1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
+2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
+
+제3조 (서비스의 제공)
+1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
+2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
+
+제4조 (회원의 의무)
+1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
+2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
+
+제5조 (서비스 이용의 제한)
+운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
+
+문의사항: alexeom97@outlook.com`);
+    }
+
+    window.markAllAsRead = async function() {
+      if (!currentUser) return;
+
+      const btn = document.getElementById('markAllReadBtn');
+      btn.disabled = true;
+      btn.innerHTML = '처리 중...';
+
+      try {
+        // 현재 사용자의 모든 알림을 isread = 2로 업데이트
+        const { data, error } = await supabase
+          .from('notification')
+          .update({ isread: 2 })
+          .eq('user', currentUser.id);
+
+        if (error) {
+          console.error('모두 읽음 처리 실패:', error);
+          alert('처리 실패: ' + error.message);
+        } else {
+          console.log('모두 읽음 처리 성공!', data);
+          // 알림 목록 다시 로드
+          loadNotifications();
+        }
+      } catch (error) {
+        console.error('모두 읽음 처리 오류:', error);
+        alert('오류 발생: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✓ 모두 읽음';
+      }
+    }
+
+    initCurrentUser();
+    updateSidebarMode();
+    window.addEventListener('resize', updateSidebarMode);
   </script>
 </body>
 </html>
