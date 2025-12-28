@@ -476,19 +476,29 @@
               notification.isread = 2;
 
               try {
-                const { error } = await supabase
+                // id가 없으면 user로 조건 검색
+                const updateCondition = notification.id 
+                  ? { id: notification.id }
+                  : { user: currentUser.id, created_at: notification.created_at };
+
+                const { data, error } = await supabase
                   .from('notification')
                   .update({ isread: 2 })
-                  .eq('id', notification.id);
+                  .match(updateCondition);
                 
                 if (error) {
                   console.error('알림 읽음 처리 실패:', error);
+                  console.error('에러 상세:', error.message);
+                  alert('알림 업데이트 실패: ' + error.message);
                   // 실패 시 원래대로 복구
                   notifDiv.classList.remove('read');
                   notification.isread = 1;
+                } else {
+                  console.log('알림 읽음 처리 성공!', data);
                 }
               } catch (error) {
                 console.error('알림 읽음 처리 오류:', error);
+                alert('오류 발생: ' + error.message);
                 // 실패 시 원래대로 복구
                 notifDiv.classList.remove('read');
                 notification.isread = 1;
