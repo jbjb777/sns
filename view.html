@@ -248,10 +248,36 @@
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
+    let currentPost = null; // 현재 게시물 정보 저장
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
-    // 링크 자동 감지 함수 (채팅 코드에서 가져옴)
+    // 알림 생성 함수
+    async function createNotification(targetUserId, detail, link) {
+      if (!targetUserId || targetUserId === currentUser?.id) return; // 자기 자신에게는 알림 X
+      
+      try {
+        const { error } = await supabase
+          .from('notification')
+          .insert([{
+            user: targetUserId,
+            detail: detail,
+            link: link,
+            isread: 1,
+            created_at: new Date().toISOString()
+          }]);
+
+        if (error) {
+          console.error('알림 생성 오류:', error);
+        } else {
+          console.log('알림 생성 성공:', detail);
+        }
+      } catch (e) {
+        console.error('알림 생성 예외:', e);
+      }
+    }
+
+    // 링크 자동 감지 함수
     function linkify(text) {
       text = escapeHtml(text);
       const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
@@ -304,7 +330,7 @@
       }
     }
 
-    // 🔥 사이드바 메시지 수신
+    // 사이드바 메시지 수신
     window.addEventListener('message', (event) => {
       const { type, page } = event.data || {};
 
@@ -355,6 +381,7 @@
           return;
         }
 
+        currentPost = post; // 현재 게시물 저장
         displayPost(post, postId);
         loadLikes(postId);
       } catch (e) {
@@ -373,7 +400,6 @@
         (currentUser.nickname === "JB777" && currentUser.isVerified)
       );
 
-      // 링크 자동 감지 적용
       const linkedContent = linkify(post.content || '');
 
       contentDiv.innerHTML = `
@@ -444,6 +470,8 @@
         return;
       }
 
+      if (!currentPost) return;
+
       try {
         const { data: existingLike } = await supabase
           .from('likes')
@@ -453,18 +481,27 @@
           .single();
 
         if (existingLike) {
+          // 좋아요 취소
           await supabase
             .from('likes')
             .delete()
             .eq('post_id', postId)
             .eq('user_id', currentUser.id);
         } else {
+          // 좋아요 추가
           await supabase
             .from('likes')
             .insert([{
               post_id: postId,
               user_id: currentUser.id
             }]);
+
+          // 🔔 좋아요 알림 생성 (게시물 작성자에게)
+          await createNotification(
+            currentPost.author_id,
+            `${currentUser.nickname}님이 당신의 게시물에 좋아요를 남겼습니다`,
+            `view.html?id=${postId}`
+          );
         }
 
         loadLikes(postId);
@@ -514,7 +551,6 @@
         const date = new Date(comment.created_at).toLocaleString('ko-KR');
         const isCommentVerified = comment.user_name === "JB777";
         
-        // 댓글에도 링크 자동 감지 적용
         const linkedCommentText = linkify(comment.text);
         
         const div = document.createElement('div');
@@ -544,6 +580,7 @@
       }
       
       if (!text) return;
+      if (!currentPost) return;
 
       try {
         const { error } = await supabase
@@ -557,6 +594,13 @@
           }]);
 
         if (error) throw error;
+
+        // 🔔 댓글 알림 생성 (게시물 작성자에게)
+        await createNotification(
+          currentPost.author_id,
+          `${currentUser.nickname}님이 당신의 게시물에 댓글을 남겼습니다`,
+          `view.html?id=${postId}`
+        );
 
         input.value = '';
         listenComments(postId);
