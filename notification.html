@@ -450,8 +450,8 @@
           const notifDiv = document.createElement('div');
           notifDiv.className = 'notification-item';
           
-          // isread가 2이면 read 클래스 추가 (투명도 효과)
-          if (notification.isread === 2) {
+          // isread 타입 변환 후 비교 (문자열 "2"와 숫자 2 둘 다 처리)
+          if (Number(notification.isread) === 2) {
             notifDiv.classList.add('read');
           }
           
@@ -470,14 +470,28 @@
 
           notifDiv.onclick = async () => {
             // isread가 1일 때만 2로 업데이트
-            if (notification.isread === 1) {
+            if (Number(notification.isread) === 1) {
+              // 즉시 화면에 투명도 적용 (UX 개선)
+              notifDiv.classList.add('read');
+              notification.isread = 2;
+
               try {
-                await supabase
+                const { error } = await supabase
                   .from('notification')
                   .update({ isread: 2 })
                   .eq('id', notification.id);
+                
+                if (error) {
+                  console.error('알림 읽음 처리 실패:', error);
+                  // 실패 시 원래대로 복구
+                  notifDiv.classList.remove('read');
+                  notification.isread = 1;
+                }
               } catch (error) {
                 console.error('알림 읽음 처리 오류:', error);
+                // 실패 시 원래대로 복구
+                notifDiv.classList.remove('read');
+                notification.isread = 1;
               }
             }
             
