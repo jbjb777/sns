@@ -75,6 +75,11 @@
       gap: 8px;
     }
 
+    .notification-item.read {
+      opacity: 0.5;
+      background: #1a1a1a;
+    }
+
     .notification-item:hover {
       transform: translateY(-2px);
       border-color: #3663FF;
@@ -445,6 +450,11 @@
           const notifDiv = document.createElement('div');
           notifDiv.className = 'notification-item';
           
+          // isread가 2이면 read 클래스 추가 (투명도 효과)
+          if (notification.isread === 2) {
+            notifDiv.classList.add('read');
+          }
+          
           const timeStr = formatTime(notification.created_at);
           const icon = getNotificationIcon(notification.detail);
 
@@ -458,7 +468,20 @@
             </div>
           `;
 
-          notifDiv.onclick = () => {
+          notifDiv.onclick = async () => {
+            // isread가 1일 때만 2로 업데이트
+            if (notification.isread === 1) {
+              try {
+                await supabase
+                  .from('notification')
+                  .update({ isread: 2 })
+                  .eq('id', notification.id);
+              } catch (error) {
+                console.error('알림 읽음 처리 오류:', error);
+              }
+            }
+            
+            // 링크로 이동
             if (notification.link) {
               window.location.href = notification.link;
             }
