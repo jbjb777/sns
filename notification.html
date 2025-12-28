@@ -328,6 +328,9 @@
   <div class="main-wrapper">
     <div class="header">
       <div class="header-title">🔔 알림</div>
+      <button class="mark-all-read-btn" id="markAllReadBtn" onclick="markAllAsRead()">
+        ✓ 모두 읽음
+      </button>
     </div>
 
     <div class="main-content">
@@ -645,6 +648,37 @@
 운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
 
 문의사항: alexeom97@outlook.com`);
+    }
+
+    window.markAllAsRead = async function() {
+      if (!currentUser) return;
+
+      const btn = document.getElementById('markAllReadBtn');
+      btn.disabled = true;
+      btn.innerHTML = '처리 중...';
+
+      try {
+        // 현재 사용자의 모든 알림을 isread = 2로 업데이트
+        const { data, error } = await supabase
+          .from('notification')
+          .update({ isread: 2 })
+          .eq('user', currentUser.id);
+
+        if (error) {
+          console.error('모두 읽음 처리 실패:', error);
+          alert('처리 실패: ' + error.message);
+        } else {
+          console.log('모두 읽음 처리 성공!', data);
+          // 알림 목록 다시 로드
+          loadNotifications();
+        }
+      } catch (error) {
+        console.error('모두 읽음 처리 오류:', error);
+        alert('오류 발생: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✓ 모두 읽음';
+      }
     }
 
     initCurrentUser();
