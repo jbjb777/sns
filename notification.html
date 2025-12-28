@@ -41,12 +41,41 @@
       position: sticky;
       top: 0;
       z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .header-title {
       font-size: 24px;
       font-weight: 600;
       color: #fff;
+    }
+
+    .mark-all-read-btn {
+      background: #3663FF;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mark-all-read-btn:hover {
+      background: #2952CC;
+      transform: translateY(-2px);
+    }
+
+    .mark-all-read-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .main-content {
