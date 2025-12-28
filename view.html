@@ -252,16 +252,16 @@
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
-    // 알림 생성 함수
+    // 🔔 알림 생성 함수
     async function createNotification(targetUserId, detail, link) {
-      // 자기 자신에게는 알림 X, 아이디로 비교
-      if (!targetUserId || targetUserId === currentUser?.id) return; 
+      // 자기 자신에게는 알림 X
+      if (!targetUserId || targetUserId === currentUser?.id) return;
       
       try {
         const { error } = await supabase
           .from('notification')
           .insert([{
-            user: targetUserId, // ✅ 아이디 저장
+            user: targetUserId, // ✅ 게시물 작성자의 아이디
             detail: detail,
             link: link,
             isread: 1,
@@ -269,7 +269,7 @@
           }]);
 
         if (error) {
-          console.error('알림 생성 오류:', error);
+          console.error('❌ 알림 생성 실패:', error);
         } else {
           console.log('✅ 알림 생성 성공:', detail, '→', targetUserId);
         }
@@ -382,7 +382,7 @@
           return;
         }
 
-        currentPost = post; // 현재 게시물 저장
+        currentPost = post; // 🔥 현재 게시물 저장
         displayPost(post, postId);
         loadLikes(postId);
       } catch (e) {
@@ -499,7 +499,7 @@
 
           // 🔔 좋아요 알림 생성 (게시물 작성자에게)
           await createNotification(
-            currentPost.author_id, // ✅ 아이디 사용
+            currentPost.author_id, // ✅ 게시물 작성자의 아이디
             `${currentUser.nickname}님이 당신의 게시물에 좋아요를 남겼습니다`,
             `view.html?id=${postId}`
           );
@@ -598,7 +598,7 @@
 
         // 🔔 댓글 알림 생성 (게시물 작성자에게)
         await createNotification(
-          currentPost.author_id, // ✅ 아이디 사용
+          currentPost.author_id, // ✅ 게시물 작성자의 아이디
           `${currentUser.nickname}님이 당신의 게시물에 댓글을 남겼습니다`,
           `view.html?id=${postId}`
         );
