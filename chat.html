@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Web → Discord Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat {
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    button {
+      background: #5865F2;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat">
+  <h3>웹 → 디스코드 테스트</h3>
+  <input id="name" placeholder="닉네임">
+  <input id="msg" placeholder="메시지">
+  <button onclick="send()">보내기</button>
+</div>
+
+<script>
+  const WEBHOOK_URL = "여기에_웹훅_URL_붙여넣기";
+
+  function send() {
+    const name = document.getElementById("name").value || "웹유저";
+    const msg = document.getElementById("msg").value;
+
+    if (!msg) return;
+
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: name,
+        content: msg
+      })
+    });
+
+    document.getElementById("msg").value = "";
+  }
+</script>
+
+</body>
+</html>
