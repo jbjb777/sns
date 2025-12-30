@@ -111,6 +111,15 @@
       word-break: break-word;
     }
 
+    .short-text-content a {
+      color: #00bfff;
+      text-decoration: underline;
+    }
+
+    .short-text-content a:hover {
+      color: #53b6f9;
+    }
+
     .short-caption {
       padding: 16px 20px;
       background: rgba(30, 30, 30, 0.9);
@@ -127,6 +136,15 @@
       color: #fff;
       white-space: pre-wrap;
       word-break: break-word;
+    }
+
+    .short-caption-text a {
+      color: #00bfff;
+      text-decoration: underline;
+    }
+
+    .short-caption-text a:hover {
+      color: #53b6f9;
     }
 
     .short-info-bar {
@@ -238,7 +256,6 @@
       margin-top: 2px;
     }
 
-    /* 네비게이션 버튼 스타일 */
     .nav-buttons {
       position: fixed;
       right: 100px;
@@ -364,6 +381,31 @@
       align-items: center;
     }
 
+    .comment-author-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .comment-author-wrapper:hover {
+      opacity: 0.8;
+    }
+
+    .comment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
     .comment-author {
       font-size: 14px;
       font-weight: 600;
@@ -377,6 +419,15 @@
       color: #ddd;
       line-height: 1.5;
       white-space: pre-wrap;
+    }
+
+    .comment-content a {
+      color: #00bfff;
+      text-decoration: underline;
+    }
+
+    .comment-content a:hover {
+      color: #53b6f9;
     }
 
     .comment-date {
@@ -640,7 +691,6 @@
         height: 80vh;
       }
       
-      /* 모바일에서 네비게이션 버튼 숨김 */
       .nav-buttons {
         display: none;
       }
@@ -696,14 +746,9 @@
     </div>
   </div>
 
-  <!-- 네비게이션 버튼 (데스크탑 전용) -->
   <div class="nav-buttons" id="navButtons">
-    <div class="nav-btn" id="navUpBtn" onclick="scrollToPrevious()">
-      ▲
-    </div>
-    <div class="nav-btn" id="navDownBtn" onclick="scrollToNext()">
-      ▼
-    </div>
+    <div class="nav-btn" id="navUpBtn" onclick="scrollToPrevious()">▲</div>
+    <div class="nav-btn" id="navDownBtn" onclick="scrollToNext()">▼</div>
   </div>
 
   <div class="comment-modal-overlay" id="commentOverlay" onclick="closeComments()"></div>
@@ -739,6 +784,15 @@
     let currentScrollIndex = 0;
     let loadedPostIndices = new Set();
     const INITIAL_LOAD = 2;
+
+    function linkify(text) {
+      text = escapeHtml(text);
+      const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
+      return text.replace(urlRegex, url => {
+        let href = url.startsWith('http') ? url : 'https://' + url;
+        return `<a href="${href}" target="_blank">${url}</a>`;
+      });
+    }
 
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
@@ -808,7 +862,6 @@
     updateSidebarMode();
     window.addEventListener('resize', updateSidebarMode);
 
-    // 네비게이션 버튼 함수
     window.scrollToNext = function() {
       const container = document.getElementById('shortsContainer');
       const items = container.querySelectorAll('.short-item');
@@ -817,11 +870,8 @@
         currentScrollIndex++;
         items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
         updateNavButtons();
-        
-        // 다음 게시물 미리 로드
         preloadNextPost();
       } else {
-        // 마지막 게시물인 경우 새 게시물 로드 후 이동
         preloadNextPost();
         setTimeout(() => {
           const updatedItems = container.querySelectorAll('.short-item');
@@ -832,7 +882,7 @@
           }
         }, 100);
       }
-    }
+    };
 
     window.scrollToPrevious = function() {
       const container = document.getElementById('shortsContainer');
@@ -843,7 +893,7 @@
         items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
         updateNavButtons();
       }
-    }
+    };
 
     function updateNavButtons() {
       const container = document.getElementById('shortsContainer');
@@ -857,8 +907,6 @@
         } else {
           upBtn.classList.remove('disabled');
         }
-        
-        // 무한 스크롤이므로 항상 다운 버튼 활성화
         downBtn.classList.remove('disabled');
       }
     }
@@ -899,7 +947,6 @@
       const container = document.getElementById('shortsContainer');
       container.innerHTML = '';
 
-      // 처음 2개 게시물만 로드
       for (let i = 0; i < INITIAL_LOAD; i++) {
         const post = getNextPost();
         if (post) {
@@ -914,7 +961,6 @@
 
     function getNextPost() {
       if (currentPostIndex >= displayedPosts.length) {
-        // 모든 게시물을 본 경우 다시 섞기
         const newShuffled = [...allPosts].sort(() => Math.random() - 0.5);
         displayedPosts = [...displayedPosts, ...newShuffled];
       }
@@ -954,25 +1000,11 @@
             if (currentScrollIndex !== index) {
               currentScrollIndex = index;
               updateNavButtons();
-              
-              // 다음 게시물 미리 로드
               preloadNextPost();
             }
           }
         });
       });
-    }
-
-    function renderPosts() {
-      const container = document.getElementById('shortsContainer');
-      container.innerHTML = '';
-
-      displayedPosts.forEach((post, index) => {
-        const shortItem = createShortItem(post, index);
-        container.appendChild(shortItem);
-      });
-
-      loadLikesAndComments();
     }
 
     function createShortItem(post, index) {
@@ -988,11 +1020,12 @@
       let contentHTML = '';
 
       if (hasImage && hasContent) {
+        const linkedContent = linkify(post.content);
         contentHTML = `
           <div class="short-content">
             <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
             <div class="short-caption">
-              <div class="short-caption-text">${escapeHtml(post.content)}</div>
+              <div class="short-caption-text">${linkedContent}</div>
             </div>
           </div>
         `;
@@ -1003,10 +1036,11 @@
           </div>
         `;
       } else if (!hasImage && hasContent) {
+        const linkedContent = linkify(post.content);
         contentHTML = `
           <div class="short-content">
             <div class="short-text-only">
-              <div class="short-text-content">${escapeHtml(post.content)}</div>
+              <div class="short-text-content">${linkedContent}</div>
             </div>
           </div>
         `;
@@ -1124,11 +1158,7 @@
       } catch (error) {
         console.error('좋아요 오류:', error);
       }
-    }
-
-    window.goToPost = function(postId) {
-      window.location.href = `view.html?id=${postId}`;
-    }
+    };
 
     window.openComments = async function(postId) {
       currentCommentPostId = postId;
@@ -1136,7 +1166,7 @@
       document.getElementById('commentModal').classList.add('active');
       
       await loadComments(postId);
-    }
+    };
 
     window.closeComments = function() {
       document.getElementById('commentOverlay').classList.remove('active');
@@ -1145,7 +1175,7 @@
       
       document.getElementById('commentInput').value = '';
       document.getElementById('commentList').innerHTML = '';
-    }
+    };
 
     async function loadComments(postId) {
       const listDiv = document.getElementById('commentList');
@@ -1173,14 +1203,19 @@
           const date = new Date(comment.created_at).toLocaleString('ko-KR');
           const isCommentVerified = comment.user_name === "JB777";
           
+          const linkedCommentText = linkify(comment.text);
+          
           const div = document.createElement('div');
           div.className = 'comment-item';
           div.innerHTML = `
             <div class="comment-header">
-              <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
+              <div class="comment-author-wrapper" onclick="goToProfile('${comment.user_id}', '${escapeHtml(comment.user_name)}')">
+                <div class="comment-avatar">${comment.user_name ? comment.user_name[0].toUpperCase() : '?'}</div>
+                <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}</span>
+              </div>
               ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}', '${postId}')">삭제</button>` : ''}
             </div>
-            <div class="comment-content">${escapeHtml(comment.text)}</div>
+            <div class="comment-content">${linkedCommentText}</div>
             <div class="comment-date">${date}</div>
           `;
           listDiv.appendChild(div);
@@ -1233,7 +1268,7 @@
       } finally {
         submitBtn.disabled = false;
       }
-    }
+    };
 
     window.deleteComment = async function(commentId, postId) {
       if (!confirm('댓글을 삭제하시겠습니까?')) return;
@@ -1256,11 +1291,11 @@
         console.error('댓글 삭제 오류:', e);
         alert('삭제에 실패했습니다.');
       }
-    }
+    };
 
     window.goToProfile = function(userId, nickname) {
       window.location.href = `user.html?id=${userId}&nickname=${nickname}`;
-    }
+    };
 
     function showNoPosts() {
       const container = document.getElementById('shortsContainer');
@@ -1298,53 +1333,6 @@
         "'": '&#039;'
       };
       return text.replace(/[&<>"']/g, m => map[m]);
-    }
-
-    window.showPrivacyPolicy = function() {
-      alert(`개인정보처리방침
-
-㋡꧁정빈777꧂ SNS는 이용자의 개인정보를 중요시하며, "개인정보 보호법"을 준수하고 있습니다.
-
-1. 수집하는 개인정보 항목
-- 필수항목: 아이디, 비밀번호, 닉네임
-
-2. 개인정보의 수집 및 이용목적
-- 회원 관리, 서비스 제공, 게시물 관리
-
-3. 개인정보의 보유 및 이용기간
-- 회원 탈퇴 시까지
-
-4. 개인정보 파기절차 및 방법
-- 이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다.
-
-5. 이용자의 권리
-- 이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.
-
-문의사항: alexeom97@outlook.com`);
-    }
-
-    window.showTerms = function() {
-      alert(`이용약관
-
-제1조 (목적)
-이 약관은 ㋡꧁정빈777꧂ SNS 서비스의 이용조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.
-
-제2조 (용어의 정의)
-1. "서비스"란 ㋡꧁정빈777꧂ SNS가 제공하는 모든 서비스를 의미합니다.
-2. "회원"이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
-
-제3조 (서비스의 제공)
-1. 서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다.
-2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
-
-제4조 (회원의 의무)
-1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.
-2. 회원은 타인의 명예를 손상시키거나 불이익을 주는 행위를 해서는 안 됩니다.
-
-제5조 (서비스 이용의 제한)
-운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.
-
-문의사항: alexeom97@outlook.com`);
     }
 
     loadAllPosts();
