@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .logo-container:hover {
+      transform: scale(1.05);
+    }
+
+    .logo-svg {
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .auth-container {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .auth-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #fff;
+      font-size: 28px;
+    }
+
+    .auth-container input {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 2px solid #333;
+      font-size: 16px;
+      margin-bottom: 15px;
+      outline: none;
+      background: #2c2c2c;
+      color: #fff;
+      box-sizing: border-box;
+    }
+
+    .auth-container input:focus {
+      border-color: #3663FF;
+    }
+
+    .auth-container button {
+      width: 100%;
+      padding: 12px 24px;
+      border-radius: 30px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      background: #3663FF;
+      color: #fff;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      margin-bottom: 10px;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-container button:hover:not(:disabled) {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    .auth-container button:active:not(:disabled) {
+      background: #2952CC;
+    }
+
+    .auth-container button:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      color: #ff6b6b;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .success-message {
+      color: #00ff00;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 20px;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+
+    /* 반응형 스타일 */
+    @media (max-width: 768px) {
+      .logo-text {
+        font-size: 20px;
+      }
+
+      .auth-container {
+        padding: 30px 20px;
+      }
+
+      .auth-container h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container" onclick="goHome()">
+      <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
+      <span class="logo-text">Sharer</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="auth-container">
+      <h2>회원정보 입력</h2>
+      
+      <div id="signupForm">
+        <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
+        <div class="error-message" id="nicknameError"></div>
+        
+        <input type="text" id="signupId" placeholder="아이디">
+        <div class="error-message" id="idError"></div>
+        
+        <input type="password" id="signupPassword" placeholder="비밀번호">
+        <div class="error-message" id="signupError"></div>
+        
+        <div class="success-message" id="signupSuccess"></div>
+        
+        <button id="signupBtn" onclick="handleSignup()">가입 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
+    
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    window.goHome = function() {
+      // 로고 클릭 시 로그인 페이지로 이동
+      window.location.href = 'index.html';
+    }
+
+    function setButtonLoading(buttonId, isLoading, loadingText = '처리 중...') {
+      const button = document.getElementById(buttonId);
+      if (isLoading) {
+        button.disabled = true;
+        button.innerHTML = `<span class="spinner"></span>${loadingText}`;
+      } else {
+        button.disabled = false;
+        button.innerHTML = '가입 완료';
+      }
+    }
+
+    window.handleSignup = async function() {
+      const nickname = document.getElementById('signupNickname').value.trim();
+      const id = document.getElementById('signupId').value.trim();
+      const password = document.getElementById('signupPassword').value.trim();
+      
+      const idErrorDiv = document.getElementById('idError');
+      const nicknameErrorDiv = document.getElementById('nicknameError');
+      const errorDiv = document.getElementById('signupError');
+      const successDiv = document.getElementById('signupSuccess');
+
+      // 초기화
+      idErrorDiv.textContent = '';
+      nicknameErrorDiv.textContent = '';
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+
+      // 1. 기본 유효성 검사
+      if (!nickname || !id || !password) {
+        errorDiv.textContent = '모든 필드를 입력하세요.';
+        return;
+      }
+
+      if (nickname.length > 20) {
+        nicknameErrorDiv.textContent = '닉네임은 20자 이하로 입력하세요.';
+        return;
+      }
+
+      if (nickname.includes("정빈777")) {
+        nicknameErrorDiv.textContent = '이 닉네임은 사용할 수 없습니다.';
+        return;
+      }
+
+      setButtonLoading('signupBtn', true, '가입 중...');
+
+      try {
+        // 2. 아이디 중복 확인
+        const { data: idCheck } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (idCheck) {
+          idErrorDiv.textContent = '이미 사용 중인 아이디입니다.';
+          setButtonLoading('signupBtn', false);
+          return;
+        }
+
+        // 3. 닉네임 중복 확인
+        const { data: nicknameCheck } = await supabase
+          .from('users')
+          .select('nickname')
+          .eq('nickname', nickname)
+          .maybeSingle();
+
+        if (nicknameCheck) {
+          nicknameErrorDiv.textContent = '이미 사용 중인 닉네임입니다.';
+          setButtonLoading('signupBtn', false);
+          return;
+        }
+
+        // 4. 회원가입 처리 (DB insert)
+        const { error } = await supabase
+          .from('users')
+          .insert([
+            {
+              id: id,
+              nickname: nickname,
+              password: password,
+              created_at: new Date().toISOString()
+            }
+          ]);
+
+        if (error) throw error;
+
+        // 5. 성공 시 처리
+        successDiv.textContent = '회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.';
+        
+        // 1.5초 후 로그인 페이지로 이동
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+
+      } catch (error) {
+        console.error('회원가입 오류 원인:', error);
+        errorDiv.textContent = error.message || '회원가입에 실패했습니다. 다시 시도해주세요.';
+        setButtonLoading('signupBtn', false);
+      }
+    }
+
+    // Enter 키로 가입 실행
+    document.getElementById('signupPassword').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSignup();
+    });
+  </script>
+</body>
+</html>
