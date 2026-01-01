@@ -20,7 +20,6 @@
       background: #1e1e1e;
       border-right: 1px solid #333;
       padding: 20px;
-      padding-bottom: 30px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -141,14 +140,12 @@
 
     .user-info {
       margin-top: auto;
-      margin-bottom: auto;
       padding: 12px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
       border-top: 1px solid #333;
       padding-top: 20px;
-      padding-bottom: 20px;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       border-radius: 12px;
@@ -272,20 +269,21 @@
     }
 
     .sidebar.narrow .user-info {
-      flex-direction: row;
-      justify-content: center;
-      gap: 12px;
+      flex-direction: column;
+      gap: 8px;
       padding: 12px 8px;
-      padding-bottom: 20px;
     }
 
     .sidebar.narrow .user-details {
       display: none;
     }
 
+    .sidebar.narrow .logout-icon-btn {
+      display: none;
+    }
+
     .sidebar.narrow {
       padding: 10px;
-      padding-bottom: 30px;
     }
   </style>
 </head>
