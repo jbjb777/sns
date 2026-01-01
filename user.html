@@ -414,11 +414,13 @@
         let userData = null;
 
         if (userNickname === "JB777") {
+          // JB777은 localStorage에 상태메시지 저장
+          const jb777Message = localStorage.getItem('JB777_status_message') || '';
           userData = {
             nickname: "JB777",
             id: "정빈777",
             isVerified: true,
-            message: null
+            message: jb777Message
           };
         } else {
           const { data, error } = await supabase
@@ -535,22 +537,21 @@
 
       try {
         if (currentUser.nickname === "JB777") {
-          alert('JB777 계정의 상태메시지는 수정할 수 없습니다.');
-          closeStatusModal();
-          return;
+          // JB777은 localStorage에 저장
+          localStorage.setItem('JB777_status_message', newMessage);
+          viewingUser.message = newMessage;
+        } else {
+          // 일반 사용자는 Supabase에 저장
+          const { error } = await supabase
+            .from('users')
+            .update({ message: newMessage })
+            .eq('nickname', currentUser.nickname);
+
+          if (error) throw error;
+          viewingUser.message = newMessage;
         }
-
-        const { error } = await supabase
-          .from('users')
-          .update({ message: newMessage })
-          .eq('nickname', currentUser.nickname);
-
-        if (error) throw error;
-
-        viewingUser.message = newMessage;
         
         await displayProfile(viewingUser);
-        
         closeStatusModal();
       } catch (e) {
         console.error('상태메시지 저장 오류:', e);
