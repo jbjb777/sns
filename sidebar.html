@@ -103,8 +103,9 @@
       white-space: nowrap;
     }
 
+    /* 만들기 버튼 스타일 수정 */
     .create-btn {
-      background: linear-gradient(135deg, #00aaff, #0044ff);
+      background: linear-gradient(135deg, #5269FF, #5722B3, #FF00EC);
       color: white;
       border: none;
       padding: 12px 16px;
@@ -116,20 +117,32 @@
       align-items: center;
       justify-content: center;
       margin-top: 20px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: none; /* 호버 시 올라가는 효과 완전 제거 */
       width: 100%;
+      position: relative;
+      overflow: hidden;
     }
 
+    /* 호버 효과 제거 */
     .create-btn:hover {
-      transform: translateY(-8px) scale(1.05);
+      transform: none;
     }
 
+    /* 클릭 시 딸깍 애니메이션 (부드러운 scale 효과) */
     .create-btn:active {
-      background: linear-gradient(135deg, #0088cc, #003388);
+      animation: clickEffect 0.3s ease forwards;
+      background: linear-gradient(135deg, #3d52cc, #401a8c, #cc00bc);
     }
 
-    .create-btn .btn-icon {
-      font-size: 24px;
+    @keyframes clickEffect {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    .create-btn .btn-icon-img {
+      width: 24px;
+      height: 24px;
       margin-right: 8px;
       flex-shrink: 0;
     }
@@ -298,7 +311,7 @@
       display: none;
     }
 
-    .sidebar.narrow .create-btn .btn-icon {
+    .sidebar.narrow .create-btn .btn-icon-img {
       margin-right: 0;
     }
 
@@ -359,7 +372,7 @@
     </div>
 
     <button class="create-btn" id="createBtn">
-      <span class="btn-icon">➕</span>
+      <img src="new.png" alt="만들기" class="btn-icon-img">
       <span class="btn-text">만들기</span>
     </button>
     
