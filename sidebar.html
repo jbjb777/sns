@@ -103,8 +103,9 @@
       white-space: nowrap;
     }
 
-    /* 만들기 버튼 스타일 수정 */
+    /* 만들기 버튼 - 새로운 호버/클릭 효과 */
     .create-btn {
+      position: relative;
       background: linear-gradient(135deg, #5269FF, #5722B3, #FF00EC);
       color: white;
       border: none;
@@ -117,27 +118,27 @@
       align-items: center;
       justify-content: center;
       margin-top: 20px;
-      transition: none; /* 호버 시 올라가는 효과 완전 제거 */
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       width: 100%;
-      position: relative;
       overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
-    /* 호버 효과 제거 */
+    /* 호버 시 커지는 효과 (scale 1.05 → 1.1 부드럽게) */
     .create-btn:hover {
-      transform: none;
+      transform: scale(1.1);
+      box-shadow: 0 20px 50px rgba(82, 105, 255, 0.4);
     }
 
-    /* 클릭 시 딸깍 애니메이션 (부드러운 scale 효과) */
+    /* 클릭 시 부드러운 딸깍 효과 */
     .create-btn:active {
-      animation: clickEffect 0.3s ease forwards;
-      background: linear-gradient(135deg, #3d52cc, #401a8c, #cc00bc);
+      transform: scale(0.95);
+      transition: transform 0.15s ease;
     }
 
-    @keyframes clickEffect {
-      0% { transform: scale(1); }
-      50% { transform: scale(0.95); }
-      100% { transform: scale(1); }
+    /* 호버 시 배경 그라데이션 살짝 진하게 */
+    .create-btn:hover {
+      background: linear-gradient(135deg, #3d52cc, #401a8c, #cc00bc);
     }
 
     .create-btn .btn-icon-img {
@@ -145,6 +146,12 @@
       height: 24px;
       margin-right: 8px;
       flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    /* 호버 시 아이콘 살짝 커지게 */
+    .create-btn:hover .btn-icon-img {
+      transform: scale(1.2);
     }
 
     .btn-text {
@@ -359,11 +366,11 @@
     </div>
 
     <div class="nav-item active" id="homeNav">
-      <img src="home.png" alt="explore" class="nav-icon-img-home">
+      <img src="home.png" alt="홈" class="nav-icon-img-home">
       <span class="nav-text">홈</span>
     </div>
     <div class="nav-item" id="exploreNav">
-      <img src="explore.png" alt="explore" class="nav-icon-img-explore">
+      <img src="explore.png" alt="탐색" class="nav-icon-img-explore">
       <span class="nav-text">탐색</span>
     </div>
     <div class="nav-item" id="discordNav">
