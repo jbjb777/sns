@@ -56,6 +56,145 @@
     
     .verification-badge { display: inline-block; width: 22px; height: 22px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
     
+    .status-message-container { 
+      margin-top: 15px; 
+      padding-top: 15px; 
+      border-top: 1px solid #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .status-message-text { 
+      color: #aaa; 
+      font-size: 14px; 
+      line-height: 1.5;
+      flex: 1;
+    }
+    
+    .status-message-empty {
+      color: #666;
+      font-style: italic;
+    }
+    
+    .edit-status-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+    
+    .edit-status-btn:hover {
+      background: #333;
+      border-color: #3663FF;
+    }
+    
+    .edit-status-btn img {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+    }
+    
+    .edit-status-btn:hover img {
+      opacity: 1;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 16px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    
+    .modal-input {
+      width: 100%;
+      padding: 12px 15px;
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      margin-bottom: 20px;
+      resize: vertical;
+      min-height: 80px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    
+    .modal-input:focus {
+      outline: none;
+      border-color: #3663FF;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    
+    .modal-btn {
+      padding: 10px 24px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-btn-cancel {
+      background: #2a2a2a;
+      color: #aaa;
+    }
+    
+    .modal-btn-cancel:hover {
+      background: #333;
+      color: #fff;
+    }
+    
+    .modal-btn-confirm {
+      background: #3663FF;
+      color: #fff;
+    }
+    
+    .modal-btn-confirm:hover {
+      background: #2952CC;
+    }
+    
     .posts-section { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
     .section-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #333; }
     
@@ -98,6 +237,7 @@
       .post-item-image { height: 150px; }
       .profile-header { flex-direction: column; text-align: center; }
       .profile-stats { justify-content: center; }
+      .modal-content { width: 95%; padding: 20px; }
     }
   </style>
 </head>
@@ -177,6 +317,23 @@
     </div>
   </div>
 
+  <!-- 상태메시지 수정 모달 -->
+  <div class="modal-overlay" id="statusModal">
+    <div class="modal-content">
+      <div class="modal-title">상태메시지 수정</div>
+      <textarea 
+        class="modal-input" 
+        id="statusInput" 
+        placeholder="상태메시지를 입력하세요..."
+        maxlength="100"
+      ></textarea>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
+        <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     
@@ -190,6 +347,7 @@
     const userNickname = urlParams.get('nickname');
 
     let currentUser = null;
+    let viewingUser = null;
 
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
@@ -220,24 +378,20 @@
       }
     }
 
-    // 🔥 사이드바 메시지 수신 (홈/탐색 네비게이션 추가)
     window.addEventListener('message', (event) => {
       const { type, page } = event.data || {};
 
-      // 네비게이션 메시지
       if (type === 'navigate') {
         if (page === 'home') location.href = 'index.html';
         if (page === 'explore') location.href = 'explore.html';
       }
 
-      // 로그아웃
       if (type === 'logout') {
         localStorage.removeItem('snsUser');
         currentUser = null;
         location.href = 'index.html';
       }
 
-      // 유저 정보 요청
       if (type === 'requestUserInfo') {
         updateSidebar();
       }
@@ -263,7 +417,8 @@
           userData = {
             nickname: "JB777",
             id: "정빈777",
-            isVerified: true
+            isVerified: true,
+            message: null
           };
         } else {
           const { data, error } = await supabase
@@ -279,6 +434,7 @@
           userData = data;
         }
 
+        viewingUser = userData;
         displayProfile(userData);
       } catch (e) {
         console.error('프로필 로드 오류:', e);
@@ -289,6 +445,7 @@
     async function displayProfile(user) {
       const contentDiv = document.getElementById('profileContent');
       const isVerified = user.nickname === "JB777";
+      const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
       const { data: posts } = await supabase
         .from('posts')
@@ -313,6 +470,17 @@
           totalLikes += likes ? likes.length : 0;
         }
       }
+
+      const statusMessage = user.message || '';
+      const statusDisplay = statusMessage 
+        ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
+        : `<div class="status-message-text status-message-empty">상태메시지가 없습니다.</div>`;
+
+      const editButton = isOwnProfile 
+        ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
+             <img src="pencil.png" alt="수정">
+           </button>`
+        : '';
 
       contentDiv.innerHTML = `
         <div class="profile-card">
@@ -341,9 +509,60 @@
               </div>
             </div>
           </div>
+          <div class="status-message-container">
+            ${statusDisplay}
+            ${editButton}
+          </div>
         </div>
       `;
     }
+
+    window.openStatusModal = function() {
+      const modal = document.getElementById('statusModal');
+      const input = document.getElementById('statusInput');
+      input.value = viewingUser.message || '';
+      modal.classList.add('active');
+    }
+
+    window.closeStatusModal = function() {
+      const modal = document.getElementById('statusModal');
+      modal.classList.remove('active');
+    }
+
+    window.saveStatusMessage = async function() {
+      const input = document.getElementById('statusInput');
+      const newMessage = input.value.trim();
+
+      try {
+        if (currentUser.nickname === "JB777") {
+          alert('JB777 계정의 상태메시지는 수정할 수 없습니다.');
+          closeStatusModal();
+          return;
+        }
+
+        const { error } = await supabase
+          .from('users')
+          .update({ message: newMessage })
+          .eq('nickname', currentUser.nickname);
+
+        if (error) throw error;
+
+        viewingUser.message = newMessage;
+        
+        await displayProfile(viewingUser);
+        
+        closeStatusModal();
+      } catch (e) {
+        console.error('상태메시지 저장 오류:', e);
+        alert('상태메시지 저장에 실패했습니다.');
+      }
+    }
+
+    document.getElementById('statusModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeStatusModal();
+      }
+    });
 
     async function loadUserPosts() {
       const postsDiv = document.getElementById('userPosts');
