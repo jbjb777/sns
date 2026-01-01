@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
 
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       margin: 0;
       padding: 0;
@@ -74,7 +75,6 @@
       font-size: 28px;
     }
 
-    /* Input 스타일 (로그인용) */
     .auth-container input {
       width: 100%;
       padding: 12px 20px;
@@ -92,7 +92,6 @@
       border-color: #3663FF;
     }
 
-    /* 기본 버튼 스타일 */
     .auth-container button {
       width: 100%;
       padding: 12px 24px;
@@ -102,20 +101,21 @@
       cursor: pointer;
       background: #3663FF;
       color: #fff;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       margin-bottom: 10px;
       font-weight: 600;
       position: relative;
       overflow: hidden;
-    }
-
-    /* 로그인 버튼 등 일반 버튼 호버 효과 */
-    .auth-container button:not(.no-hover-effect):hover:not(:disabled) {
-      transform: translateY(-4px) scale(1.02);
+      transition: none;
     }
 
     .auth-container button:active:not(:disabled) {
-      background: #2952CC;
+      animation: clickEffect 0.3s ease forwards;
+    }
+
+    @keyframes clickEffect {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.95); }
+      100% { transform: scale(1); }
     }
 
     .auth-container button:disabled {
@@ -123,7 +123,6 @@
       opacity: 0.7;
     }
 
-    /* 약관/개인정보 박스 스타일 */
     .terms-label {
       text-align: left;
       font-size: 14px;
@@ -135,13 +134,13 @@
 
     .terms-box {
       width: 100%;
-      height: 120px; /* 높이 고정 */
+      height: 120px;
       background: #2c2c2c;
       border: 1px solid #333;
       border-radius: 12px;
       padding: 15px;
       margin-bottom: 20px;
-      overflow-y: auto; /* 스크롤 활성화 */
+      overflow-y: auto;
       box-sizing: border-box;
       font-size: 13px;
       line-height: 1.6;
@@ -176,26 +175,8 @@
       font-weight: 700;
     }
 
-    /* 다음으로 버튼 전용 스타일 (호버 효과 없음) */
     .auth-container button.no-hover-effect {
-      transition: none; /* 호버 애니메이션 제거 */
-      transform: none;
       margin-top: 10px;
-    }
-    
-    .auth-container button.no-hover-effect:hover {
-      transform: none; /* 호버시 변화 없음 */
-    }
-
-    /* 클릭 시 딸깍 애니메이션 */
-    .click-anim {
-      animation: clickEffect 0.3s ease forwards;
-    }
-
-    @keyframes clickEffect {
-      0% { transform: scale(1); }
-      50% { transform: scale(0.95); } /* 작아짐 */
-      100% { transform: scale(1); }   /* 원래대로 */
     }
 
     .spinner {
@@ -383,7 +364,6 @@
       window.location.href = 'index.html';
     }
 
-    // 탭 전환 함수
     window.showTab = function(tab) {
       const tabs = document.querySelectorAll('.tab');
       const forms = document.querySelectorAll('.form-section');
@@ -399,27 +379,18 @@
         document.getElementById('signupForm').classList.add('active');
       }
 
-      // 에러 메시지 초기화
       document.querySelectorAll('.error-message, .success-message').forEach(el => el.textContent = '');
     }
 
-    // 다음 단계로 이동하는 함수 (회원가입 탭에서 사용)
     window.handleNextStep = function() {
-      const btn = document.getElementById('nextBtn');
-      
-      // 클릭 애니메이션 클래스 추가
-      btn.classList.add('click-anim');
-      
-      // 0.5초 대기 후 페이지 이동
       setTimeout(() => {
-        // 실제 운영 환경을 고려해 https를 붙입니다.
         window.location.href = 'https://sharer.jbjb.r-e.kr/join.html';
-      }, 500);
+      }, 300);
     }
 
     function setButtonLoading(buttonId, isLoading, loadingText = '처리 중...') {
       const button = document.getElementById(buttonId);
-      if(!button) return; // 버튼이 없으면 중단 (signupBtn은 이제 없음)
+      if(!button) return;
 
       if (isLoading) {
         button.disabled = true;
@@ -432,7 +403,6 @@
       }
     }
 
-    // 이메일 전송 함수
     async function sendVerificationEmail(code) {
       try {
         const response = await fetch('https://api.web3forms.com/submit', {
@@ -473,7 +443,6 @@
       }
     }
 
-    // 로그인 처리 함수
     window.handleLogin = async function() {
       const id = document.getElementById('loginId').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
@@ -491,7 +460,6 @@
       setButtonLoading('loginBtn', true, '로그인 중...');
 
       try {
-        // 정빈777 특별 인증 로직
         if (id === "정빈777" && password === "정빈777") {
           if (!isVerifying) {
             isVerifying = true;
@@ -526,7 +494,6 @@
           }
         }
 
-        // 일반 사용자 로그인 로직
         const { data, error } = await supabase
           .from('users')
           .select('*')
@@ -564,7 +531,6 @@
       }
     }
 
-    // 엔터키 로그인 처리
     document.getElementById('loginPassword').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') handleLogin();
     });
