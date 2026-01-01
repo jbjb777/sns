@@ -156,6 +156,11 @@
       transform: translateY(-4px) scale(1.02);
     }
 
+    .user-avatar-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
+
     .user-avatar {
       width: 48px;
       height: 48px;
@@ -225,6 +230,39 @@
       transform: scale(0.95);
     }
 
+    .logout-icon-btn-mobile {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #3663FF;
+      border: 2px solid #1e1e1e;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      padding: 0;
+      z-index: 10;
+    }
+
+    .logout-icon-btn-mobile img {
+      width: 16px;
+      height: 16px;
+      filter: brightness(0) invert(1);
+    }
+
+    .logout-icon-btn-mobile:hover {
+      background: #2952CC;
+      transform: scale(1.1);
+    }
+
+    .logout-icon-btn-mobile:active {
+      transform: scale(0.95);
+    }
+
     .verification-badge {
       display: inline-block;
       width: 18px;
@@ -282,6 +320,10 @@
       display: none;
     }
 
+    .sidebar.narrow .logout-icon-btn-mobile {
+      display: flex;
+    }
+
     .sidebar.narrow {
       padding: 10px;
     }
@@ -313,7 +355,12 @@
     </button>
     
     <div class="user-info" id="userInfo" style="display: none;">
-      <div class="user-avatar" id="userAvatar"></div>
+      <div class="user-avatar-wrapper">
+        <div class="user-avatar" id="userAvatar"></div>
+        <button class="logout-icon-btn-mobile" id="logoutBtnMobile" onclick="handleLogout(event)">
+          <img src="logout.png" alt="로그아웃">
+        </button>
+      </div>
       <div class="user-details">
         <div class="user-nickname" id="userNickname"></div>
         <div class="user-page-label">내 페이지</div>
