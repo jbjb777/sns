@@ -413,22 +413,29 @@
       try {
         let userData = null;
 
-        if (userNickname === "JB777") {
-          // JB777은 localStorage에 상태메시지 저장
-          const jb777Message = localStorage.getItem('JB777_status_message') || '';
-          userData = {
-            nickname: "JB777",
-            id: "정빈777",
-            isVerified: true,
-            message: jb777Message
-          };
-        } else {
-          const { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('nickname', userNickname)
-            .single();
+        // JB777도 Supabase에서 조회 시도
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('nickname', userNickname)
+          .single();
 
+        if (userNickname === "JB777") {
+          // JB777이 Supabase에 없으면 기본값으로 생성
+          if (error || !data) {
+            userData = {
+              nickname: "JB777",
+              id: "jb777",
+              isVerified: true,
+              message: null
+            };
+          } else {
+            userData = {
+              ...data,
+              isVerified: true
+            };
+          }
+        } else {
           if (error || !data) {
             showError('사용자를 찾을 수 없습니다.');
             return;
@@ -446,7 +453,7 @@
 
     async function displayProfile(user) {
       const contentDiv = document.getElementById('profileContent');
-      const isVerified = user.nickname === "JB777";
+      const isVerified = user.nickname === "JB777" || user.isVerified;
       const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
       const { data: posts } = await supabase
@@ -536,21 +543,18 @@
       const newMessage = input.value.trim();
 
       try {
-        if (currentUser.nickname === "JB777") {
-          // JB777은 localStorage에 저장
-          localStorage.setItem('JB777_status_message', newMessage);
-          viewingUser.message = newMessage;
-        } else {
-          // 일반 사용자는 Supabase에 저장
-          const { error } = await supabase
-            .from('users')
-            .update({ message: newMessage })
-            .eq('nickname', currentUser.nickname);
+        // 모든 사용자 (JB777 포함) Supabase에 저장
+        const { error } = await supabase
+          .from('users')
+          .update({ message: newMessage })
+          .eq('nickname', currentUser.nickname);
 
-          if (error) throw error;
-          viewingUser.message = newMessage;
+        if (error) {
+          console.error('Supabase 업데이트 오류:', error);
+          throw error;
         }
-        
+
+        viewingUser.message = newMessage;
         await displayProfile(viewingUser);
         closeStatusModal();
       } catch (e) {
