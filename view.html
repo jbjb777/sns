@@ -394,7 +394,8 @@
     function displayPost(post, postId) {
       const contentDiv = document.getElementById('postContent');
       const timeStr = new Date(post.created_at).toLocaleString('ko-KR');
-      const isVerified = post.author === "JB777";
+      // JB777 또는 진정오 일 때 인증 배지 표시
+      const isVerified = post.author === "JB777" || post.author === "진정오";
       const canDelete = currentUser && (
         currentUser.nickname === post.author || 
         currentUser.id === post.author_id || 
@@ -550,7 +551,8 @@
       comments.forEach(comment => {
         const isMyComment = currentUser && (currentUser.id === comment.user_id);
         const date = new Date(comment.created_at).toLocaleString('ko-KR');
-        const isCommentVerified = comment.user_name === "JB777";
+        // 댓글에서도 JB777 또는 진정오 일 때 인증 배지 표시
+        const isCommentVerified = comment.user_name === "JB777" || comment.user_name === "진정오";
         
         const linkedCommentText = linkify(comment.text);
         

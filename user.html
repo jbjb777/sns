@@ -413,19 +413,19 @@
       try {
         let userData = null;
 
-        // JB777도 Supabase에서 조회 시도
+        // Supabase에서 조회 시도
         const { data, error } = await supabase
           .from('users')
           .select('*')
           .eq('nickname', userNickname)
           .single();
 
-        if (userNickname === "JB777") {
-          // JB777이 Supabase에 없으면 기본값으로 생성
+        if (userNickname === "JB777" || userNickname === "진정오") {
+          // JB777 또는 진정오인 경우 Supabase에 없으면 기본값으로 생성
           if (error || !data) {
             userData = {
-              nickname: "JB777",
-              id: "jb777",
+              nickname: userNickname,
+              id: userNickname.toLowerCase(),
               isVerified: true,
               message: null
             };
@@ -453,7 +453,8 @@
 
     async function displayProfile(user) {
       const contentDiv = document.getElementById('profileContent');
-      const isVerified = user.nickname === "JB777" || user.isVerified;
+      // JB777 또는 진정오이면 무조건 인증 배지 표시
+      const isVerified = user.nickname === "JB777" || user.nickname === "진정오" || user.isVerified;
       const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
       const { data: posts } = await supabase
@@ -543,7 +544,7 @@
       const newMessage = input.value.trim();
 
       try {
-        // 모든 사용자 (JB777 포함) Supabase에 저장
+        // 모든 사용자 (JB777, 진정오 포함) Supabase에 저장
         const { error } = await supabase
           .from('users')
           .update({ message: newMessage })

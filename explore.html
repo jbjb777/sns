@@ -1008,7 +1008,8 @@
     }
 
     function createShortItem(post, index) {
-      const isVerified = post.author === "JB777";
+      // 게시물 작성자 인증 배지: JB777 또는 진정오
+      const isVerified = post.author === "JB777" || post.author === "진정오";
       const hasImage = post.image_url;
       const hasContent = post.content && post.content.trim();
 
@@ -1201,7 +1202,8 @@
         comments.forEach(comment => {
           const isMyComment = currentUser && (currentUser.id === comment.user_id);
           const date = new Date(comment.created_at).toLocaleString('ko-KR');
-          const isCommentVerified = comment.user_name === "JB777";
+          // 댓글 작성자 인증 배지: JB777 또는 진정오
+          const isCommentVerified = comment.user_name === "JB777" || comment.user_name === "진정오";
           
           const linkedCommentText = linkify(comment.text);
           
