@@ -20,6 +20,7 @@
       background: #1e1e1e;
       border-right: 1px solid #333;
       padding: 20px;
+      padding-bottom: 100px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -143,51 +144,93 @@
       padding: 12px 16px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
       border-top: 1px solid #333;
       padding-top: 20px;
-      gap: 10px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      border-radius: 12px;
+      margin-bottom: 20px;
     }
 
-    .user-nickname {
-      font-weight: 600;
-      font-size: 14px;
+    .user-info:hover {
+      background: #2c2c2c;
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
       color: #fff;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       flex: 1;
       min-width: 0;
     }
 
-    .logout-btn {
+    .user-nickname {
+      font-weight: 600;
+      font-size: 16px;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .user-page-label {
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    .logout-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
       background: #3663FF;
       border: none;
-      color: #fff;
       cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 6px 16px;
-      border-radius: 20px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       flex-shrink: 0;
+      padding: 0;
     }
 
-    .logout-btn:hover {
-      transform: translateY(-4px) scale(1.05);
+    .logout-icon-btn img {
+      width: 20px;
+      height: 20px;
+      filter: brightness(0) invert(1);
     }
 
-    .logout-btn:active {
+    .logout-icon-btn:hover {
       background: #2952CC;
+      transform: scale(1.1);
+    }
+
+    .logout-icon-btn:active {
+      transform: scale(0.95);
     }
 
     .verification-badge {
       display: inline-block;
       width: 18px;
       height: 18px;
-      margin-left: 5px;
-      vertical-align: middle;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
       background-size: contain;
       background-repeat: no-repeat;
@@ -230,10 +273,16 @@
     .sidebar.narrow .user-info {
       flex-direction: column;
       gap: 8px;
+      padding: 12px 8px;
+    }
+
+    .sidebar.narrow .user-details {
+      display: none;
     }
 
     .sidebar.narrow {
       padding: 10px;
+      padding-bottom: 100px;
     }
   </style>
 </head>
@@ -263,8 +312,14 @@
     </button>
     
     <div class="user-info" id="userInfo" style="display: none;">
-      <div class="user-nickname" id="userNickname"></div>
-      <button class="logout-btn" id="logoutBtn">로그아웃</button>
+      <div class="user-avatar" id="userAvatar"></div>
+      <div class="user-details">
+        <div class="user-nickname" id="userNickname"></div>
+        <div class="user-page-label">내 페이지</div>
+      </div>
+      <button class="logout-icon-btn" id="logoutBtn" onclick="handleLogout(event)">
+        <img src="logout.png" alt="로그아웃">
+      </button>
     </div>
   </div>
 
@@ -274,11 +329,13 @@
     const discordNav = document.getElementById('discordNav');
     const createBtn = document.getElementById('createBtn');
     const logoContainer = document.getElementById('logoContainer');
-    const logoutBtn = document.getElementById('logoutBtn');
     const userInfo = document.getElementById('userInfo');
     const userNickname = document.getElementById('userNickname');
+    const userAvatar = document.getElementById('userAvatar');
 
     let isLoggedIn = false;
+    let currentUserId = null;
+    let currentUserNickname = null;
 
     // 🔥 로고 클릭 → index.html
     logoContainer.onclick = () => {
@@ -309,8 +366,16 @@
       }
     };
 
-    // 🔥 로그아웃
-    logoutBtn.onclick = () => {
+    // 🔥 내 페이지 클릭
+    userInfo.onclick = () => {
+      if (isLoggedIn && currentUserId && currentUserNickname) {
+        parent.location.href = `user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
+      }
+    };
+
+    // 🔥 로그아웃 버튼 클릭 (이벤트 전파 방지)
+    window.handleLogout = (event) => {
+      event.stopPropagation(); // 부모 요소(userInfo) 클릭 이벤트 방지
       parent.postMessage({ type: 'logout' }, '*');
     };
 
@@ -329,13 +394,21 @@
       if (data.type === 'updateUser') {
         if (data.user) {
           isLoggedIn = true;
+          currentUserId = data.user.id;
+          currentUserNickname = data.user.nickname;
+          
+          userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
           userNickname.innerHTML = data.user.nickname;
+          
           if (data.user.isVerified) {
             userNickname.innerHTML += '<span class="verification-badge"></span>';
           }
+          
           userInfo.style.display = 'flex';
         } else {
           isLoggedIn = false;
+          currentUserId = null;
+          currentUserNickname = null;
           userInfo.style.display = 'none';
         }
       }
