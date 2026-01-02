@@ -243,20 +243,11 @@
       background: #1e1e1e;
       padding: 0 20px;
     }
-    .google-btn {
-      background: #ffffff !important;
-      color: #000 !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      font-weight: 600;
-      border-radius: 30px;
-      height: 48px; /* 버튼 높이 고정 */
-    }
-    .google-btn img {
-      width: 20px;
-      height: 20px;
+    /* 커스텀 구글 버튼 컨테이너 */
+    #googleLoginBtnContainer, #googleSignupBtnContainer {
+      width: 100%;
+      height: 48px;
+      margin-bottom: 10px;
     }
     @media (max-width: 768px) {
       .logo-text { font-size: 20px; }
@@ -290,7 +281,6 @@
         <button id="loginBtn" onclick="handleLogin()">로그인</button>
         
         <div class="or-divider"><span>또는</span></div>
-        <!-- Google 로그인 버튼 자리 (JS에서 renderButton으로 채움) -->
         <div id="googleLoginBtnContainer"></div>
       </div>
 
@@ -330,7 +320,6 @@
         <button id="nextBtn" class="no-hover-effect" onclick="handleNextStep()">다음으로</button>
         
         <div class="or-divider"><span>또는</span></div>
-        <!-- Google 가입 버튼 자리 -->
         <div id="googleSignupBtnContainer"></div>
       </div>
     </div>
@@ -368,6 +357,8 @@
         document.getElementById('signupForm').classList.add('active');
       }
       document.querySelectorAll('.error-message, .success-message').forEach(el => el.textContent = '');
+      // 탭 전환 시 버튼 재렌더링 (안정성 확보)
+      renderGoogleButtons();
     }
 
     window.handleNextStep = function() {
@@ -376,18 +367,17 @@
       }, 300);
     }
 
-    function setButtonLoading(buttonId, isLoading) {
-      const container = document.getElementById(buttonId + 'Container');
-      if (!container) return;
-
+    // 로딩 상태 관리
+    function setGoogleButtonLoading(containerId, isLoading) {
+      const container = document.getElementById(containerId);
       if (isLoading) {
-        container.innerHTML = `<button class="google-btn" disabled><span class="spinner"></span>처리 중...</button>`;
+        container.innerHTML = `<button style="width:100%;height:48px;border-radius:30px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;gap:12px;font-weight:600;" disabled>
+          <span class="spinner"></span>처리 중...
+        </button>`;
       }
-      // 처리 끝나면 JS에서 다시 renderButton 호출 (아래 handleCredentialResponse의 finally에서 처리)
     }
 
     async function sendVerificationEmail(code) {
-      // 기존 코드 유지
       try {
         const response = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
@@ -416,7 +406,7 @@
     }
 
     window.handleLogin = async function() {
-      // 기존 일반 로그인 로직 (생략 없이 그대로)
+      // 기존 일반 로그인 로직 유지
       const id = document.getElementById('loginId').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
       const errorDiv = document.getElementById('loginError');
@@ -493,7 +483,7 @@
       successDiv.textContent = '';
 
       try {
-        setButtonLoading(currentContainerId.replace('Container', 'Btn'), true);
+        setGoogleButtonLoading(currentContainerId, true);
 
         const { data: user } = await supabase.from('users').select('*').eq('id', googleEmail).maybeSingle();
 
@@ -520,6 +510,7 @@
         } else {
           if (!user) {
             errorDiv.textContent = '구글 계정으로 가입된 내역이 없습니다. 회원가입 탭에서 구글 가입해주세요.';
+            renderGoogleButtons(); // 버튼 복구
             return;
           }
 
@@ -530,8 +521,6 @@
       } catch (err) {
         console.error(err);
         errorDiv.textContent = '구글 처리 중 오류가 발생했습니다.';
-      } finally {
-        // 처리 끝 → 버튼 다시 렌더링
         renderGoogleButtons();
       }
     }
@@ -542,7 +531,7 @@
       return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     }
 
-    // Google 버튼 렌더링 함수 (팝업 강제)
+    // 커스텀 구글 버튼 렌더링 (팝업 강제 + 디자인 유지)
     function renderGoogleButtons() {
       if (!window.google || !google.accounts || !google.accounts.id) return;
 
@@ -560,7 +549,7 @@
         }
       );
 
-      // 회원가입 버튼
+      // 가입 버튼
       google.accounts.id.renderButton(
         document.getElementById("googleSignupBtnContainer"),
         {
@@ -587,7 +576,6 @@
         callback: handleCredentialResponse
       });
 
-      // 버튼 렌더링
       renderGoogleButtons();
     });
 
