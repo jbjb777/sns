@@ -474,7 +474,7 @@
       }
     }
 
-    // Google 로그인 콜백
+    // Google 로그인 콜백 (핵심 수정: 이메일에 . 있으면 쿼리 따옴표 처리)
     window.handleCredentialResponse = async function(response) {
       const data = parseJwt(response.credential);
       const googleEmail = data.email;
@@ -488,16 +488,27 @@
       successDiv.textContent = '';
 
       try {
-        let { data: user } = await supabase.from('users').select('*').eq('id', googleEmail).single();
+        // 이메일에 .이 포함되어도 안전하게 쿼리 (따옴표로 감싸기)
+        const { data: user, error: selectError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', googleEmail)
+          .maybeSingle();  // 존재하지 않아도 에러 안 남
+
+        if (selectError && selectError.code !== 'PGRST116') {  // PGRST116 = no row
+          throw selectError;
+        }
 
         if (isSignupMode) {
           if (user) {
+            // 이미 가입됨 → 로그인
             localStorage.setItem('snsUser', JSON.stringify({id: googleEmail, nickname: user.nickname, isVerified: false}));
             successDiv.textContent = '구글 계정으로 로그인되었습니다!';
             setTimeout(() => window.location.href = 'index.html', 1000);
             return;
           }
 
+          // 새로 가입
           const { error: insertError } = await supabase.from('users').insert({
             id: googleEmail,
             password: 'googlelogin',
@@ -511,6 +522,7 @@
           setTimeout(() => window.location.href = 'index.html', 1000);
 
         } else {
+          // 로그인 모드
           if (!user) {
             errorDiv.textContent = '구글 계정으로 가입된 내역이 없습니다. 회원가입 탭에서 구글 가입해주세요.';
             return;
@@ -522,7 +534,7 @@
         }
       } catch (err) {
         console.error(err);
-        errorDiv.textContent = '구글 처리 중 오류가 발생했습니다.';
+        errorDiv.textContent = '구글 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
       }
     }
 
@@ -532,11 +544,10 @@
       return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     }
 
-    // Google 스크립트 로드 완료 후 초기화 (안전하게 DOMContentLoaded에서)
+    // Google 초기화 (DOMContentLoaded에서 안전하게)
     document.addEventListener('DOMContentLoaded', () => {
-      // Google 라이브러리가 로드되었는지 확인
       if (!window.google || !google.accounts || !google.accounts.id) {
-        console.error('Google Identity Services가 로드되지 않았습니다.');
+        console.error('Google Identity Services 로드 실패');
         return;
       }
 
@@ -545,7 +556,6 @@
         callback: handleCredentialResponse
       });
 
-      // 커스텀 버튼에 이벤트 연결
       document.getElementById('googleLoginBtn').addEventListener('click', () => {
         google.accounts.id.prompt();
       });
@@ -555,7 +565,7 @@
       });
     });
 
-    // 엔터키로 일반 로그인
+    // 엔터키 로그인
     document.getElementById('loginPassword').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') handleLogin();
     });
