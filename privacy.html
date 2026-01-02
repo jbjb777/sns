@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이용약관 - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .logo-container:hover {
+      transform: scale(1.05);
+    }
+
+    .logo-svg {
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px 20px;
+    }
+
+    .terms-container {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 40px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .terms-container h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      color: #fff;
+      font-size: 32px;
+    }
+
+    .terms-container h4 {
+      color: #3663FF;
+      font-size: 20px;
+      margin: 32px 0 12px 0;
+      border-bottom: 1px solid #444;
+      padding-bottom: 8px;
+    }
+
+    .terms-container p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #ddd;
+      margin-bottom: 16px;
+    }
+
+    .terms-container strong {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .terms-container ol, .terms-container ul {
+      margin-left: 20px;
+      margin-bottom: 16px;
+    }
+
+    .terms-container li {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #ddd;
+      margin-bottom: 8px;
+    }
+
+    .terms-container .contact {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .terms-container .contact a {
+      color: #3663FF;
+      text-decoration: none;
+    }
+
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 20px;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+      margin-top: auto;
+    }
+
+    @media (max-width: 768px) {
+      .logo-text {
+        font-size: 20px;
+      }
+
+      .terms-container {
+        padding: 30px 20px;
+      }
+
+      .terms-container h1 {
+        font-size: 28px;
+      }
+
+      .terms-container h4 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container" onclick="window.location.href='index.html'">
+      <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
+      <span class="logo-text">Sharer</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="terms-container">
+      <h1>이용약관</h1>
+
+      <h4>제1조 (목적)</h4>
+      <p>이 약관은 <strong>서비스의 이용조건 및 절차</strong>에 관한 사항을 규정함을 목적으로 합니다.</p>
+
+      <h4>제2조 (용어의 정의)</h4>
+      <ol>
+        <li><strong>"서비스"</strong>란 웹사이트가 제공하는 모든 서비스를 의미합니다.</li>
+        <li><strong>"회원"</strong>이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.</li>
+      </ol>
+
+      <h4>제3조 (서비스의 제공)</h4>
+      <ol>
+        <li>서비스는 <strong>연중무휴, 1일 24시간</strong> 제공함을 원칙으로 합니다.</li>
+        <li>서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.</li>
+      </ol>
+
+      <h4>제4조 (회원의 의무)</h4>
+      <ol>
+        <li>회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.</li>
+        <li>회원은 <strong>타인의 명예를 손상시키거나 불이익을 주는 행위</strong>를 해서는 안 됩니다.</li>
+      </ol>
+
+      <h4>제5조 (서비스 이용의 제한)</h4>
+      <p>운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.</p>
+
+      <div class="contact">
+        <strong>문의사항:</strong> <a href="mailto:alexeom97@outlook.com">alexeom97@outlook.com</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+  </div>
+
+  <script>
+    // 필요 시 추가 자바스크립트 (현재는 불필요)
+  </script>
+</body>
+</html>
