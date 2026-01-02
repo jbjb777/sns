@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - 페이지 없음 - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    .logo-container:hover {
+      transform: scale(1.05);
+    }
+    .logo-svg {
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+    }
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    .error-container {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 60px 40px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+    .error-container h1 {
+      font-size: 72px;
+      margin-bottom: 20px;
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+    .error-container h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .error-container p {
+      font-size: 16px;
+      color: #aaa;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .error-container button {
+      width: 100%;
+      max-width: 300px;
+      padding: 14px 24px;
+      border-radius: 30px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      background: #3663FF;
+      color: #fff;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      transition: none;
+    }
+    .error-container button:active:not(:disabled) {
+      animation: clickEffect 0.3s ease forwards;
+    }
+    @keyframes clickEffect {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 20px;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+    @media (max-width: 768px) {
+      .logo-text {
+        font-size: 20px;
+      }
+      .error-container {
+        padding: 40px 20px;
+      }
+      .error-container h1 {
+        font-size: 56px;
+      }
+      .error-container h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container" onclick="goHome()">
+      <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
+      <span class="logo-text">Sharer</span>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="error-container">
+      <h1>404</h1>
+      <h2>페이지가 존재하지 않습니다</h2>
+      <p>요청하신 페이지가 삭제되었거나<br>주소가 잘못되었을 수 있습니다.</p>
+      <button onclick="goHome()">홈으로 돌아가기</button>
+    </div>
+  </div>
+  <div class="footer">
+    © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+  </div>
+  <script>
+    window.goHome = function() {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
