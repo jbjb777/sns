@@ -238,9 +238,9 @@
     }
     .google-btn {
       width: 100%;
-      padding: 12px 24px;
-      background: #ffffff;
-      color: #000;
+      height: 48px;
+      background: #ffffff !important;
+      color: #000 !important;
       border: none;
       border-radius: 30px;
       display: flex;
@@ -260,10 +260,46 @@
       opacity: 0.7;
       cursor: not-allowed;
     }
+    /* 모달 스타일 */
+    .google-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .google-modal h3 {
+      color: #fff;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+    .google-modal .google-btn-container {
+      width: 100%;
+      height: 48px;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
     @media (max-width: 768px) {
       .logo-text { font-size: 20px; }
       .auth-container { padding: 30px 20px; }
       .auth-container h2 { font-size: 24px; }
+      .google-modal { padding: 15px; }
     }
   </style>
 </head>
@@ -292,7 +328,7 @@
         <button id="loginBtn" onclick="handleLogin()">로그인</button>
         
         <div class="or-divider"><span>또는</span></div>
-        <button class="google-btn" id="googleLoginBtn">
+        <button class="google-btn" id="googleLoginBtn" onclick="showGoogleModal('login')">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
           구글로 로그인
         </button>
@@ -306,7 +342,7 @@
           이 약관은 <strong>서비스의 이용조건 및 절차</strong>에 관한 사항을 규정함을 목적으로 합니다.
           <h4>제2조 (용어의 정의)</h4>
           1. <strong>"서비스"</strong>란 웹사이트가 제공하는 모든 서비스를 의미합니다.<br>
-          2. <strong>"회원"</strong>이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
+          2. <strong>"회원"</strong>란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
           <h4>제3조 (서비스의 제공)</h4>
           1. 서비스는 <strong>연중무휴, 1일 24시간 제공</strong>함을 원칙으로 합니다.<br>
           2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
@@ -334,11 +370,18 @@
         <button id="nextBtn" class="no-hover-effect" onclick="handleNextStep()">다음으로</button>
         
         <div class="or-divider"><span>또는</span></div>
-        <button class="google-btn" id="googleSignupBtn">
+        <button class="google-btn" id="googleSignupBtn" onclick="showGoogleModal('signup')">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
           구글로 가입
         </button>
       </div>
+    </div>
+
+    <!-- Google 로그인 모달 -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="google-modal" id="googleModal">
+      <h3 id="modalTitle">구글로 로그인</h3>
+      <div class="google-btn-container" id="googleModalBtn"></div>
     </div>
   </div>
   <div class="footer">
@@ -374,6 +417,8 @@
         document.getElementById('signupForm').classList.add('active');
       }
       document.querySelectorAll('.error-message, .success-message').forEach(el => el.textContent = '');
+      // 모달 닫기
+      hideGoogleModal();
     }
 
     window.handleNextStep = function() {
@@ -382,6 +427,61 @@
       }, 300);
     }
 
+    // 모달 표시
+    window.showGoogleModal = function(mode) {
+      const modal = document.getElementById('googleModal');
+      const overlay = document.getElementById('modalOverlay');
+      const modalTitle = document.getElementById('modalTitle');
+      const authContainer = document.querySelector('.auth-container');
+      const buttonId = mode === 'login' ? 'googleLoginBtn' : 'googleSignupBtn';
+
+      // 로딩 상태
+      setGoogleLoading(buttonId, true);
+
+      // 모달 타이틀 설정
+      modalTitle.textContent = mode === 'login' ? '구글로 로그인' : '구글로 가입';
+
+      // auth-container 숨기기
+      authContainer.style.display = 'none';
+
+      // 모달 및 오버레이 표시
+      modal.style.display = 'block';
+      overlay.style.display = 'block';
+
+      // Google 버튼 렌더링
+      if (window.google && google.accounts && google.accounts.id) {
+        google.accounts.id.renderButton(
+          document.getElementById('googleModalBtn'),
+          {
+            type: 'standard',
+            theme: 'filled_blue',
+            size: 'large',
+            text: mode === 'login' ? 'signin_with' : 'signup_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: '100%',
+            ux_mode: 'popup'
+          }
+        );
+      }
+
+      // 로딩 상태 해제 (모달이 띄워졌으므로)
+      setTimeout(() => setGoogleLoading(buttonId, false), 500);
+    }
+
+    // 모달 숨기기
+    window.hideGoogleModal = function() {
+      const modal = document.getElementById('googleModal');
+      const overlay = document.getElementById('modalOverlay');
+      const authContainer = document.querySelector('.auth-container');
+      modal.style.display = 'none';
+      overlay.style.display = 'none';
+      authContainer.style.display = 'block';
+      // Google 버튼 컨테이너 초기화
+      document.getElementById('googleModalBtn').innerHTML = '';
+    }
+
+    // 구글 버튼 로딩 상태
     function setGoogleLoading(buttonId, loading) {
       const btn = document.getElementById(buttonId);
       if (loading) {
@@ -423,7 +523,6 @@
     }
 
     window.handleLogin = async function() {
-      // 기존 일반 로그인 로직 (생략 없이 동일)
       const id = document.getElementById('loginId').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
       const errorDiv = document.getElementById('loginError');
@@ -506,6 +605,7 @@
           if (user) {
             localStorage.setItem('snsUser', JSON.stringify({id: googleEmail, nickname: user.nickname, isVerified: false}));
             successDiv.textContent = '구글 계정으로 로그인되었습니다!';
+            hideGoogleModal();
             setTimeout(() => window.location.href = 'index.html', 1000);
             return;
           }
@@ -520,23 +620,24 @@
 
           localStorage.setItem('snsUser', JSON.stringify({id: googleEmail, nickname: googleName, isVerified: false}));
           successDiv.textContent = '구글로 회원가입 및 로그인 완료!';
+          hideGoogleModal();
           setTimeout(() => window.location.href = 'index.html', 1000);
         } else {
           if (!user) {
             errorDiv.textContent = '구글 계정으로 가입된 내역이 없습니다. 회원가입 탭에서 구글 가입해주세요.';
-            setGoogleLoading(buttonId, false);
+            hideGoogleModal();
             return;
           }
 
           localStorage.setItem('snsUser', JSON.stringify({id: googleEmail, nickname: user.nickname, isVerified: false}));
           successDiv.textContent = '구글 로그인 성공!';
+          hideGoogleModal();
           setTimeout(() => window.location.href = 'index.html', 1000);
         }
       } catch (err) {
         console.error(err);
         errorDiv.textContent = '구글 처리 중 오류가 발생했습니다.';
-      } finally {
-        setGoogleLoading(buttonId, false);
+        hideGoogleModal();
       }
     }
 
@@ -546,7 +647,7 @@
       return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     }
 
-    // Google 초기화 (ux_mode: "popup" 추가 → 강제 중앙 팝업)
+    // Google 초기화
     document.addEventListener('DOMContentLoaded', () => {
       if (!window.google || !google.accounts || !google.accounts.id) {
         console.error('Google Identity Services 로드 실패');
@@ -556,30 +657,11 @@
       google.accounts.id.initialize({
         client_id: '975630642362-d0uef48gbfrrroojikf4ss6hmqdru2hg.apps.googleusercontent.com',
         callback: handleCredentialResponse,
-        ux_mode: 'popup',  // ⭐ 핵심: 항상 중앙 팝업
-        auto_select: false
+        ux_mode: 'popup'
       });
 
-      // 커스텀 버튼 클릭 → 팝업 강제 표시
-      document.getElementById('googleLoginBtn').addEventListener('click', () => {
-        setGoogleLoading('googleLoginBtn', true);
-        google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            setGoogleLoading('googleLoginBtn', false);
-            document.getElementById('loginError').textContent = '구글 로그인 창을 열 수 없습니다. 팝업 차단을 해제해주세요.';
-          }
-        });
-      });
-
-      document.getElementById('googleSignupBtn').addEventListener('click', () => {
-        setGoogleLoading('googleSignupBtn', true);
-        google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            setGoogleLoading('googleSignupBtn', false);
-            document.getElementById('loginError').textContent = '구글 로그인 창을 열 수 없습니다. 팝업 차단을 해제해주세요.';
-          }
-        });
-      });
+      // 모달 오버레이 클릭 시 닫기
+      document.getElementById('modalOverlay').addEventListener('click', hideGoogleModal);
     });
 
     document.getElementById('loginPassword').addEventListener('keypress', (e) => {
