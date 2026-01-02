@@ -110,7 +110,7 @@
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
-    /* hover 시 확대 효과 유지 */
+    /* 버튼 전체 확대 */
     .create-btn:hover {
       transform: scale(1.1);
     }
@@ -123,27 +123,28 @@
     .create-btn:hover {
       background: linear-gradient(135deg, #3d52cc, #401a8c, #cc00bc);
     }
-    /* 그림자 효과 제거 */
+    /* 그림자 완전 제거 */
     .create-btn:hover {
       box-shadow: none;
     }
 
-    /* 뒷배경 회전 레이어 */
+    /* 그라데이션 배경 확대 레이어 */
     .create-btn::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: inherit; /* 부모의 그라데이션 상속 */
+      top: -10%; left: -10%;
+      width: 120%; height: 120%;
+      background: inherit; /* 부모의 그라데이션 그대로 */
       border-radius: 30px;
-      transform: rotate(0deg);
-      transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform: scale(1);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       pointer-events: none;
       z-index: -1;
     }
 
-    /* hover 시 180도 회전 (부드럽지만 빠르게) */
+    /* hover 시 그라데이션 배경만 더 크게 확대 */
     .create-btn:hover::before {
-      transform: rotate(180deg);
+      transform: scale(1.15);
     }
 
     .create-btn .btn-icon-img {
