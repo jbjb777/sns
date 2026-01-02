@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>로그인 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- async 제거, defer만 사용 -->
+  <script src="https://accounts.google.com/gsi/client" defer></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -313,12 +314,11 @@
   <div class="main-content">
     <div class="auth-container">
       <h2>환영합니다!</h2>
-     
+    
       <div class="tab-container">
         <div class="tab active" onclick="showTab('login')">로그인</div>
         <div class="tab" onclick="showTab('signup')">회원가입</div>
       </div>
-
       <!-- 로그인 탭 -->
       <div class="form-section active" id="loginForm">
         <input type="text" id="loginId" placeholder="아이디">
@@ -326,14 +326,13 @@
         <div class="error-message" id="loginError"></div>
         <div class="success-message" id="loginSuccess"></div>
         <button id="loginBtn" onclick="handleLogin()">로그인</button>
-        
+       
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleLoginBtn" onclick="showGoogleModal('login')">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
           구글로 로그인
         </button>
       </div>
-
       <!-- 회원가입 탭 -->
       <div class="form-section" id="signupForm">
         <div class="terms-label">이용약관</div>
@@ -368,7 +367,7 @@
           <strong>문의사항:</strong> alexeom97@outlook.com
         </div>
         <button id="nextBtn" class="no-hover-effect" onclick="handleNextStep()">다음으로</button>
-        
+       
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleSignupBtn" onclick="showGoogleModal('signup')">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
@@ -376,7 +375,6 @@
         </button>
       </div>
     </div>
-
     <!-- Google 로그인 모달 -->
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="google-modal" id="googleModal">
@@ -387,28 +385,66 @@
   <div class="footer">
     © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
   </div>
-
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-   
+  
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-   
+  
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
     let verificationCode = "";
     let isVerifying = false;
+
+    // Google GSI가 로드될 때까지 기다리는 함수
+    function waitForGoogle(timeout = 8000) {
+      return new Promise((resolve, reject) => {
+        const start = Date.now();
+        const timer = setInterval(() => {
+          if (window.google && google.accounts && google.accounts.id) {
+            clearInterval(timer);
+            resolve();
+          } else if (Date.now() - start > timeout) {
+            clearInterval(timer);
+            reject(new Error('Google GSI load timeout'));
+          }
+        }, 100);
+      });
+    }
+
+    // 안전하게 구글 버튼 렌더링
+    async function renderGoogleButtonSafely(mode) {
+      const container = document.getElementById('googleModalBtn');
+      container.innerHTML = '<div style="color:#aaa;font-size:14px">로딩 중...</div>';
+
+      try {
+        await waitForGoogle(8000);
+
+        container.innerHTML = '';
+        google.accounts.id.renderButton(container, {
+          type: 'standard',
+          theme: 'filled_blue',
+          size: 'large',
+          text: mode === 'login' ? 'signin_with' : 'signup_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          width: '100%',
+          ux_mode: 'popup'
+        });
+      } catch (e) {
+        container.innerHTML =
+          '<div style="color:#ff6b6b;font-size:14px">구글 로그인 로드 실패<br><small>새로고침 후 다시 시도해주세요</small></div>';
+      }
+    }
 
     window.goHome = function() {
       window.location.href = 'index.html';
     }
-
     window.showTab = function(tab) {
       const tabs = document.querySelectorAll('.tab');
       const forms = document.querySelectorAll('.form-section');
       tabs.forEach(t => t.classList.remove('active'));
       forms.forEach(f => f.classList.remove('active'));
-     
+    
       if (tab === 'login') {
         tabs[0].classList.add('active');
         document.getElementById('loginForm').classList.add('active');
@@ -417,17 +453,15 @@
         document.getElementById('signupForm').classList.add('active');
       }
       document.querySelectorAll('.error-message, .success-message').forEach(el => el.textContent = '');
-      // 모달 닫기
       hideGoogleModal();
     }
-
     window.handleNextStep = function() {
       setTimeout(() => {
         window.location.href = 'https://sharer.jbjb.r-e.kr/join.html';
       }, 300);
     }
 
-    // 모달 표시
+    // 모달 표시 (즉시 renderButton 호출 제거 → 안전한 함수 사용)
     window.showGoogleModal = function(mode) {
       const modal = document.getElementById('googleModal');
       const overlay = document.getElementById('modalOverlay');
@@ -435,38 +469,16 @@
       const authContainer = document.querySelector('.auth-container');
       const buttonId = mode === 'login' ? 'googleLoginBtn' : 'googleSignupBtn';
 
-      // 로딩 상태
       setGoogleLoading(buttonId, true);
 
-      // 모달 타이틀 설정
       modalTitle.textContent = mode === 'login' ? '구글로 로그인' : '구글로 가입';
-
-      // auth-container 숨기기
       authContainer.style.display = 'none';
-
-      // 모달 및 오버레이 표시
       modal.style.display = 'block';
       overlay.style.display = 'block';
 
-      // Google 버튼 렌더링
-      if (window.google && google.accounts && google.accounts.id) {
-        google.accounts.id.renderButton(
-          document.getElementById('googleModalBtn'),
-          {
-            type: 'standard',
-            theme: 'filled_blue',
-            size: 'large',
-            text: mode === 'login' ? 'signin_with' : 'signup_with',
-            shape: 'rectangular',
-            logo_alignment: 'left',
-            width: '100%',
-            ux_mode: 'popup'
-          }
-        );
-      }
+      renderGoogleButtonSafely(mode);
 
-      // 로딩 상태 해제 (모달이 띄워졌으므로)
-      setTimeout(() => setGoogleLoading(buttonId, false), 500);
+      setTimeout(() => setGoogleLoading(buttonId, false), 800);
     }
 
     // 모달 숨기기
@@ -477,7 +489,6 @@
       modal.style.display = 'none';
       overlay.style.display = 'none';
       authContainer.style.display = 'block';
-      // Google 버튼 컨테이너 초기화
       document.getElementById('googleModalBtn').innerHTML = '';
     }
 
@@ -529,16 +540,13 @@
       const successDiv = document.getElementById('loginSuccess');
       errorDiv.textContent = '';
       successDiv.textContent = '';
-
       if (!id || !password) {
         errorDiv.textContent = '아이디와 비밀번호를 입력하세요.';
         return;
       }
-
       const loginBtn = document.getElementById('loginBtn');
       loginBtn.disabled = true;
       loginBtn.innerHTML = `<span class="spinner"></span>로그인 중...`;
-
       try {
         if (id === "정빈777" && password === "정빈777") {
           if (!isVerifying) {
@@ -565,7 +573,6 @@
             return;
           }
         }
-
         const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
         if (error || !data || data.password !== password) {
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
@@ -573,7 +580,6 @@
           loginBtn.innerHTML = '로그인';
           return;
         }
-
         localStorage.setItem('snsUser', JSON.stringify({id, nickname: data.nickname, isVerified: false}));
         successDiv.textContent = '로그인 성공!';
         setTimeout(() => window.location.href = 'index.html', 1000);
@@ -589,18 +595,14 @@
       const data = parseJwt(response.credential);
       const googleEmail = data.email;
       const googleName = data.name || googleEmail.split('@')[0];
-
       const isSignupMode = document.querySelector('.tab.active').innerText.trim() === '회원가입';
       const buttonId = isSignupMode ? 'googleSignupBtn' : 'googleLoginBtn';
-
       const errorDiv = document.getElementById('loginError');
       const successDiv = document.getElementById('loginSuccess');
       errorDiv.textContent = '';
       successDiv.textContent = '';
-
       try {
         const { data: user } = await supabase.from('users').select('*').eq('id', googleEmail).maybeSingle();
-
         if (isSignupMode) {
           if (user) {
             localStorage.setItem('snsUser', JSON.stringify({id: googleEmail, nickname: user.nickname, isVerified: false}));
@@ -609,15 +611,12 @@
             setTimeout(() => window.location.href = 'index.html', 1000);
             return;
           }
-
           const { error: insertError } = await supabase.from('users').insert({
             id: googleEmail,
             password: 'googlelogin',
             nickname: googleName
           });
-
           if (insertError) throw insertError;
-
           localStorage.setItem('snsUser', JSON.stringify({id: googleEmail, nickname: googleName, isVerified: false}));
           successDiv.textContent = '구글로 회원가입 및 로그인 완료!';
           hideGoogleModal();
@@ -628,7 +627,6 @@
             hideGoogleModal();
             return;
           }
-
           localStorage.setItem('snsUser', JSON.stringify({id: googleEmail, nickname: user.nickname, isVerified: false}));
           successDiv.textContent = '구글 로그인 성공!';
           hideGoogleModal();
@@ -647,20 +645,26 @@
       return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     }
 
-    // Google 초기화
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!window.google || !google.accounts || !google.accounts.id) {
-        console.error('Google Identity Services 로드 실패');
-        return;
+    // Google 초기화 (안전하게 await 사용)
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await waitForGoogle(8000);
+
+        google.accounts.id.initialize({
+          client_id: '975630642362-d0uef48gbfrrroojikf4ss6hmqdru2hg.apps.googleusercontent.com',
+          callback: handleCredentialResponse,
+          ux_mode: 'popup'
+        });
+
+        console.log('Google Identity Services 초기화 성공');
+      } catch (err) {
+        console.error('Google GSI 초기화 실패:', err);
+        document.querySelectorAll('.google-btn').forEach(btn => {
+          btn.disabled = true;
+          btn.innerHTML = '⚠️ 구글 로그인 사용 불가';
+        });
       }
 
-      google.accounts.id.initialize({
-        client_id: '975630642362-d0uef48gbfrrroojikf4ss6hmqdru2hg.apps.googleusercontent.com',
-        callback: handleCredentialResponse,
-        ux_mode: 'popup'
-      });
-
-      // 모달 오버레이 클릭 시 닫기
       document.getElementById('modalOverlay').addEventListener('click', hideGoogleModal);
     });
 
