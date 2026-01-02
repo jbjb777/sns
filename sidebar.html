@@ -105,12 +105,12 @@
       align-items: center;
       justify-content: center;
       margin-top: 20px;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       width: 100%;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
-    /* hover 시 scale 효과 유지 */
+    /* hover 시 확대 효과 유지 */
     .create-btn:hover {
       transform: scale(1.1);
     }
@@ -119,38 +119,31 @@
       transform: scale(0.95);
       transition: transform 0.15s ease;
     }
-    /* hover 시 그라데이션 색상 살짝 진하게 (기존과 동일) */
+    /* hover 시 색상 살짝 진하게 */
     .create-btn:hover {
       background: linear-gradient(135deg, #3d52cc, #401a8c, #cc00bc);
     }
-    /* 그림자(빛) 효과 완전 제거 */
+    /* 그림자 효과 제거 */
     .create-btn:hover {
       box-shadow: none;
     }
 
-    /* 그라데이션 모션 애니메이션 (hover 시에만 작동) */
+    /* 뒷배경 회전 레이어 */
     .create-btn::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, #5269FF, #5722B3, #FF00EC);
+      background: inherit; /* 부모의 그라데이션 상속 */
       border-radius: 30px;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      animation: gradientFlow 8s ease infinite;
+      transform: rotate(0deg);
+      transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       pointer-events: none;
-    }
-    .create-btn:hover::before {
-      opacity: 0.4; /* 살짝 비쳐서 부드러운 움직임 보이게 */
-    }
-    .create-btn:hover:hover::before {
-      background: linear-gradient(135deg, #3d52cc, #401a8c, #cc00bc);
+      z-index: -1;
     }
 
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    /* hover 시 180도 회전 (부드럽지만 빠르게) */
+    .create-btn:hover::before {
+      transform: rotate(180deg);
     }
 
     .create-btn .btn-icon-img {
@@ -159,12 +152,16 @@
       margin-right: 8px;
       flex-shrink: 0;
       transition: transform 0.3s ease;
+      position: relative;
+      z-index: 1;
     }
     .create-btn:hover .btn-icon-img {
       transform: scale(1.2);
     }
     .btn-text {
       white-space: nowrap;
+      position: relative;
+      z-index: 1;
     }
     .user-info {
       margin-top: auto;
