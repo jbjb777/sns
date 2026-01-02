@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+ 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>로그인 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -18,7 +19,6 @@
       flex-direction: column;
       min-height: 100vh;
     }
-
     .header {
       background: #1e1e1e;
       border-bottom: 1px solid #333;
@@ -27,30 +27,25 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .logo-container {
       display: flex;
       align-items: center;
       cursor: pointer;
       transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
-
     .logo-container:hover {
       transform: scale(1.05);
     }
-
     .logo-svg {
       width: 40px;
       height: 40px;
       margin-right: 12px;
     }
-
     .logo-text {
       font-size: 24px;
       font-weight: bold;
       color: #fff;
     }
-
     .main-content {
       flex: 1;
       display: flex;
@@ -58,7 +53,6 @@
       align-items: center;
       padding: 40px 20px;
     }
-
     .auth-container {
       background: #1e1e1e;
       border-radius: 16px;
@@ -67,14 +61,12 @@
       max-width: 400px;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
     }
-
     .auth-container h2 {
       text-align: center;
       margin-bottom: 30px;
       color: #fff;
       font-size: 28px;
     }
-
     .auth-container input {
       width: 100%;
       padding: 12px 20px;
@@ -87,11 +79,9 @@
       color: #fff;
       box-sizing: border-box;
     }
-
     .auth-container input:focus {
       border-color: #3663FF;
     }
-
     .auth-container button {
       width: 100%;
       padding: 12px 24px;
@@ -107,22 +97,18 @@
       overflow: hidden;
       transition: none;
     }
-
     .auth-container button:active:not(:disabled) {
       animation: clickEffect 0.3s ease forwards;
     }
-
     @keyframes clickEffect {
       0% { transform: scale(1); }
       50% { transform: scale(0.95); }
       100% { transform: scale(1); }
     }
-
     .auth-container button:disabled {
       cursor: not-allowed;
       opacity: 0.7;
     }
-
     .terms-label {
       text-align: left;
       font-size: 14px;
@@ -131,7 +117,6 @@
       font-weight: 600;
       padding-left: 4px;
     }
-
     .terms-box {
       width: 100%;
       height: 120px;
@@ -147,7 +132,6 @@
       color: #ddd;
       text-align: left;
     }
-
     .terms-box::-webkit-scrollbar {
       width: 8px;
     }
@@ -158,7 +142,6 @@
     .terms-box::-webkit-scrollbar-track {
       background: transparent;
     }
-
     .terms-box h4 {
       margin: 15px 0 5px 0;
       color: #fff;
@@ -169,16 +152,13 @@
     .terms-box h4:first-child {
       margin-top: 0;
     }
-
     .terms-box strong {
       color: #fff;
       font-weight: 700;
     }
-
     .auth-container button.no-hover-effect {
       margin-top: 10px;
     }
-
     .spinner {
       display: inline-block;
       width: 16px;
@@ -190,11 +170,9 @@
       margin-right: 8px;
       vertical-align: middle;
     }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
     .error-message {
       color: #ff6b6b;
       font-size: 14px;
@@ -202,7 +180,6 @@
       margin-bottom: 10px;
       text-align: center;
     }
-
     .success-message {
       color: #00ff00;
       font-size: 14px;
@@ -210,7 +187,6 @@
       margin-bottom: 10px;
       text-align: center;
     }
-
     .footer {
       background: #1e1e1e;
       border-top: 1px solid #333;
@@ -219,13 +195,11 @@
       color: #666;
       font-size: 12px;
     }
-
     .tab-container {
       display: flex;
       margin-bottom: 30px;
       border-bottom: 2px solid #333;
     }
-
     .tab {
       flex: 1;
       padding: 12px;
@@ -237,33 +211,57 @@
       border-bottom: 3px solid transparent;
       margin-bottom: -2px;
     }
-
     .tab:hover {
       color: #fff;
     }
-
     .tab.active {
       color: #3663FF;
       border-bottom-color: #3663FF;
     }
-
     .form-section {
       display: none;
     }
-
     .form-section.active {
       display: block;
     }
-
+    .or-divider {
+      text-align: center;
+      margin: 20px 0 10px;
+      color: #aaa;
+      position: relative;
+    }
+    .or-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #333;
+    }
+    .or-divider span {
+      background: #1e1e1e;
+      padding: 0 20px;
+    }
+    .google-btn {
+      background: #ffffff !important;
+      color: #000 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .google-btn img {
+      width: 20px;
+      height: 20px;
+    }
     @media (max-width: 768px) {
       .logo-text {
         font-size: 20px;
       }
-
       .auth-container {
         padding: 30px 20px;
       }
-
       .auth-container h2 {
         font-size: 24px;
       }
@@ -277,86 +275,95 @@
       <span class="logo-text">Sharer</span>
     </div>
   </div>
-
   <div class="main-content">
     <div class="auth-container">
       <h2>환영합니다!</h2>
-      
+     
       <div class="tab-container">
         <div class="tab active" onclick="showTab('login')">로그인</div>
         <div class="tab" onclick="showTab('signup')">회원가입</div>
       </div>
-
       <div class="form-section active" id="loginForm">
         <input type="text" id="loginId" placeholder="아이디">
         <input type="password" id="loginPassword" placeholder="비밀번호">
         <div class="error-message" id="loginError"></div>
         <div class="success-message" id="loginSuccess"></div>
         <button id="loginBtn" onclick="handleLogin()">로그인</button>
-      </div>
-
-      <div class="form-section" id="signupForm">
         
+        <div class="or-divider"><span>또는</span></div>
+        <button class="google-btn" onclick="triggerGoogleSignIn('login')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
+          구글로 로그인
+        </button>
+      </div>
+      <div class="form-section" id="signupForm">
+       
         <div class="terms-label">이용약관</div>
         <div class="terms-box">
           <h4>제1조 (목적)</h4>
           이 약관은 <strong>서비스의 이용조건 및 절차</strong>에 관한 사항을 규정함을 목적으로 합니다.
-          
+         
           <h4>제2조 (용어의 정의)</h4>
           1. <strong>"서비스"</strong>란 웹사이트가 제공하는 모든 서비스를 의미합니다.<br>
           2. <strong>"회원"</strong>이란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
-          
+         
           <h4>제3조 (서비스의 제공)</h4>
           1. 서비스는 <strong>연중무휴, 1일 24시간 제공</strong>함을 원칙으로 합니다.<br>
           2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
-          
+         
           <h4>제4조 (회원의 의무)</h4>
           1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.<br>
           2. 회원은 <strong>타인의 명예를 손상시키거나 불이익을 주는 행위</strong>를 해서는 안 됩니다.
-          
+         
           <h4>제5조 (서비스 이용의 제한)</h4>
           운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.<br><br>
-          
+         
           <strong>문의사항:</strong> alexeom97@outlook.com
         </div>
-
         <div class="terms-label">개인정보 처리방침</div>
         <div class="terms-box">
           <h4>수집하는 개인정보 항목</h4>
           <strong>필수항목:</strong> 아이디, 비밀번호, 닉네임
-          
+         
           <h4>개인정보의 수집 및 이용목적</h4>
           회원 관리, 서비스 제공, 게시물 관리
-          
+         
           <h4>개인정보의 보유 및 이용기간</h4>
           <strong>회원 탈퇴 시까지</strong>
-          
+         
           <h4>개인정보 파기절차 및 방법</h4>
           이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 <strong>지체 없이 파기</strong>합니다.
-          
+         
           <h4>이용자의 권리</h4>
           이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.<br><br>
           <strong>문의사항:</strong> alexeom97@outlook.com
         </div>
-
         <button id="nextBtn" class="no-hover-effect" onclick="handleNextStep()">다음으로</button>
-
+        
+        <div class="or-divider"><span>또는</span></div>
+        <button class="google-btn" onclick="triggerGoogleSignIn('signup')">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
+          구글로 가입
+        </button>
       </div>
     </div>
   </div>
-
   <div class="footer">
     © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
   </div>
 
+  <!-- Google Sign In Button (숨김 처리, 클릭으로 트리거) -->
+  <div id="googleSignInButton" style="display: none;">
+    <div class="g_id_signin" data-type="standard"></div>
+  </div>
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    
+   
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-    
+   
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
     let verificationCode = "";
     let isVerifying = false;
 
@@ -367,10 +374,10 @@
     window.showTab = function(tab) {
       const tabs = document.querySelectorAll('.tab');
       const forms = document.querySelectorAll('.form-section');
-      
+     
       tabs.forEach(t => t.classList.remove('active'));
       forms.forEach(f => f.classList.remove('active'));
-      
+     
       if (tab === 'login') {
         tabs[0].classList.add('active');
         document.getElementById('loginForm').classList.add('active');
@@ -378,7 +385,6 @@
         tabs[1].classList.add('active');
         document.getElementById('signupForm').classList.add('active');
       }
-
       document.querySelectorAll('.error-message, .success-message').forEach(el => el.textContent = '');
     }
 
@@ -391,7 +397,6 @@
     function setButtonLoading(buttonId, isLoading, loadingText = '처리 중...') {
       const button = document.getElementById(buttonId);
       if(!button) return;
-
       if (isLoading) {
         button.disabled = true;
         button.innerHTML = `<span class="spinner"></span>${loadingText}`;
@@ -416,18 +421,14 @@
             message: `━━━━━━━━━━━━━━━━━━━━
   정빈777 개발자 인증
 ━━━━━━━━━━━━━━━━━━━━
-
 요청하신 인증 코드입니다:
-
     ${code}
-
 이 코드를 SNS 사이트에 입력해주세요.
-
 ━━━━━━━━━━━━━━━━━━━━
 본인이 요청하지 않았다면 이 메일을 무시하세요.`
           })
         });
-        
+       
         const result = await response.json();
         if (result.success) {
           console.log("✅ 인증 코드 이메일 발송 성공!");
@@ -448,28 +449,24 @@
       const password = document.getElementById('loginPassword').value.trim();
       const errorDiv = document.getElementById('loginError');
       const successDiv = document.getElementById('loginSuccess');
-
       errorDiv.textContent = '';
       successDiv.textContent = '';
-
       if (!id || !password) {
         errorDiv.textContent = '아이디와 비밀번호를 입력하세요.';
         return;
       }
-
       setButtonLoading('loginBtn', true, '로그인 중...');
-
       try {
         if (id === "정빈777" && password === "정빈777") {
           if (!isVerifying) {
             isVerifying = true;
             verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-            
+           
             document.getElementById('loginId').placeholder = "인증 코드 6자리";
             document.getElementById('loginId').value = "";
             document.getElementById('loginPassword').style.display = "none";
             successDiv.textContent = "제작자 이메일로 인증번호를 보냈습니다.";
-            
+           
             await sendVerificationEmail(verificationCode);
             console.log("Generated code for 정빈777:", verificationCode);
             setButtonLoading('loginBtn', false);
@@ -493,25 +490,22 @@
             return;
           }
         }
-
         const { data, error } = await supabase
           .from('users')
           .select('*')
           .eq('id', id)
           .single();
-        
+       
         if (error || !data) {
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
           setButtonLoading('loginBtn', false);
           return;
         }
-
         if (data.password !== password) {
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
           setButtonLoading('loginBtn', false);
           return;
         }
-
         const currentUser = {
           id: id,
           nickname: data.nickname,
@@ -519,11 +513,10 @@
         };
         localStorage.setItem('snsUser', JSON.stringify(currentUser));
         successDiv.textContent = '로그인 성공!';
-        
+       
         setTimeout(() => {
           window.location.href = 'index.html';
         }, 1000);
-
       } catch (error) {
         console.error('로그인 오류:', error);
         errorDiv.textContent = '로그인에 실패했습니다. 다시 시도해주세요.';
@@ -534,6 +527,73 @@
     document.getElementById('loginPassword').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') handleLogin();
     });
+
+    // Google 로그인 콜백 처리
+    window.handleCredentialResponse = async function(response) {
+      const data = parseJwt(response.credential);
+      const googleEmail = data.email;  // 아이디로 사용
+      const googleName = data.name;    // 닉네임으로 사용
+
+      const currentMode = document.querySelector('.tab.active').textContent.trim() === '로그인' ? 'login' : 'signup';
+
+      if (currentMode === 'signup') {
+        // 회원가입 모드: join.html로 이동 (그곳에서 아이디=googleEmail, 닉네임=googleName, 비밀번호=googlelogin 처리 가정)
+        window.location.href = `https://sharer.jbjb.r-e.kr/join.html?google_email=${encodeURIComponent(googleEmail)}&google_name=${encodeURIComponent(googleName)}`;
+      } else {
+        // 로그인 모드: Supabase에서 해당 이메일(아이디) 사용자 조회
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', googleEmail)
+          .single();
+
+        if (error || !userData) {
+          document.getElementById('loginError').textContent = '구글 계정으로 가입된 사용자가 아닙니다. 먼저 회원가입해주세요.';
+          return;
+        }
+
+        // 비밀번호 확인 생략 (googlelogin인 경우)
+        const currentUser = {
+          id: googleEmail,
+          nickname: userData.nickname,
+          isVerified: false
+        };
+        localStorage.setItem('snsUser', JSON.stringify(currentUser));
+        document.getElementById('loginSuccess').textContent = '구글 로그인 성공!';
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+      }
+    }
+
+    function parseJwt(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      return JSON.parse(
+        decodeURIComponent(
+          atob(base64).split('').map(c =>
+            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+          ).join('')
+        )
+      );
+    }
+
+    // 커스텀 구글 버튼 클릭 시 실제 Google Sign In 트리거
+    window.triggerGoogleSignIn = function(mode) {
+      // Google One Tap 또는 버튼을 프로그래밍적으로 트리거
+      // 숨겨진 div의 버튼 클릭 시뮬레이션
+      const googleButton = document.querySelector('#googleSignInButton .g_id_signin');
+      if (googleButton) {
+        googleButton.click();
+      }
+    }
   </script>
+
+  <!-- Google Identity Services 로드 및 설정 -->
+  <div id="g_id_onload"
+       data-client_id="975630642362-d0uef48gbfrrroojikf4ss6hmqdru2hg.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse"
+       data-auto_prompt="false">
+  </div>
 </body>
 </html>
