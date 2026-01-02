@@ -538,44 +538,45 @@
     });
   </script>
 
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <div id="g_id_onload"
-    data-client_id="975630642362-d0uef48gbfrrroojikf4ss6hmqdru2hg.apps.googleusercontent.com"
-    data-login_uri="https://sharer.jbjb.r-e.kr/auth/callback"
-    data-auto_prompt="false">
+     data-client_id="⭐하나만⭐_CLIENT_ID"
+     data-callback="handleCredentialResponse"
+     data-auto_prompt="false">
 </div>
 
 <div class="g_id_signin"
-    data-type="standard"
-    data-shape="rectangular"
-    data-theme="outline"
-    data-size="large"
-    data-text="signin_with"
-    data-logo_alignment="center">
+     data-type="standard"
+     data-shape="rectangular"
+     data-theme="outline"
+     data-size="large">
 </div>
 
-<script>
-  function handleCredentialResponse(response) {
-    const data = parseJwt(response.credential);
-    document.getElementById("userinfo").innerHTML =
-      "안녕하세요, " + data.name + "님!<br>" +
-      "이메일: " + data.email;
-  }
+<div id="userinfo"></div>
 
-  function parseJwt(token) {
-    let base64Url = token.split('.')[1];
-    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    let jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  }
+<script>
+function handleCredentialResponse(response) {
+  const data = parseJwt(response.credential);
+  document.getElementById("userinfo").innerHTML =
+    `안녕하세요 ${data.name}님<br>이메일: ${data.email}`;
+}
+
+function parseJwt(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(
+    decodeURIComponent(
+      atob(base64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join('')
+    )
+  );
+}
 </script>
 
-<div id="userinfo"></div>
+
 
 
 </body>
