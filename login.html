@@ -256,10 +256,6 @@
       width: 20px;
       height: 20px;
     }
-    .google-official-btn {
-      margin-top: 10px;
-      justify-content: center;
-    }
     @media (max-width: 768px) {
       .logo-text { font-size: 20px; }
       .auth-container { padding: 30px 20px; }
@@ -292,15 +288,10 @@
         <button id="loginBtn" onclick="handleLogin()">로그인</button>
         
         <div class="or-divider"><span>또는</span></div>
-        <button class="google-btn" id="customGoogleLoginBtn">
+        <button class="google-btn" id="googleLoginBtn">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
           구글로 로그인
         </button>
-
-        <!-- 실제 Google 버튼 (보이지 않게 배치 후 클릭 트리거) -->
-        <div id="googleLoginContainer" style="opacity:0; height:0; overflow:hidden;">
-          <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signin_with" data-shape="rectangular"></div>
-        </div>
       </div>
 
       <!-- 회원가입 탭 -->
@@ -339,15 +330,10 @@
         <button id="nextBtn" class="no-hover-effect" onclick="handleNextStep()">다음으로</button>
         
         <div class="or-divider"><span>또는</span></div>
-        <button class="google-btn" id="customGoogleSignupBtn">
+        <button class="google-btn" id="googleSignupBtn">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
           구글로 가입
         </button>
-
-        <!-- 회원가입용 Google 버튼 (동일하게 숨김) -->
-        <div id="googleSignupContainer" style="opacity:0; height:0; overflow:hidden;">
-          <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="signup_with" data-shape="rectangular"></div>
-        </div>
       </div>
     </div>
   </div>
@@ -488,7 +474,7 @@
       }
     }
 
-    // Google 로그인 콜백
+    // Google 로그인 콜백 처리
     window.handleCredentialResponse = async function(response) {
       const data = parseJwt(response.credential);
       const googleEmail = data.email;
@@ -506,7 +492,7 @@
 
         if (isSignupMode) {
           if (user) {
-            // 이미 가입됨 → 바로 로그인
+            // 이미 가입된 경우 → 로그인 처리
             localStorage.setItem('snsUser', JSON.stringify({id: googleEmail, nickname: user.nickname, isVerified: false}));
             successDiv.textContent = '구글 계정으로 로그인되었습니다!';
             setTimeout(() => window.location.href = 'index.html', 1000);
@@ -527,6 +513,7 @@
           setTimeout(() => window.location.href = 'index.html', 1000);
 
         } else {
+          // 로그인 모드
           if (!user) {
             errorDiv.textContent = '구글 계정으로 가입된 내역이 없습니다. 회원가입 탭에서 구글 가입해주세요.';
             return;
@@ -548,26 +535,30 @@
       return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     }
 
-    // 커스텀 버튼 클릭 → 실제 Google 버튼 클릭
-    document.getElementById('customGoogleLoginBtn').addEventListener('click', () => {
-      document.querySelector('#googleLoginContainer .g_id_signin div[role=button]').click();
-    });
+    // Google 라이브러리 로드 완료 후 초기화
+    window.onGoogleLibraryLoad = function() {
+      google.accounts.id.initialize({
+        client_id: '975630642362-d0uef48gbfrrroojikf4ss6hmqdru2hg.apps.googleusercontent.com',
+        callback: handleCredentialResponse
+      });
 
-    document.getElementById('customGoogleSignupBtn').addEventListener('click', () => {
-      document.querySelector('#googleSignupContainer .g_id_signin div[role=button]').click();
-    });
+      // 커스텀 버튼 클릭 시 Google 로그인 프롬프트 표시
+      document.getElementById('googleLoginBtn').addEventListener('click', () => {
+        google.accounts.id.prompt();
+      });
 
-    // 엔터키 로그인
+      document.getElementById('googleSignupBtn').addEventListener('click', () => {
+        google.accounts.id.prompt();
+      });
+    }
+
+    // 엔터키로 일반 로그인
     document.getElementById('loginPassword').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') handleLogin();
     });
   </script>
 
-  <!-- Google Identity Services 설정 -->
-  <div id="g_id_onload"
-       data-client_id="975630642362-d0uef48gbfrrroojikf4ss6hmqdru2hg.apps.googleusercontent.com"
-       data-callback="handleCredentialResponse"
-       data-auto_prompt="false">
-  </div>
+  <!-- Google 스크립트 로드 (onload로 초기화 연결) -->
+  <script src="https://accounts.google.com/gsi/client" async defer onload="onGoogleLibraryLoad()"></script>
 </body>
 </html>
