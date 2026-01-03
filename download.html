@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sharer 다운로드 - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    .logo-container:hover {
+      transform: scale(1.05);
+    }
+    .logo-svg {
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+    }
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 20px;
+    }
+    .download-container {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 60px 40px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+    .download-container h1 {
+      font-size: 36px;
+      margin-bottom: 24px;
+      color: #fff;
+    }
+    .download-container p {
+      font-size: 18px;
+      margin-bottom: 40px;
+      color: #ddd;
+      line-height: 1.6;
+    }
+    .download-btn {
+      background: #3663FF;
+      color: #fff;
+      border: none;
+      padding: 16px 40px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      margin-bottom: 40px;
+    }
+    .download-btn:hover {
+      background: #2850cc;
+      transform: translateY(-3px);
+    }
+    .manual-links {
+      margin-top: 30px;
+    }
+    .manual-links a {
+      color: #3663FF;
+      text-decoration: none;
+      font-size: 16px;
+      margin: 0 15px;
+    }
+    .manual-links a:hover {
+      text-decoration: underline;
+    }
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 20px;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+    @media (max-width: 768px) {
+      .download-container {
+        padding: 40px 20px;
+      }
+      .download-container h1 {
+        font-size: 30px;
+      }
+      .download-btn {
+        padding: 14px 30px;
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container" onclick="window.location.href='index.html'">
+      <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
+      <span class="logo-text">Sharer</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="download-container">
+      <h1>Sharer 앱 다운로드</h1>
+      <p>Sharer를 지금 바로 다운로드하세요!<br>운영체제를 자동으로 감지하여 적합한 버전을 제공합니다.</p>
+      
+      <button class="download-btn" onclick="downloadApp()">Sharer 다운로드</button>
+      
+      <div class="manual-links">
+        <p>직접 선택하고 싶으신가요?</p>
+        <a href="https://github.com/jbjb777/sharer-app/releases/download/untagged-01f47c82aa8292679cae/Sharer-1.0.0-arm64.dmg" download>macOS 버전 다운로드</a> |
+        <a href="https://github.com/jbjb777/sharer-app/releases/download/untagged-01f47c82aa8292679cae/Sharer-Setup-1.0.0.exe" download>Windows 버전 다운로드</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+  </div>
+
+  <script>
+    // 로고 클릭 시 홈으로 이동
+    document.querySelector('.logo-container').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // OS 자동 감지 다운로드
+    function downloadApp() {
+      const ua = navigator.userAgent.toLowerCase();
+
+      if (ua.includes("mac")) {
+        window.location.href = "https://github.com/jbjb777/sharer-app/releases/download/untagged-01f47c82aa8292679cae/Sharer-1.0.0-arm64.dmg";
+      } else if (ua.includes("win")) {
+        window.location.href = "https://github.com/jbjb777/sharer-app/releases/download/untagged-01f47c82aa8292679cae/Sharer-Setup-1.0.0.exe";
+      } else {
+        alert("지원하지 않는 운영체제입니다.\n직접 선택하여 다운로드해주세요.");
+      }
+    }
+  </script>
+</body>
+</html>
