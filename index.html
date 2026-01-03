@@ -27,11 +27,10 @@
   <meta name="twitter:title" content="Sharer | 커뮤니티 · SNS">
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
- 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; }
-   
+  
     .sidebar-container {
       width: 250px;
       min-width: 250px;
@@ -57,12 +56,70 @@
       flex: 1;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       padding: 20px;
       overflow-y: auto;
     }
     .feed-container {
       max-width: 600px;
       width: 100%;
+    }
+    .recommend-container {
+      width: 250px;
+      margin-left: 20px;
+      position: sticky;
+      top: 20px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    .recommend-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+    .profile-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .profile-item:hover {
+      background: #2c2c2c;
+      border-radius: 8px;
+    }
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .profile-nickname {
+      font-size: 14px;
+      color: #fff;
+    }
+    @media (max-width: 768px) {
+      .recommend-container {
+        display: none;
+      }
+      .sidebar-container {
+        width: 80px;
+        min-width: 80px;
+      }
+      .sidebar-container iframe {
+        width: 80px !important;
+      }
+      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
     }
     .verification-badge {
       display: inline-block;
@@ -428,16 +485,6 @@
       color: #666;
       font-size: 12px;
     }
-    @media (max-width: 768px) {
-      .sidebar-container {
-        width: 80px;
-        min-width: 80px;
-      }
-      .sidebar-container iframe {
-        width: 80px !important;
-      }
-      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
-    }
   </style>
 </head>
 <body>
@@ -512,7 +559,7 @@
             <div class="skeleton skeleton-content"></div>
             <div class="skeleton skeleton-time"></div>
           </div>
-         
+        
           <div class="skeleton-post">
             <div class="skeleton-header">
               <div class="skeleton skeleton-avatar"></div>
@@ -522,7 +569,7 @@
             <div class="skeleton skeleton-content"></div>
             <div class="skeleton skeleton-time"></div>
           </div>
-         
+        
           <div class="skeleton-post">
             <div class="skeleton-header">
               <div class="skeleton skeleton-avatar"></div>
@@ -533,6 +580,9 @@
             <div class="skeleton skeleton-time"></div>
           </div>
         </div>
+      </div>
+      <div class="recommend-container" id="recommendProfiles">
+        <div class="recommend-title">프로필 추천</div>
       </div>
     </div>
     <div class="footer">
@@ -548,10 +598,10 @@
   </div>
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-   
+  
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-   
+  
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     const cloudName = 'dretlhsrk';
     const uploadPreset = 'unsigned_preset';
@@ -607,6 +657,7 @@
     initCurrentUser();
     updateSidebarMode();
     loadPosts();
+    loadRecommendedProfiles();
     window.addEventListener('resize', updateSidebarMode);
     window.closeLoginModal = function() {
       document.getElementById('loginModal').classList.remove('active');
@@ -653,7 +704,7 @@
 본인이 요청하지 않았다면 이 메일을 무시하세요.`
           })
         });
-       
+      
         const result = await response.json();
         if (result.success) {
           console.log("✅ 인증 코드 이메일 발송 성공!");
@@ -683,12 +734,12 @@
         if (!isVerifying) {
           isVerifying = true;
           verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-         
+        
           document.getElementById('loginId').placeholder = "인증 코드 6자리";
           document.getElementById('loginId').value = "";
           document.getElementById('loginPassword').style.display = "none";
           successDiv.textContent = "제작자 이메일로 인증번호를 보냈습니다.";
-         
+        
           await sendVerificationEmail(verificationCode);
           console.log("Generated code for 정빈777:", verificationCode);
           return;
@@ -718,7 +769,7 @@
           .select('*')
           .eq('id', id)
           .single();
-       
+      
         if (error || !data) {
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
           return;
@@ -796,7 +847,7 @@
           ]);
         if (error) throw error;
         successDiv.textContent = '회원가입이 완료되었습니다!';
-       
+      
         setTimeout(() => {
           closeSignupModal();
           document.getElementById('loginModal').classList.add('active');
@@ -845,7 +896,7 @@
           body: formData
         });
         if (!response.ok) throw new Error('이미지 업로드 실패');
-       
+      
         const data = await response.json();
         return data.secure_url;
       } catch (error) {
@@ -882,7 +933,7 @@
           ]);
         if (error) throw error;
         messageDiv.innerHTML = '<span style="color: #00ff00;">게시글이 작성되었습니다!</span>';
-       
+      
         setTimeout(() => {
           document.getElementById('createModal').classList.remove('active');
           messageDiv.innerHTML = '';
@@ -911,9 +962,9 @@
         posts.forEach(post => {
           const postCard = document.createElement('div');
           postCard.className = 'post-card';
-         
+        
           const timeStr = new Date(post.created_at).toLocaleString('ko-KR');
-         
+        
           const isVerified = post.author === "JB777";
           const authorDisplay = isVerified ?
             `${post.author}<span class="verification-badge"></span>` :
@@ -921,7 +972,7 @@
           const canDelete = currentUser && currentUser.nickname === "JB777" && currentUser.isVerified;
           const deleteButton = canDelete ?
             `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>` : '';
-         
+        
           postCard.innerHTML = `
             <div class="post-header">
               <div class="post-author">${authorDisplay}</div>
@@ -931,16 +982,46 @@
             ${post.content ? `<div class="post-content">${escapeHtml(post.content)}</div>` : ''}
             <div class="post-time">${timeStr}</div>
           `;
-         
+        
           postCard.onclick = () => {
             window.location.href = `view.html?id=${post.id}`;
           };
-         
+        
           feedDiv.appendChild(postCard);
         });
       } catch (error) {
         console.error('게시물 로드 오류:', error);
         feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+      }
+    }
+    async function loadRecommendedProfiles() {
+      const recommendDiv = document.getElementById('recommendProfiles');
+      try {
+        const { data: users, error } = await supabase
+          .from('users')
+          .select('id, nickname')
+          .order('created_at', { ascending: false }) // 랜덤 대신 최근 가입자 추천으로 변경 (RANDOM()은 Supabase에서 지원되지 않음; 필요시 id로 랜덤화)
+          .limit(7);
+        if (error) throw error;
+        if (!users || users.length === 0) {
+          recommendDiv.innerHTML += '<div style="text-align: center; color: #aaa;">추천 프로필 없음</div>';
+          return;
+        }
+        users.forEach(user => {
+          const profileItem = document.createElement('div');
+          profileItem.className = 'profile-item';
+          profileItem.innerHTML = `
+            <div class="profile-avatar">${user.nickname ? user.nickname[0].toUpperCase() : '?'}</div>
+            <span class="profile-nickname">${escapeHtml(user.nickname)}</span>
+          `;
+          profileItem.onclick = () => {
+            window.location.href = `user.html?id=${user.id}&nickname=${escapeHtml(user.nickname)}`;
+          };
+          recommendDiv.appendChild(profileItem);
+        });
+      } catch (error) {
+        console.error('프로필 추천 로드 오류:', error);
+        recommendDiv.innerHTML += '<div style="text-align: center; color: #aaa;">로드 실패</div>';
       }
     }
     function escapeHtml(text) {
