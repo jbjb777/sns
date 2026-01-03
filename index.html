@@ -109,6 +109,35 @@
       font-size: 14px;
       color: #fff;
     }
+
+    /* 스켈레톤 스타일 */
+    .skeleton {
+      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-profile-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .skeleton-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .skeleton-nickname {
+      width: 100px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
     @media (max-width: 768px) {
       .recommend-container {
         display: none;
@@ -122,6 +151,7 @@
       }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
     }
+
     .verification-badge {
       display: inline-block;
       width: 18px;
@@ -131,16 +161,6 @@
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
       background-size: contain;
       background-repeat: no-repeat;
-    }
-    .skeleton {
-      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s ease-in-out infinite;
-      border-radius: 4px;
-    }
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
     }
     .skeleton-post {
       background: #1e1e1e;
@@ -153,12 +173,6 @@
       display: flex;
       align-items: center;
       margin-bottom: 12px;
-    }
-    .skeleton-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 12px;
     }
     .skeleton-author {
       width: 120px;
@@ -602,6 +616,37 @@
       </div>
       <div class="recommend-container" id="recommendProfiles">
         <div class="recommend-title">프로필 추천</div>
+        <!-- 스켈레톤 UI (초기 7개 표시) -->
+        <div id="recommendSkeleton">
+          <div class="skeleton-profile-item">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-nickname"></div>
+          </div>
+          <div class="skeleton-profile-item">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-nickname"></div>
+          </div>
+          <div class="skeleton-profile-item">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-nickname"></div>
+          </div>
+          <div class="skeleton-profile-item">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-nickname"></div>
+          </div>
+          <div class="skeleton-profile-item">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-nickname"></div>
+          </div>
+          <div class="skeleton-profile-item">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-nickname"></div>
+          </div>
+          <div class="skeleton-profile-item">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-nickname"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="footer">
@@ -977,7 +1022,6 @@
     async function loadPosts() {
       const feedDiv = document.getElementById('postsFeed');
       try {
-        // posts와 함께 작성자 정보(author_id로 users 테이블에서 nickname 가져오기)
         const { data: posts, error } = await supabase
           .from('posts')
           .select('*, author_id')
@@ -993,7 +1037,6 @@
         feedDiv.innerHTML = '';
 
         for (const post of posts) {
-          // 작성자 정보 가져오기 (이미 posts에 author, author_id 있음)
           const authorNickname = post.author || '알 수 없음';
           const authorId = post.author_id || '';
           const firstLetter = authorNickname ? authorNickname[0].toUpperCase() : '?';
@@ -1025,7 +1068,6 @@
             <div class="post-time">${timeStr}</div>
           `;
 
-          // 카드 전체 클릭 → 게시물 보기
           postCard.onclick = () => {
             window.location.href = `view.html?id=${post.id}`;
           };
@@ -1040,7 +1082,7 @@
 
     async function loadRecommendedProfiles() {
       const recommendDiv = document.getElementById('recommendProfiles');
-      recommendDiv.innerHTML = '<div class="recommend-title">프로필 추천</div>'; // 초기화
+      const skeletonDiv = document.getElementById('recommendSkeleton');
 
       try {
         let { data: users, error } = await supabase
@@ -1049,18 +1091,22 @@
 
         if (error) throw error;
         if (!users || users.length === 0) {
-          recommendDiv.innerHTML += '<div style="text-align: center; color: #aaa;">사용자 없음</div>';
+          skeletonDiv.remove();
+          recommendDiv.innerHTML += '<div style="text-align: center; color: #aaa; padding: 12px 0;">사용자 없음</div>';
           return;
         }
 
-        // 배열 섞기 (Fisher-Yates shuffle)
+        // Fisher-Yates shuffle
         for (let i = users.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [users[i], users[j]] = [users[j], users[i]];
         }
 
-        // 최대 7명만 표시
+        // 최대 7명
         users = users.slice(0, 7);
+
+        // 스켈레톤 제거
+        skeletonDiv.remove();
 
         users.forEach(user => {
           const firstLetter = user.nickname ? user.nickname[0].toUpperCase() : '?';
@@ -1077,7 +1123,7 @@
         });
       } catch (error) {
         console.error('프로필 추천 로드 오류:', error);
-        recommendDiv.innerHTML += '<div style="text-align: center; color: #aaa;">로드 실패</div>';
+        skeletonDiv.innerHTML = '<div style="text-align: center; color: #aaa; padding: 12px 0;">로드 실패</div>';
       }
     }
 
