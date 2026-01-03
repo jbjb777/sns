@@ -1,0 +1,36 @@
+# render.yaml 파일 예시
+# 이 파일은 Render 블루프린트 배포에 사용됩니다.
+
+# YAML 파일의 버전 명시 (필수)
+yamlFileVersion: 1
+
+# 서비스들을 정의합니다.
+services:
+  # 웹 서비스 정의
+  - type: web # 서비스 타입: 웹 서비스
+    name: my-backend-app # 서비스의 고유한 이름 (원하는 이름으로 변경)
+    env: node # 환경: Node.js (python, ruby, go, docker 등 가능)
+    region: singapore # 서비스가 배포될 리전 (georgia, oregon, frankfurt, singapore 중 선택)
+    plan: free # 사용할 플랜: free 또는 starter, standard 등
+    buildCommand: 'npm install' # 빌드 명령어: 의존성 설치
+    startCommand: 'node server.js' # 시작 명령어: 서버 실행 (예: server.js 파일을 실행한다고 가정)
+    # 루트 디렉토리 (만약 프로젝트 루트에 모든 코드가 있다면 빈 문자열로 둡니다.)
+    # 만약 백엔드 코드가 'backend/'와 같은 하위 디렉토리에 있다면 'backend'로 지정합니다.
+    rootDirectory: './' 
+    # 환경 변수 설정
+    envVars:
+      - key: PORT
+        value: 10000 # Render는 기본적으로 10000 포트를 사용합니다.
+      - key: DATABASE_URL
+        fromDatabase: # 데이터베이스 연결 정보는 아래에서 정의된 데이터베이스에서 가져옵니다.
+          name: my-database # 아래 정의된 데이터베이스의 이름과 일치해야 합니다.
+          property: connectionString # 연결 문자열을 가져옵니다.
+
+  # PostgreSQL 데이터베이스 서비스 정의
+  - type: postgres # 서비스 타입: PostgreSQL 데이터베이스
+    name: my-database # 데이터베이스의 고유한 이름 (위에서 참조한 이름과 일치해야 합니다.)
+    region: singapore # 데이터베이스가 배포될 리전 (웹 서비스와 동일한 리전 권장)
+    plan: free # 사용할 플랜: free 또는 starter, standard 등
+    ipAllowList: # 데이터베이스에 접근을 허용할 IP 주소 목록 (0.0.0.0/0 은 모든 IP를 허용)
+      - source: 0.0.0.0/0
+        description: Allow all traffic # 모든 트래픽 허용 (보안에 주의)
