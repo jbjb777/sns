@@ -29,8 +29,19 @@
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; }
-  
+    body { 
+      font-family: 'Segoe UI', sans-serif; 
+      background: #121212; 
+      color: #fff; 
+      min-height: 100vh; 
+      display: flex;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     .sidebar-container {
       width: 250px;
       min-width: 250px;
@@ -59,6 +70,15 @@
       align-items: flex-start;
       padding: 20px;
       overflow-y: auto;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: slideUp 0.6s ease-out 0.2s forwards;
+    }
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .feed-container {
       max-width: 600px;
@@ -74,6 +94,11 @@
       border-radius: 16px;
       padding: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      animation: fadeInText 0.5s ease-out 0.6s forwards;
+    }
+    @keyframes fadeInText {
+      to { opacity: 1; }
     }
     .recommend-title {
       font-size: 16px;
@@ -88,6 +113,22 @@
       padding: 8px 0;
       cursor: pointer;
       transition: background 0.3s;
+      opacity: 0;
+      transform: translateX(20px);
+      animation: slideInLeft 0.5s ease-out forwards;
+    }
+    .profile-item:nth-child(1) { animation-delay: 0.7s; }
+    .profile-item:nth-child(2) { animation-delay: 0.75s; }
+    .profile-item:nth-child(3) { animation-delay: 0.8s; }
+    .profile-item:nth-child(4) { animation-delay: 0.85s; }
+    .profile-item:nth-child(5) { animation-delay: 0.9s; }
+    .profile-item:nth-child(6) { animation-delay: 0.95s; }
+    .profile-item:nth-child(7) { animation-delay: 1s; }
+    @keyframes slideInLeft {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
     .profile-item:hover {
       background: #2c2c2c;
@@ -416,6 +457,22 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
       transition: all 0.3s ease;
       cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideUpFade 0.6s ease-out forwards;
+    }
+    .post-card:nth-child(1) { animation-delay: 0.4s; }
+    .post-card:nth-child(2) { animation-delay: 0.5s; }
+    .post-card:nth-child(3) { animation-delay: 0.6s; }
+    .post-card:nth-child(4) { animation-delay: 0.7s; }
+    .post-card:nth-child(5) { animation-delay: 0.8s; }
+    .post-card:nth-child(6) { animation-delay: 0.9s; }
+    .post-card:nth-child(7) { animation-delay: 1.0s; }
+    @keyframes slideUpFade {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .post-card:hover {
       transform: translateY(-2px);
@@ -500,6 +557,8 @@
       color: #aaa;
       font-size: 14px;
       margin-top: auto;
+      opacity: 0;
+      animation: fadeInText 0.5s ease-out 1.1s forwards;
     }
     .footer-links {
       margin-bottom: 15px;
@@ -592,7 +651,7 @@
             <div class="skeleton skeleton-content"></div>
             <div class="skeleton skeleton-time"></div>
           </div>
-        
+
           <div class="skeleton-post">
             <div class="skeleton-header">
               <div class="skeleton skeleton-avatar"></div>
@@ -602,7 +661,7 @@
             <div class="skeleton skeleton-content"></div>
             <div class="skeleton skeleton-time"></div>
           </div>
-        
+
           <div class="skeleton-post">
             <div class="skeleton-header">
               <div class="skeleton skeleton-avatar"></div>
@@ -662,10 +721,10 @@
   </div>
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-  
+
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-  
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     const cloudName = 'dretlhsrk';
     const uploadPreset = 'unsigned_preset';
@@ -761,16 +820,16 @@
             from_name: '정빈777 SNS',
             to_email: 'alexeom97@outlook.com',
             message: `━━━━━━━━━━━━━━━━━━━━
-  정빈777 개발자 인증
+정빈777 개발자 인증
 ━━━━━━━━━━━━━━━━━━━━
 요청하신 인증 코드입니다:
-    ${code}
+ ${code}
 이 코드를 SNS 사이트에 입력해주세요.
 ━━━━━━━━━━━━━━━━━━━━
 본인이 요청하지 않았다면 이 메일을 무시하세요.`
           })
         });
-      
+
         const result = await response.json();
         if (result.success) {
           console.log("✅ 인증 코드 이메일 발송 성공!");
@@ -801,12 +860,12 @@
         if (!isVerifying) {
           isVerifying = true;
           verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        
+
           document.getElementById('loginId').placeholder = "인증 코드 6자리";
           document.getElementById('loginId').value = "";
           document.getElementById('loginPassword').style.display = "none";
           successDiv.textContent = "제작자 이메일로 인증번호를 보냈습니다.";
-        
+
           await sendVerificationEmail(verificationCode);
           console.log("Generated code for 정빈777:", verificationCode);
           return;
@@ -836,7 +895,7 @@
           .select('*')
           .eq('id', id)
           .single();
-      
+
         if (error || !data) {
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
           return;
@@ -915,7 +974,7 @@
           ]);
         if (error) throw error;
         successDiv.textContent = '회원가입이 완료되었습니다!';
-      
+
         setTimeout(() => {
           closeSignupModal();
           document.getElementById('loginModal').classList.add('active');
@@ -967,7 +1026,7 @@
           body: formData
         });
         if (!response.ok) throw new Error('이미지 업로드 실패');
-      
+
         const data = await response.json();
         return data.secure_url;
       } catch (error) {
@@ -1005,7 +1064,7 @@
           ]);
         if (error) throw error;
         messageDiv.innerHTML = '<span style="color: #00ff00;">게시글이 작성되었습니다!</span>';
-      
+
         setTimeout(() => {
           document.getElementById('createModal').classList.remove('active');
           messageDiv.innerHTML = '';
@@ -1117,7 +1176,7 @@
             <span class="profile-nickname">${escapeHtml(user.nickname)}</span>
           `;
           profileItem.onclick = () => {
-            window.location.href = `user.html?id=${user.id}&nickname=${escapeHtml(user.nickname)}`;
+            window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`;
           };
           recommendDiv.appendChild(profileItem);
         });
