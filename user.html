@@ -459,7 +459,7 @@
       const { data: followings } = await supabase
         .from('follow')
         .select('*')
-        .eq('id', user.id);
+        .eq('user_id', user.id);
       const followingCount = followings ? followings.length : 0;
       const statusMessage = user.message || '';
       const statusDisplay = statusMessage
@@ -516,30 +516,33 @@
         </div>
       `;
       if (!isOwnProfile && currentUser) {
-        loadFollows(user.id);
+        loadFollowState(user.id);
       }
     }
-    async function loadFollows(followedId) {
+    async function loadFollowState(followedId) {
       try {
         const { data: follows, error } = await supabase
           .from('follow')
           .select('*')
-          .eq('follow_id', followedId);
+          .eq('follow_id', followedId)
+          .eq('user_id', currentUser.id);
         if (error) throw error;
         updateFollowUI(follows || []);
       } catch (e) {
-        console.error('팔로우 로드 오류:', e);
+        console.error('팔로우 상태 로드 오류:', e);
       }
     }
     function updateFollowUI(follows) {
       const btn = document.getElementById('followBtn');
       const count = document.getElementById('followCount');
-      if (!btn) return;
-      count.textContent = follows.length;
-      if (currentUser && follows.some(follow => follow.id === currentUser.id)) {
+      if (!btn || !count) return;
+      count.textContent = follows.length > 0 ? parseInt(count.textContent) : parseInt(count.textContent); // 실제로는 followerCount를 다시 불러오지 않아도 되지만 UI 갱신용
+      if (follows.length > 0) {
         btn.classList.add('followed');
+        btn.innerHTML = `팔로잉: <span id="followCount">${count.textContent}</span>`;
       } else {
         btn.classList.remove('followed');
+        btn.innerHTML = `팔로우: <span id="followCount">${count.textContent}</span>`;
       }
     }
     window.toggleFollow = async function() {
@@ -549,25 +552,39 @@
       }
       if (!viewingUser) return;
       try {
-        const { data: existingFollow } = await supabase
+        const { data: existingFollow, error: checkError } = await supabase
           .from('follow')
           .select('*')
           .eq('follow_id', viewingUser.id)
-          .eq('id', currentUser.id)
-          .single();
+          .eq('user_id', currentUser.id)
+          .maybeSingle();
+
+        if (checkError && checkError.code !== 'PGRST116') throw checkError; // PGRST116 = no rows
+
         if (existingFollow) {
-          await supabase.from('follow').delete().eq('follow_id', viewingUser.id).eq('id', currentUser.id);
+          // 언팔로우
+          await supabase
+            .from('follow')
+            .delete()
+            .eq('follow_id', viewingUser.id)
+            .eq('user_id', currentUser.id);
         } else {
-          await supabase.from('follow').insert([{
-            id: currentUser.id,
-            follow_id: viewingUser.id,
-            user_id: currentUser.nickname,
-            created_at: new Date().toISOString()
-          }]);
+          // 팔로우
+          await supabase
+            .from('follow')
+            .insert([{
+              user_id: currentUser.id,        // ⭐ RLS 대응 필수
+              follow_id: viewingUser.id,
+              created_at: new Date().toISOString()
+            }]);
           await createNotification(viewingUser.id, `${currentUser.nickname}님이 당신을 팔로우했습니다`, `user.html?id=${viewingUser.id}&nickname=${viewingUser.nickname}`);
         }
-        loadFollows(viewingUser.id);
-      } catch (e) { console.error('팔로우 오류:', e); }
+        // UI 갱신을 위해 프로필 다시 로드 (팔로워 수 반영)
+        await loadUserProfile();
+      } catch (e) { 
+        console.error('팔로우 토글 오류:', e); 
+        alert('팔로우 처리 중 오류가 발생했습니다.');
+      }
     };
     async function createNotification(targetUserId, detail, link) {
       if (!targetUserId || targetUserId === currentUser?.id) return;
@@ -600,7 +617,6 @@
       const input = document.getElementById('statusInput');
       const newMessage = input.value.trim();
       try {
-        // 모든 사용자 (JB777, 진정오 포함) Supabase에 저장
         const { error } = await supabase
           .from('users')
           .update({ message: newMessage })
