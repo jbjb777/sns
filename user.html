@@ -338,7 +338,7 @@
     const userId = urlParams.get('id');
     const userNickname = urlParams.get('nickname');
     let currentUser = null;
-    let viewingUser = null; // { nickname, id: uuid, message, isVerified }
+    let viewingUser = null;
     
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
@@ -394,7 +394,6 @@
 
     async function loadUserProfile() {
       try {
-        // 1. users 테이블에서 실제 uuid(id)와 기타 정보 가져오기
         const { data: targetUser, error } = await supabase
           .from('users')
           .select('id, nickname, message, isVerified')
@@ -402,12 +401,11 @@
           .single();
 
         if (error || !targetUser) {
-          // JB777, 진정오 같은 특수 계정 처리
           if (userNickname === "JB777" || userNickname === "진정오") {
             viewingUser = {
-              id: userNickname.toLowerCase(), // uuid가 아니지만 특수 처리
+              id: userNickname.toLowerCase(),
               nickname: userNickname,
-              message: null,
+              message: '',
               isVerified: true
             };
           } else {
@@ -416,9 +414,9 @@
           }
         } else {
           viewingUser = {
-            id: targetUser.id,           // ⭐ 실제 UUID
+            id: targetUser.id,
             nickname: targetUser.nickname,
-            message: targetUser.message,
+            message: targetUser.message || '',
             isVerified: targetUser.isVerified || false
           };
         }
@@ -435,14 +433,12 @@
       const isVerified = user.nickname === "JB777" || user.nickname === "진정오" || user.isVerified;
       const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
-      // 게시물 수
-      const { data: posts, error: postError } = await supabase
+      const { data: posts } = await supabase
         .from('posts')
         .select('id')
         .eq('author', user.nickname);
       const postCount = posts ? posts.length : 0;
 
-      // 총 좋아요 수
       const { data: userPosts } = await supabase
         .from('posts')
         .select('id')
@@ -458,24 +454,23 @@
         }
       }
 
-      // 팔로워 수 (나를 팔로우하는 사람 수)
       const { data: followers } = await supabase
         .from('follow')
         .select('id')
         .eq('follow_id', user.id);
       const followerCount = followers ? followers.length : 0;
 
-      // 팔로잉 수 (내가 팔로우하는 사람 수)
       const { data: followings } = await supabase
         .from('follow')
         .select('id')
-        .eq('user_id', currentUser?.id || ''); // currentUser 없으면 0
+        .eq('user_id', currentUser?.id || '');
       const followingCount = currentUser ? (followings ? followings.length : 0) : 0;
 
       const statusMessage = user.message || '';
       const statusDisplay = statusMessage
         ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
         : `<div class="status-message-text status-message-empty">상태메시지가 없습니다.</div>`;
+
       const editButton = isOwnProfile
         ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
              <img src="pencil.png" alt="수정">
@@ -529,19 +524,19 @@
         </div>
       `;
 
-      // 팔로우 상태 로드 (본인 프로필이 아니고 로그인 상태일 때만)
       if (!isOwnProfile && currentUser) {
         loadFollowState(user.id);
       }
     }
 
     async function loadFollowState(targetUuid) {
+      if (!currentUser) return;
       try {
         const { data: follows, error } = await supabase
           .from('follow')
           .select('*')
-          .eq('follow_id', targetUuid)      // uuid
-          .eq('user_id', currentUser.id);   // text
+          .eq('follow_id', targetUuid)
+          .eq('user_id', currentUser.id);
 
         if (error) throw error;
         updateFollowUI(follows || []);
@@ -565,46 +560,43 @@
     }
 
     window.toggleFollow = async function() {
-      if (!currentUser) {
+      if (!currentUser || !viewingUser) {
         showLoginAlert();
         return;
       }
-      if (!viewingUser) return;
 
       try {
-        // 현재 팔로우 상태 확인
-        const { data: existingFollow, error: checkError } = await supabase
+        const { data: existingFollow } = await supabase
           .from('follow')
           .select('*')
-          .eq('follow_id', viewingUser.id)   // uuid
-          .eq('user_id', currentUser.id)     // text
+          .eq('follow_id', viewingUser.id)
+          .eq('user_id', currentUser.id)
           .maybeSingle();
 
-        if (checkError && checkError.code !== 'PGRST116') throw checkError;
-
         if (existingFollow) {
-          // 언팔로우
           await supabase
             .from('follow')
             .delete()
             .eq('follow_id', viewingUser.id)
             .eq('user_id', currentUser.id);
         } else {
-          // 팔로우
           await supabase
             .from('follow')
             .insert([{
-              user_id: currentUser.id,           // text (RLS 통과용)
-              follow_id: viewingUser.id,         // uuid
+              user_id: currentUser.id,
+              follow_id: viewingUser.id,
               created_at: new Date().toISOString()
             }]);
 
-          // 알림 보내기
-          await createNotification(viewingUser.id, `${currentUser.nickname}님이 당신을 팔로우했습니다`, `user.html?id=${viewingUser.id}&nickname=${encodeURIComponent(viewingUser.nickname)}`);
+          await createNotification(
+            viewingUser.id,
+            `${currentUser.nickname}님이 당신을 팔로우했습니다`,
+            `user.html?id=${viewingUser.id}&nickname=${encodeURIComponent(viewingUser.nickname)}`
+          );
         }
 
-        // UI 갱신을 위해 프로필 다시 로드
-        await loadUserProfile();
+        loadFollowState(viewingUser.id);
+        displayProfile(viewingUser);
       } catch (e) {
         console.error('팔로우 토글 오류:', e);
         alert('팔로우 처리 중 오류가 발생했습니다.');
