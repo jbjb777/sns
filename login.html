@@ -18,6 +18,11 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .header {
       background: #1e1e1e;
@@ -26,6 +31,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: slideDown 0.5s ease-out 0.15s forwards;
+    }
+    @keyframes slideDown {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .logo-container {
       display: flex;
@@ -52,6 +66,15 @@
       justify-content: center;
       align-items: center;
       padding: 40px 20px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: slideUp 0.6s ease-out 0.3s forwards;
+    }
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .auth-container {
       background: #1e1e1e;
@@ -60,6 +83,11 @@
       width: 90%;
       max-width: 400px;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      animation: fadeInText 0.5s ease-out 0.55s forwards;
+    }
+    @keyframes fadeInText {
+      to { opacity: 1; }
     }
     .auth-container h2 {
       text-align: center;
@@ -188,6 +216,8 @@
       text-align: center;
       color: #666;
       font-size: 12px;
+      opacity: 0;
+      animation: fadeInText 0.5s ease-out 1s forwards;
     }
     .tab-container {
       display: flex;
@@ -314,7 +344,7 @@
   <div class="main-content">
     <div class="auth-container">
       <h2>환영합니다!</h2>
-    
+   
       <div class="tab-container">
         <div class="tab active" onclick="showTab('login')">로그인</div>
         <div class="tab" onclick="showTab('signup')">회원가입</div>
@@ -326,7 +356,7 @@
         <div class="error-message" id="loginError"></div>
         <div class="success-message" id="loginSuccess"></div>
         <button id="loginBtn" onclick="handleLogin()">로그인</button>
-       
+      
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleLoginBtn" onclick="showGoogleModal('login')">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
@@ -367,7 +397,7 @@
           <strong>문의사항:</strong> alexeom97@outlook.com
         </div>
         <button id="nextBtn" class="no-hover-effect" onclick="handleNextStep()">다음으로</button>
-       
+      
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleSignupBtn" onclick="showGoogleModal('signup')">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google">
@@ -387,14 +417,13 @@
   </div>
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-  
+ 
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-  
+ 
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     let verificationCode = "";
     let isVerifying = false;
-
     // Google GSI가 로드될 때까지 기다리는 함수
     function waitForGoogle(timeout = 8000) {
       return new Promise((resolve, reject) => {
@@ -410,15 +439,12 @@
         }, 100);
       });
     }
-
     // 안전하게 구글 버튼 렌더링
     async function renderGoogleButtonSafely(mode) {
       const container = document.getElementById('googleModalBtn');
       container.innerHTML = '<div style="color:#aaa;font-size:14px">로딩 중...</div>';
-
       try {
         await waitForGoogle(8000);
-
         container.innerHTML = '';
         google.accounts.id.renderButton(container, {
           type: 'standard',
@@ -435,7 +461,6 @@
           '<div style="color:#ff6b6b;font-size:14px">구글 로그인 로드 실패<br><small>새로고침 후 다시 시도해주세요</small></div>';
       }
     }
-
     window.goHome = function() {
       window.location.href = 'index.html';
     }
@@ -444,7 +469,7 @@
       const forms = document.querySelectorAll('.form-section');
       tabs.forEach(t => t.classList.remove('active'));
       forms.forEach(f => f.classList.remove('active'));
-    
+   
       if (tab === 'login') {
         tabs[0].classList.add('active');
         document.getElementById('loginForm').classList.add('active');
@@ -460,7 +485,6 @@
         window.location.href = 'https://sharer.jbjb.r-e.kr/join.html';
       }, 300);
     }
-
     // 모달 표시 (즉시 renderButton 호출 제거 → 안전한 함수 사용)
     window.showGoogleModal = function(mode) {
       const modal = document.getElementById('googleModal');
@@ -468,19 +492,14 @@
       const modalTitle = document.getElementById('modalTitle');
       const authContainer = document.querySelector('.auth-container');
       const buttonId = mode === 'login' ? 'googleLoginBtn' : 'googleSignupBtn';
-
       setGoogleLoading(buttonId, true);
-
       modalTitle.textContent = mode === 'login' ? '구글로 로그인' : '구글로 가입';
       authContainer.style.display = 'none';
       modal.style.display = 'block';
       overlay.style.display = 'block';
-
       renderGoogleButtonSafely(mode);
-
       setTimeout(() => setGoogleLoading(buttonId, false), 800);
     }
-
     // 모달 숨기기
     window.hideGoogleModal = function() {
       const modal = document.getElementById('googleModal');
@@ -491,7 +510,6 @@
       authContainer.style.display = 'block';
       document.getElementById('googleModalBtn').innerHTML = '';
     }
-
     // 구글 버튼 로딩 상태
     function setGoogleLoading(buttonId, loading) {
       const btn = document.getElementById(buttonId);
@@ -504,7 +522,6 @@
         btn.innerHTML = `<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/480px-Google_%22G%22_logo.svg.png" alt="Google"> ${text}`;
       }
     }
-
     async function sendVerificationEmail(code) {
       try {
         const response = await fetch('https://api.web3forms.com/submit', {
@@ -532,7 +549,6 @@
         alert(`이메일 발송 실패. 콘솔에서 인증번호 확인: ${code}`);
       }
     }
-
     window.handleLogin = async function() {
       const id = document.getElementById('loginId').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
@@ -589,7 +605,6 @@
         loginBtn.innerHTML = '로그인';
       }
     }
-
     // Google 콜백
     window.handleCredentialResponse = async function(response) {
       const data = parseJwt(response.credential);
@@ -638,24 +653,20 @@
         hideGoogleModal();
       }
     }
-
     function parseJwt(token) {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
     }
-
     // Google 초기화 (안전하게 await 사용)
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         await waitForGoogle(8000);
-
         google.accounts.id.initialize({
           client_id: '975630642362-d0uef48gbfrrroojikf4ss6hmqdru2hg.apps.googleusercontent.com',
           callback: handleCredentialResponse,
           ux_mode: 'popup'
         });
-
         console.log('Google Identity Services 초기화 성공');
       } catch (err) {
         console.error('Google GSI 초기화 실패:', err);
@@ -664,10 +675,8 @@
           btn.innerHTML = '⚠️ 구글 로그인 사용 불가';
         });
       }
-
       document.getElementById('modalOverlay').addEventListener('click', hideGoogleModal);
     });
-
     document.getElementById('loginPassword').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') handleLogin();
     });
