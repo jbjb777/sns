@@ -237,6 +237,7 @@
 
     .follow-btn { background: transparent; border: 1px solid #3663FF; color: #3663FF; cursor: pointer; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 12px; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; }
     .follow-btn.followed { background: #3663FF; color: #fff; }
+    .follow-btn.followed:hover { background: #2952CC; }
   </style>
 </head>
 <body>
@@ -337,7 +338,8 @@
     const userId = urlParams.get('id');
     const userNickname = urlParams.get('nickname');
     let currentUser = null;
-    let viewingUser = null;
+    let viewingUser = null; // { nickname, id: uuid, message, isVerified }
+    
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -382,60 +384,65 @@
     initCurrentUser();
     updateSidebarMode();
     window.addEventListener('resize', updateSidebarMode);
+    
     if (!userId && !userNickname) {
       showError('사용자 정보가 없습니다.');
     } else {
       loadUserProfile();
       loadUserPosts();
     }
+
     async function loadUserProfile() {
       try {
-        let userData = null;
-        // Supabase에서 조회 시도
-        const { data, error } = await supabase
+        // 1. users 테이블에서 실제 uuid(id)와 기타 정보 가져오기
+        const { data: targetUser, error } = await supabase
           .from('users')
-          .select('*')
+          .select('id, nickname, message, isVerified')
           .eq('nickname', userNickname)
           .single();
-        if (userNickname === "JB777" || userNickname === "진정오") {
-          // JB777 또는 진정오인 경우 Supabase에 없으면 기본값으로 생성
-          if (error || !data) {
-            userData = {
+
+        if (error || !targetUser) {
+          // JB777, 진정오 같은 특수 계정 처리
+          if (userNickname === "JB777" || userNickname === "진정오") {
+            viewingUser = {
+              id: userNickname.toLowerCase(), // uuid가 아니지만 특수 처리
               nickname: userNickname,
-              id: userNickname.toLowerCase(),
-              isVerified: true,
-              message: null
-            };
-          } else {
-            userData = {
-              ...data,
+              message: null,
               isVerified: true
             };
-          }
-        } else {
-          if (error || !data) {
+          } else {
             showError('사용자를 찾을 수 없습니다.');
             return;
           }
-          userData = data;
+        } else {
+          viewingUser = {
+            id: targetUser.id,           // ⭐ 실제 UUID
+            nickname: targetUser.nickname,
+            message: targetUser.message,
+            isVerified: targetUser.isVerified || false
+          };
         }
-        viewingUser = userData;
-        displayProfile(userData);
+
+        displayProfile(viewingUser);
       } catch (e) {
         console.error('프로필 로드 오류:', e);
         showError('오류가 발생했습니다.');
       }
     }
+
     async function displayProfile(user) {
       const contentDiv = document.getElementById('profileContent');
-      // JB777 또는 진정오이면 무조건 인증 배지 표시
       const isVerified = user.nickname === "JB777" || user.nickname === "진정오" || user.isVerified;
       const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
-      const { data: posts } = await supabase
+
+      // 게시물 수
+      const { data: posts, error: postError } = await supabase
         .from('posts')
         .select('id')
         .eq('author', user.nickname);
       const postCount = posts ? posts.length : 0;
+
+      // 총 좋아요 수
       const { data: userPosts } = await supabase
         .from('posts')
         .select('id')
@@ -447,20 +454,24 @@
             .from('likes')
             .select('id')
             .eq('post_id', post.id);
-         
           totalLikes += likes ? likes.length : 0;
         }
       }
+
+      // 팔로워 수 (나를 팔로우하는 사람 수)
       const { data: followers } = await supabase
         .from('follow')
-        .select('*')
+        .select('id')
         .eq('follow_id', user.id);
       const followerCount = followers ? followers.length : 0;
+
+      // 팔로잉 수 (내가 팔로우하는 사람 수)
       const { data: followings } = await supabase
         .from('follow')
-        .select('*')
-        .eq('user_id', user.id);
-      const followingCount = followings ? followings.length : 0;
+        .select('id')
+        .eq('user_id', currentUser?.id || ''); // currentUser 없으면 0
+      const followingCount = currentUser ? (followings ? followings.length : 0) : 0;
+
       const statusMessage = user.message || '';
       const statusDisplay = statusMessage
         ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
@@ -470,9 +481,11 @@
              <img src="pencil.png" alt="수정">
            </button>`
         : '';
+
       const followButton = !isOwnProfile && currentUser
         ? `<button class="follow-btn" id="followBtn" onclick="toggleFollow()">팔로우: <span id="followCount">${followerCount}</span></button>`
         : '';
+
       contentDiv.innerHTML = `
         <div class="profile-card">
           <div class="profile-header">
@@ -515,51 +528,59 @@
           </div>
         </div>
       `;
+
+      // 팔로우 상태 로드 (본인 프로필이 아니고 로그인 상태일 때만)
       if (!isOwnProfile && currentUser) {
         loadFollowState(user.id);
       }
     }
-    async function loadFollowState(followedId) {
+
+    async function loadFollowState(targetUuid) {
       try {
         const { data: follows, error } = await supabase
           .from('follow')
           .select('*')
-          .eq('follow_id', followedId)
-          .eq('user_id', currentUser.id);
+          .eq('follow_id', targetUuid)      // uuid
+          .eq('user_id', currentUser.id);   // text
+
         if (error) throw error;
         updateFollowUI(follows || []);
       } catch (e) {
         console.error('팔로우 상태 로드 오류:', e);
       }
     }
+
     function updateFollowUI(follows) {
       const btn = document.getElementById('followBtn');
-      const count = document.getElementById('followCount');
-      if (!btn || !count) return;
-      count.textContent = follows.length > 0 ? parseInt(count.textContent) : parseInt(count.textContent); // 실제로는 followerCount를 다시 불러오지 않아도 되지만 UI 갱신용
+      const countSpan = document.getElementById('followCount');
+      if (!btn || !countSpan) return;
+
       if (follows.length > 0) {
         btn.classList.add('followed');
-        btn.innerHTML = `팔로잉: <span id="followCount">${count.textContent}</span>`;
+        btn.innerHTML = `팔로잉: <span id="followCount">${countSpan.textContent}</span>`;
       } else {
         btn.classList.remove('followed');
-        btn.innerHTML = `팔로우: <span id="followCount">${count.textContent}</span>`;
+        btn.innerHTML = `팔로우: <span id="followCount">${countSpan.textContent}</span>`;
       }
     }
+
     window.toggleFollow = async function() {
       if (!currentUser) {
         showLoginAlert();
         return;
       }
       if (!viewingUser) return;
+
       try {
+        // 현재 팔로우 상태 확인
         const { data: existingFollow, error: checkError } = await supabase
           .from('follow')
           .select('*')
-          .eq('follow_id', viewingUser.id)
-          .eq('user_id', currentUser.id)
+          .eq('follow_id', viewingUser.id)   // uuid
+          .eq('user_id', currentUser.id)     // text
           .maybeSingle();
 
-        if (checkError && checkError.code !== 'PGRST116') throw checkError; // PGRST116 = no rows
+        if (checkError && checkError.code !== 'PGRST116') throw checkError;
 
         if (existingFollow) {
           // 언팔로우
@@ -573,19 +594,23 @@
           await supabase
             .from('follow')
             .insert([{
-              user_id: currentUser.id,        // ⭐ RLS 대응 필수
-              follow_id: viewingUser.id,
+              user_id: currentUser.id,           // text (RLS 통과용)
+              follow_id: viewingUser.id,         // uuid
               created_at: new Date().toISOString()
             }]);
-          await createNotification(viewingUser.id, `${currentUser.nickname}님이 당신을 팔로우했습니다`, `user.html?id=${viewingUser.id}&nickname=${viewingUser.nickname}`);
+
+          // 알림 보내기
+          await createNotification(viewingUser.id, `${currentUser.nickname}님이 당신을 팔로우했습니다`, `user.html?id=${viewingUser.id}&nickname=${encodeURIComponent(viewingUser.nickname)}`);
         }
-        // UI 갱신을 위해 프로필 다시 로드 (팔로워 수 반영)
+
+        // UI 갱신을 위해 프로필 다시 로드
         await loadUserProfile();
-      } catch (e) { 
-        console.error('팔로우 토글 오류:', e); 
+      } catch (e) {
+        console.error('팔로우 토글 오류:', e);
         alert('팔로우 처리 중 오류가 발생했습니다.');
       }
     };
+
     async function createNotification(targetUserId, detail, link) {
       if (!targetUserId || targetUserId === currentUser?.id) return;
       try {
@@ -603,6 +628,7 @@
         console.error('알림 생성 예외:', e);
       }
     }
+
     window.openStatusModal = function() {
       const modal = document.getElementById('statusModal');
       const input = document.getElementById('statusInput');
@@ -621,10 +647,8 @@
           .from('users')
           .update({ message: newMessage })
           .eq('nickname', currentUser.nickname);
-        if (error) {
-          console.error('Supabase 업데이트 오류:', error);
-          throw error;
-        }
+        if (error) throw error;
+
         viewingUser.message = newMessage;
         await displayProfile(viewingUser);
         closeStatusModal();
@@ -634,13 +658,11 @@
       }
     }
     document.getElementById('statusModal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeStatusModal();
-      }
+      if (e.target === this) closeStatusModal();
     });
+
     async function loadUserPosts() {
       const postsDiv = document.getElementById('userPosts');
-     
       try {
         const { data: posts, error } = await supabase
           .from('posts')
@@ -648,17 +670,18 @@
           .eq('author', userNickname)
           .order('created_at', { ascending: false });
         if (error) throw error;
+
         if (!posts || posts.length === 0) {
           postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
           return;
         }
+
         const postsWithLikes = await Promise.all(
           posts.map(async (post) => {
             const { data: likes } = await supabase
               .from('likes')
               .select('id')
               .eq('post_id', post.id);
-           
             return {
               ...post,
               likeCount: likes ? likes.length : 0
@@ -671,6 +694,7 @@
         postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
       }
     }
+
     function displayPosts(posts) {
       const postsDiv = document.getElementById('userPosts');
       const gridDiv = document.createElement('div');
@@ -695,6 +719,7 @@
       postsDiv.innerHTML = '';
       postsDiv.appendChild(gridDiv);
     }
+
     function showError(msg) {
       document.getElementById('profileContent').innerHTML = `
         <div class="profile-card">
@@ -706,6 +731,7 @@
       `;
       document.getElementById('userPosts').innerHTML = '';
     }
+
     function escapeHtml(t) {
       if (!t) return '';
       return t.replace(/[&<>"']/g, m => ({
@@ -716,21 +742,17 @@
         "'": '&#039;'
       }[m]));
     }
+
     function showLoginAlert() {
       const alert = document.createElement('div');
-      alert.className = 'login-alert';
-      alert.innerHTML = '<span class="login-alert-icon">🔐</span><span>로그인 후 사용 가능합니다</span>';
+      alert.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#3663FF;color:white;padding:16px 32px;border-radius:16px;box-shadow:0 8px 24px rgba(54,99,255,0.4);z-index:9999;font-weight:600;';
+      alert.textContent = '로그인 후 사용 가능합니다';
       document.body.appendChild(alert);
-      setTimeout(() => alert.classList.add('show'), 100);
-      const hideTimeout = setTimeout(() => {
-        alert.classList.remove('show');
-        setTimeout(() => document.body.removeChild(alert), 500);
-      }, 3000);
-      alert.onclick = () => {
-        clearTimeout(hideTimeout);
-        window.location.href = 'login.html';
-      };
+      setTimeout(() => alert.style.opacity = '0', 2500);
+      setTimeout(() => document.body.removeChild(alert), 3000);
+      alert.onclick = () => location.href = 'login.html';
     }
+
     window.goBack = () => window.history.back();
     window.showPrivacyPolicy = () => window.location.href = "privacy.html";
     window.showTerms = () => window.location.href = "policy.html";
@@ -740,10 +762,7 @@
         const btn = document.getElementById('shareBtn');
         btn.classList.add('success');
         setTimeout(() => btn.classList.remove('success'), 1500);
-      }).catch(err => {
-        console.error('복사 실패:', err);
-        alert('링크 복사에 실패했습니다.');
-      });
+      }).catch(() => alert('링크 복사에 실패했습니다.'));
     }
   </script>
 </body>
