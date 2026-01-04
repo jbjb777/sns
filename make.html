@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>새 게시물 - Sharer</title>
+  <title>게시물 만들기 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <style>
     body {
@@ -163,6 +163,21 @@
       color: #fff;
       opacity: 0;
       animation: fadeInText 0.5s ease-out 0.55s forwards;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .create-profile-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      flex-shrink: 0;
     }
     textarea {
       opacity: 0;
@@ -270,7 +285,7 @@
   </div>
   <div class="main-content">
     <div class="create-container">
-      <h2>무엇을 공유하시겠어요?</h2>
+      <h2><div class="create-profile-avatar" id="createAvatar"></div>무엇을 공유하시겠어요?</h2>
       <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
     
       <div class="image-preview-container">
@@ -305,7 +320,9 @@
         return;
       }
       currentUser = JSON.parse(savedUser);
-      document.getElementById('headerAvatar').innerHTML = currentUser.nickname ? currentUser.nickname[0].toUpperCase() : '?';
+      const avatarLetter = currentUser.nickname ? currentUser.nickname[0].toUpperCase() : '?';
+      document.getElementById('headerAvatar').innerHTML = avatarLetter;
+      document.getElementById('createAvatar').innerHTML = avatarLetter;
     }
     window.goBack = function() {
       window.history.back();
