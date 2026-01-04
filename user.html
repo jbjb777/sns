@@ -209,7 +209,6 @@
   
     .skeleton-avatar { width: 80px; height: 80px; border-radius: 50%; }
     .skeleton-text { height: 24px; border-radius: 6px; margin-bottom: 8px; }
-    .skeleton-text-small { height: 16px; border-radius: 4px; }
     .skeleton-stat { width: 60px; height: 40px; border-radius: 8px; }
     .skeleton-post-image { width: 100%; height: 200px; border-radius: 12px 12px 0 0; }
     .skeleton-post-text { height: 14px; border-radius: 4px; margin-bottom: 6px; }
@@ -220,13 +219,8 @@
     .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; }
     .footer-text { color: #666; font-size: 12px; margin-top: 10px; }
     @media (max-width: 768px) {
-      .sidebar-container {
-        width: 80px;
-        min-width: 80px;
-      }
-      .sidebar-container iframe {
-        width: 80px !important;
-      }
+      .sidebar-container { width: 80px; min-width: 80px; }
+      .sidebar-container iframe { width: 80px !important; }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
       .post-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
       .post-item-image { height: 150px; }
@@ -241,13 +235,7 @@
 </head>
 <body>
   <div class="sidebar-container">
-    <iframe
-      src="sidebar.html"
-      id="sidebarFrame"
-      width="250"
-      height="100%"
-      frameborder="0"
-    ></iframe>
+    <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
   <div class="main-wrapper">
     <div class="header">
@@ -273,30 +261,9 @@
         <div class="section-title">게시물</div>
         <div id="userPosts">
           <div class="post-grid">
-            <div class="post-item">
-              <div class="skeleton skeleton-post-image"></div>
-              <div class="post-item-content">
-                <div class="skeleton skeleton-post-text"></div>
-                <div class="skeleton skeleton-post-text" style="width: 80%;"></div>
-                <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
-              </div>
-            </div>
-            <div class="post-item">
-              <div class="skeleton skeleton-post-image"></div>
-              <div class="post-item-content">
-                <div class="skeleton skeleton-post-text"></div>
-                <div class="skeleton skeleton-post-text" style="width: 80%;"></div>
-                <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
-              </div>
-            </div>
-            <div class="post-item">
-              <div class="skeleton skeleton-post-image"></div>
-              <div class="post-item-content">
-                <div class="skeleton skeleton-post-text"></div>
-                <div class="skeleton skeleton-post-text" style="width: 80%;"></div>
-                <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
-              </div>
-            </div>
+            <div class="post-item"><div class="skeleton skeleton-post-image"></div><div class="post-item-content"><div class="skeleton skeleton-post-text"></div><div class="skeleton skeleton-post-text" style="width: 80%;"></div><div class="skeleton skeleton-post-text" style="width: 60%;"></div></div></div>
+            <div class="post-item"><div class="skeleton skeleton-post-image"></div><div class="post-item-content"><div class="skeleton skeleton-post-text"></div><div class="skeleton skeleton-post-text" style="width: 80%;"></div><div class="skeleton skeleton-post-text" style="width: 60%;"></div></div></div>
+            <div class="post-item"><div class="skeleton skeleton-post-image"></div><div class="post-item-content"><div class="skeleton skeleton-post-text"></div><div class="skeleton skeleton-post-text" style="width: 80%;"></div><div class="skeleton skeleton-post-text" style="width: 60%;"></div></div></div>
           </div>
         </div>
       </div>
@@ -310,22 +277,18 @@
       <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
     </div>
   </div>
-  <!-- 상태메시지 수정 모달 -->
+
   <div class="modal-overlay" id="statusModal">
     <div class="modal-content">
       <div class="modal-title">상태메시지 수정</div>
-      <textarea
-        class="modal-input"
-        id="statusInput"
-        placeholder="상태메시지를 입력하세요..."
-        maxlength="100"
-      ></textarea>
+      <textarea class="modal-input" id="statusInput" placeholder="상태메시지를 입력하세요..." maxlength="100"></textarea>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
         <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
       </div>
     </div>
   </div>
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   
@@ -334,37 +297,33 @@
   
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     const urlParams = new URLSearchParams(window.location.search);
-    const userId = urlParams.get('id');
     const userNickname = urlParams.get('nickname');
     let currentUser = null;
-    let viewingUser = null; // { id: uuid or string, nickname: string, message: string }
-   
+    let viewingUser = null; // { id: UUID, nickname: string, message: string }
+
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
-        currentUser = JSON.parse(savedUser);
+        currentUser = JSON.parse(savedUser); // { id: UUID, nickname: string, ... }
         updateSidebar();
       }
     }
+
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          type: 'updateUser',
-          user: currentUser
-        }, '*');
+        iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
       }
     }
+
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          type: 'setNarrowMode',
-          narrow: narrow
-        }, '*');
+        iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow: narrow }, '*');
       }
     }
+
     window.addEventListener('message', (event) => {
       const { type, page } = event.data || {};
       if (type === 'navigate') {
@@ -376,15 +335,14 @@
         currentUser = null;
         location.href = 'index.html';
       }
-      if (type === 'requestUserInfo') {
-        updateSidebar();
-      }
+      if (type === 'requestUserInfo') updateSidebar();
     });
+
     initCurrentUser();
     updateSidebarMode();
     window.addEventListener('resize', updateSidebarMode);
-   
-    if (!userId && !userNickname) {
+
+    if (!userNickname) {
       showError('사용자 정보가 없습니다.');
     } else {
       loadUserProfile();
@@ -393,32 +351,23 @@
 
     async function loadUserProfile() {
       try {
-        let targetUser = null;
-        if (userNickname === "JB777" || userNickname === "진정오") {
-          // 특수 계정 처리
-          viewingUser = {
-            id: userNickname.toLowerCase(), // 문자열 ID (UUID 아님)
-            nickname: userNickname,
-            message: ''
-          };
-        } else {
-          const { data, error } = await supabase
-            .from('users')
-            .select('id, nickname, message, isVerified')
-            .eq('nickname', userNickname)
-            .single();
+        const { data: targetUser, error } = await supabase
+          .from('users')
+          .select('id, nickname, message, isVerified')
+          .eq('nickname', userNickname)
+          .single();
 
-          if (error || !data) {
-            showError('사용자를 찾을 수 없습니다.');
-            return;
-          }
-          targetUser = data;
-          viewingUser = {
-            id: targetUser.id,               // UUID
-            nickname: targetUser.nickname,
-            message: targetUser.message || '' // 항상 문자열 보장
-          };
+        if (error || !targetUser) {
+          showError('사용자를 찾을 수 없습니다.');
+          return;
         }
+
+        viewingUser = {
+          id: targetUser.id,                    // UUID
+          nickname: targetUser.nickname,
+          message: targetUser.message || ''
+        };
+
         displayProfile(viewingUser);
       } catch (e) {
         console.error('프로필 로드 오류:', e);
@@ -428,47 +377,27 @@
 
     async function displayProfile(user) {
       const contentDiv = document.getElementById('profileContent');
-      const isVerified = user.nickname === "JB777" || user.nickname === "진정오" || (user.isVerified ?? false);
       const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
+      const isVerified = user.isVerified ?? false;
 
       // 게시물 수
-      const { data: posts } = await supabase
-        .from('posts')
-        .select('id')
-        .eq('author', user.nickname);
+      const { data: posts } = await supabase.from('posts').select('id').eq('author', user.nickname);
       const postCount = posts ? posts.length : 0;
 
       // 총 좋아요 수
       let totalLikes = 0;
       if (posts && posts.length > 0) {
         for (const post of posts) {
-          const { data: likes } = await supabase
-            .from('likes')
-            .select('id')
-            .eq('post_id', post.id);
+          const { data: likes } = await supabase.from('likes').select('id').eq('post_id', post.id);
           totalLikes += likes ? likes.length : 0;
         }
       }
 
-      // 팔로워 수 (follow 테이블에서 follow_id가 대상 사용자 id인 레코드 수)
-      let followerCount = 0;
-      if (typeof user.id === 'string' && (user.id.includes('-') || user.id.length === 36)) {
-        // 일반 UUID인 경우
-        const { data: followers } = await supabase
-          .from('follow')
-          .select('id')
-          .eq('follow_id', user.id);
-        followerCount = followers ? followers.length : 0;
-      } else {
-        // 특수 계정 (문자열 ID)
-        const { data: followers } = await supabase
-          .from('follow')
-          .select('id')
-          .eq('follow_id', user.id);
-        followerCount = followers ? followers.length : 0;
-      }
+      // 팔로워 수 (follow_id = user.id 인 레코드 수)
+      const { data: followers } = await supabase.from('follow').select('id').eq('follow_id', user.id);
+      const followerCount = followers ? followers.length : 0;
 
-      // 팔로잉 수 (현재 로그인한 사용자의 팔로잉 수)
+      // 팔로잉 수 (현재 사용자의 팔로잉 수)
       const followingCount = currentUser ? (await getFollowingCount(currentUser.id)) : 0;
 
       const statusMessage = user.message || '';
@@ -489,29 +418,17 @@
       contentDiv.innerHTML = `
         <div class="profile-card">
           <div class="profile-header">
-            <div class="profile-avatar">${user.nickname ? user.nickname[0].toUpperCase() : '?'}</div>
+            <div class="profile-avatar">${user.nickname[0].toUpperCase()}</div>
             <div class="profile-info">
               <div class="profile-name">
                 ${escapeHtml(user.nickname)}
                 ${isVerified ? '<span class="verification-badge"></span>' : ''}
               </div>
               <div class="profile-stats">
-                <div class="stat-item">
-                  <div class="stat-number">${postCount}</div>
-                  <div class="stat-label">게시물</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number">${totalLikes}</div>
-                  <div class="stat-label">좋아요</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number">${followerCount}</div>
-                  <div class="stat-label">팔로워</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-number">${followingCount}</div>
-                  <div class="stat-label">팔로잉</div>
-                </div>
+                <div class="stat-item"><div class="stat-number">${postCount}</div><div class="stat-label">게시물</div></div>
+                <div class="stat-item"><div class="stat-number">${totalLikes}</div><div class="stat-label">좋아요</div></div>
+                <div class="stat-item"><div class="stat-number">${followerCount}</div><div class="stat-label">팔로워</div></div>
+                <div class="stat-item"><div class="stat-number">${followingCount}</div><div class="stat-label">팔로잉</div></div>
               </div>
             </div>
             ${followButton}
@@ -535,21 +452,18 @@
     }
 
     async function getFollowingCount(userId) {
-      const { data } = await supabase
-        .from('follow')
-        .select('id')
-        .eq('user_id', userId);
+      const { data } = await supabase.from('follow').select('id').eq('user_id', userId);
       return data ? data.length : 0;
     }
 
-    async function loadFollowState(targetId) {
+    async function loadFollowState(targetUserId) {
       if (!currentUser) return;
       try {
         const { data: follows } = await supabase
           .from('follow')
           .select('*')
-          .eq('follow_id', targetId)
-          .eq('user_id', currentUser.id);  // UUID로 비교
+          .eq('follow_id', targetUserId)
+          .eq('user_id', currentUser.id);  // UUID
 
         updateFollowUI(follows || []);
       } catch (e) {
@@ -574,14 +488,14 @@
       }
 
       try {
-        const { data: existingFollow } = await supabase
+        const { data: existing } = await supabase
           .from('follow')
           .select('*')
           .eq('follow_id', viewingUser.id)
-          .eq('user_id', currentUser.id)  // UUID 사용
+          .eq('user_id', currentUser.id)
           .maybeSingle();
 
-        if (existingFollow) {
+        if (existing) {
           // 언팔로우
           await supabase
             .from('follow')
@@ -590,26 +504,20 @@
             .eq('user_id', currentUser.id);
         } else {
           // 팔로우
-          await supabase
-            .from('follow')
-            .insert([{
-              follow_id: viewingUser.id,
-              user_id: currentUser.id,
-              created_at: new Date().toISOString()
-            }]);
+          await supabase.from('follow').insert([{
+            user_id: currentUser.id,      // UUID
+            follow_id: viewingUser.id,    // UUID
+            created_at: new Date().toISOString()
+          }]);
 
-          // 알림 생성 (특수 계정은 알림 안 보냄)
-          if (typeof viewingUser.id === 'string' && viewingUser.id.length === 36) {
-            await createNotification(
-              viewingUser.id,
-              `${currentUser.nickname}님이 당신을 팔로우했습니다`,
-              `user.html?id=${viewingUser.id}&nickname=${encodeURIComponent(viewingUser.nickname)}`
-            );
-          }
+          await createNotification(
+            viewingUser.id,
+            `${currentUser.nickname}님이 당신을 팔로우했습니다`,
+            `user.html?nickname=${encodeURIComponent(viewingUser.nickname)}`
+          );
         }
 
-        // UI 갱신
-        await loadUserProfile();
+        await loadUserProfile(); // UI 갱신
       } catch (e) {
         console.error('팔로우 토글 오류:', e);
         alert('팔로우 처리 중 오류가 발생했습니다.');
@@ -619,25 +527,21 @@
     async function createNotification(targetUserId, detail, link) {
       if (!targetUserId || targetUserId === currentUser?.id) return;
       try {
-        await supabase
-          .from('notification')
-          .insert([{
-            user: targetUserId,
-            detail: detail,
-            link: link,
-            isread: 1,
-            created_at: new Date().toISOString()
-          }]);
+        await supabase.from('notification').insert([{
+          user: targetUserId,
+          detail: detail,
+          link: link,
+          isread: 1,
+          created_at: new Date().toISOString()
+        }]);
       } catch (e) {
         console.error('알림 생성 실패:', e);
       }
     }
 
     window.openStatusModal = function() {
-      const modal = document.getElementById('statusModal');
-      const input = document.getElementById('statusInput');
-      input.value = viewingUser.message || '';
-      modal.classList.add('active');
+      document.getElementById('statusInput').value = viewingUser.message || '';
+      document.getElementById('statusModal').classList.add('active');
     }
 
     window.closeStatusModal = function() {
@@ -645,8 +549,7 @@
     }
 
     window.saveStatusMessage = async function() {
-      const input = document.getElementById('statusInput');
-      const newMessage = input.value.trim();
+      const newMessage = document.getElementById('statusInput').value.trim();
       try {
         const { error } = await supabase
           .from('users')
@@ -659,12 +562,12 @@
         closeStatusModal();
       } catch (e) {
         console.error('상태메시지 저장 오류:', e);
-        alert('상태메시지 저장에 실패했습니다.');
+        alert('저장에 실패했습니다.');
       }
-    }
+    };
 
-    document.getElementById('statusModal').addEventListener('click', function(e) {
-      if (e.target === this) closeStatusModal();
+    document.getElementById('statusModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('statusModal')) closeStatusModal();
     });
 
     async function loadUserPosts() {
@@ -682,18 +585,10 @@
           return;
         }
 
-        const postsWithLikes = await Promise.all(
-          posts.map(async (post) => {
-            const { data: likes } = await supabase
-              .from('likes')
-              .select('id')
-              .eq('post_id', post.id);
-            return {
-              ...post,
-              likeCount: likes ? likes.length : 0
-            };
-          })
-        );
+        const postsWithLikes = await Promise.all(posts.map(async (post) => {
+          const { data: likes } = await supabase.from('likes').select('id').eq('post_id', post.id);
+          return { ...post, likeCount: likes ? likes.length : 0 };
+        }));
 
         displayPosts(postsWithLikes);
       } catch (e) {
@@ -704,18 +599,15 @@
 
     function displayPosts(posts) {
       const postsDiv = document.getElementById('userPosts');
-      const gridDiv = document.createElement('div');
-      gridDiv.className = 'post-grid';
+      const grid = document.createElement('div');
+      grid.className = 'post-grid';
 
       posts.forEach(post => {
-        const postItem = document.createElement('div');
-        postItem.className = 'post-item';
-        postItem.onclick = () => {
-          window.location.href = `view.html?id=${post.id}`;
-        };
+        const item = document.createElement('div');
+        item.className = 'post-item';
+        item.onclick = () => location.href = `view.html?id=${post.id}`;
         const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
-
-        postItem.innerHTML = `
+        item.innerHTML = `
           ${post.image_url ? `<img src="${post.image_url}" class="post-item-image" alt="게시글 이미지">` : ''}
           ${post.content ? `<div class="post-item-content"><div class="post-item-text">${escapeHtml(post.content)}</div></div>` : ''}
           <div class="post-item-footer">
@@ -723,11 +615,11 @@
             <div class="post-item-likes">👍 ${post.likeCount}</div>
           </div>
         `;
-        gridDiv.appendChild(postItem);
+        grid.appendChild(item);
       });
 
       postsDiv.innerHTML = '';
-      postsDiv.appendChild(gridDiv);
+      postsDiv.appendChild(grid);
     }
 
     function showError(msg) {
@@ -742,15 +634,9 @@
       document.getElementById('userPosts').innerHTML = '';
     }
 
-    function escapeHtml(t) {
-      if (!t) return '';
-      return t.replace(/[&<>"']/g, m => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      }[m]));
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
     }
 
     function showLoginAlert() {
@@ -763,15 +649,15 @@
     }
 
     window.goBack = () => window.history.back();
-    window.showPrivacyPolicy = () => window.location.href = "privacy.html";
-    window.showTerms = () => window.location.href = "policy.html";
+    window.showPrivacyPolicy = () => location.href = "privacy.html";
+    window.showTerms = () => location.href = "policy.html";
 
     window.copyProfileLink = function() {
-      navigator.clipboard.writeText(window.location.href).then(() => {
+      navigator.clipboard.writeText(location.href).then(() => {
         const btn = document.getElementById('shareBtn');
         btn.classList.add('success');
         setTimeout(() => btn.classList.remove('success'), 1500);
-      }).catch(() => alert('링크 복사에 실패했습니다.'));
+      }).catch(() => alert('복사 실패'));
     }
   </script>
 </body>
