@@ -164,7 +164,6 @@
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
       .login-alert { max-width: 90%; padding: 14px 24px; font-size: 14px; }
     }
-
     /* 삭제 확인 모달 */
     .delete-modal-overlay {
       position: fixed;
@@ -247,7 +246,6 @@
     <span class="login-alert-icon">🔐</span>
     <span>로그인 후 사용 가능합니다</span>
   </div>
-
   <!-- 삭제 확인 모달 -->
   <div class="delete-modal-overlay" id="deleteModal">
     <div class="delete-modal">
@@ -259,7 +257,6 @@
       </div>
     </div>
   </div>
-
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
@@ -319,20 +316,18 @@
       <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
     </div>
   </div>
-
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-   
+  
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-   
+  
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
     let currentPost = null;
     let pendingDeletePostId = null;
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
-
     // 🔔 알림 생성 함수
     async function createNotification(targetUserId, detail, link) {
       if (!targetUserId || targetUserId === currentUser?.id) return;
@@ -351,7 +346,6 @@
         console.error('알림 생성 예외:', e);
       }
     }
-
     // 링크 자동 감지 함수
     function linkify(text) {
       text = escapeHtml(text);
@@ -361,7 +355,6 @@
         return `<a href="${href}" target="_blank">${url}</a>`;
       });
     }
-
     function showLoginAlert() {
       const alert = document.getElementById('loginAlert');
       alert.classList.add('show');
@@ -371,7 +364,6 @@
         window.location.href = 'login.html';
       };
     }
-
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -379,14 +371,12 @@
         updateSidebar();
       }
     }
-
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
       }
     }
-
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
@@ -394,7 +384,6 @@
         iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow: narrow }, '*');
       }
     }
-
     window.addEventListener('message', (event) => {
       const { type, page } = event.data || {};
       if (type === 'navigate') {
@@ -408,25 +397,21 @@
       }
       if (type === 'requestUserInfo') updateSidebar();
     });
-
     document.getElementById('commentInput').addEventListener('focus', function() {
       if (!currentUser) {
         this.blur();
         showLoginAlert();
       }
     });
-
     initCurrentUser();
     updateSidebarMode();
     window.addEventListener('resize', updateSidebarMode);
-
     if (!postId) {
       showError('게시물 ID가 없습니다.');
     } else {
       loadPost(postId);
       listenComments(postId);
     }
-
     async function loadPost(postId) {
       try {
         const { data: post, error } = await supabase
@@ -438,6 +423,19 @@
           showError('게시물을 찾을 수 없습니다.');
           return;
         }
+        // 아이디 기반으로 최신 닉네임과 검증 상태 가져오기
+        const { data: authorUser, error: userError } = await supabase
+          .from('users')
+          .select('nickname, isVerified')
+          .eq('id', post.author_id)
+          .single();
+        if (userError || !authorUser) {
+          console.error('작성자 정보를 찾을 수 없습니다:', userError);
+          // fallback으로 기존 author 사용
+        } else {
+          post.author = authorUser.nickname;
+          post.author_isVerified = authorUser.isVerified || false;
+        }
         currentPost = post;
         displayPost(post, postId);
         loadLikes(postId);
@@ -446,15 +444,13 @@
         showError('오류가 발생했습니다.');
       }
     }
-
     function displayPost(post, postId) {
       const contentDiv = document.getElementById('postContent');
       const timeStr = new Date(post.created_at).toLocaleString('ko-KR');
-      const isVerified = post.author === "JB777" || post.author === "진정오";
+      const isVerified = post.author_isVerified;
       const canDelete = currentUser && (
-        currentUser.nickname === post.author ||
         currentUser.id === post.author_id ||
-        (currentUser.nickname === "JB777" && currentUser.isVerified)
+        (currentUser.isVerified && (currentUser.nickname === "JB777" || currentUser.nickname === "진정오"))
       );
       const linkedContent = linkify(post.content || '');
       contentDiv.innerHTML = `
@@ -486,7 +482,6 @@
         </div>
       `;
     }
-
     async function loadLikes(postId) {
       try {
         const { data: likes, error } = await supabase
@@ -499,7 +494,6 @@
         console.error('좋아요 로드 오류:', e);
       }
     }
-
     function updateLikeUI(likes) {
       const btn = document.getElementById('likeBtn');
       const count = document.getElementById('likeCount');
@@ -511,15 +505,29 @@
         btn.classList.remove('liked');
       }
     }
-
     async function listenComments(postId) {
       try {
-        const { data: comments, error } = await supabase
+        const { data: commentsData, error } = await supabase
           .from('comments')
           .select('*')
           .eq('post_id', postId)
           .order('created_at', { ascending: false });
         if (error) throw error;
+        // 각 댓글의 user_id 기반으로 최신 닉네임과 검증 상태 가져오기
+        const comments = await Promise.all(commentsData.map(async (comment) => {
+          const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('nickname, isVerified')
+            .eq('id', comment.user_id)
+            .single();
+          if (!userError && user) {
+            comment.user_name = user.nickname;
+            comment.user_isVerified = user.isVerified || false;
+          } else {
+            comment.user_isVerified = false;
+          }
+          return comment;
+        }));
         displayComments(comments || []);
         supabase
           .channel(`comments:${postId}`)
@@ -534,7 +542,6 @@
         console.error('댓글 로드 오류:', e);
       }
     }
-
     function displayComments(comments) {
       const listDiv = document.getElementById('commentList');
       listDiv.innerHTML = '';
@@ -545,7 +552,7 @@
       comments.forEach(comment => {
         const isMyComment = currentUser && (currentUser.id === comment.user_id);
         const date = new Date(comment.created_at).toLocaleString('ko-KR');
-        const isCommentVerified = comment.user_name === "JB777" || comment.user_name === "진정오";
+        const isCommentVerified = comment.user_isVerified;
         const linkedCommentText = linkify(comment.text);
         const div = document.createElement('div');
         div.className = 'comment-item';
@@ -563,7 +570,6 @@
         listDiv.appendChild(div);
       });
     }
-
     function showError(msg) {
       document.getElementById('postContent').innerHTML = `
         <div class="post-detail-card" style="padding: 40px;">
@@ -575,29 +581,24 @@
       `;
       document.getElementById('commentList').innerHTML = '';
     }
-
     function escapeHtml(t) {
       if (!t) return '';
       return t.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
     }
-
     // ===== 전역(window) 함수 등록 (type="module"에서도 onclick이 작동하도록) =====
     window.openDeleteModal = function(postIdToDelete) {
       pendingDeletePostId = postIdToDelete;
       document.getElementById('deleteModal').classList.add('show');
       document.body.style.overflow = 'hidden';
     };
-
     window.closeDeleteModal = function() {
       document.getElementById('deleteModal').classList.remove('show');
       document.body.style.overflow = '';
       pendingDeletePostId = null;
     };
-
     window.goToProfile = function(userId, nickname) {
       window.location.href = `user.html?id=${userId}&nickname=${nickname}`;
     };
-
     window.toggleLike = async function() {
       if (!currentUser) { showLoginAlert(); return; }
       if (!currentPost) return;
@@ -617,7 +618,6 @@
         loadLikes(postId);
       } catch (e) { console.error('좋아요 오류:', e); }
     };
-
     window.addComment = async function() {
       const input = document.getElementById('commentInput');
       const text = input.value.trim();
@@ -627,7 +627,7 @@
         const { error } = await supabase.from('comments').insert([{
           post_id: postId,
           user_id: currentUser.id,
-          user_name: currentUser.nickname,
+          user_name: currentUser.nickname,  // 삽입 시 현재 닉네임 저장하지만, 표시 시 최신으로 오버라이드
           text: text,
           created_at: new Date().toISOString()
         }]);
@@ -640,7 +640,6 @@
         alert('댓글 업로드 실패');
       }
     };
-
     window.deleteComment = async function(commentId) {
       if (!confirm('댓글을 삭제하시겠습니까?')) return;
       try {
@@ -652,7 +651,6 @@
         alert('삭제 실패');
       }
     };
-
     window.copyShareLink = function() {
       navigator.clipboard.writeText(window.location.href).then(() => {
         const btn = document.getElementById('copyBtn');
@@ -660,11 +658,9 @@
         setTimeout(() => btn.classList.remove('success'), 1500);
       });
     };
-
     window.goHome = function() { window.location.href = "index.html"; };
     window.showPrivacyPolicy = function() { window.location.href = "privacy.html"; };
     window.showTerms = function() { window.location.href = "policy.html"; };
-
     // 모달 내 삭제 버튼 클릭 시 실제 삭제
     document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
       if (!pendingDeletePostId) return;
