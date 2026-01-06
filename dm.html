@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DM - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; }
+    
+    .sidebar-container {
+      width: 250px;
+      min-width: 250px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+    }
+    .sidebar-container iframe {
+      width: 250px !important;
+      height: 100%;
+      border: none;
+    }
+    
+    .main-wrapper {
+      margin-left: 250px;
+      width: calc(100% - 250px);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .new-dm-btn {
+      background: #3663FF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .new-dm-btn:hover {
+      background: #2952CC;
+      transform: translateY(-2px);
+    }
+    
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      flex: 1;
+    }
+    
+    .dm-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .dm-item {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .dm-item:hover {
+      background: #252525;
+      border-color: #3663FF;
+    }
+    
+    .dm-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .dm-info {
+      flex: 1;
+    }
+    
+    .dm-name {
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    
+    .dm-last-message {
+      font-size: 14px;
+      color: #aaa;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .no-dm {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar-container { width: 80px; min-width: 80px; }
+      .sidebar-container iframe { width: 80px !important; }
+      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-container">
+    <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
+  </div>
+  
+  <div class="main-wrapper">
+    <div class="header">
+      <div class="header-title">DM</div>
+      <button class="new-dm-btn" onclick="createNewDM()">+ 새 DM</button>
+    </div>
+    
+    <div class="container">
+      <div id="dmList" class="dm-list">
+        <div class="no-dm">로딩 중...</div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    
+    let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
+    
+    if (!currentUser) {
+      alert('로그인이 필요합니다.');
+      window.location.href = 'login.html';
+    }
+    
+    async function loadDMRooms() {
+      try {
+        const { data: rooms, error } = await supabase
+          .from('dm_room_members')
+          .select('room_id')
+          .eq('user_id', currentUser.id);
+        
+        if (error) throw error;
+        
+        if (!rooms || rooms.length === 0) {
+          document.getElementById('dmList').innerHTML = '<div class="no-dm">DM이 없습니다</div>';
+          return;
+        }
+        
+        const roomIds = rooms.map(r => r.room_id);
+        
+        const dmData = [];
+        for (const roomId of roomIds) {
+          const { data: members } = await supabase
+            .from('dm_room_members')
+            .select('user_id')
+            .eq('room_id', roomId)
+            .neq('user_id', currentUser.id)
+            .single();
+          
+          if (!members) continue;
+          
+          const { data: user } = await supabase
+            .from('users')
+            .select('nickname')
+            .eq('id', members.user_id)
+            .single();
+          
+          const { data: lastMsg } = await supabase
+            .from('dm_messages')
+            .select('content')
+            .eq('room_id', roomId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+          
+          dmData.push({
+            roomId,
+            otherUserId: members.user_id,
+            otherUserName: user?.nickname || '알 수 없음',
+            lastMessage: lastMsg?.content || '메시지 없음'
+          });
+        }
+        
+        displayDMList(dmData);
+      } catch (e) {
+        console.error('DM 로드 오류:', e);
+      }
+    }
+    
+    function displayDMList(dmData) {
+      const listDiv = document.getElementById('dmList');
+      listDiv.innerHTML = '';
+      
+      dmData.forEach(dm => {
+        const div = document.createElement('div');
+        div.className = 'dm-item';
+        div.onclick = () => window.location.href = `dmchat.html?room=${dm.roomId}&user=${dm.otherUserId}&name=${encodeURIComponent(dm.otherUserName)}`;
+        
+        div.innerHTML = `
+          <div class="dm-avatar">${dm.otherUserName[0].toUpperCase()}</div>
+          <div class="dm-info">
+            <div class="dm-name">${dm.otherUserName}</div>
+            <div class="dm-last-message">${dm.lastMessage}</div>
+          </div>
+        `;
+        
+        listDiv.appendChild(div);
+      });
+    }
+    
+    window.createNewDM = function() {
+      const targetNickname = prompt('DM을 보낼 사용자의 닉네임을 입력하세요:');
+      if (!targetNickname) return;
+      
+      supabase
+        .from('users')
+        .select('id, nickname')
+        .eq('nickname', targetNickname)
+        .single()
+        .then(({ data: user, error }) => {
+          if (error || !user) {
+            alert('사용자를 찾을 수 없습니다.');
+            return;
+          }
+          
+          window.location.href = `dmchat.html?user=${user.id}&name=${encodeURIComponent(user.nickname)}`;
+        });
+    };
+    
+    loadDMRooms();
+  </script>
+</body>
+</html>
