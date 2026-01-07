@@ -8,7 +8,6 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; height: 100vh; display: flex; flex-direction: column; }
-    
     .header {
       background: #1e1e1e;
       border-bottom: 1px solid #333;
@@ -17,7 +16,6 @@
       align-items: center;
       gap: 12px;
     }
-    
     .back-btn {
       background: none;
       border: none;
@@ -25,16 +23,13 @@
       font-size: 24px;
       cursor: pointer;
     }
-    
     .back-btn:hover {
       color: #3663FF;
     }
-    
     .header-title {
       font-size: 18px;
       font-weight: 600;
     }
-    
     .message-container {
       flex: 1;
       overflow-y: auto;
@@ -43,17 +38,14 @@
       flex-direction: column;
       gap: 12px;
     }
-    
     .message {
       display: flex;
       gap: 8px;
       align-items: flex-end;
     }
-    
     .message.mine {
       flex-direction: row-reverse;
     }
-    
     .message-avatar {
       width: 32px;
       height: 32px;
@@ -66,7 +58,6 @@
       font-weight: bold;
       flex-shrink: 0;
     }
-    
     .message-bubble {
       background: #1e1e1e;
       padding: 10px 14px;
@@ -74,11 +65,9 @@
       max-width: 60%;
       word-wrap: break-word;
     }
-    
     .message.mine .message-bubble {
       background: #3663FF;
     }
-    
     .input-container {
       background: #1e1e1e;
       border-top: 1px solid #333;
@@ -86,7 +75,6 @@
       display: flex;
       gap: 10px;
     }
-    
     .message-input {
       flex: 1;
       background: #121212;
@@ -99,12 +87,10 @@
       min-height: 44px;
       max-height: 150px;
     }
-    
     .message-input:focus {
       outline: none;
       border-color: #3663FF;
     }
-    
     .send-btn {
       background: #3663FF;
       border: none;
@@ -113,9 +99,7 @@
       border-radius: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
     }
-    
     .send-btn:hover {
       background: #2952CC;
     }
@@ -126,110 +110,121 @@
     <button class="back-btn" onclick="goBack()">←</button>
     <div class="header-title" id="headerTitle">DM</div>
   </div>
-  
+
   <div class="message-container" id="messageContainer">
     <div style="text-align: center; color: #666;">로딩 중...</div>
   </div>
-  
+
   <div class="input-container">
     <textarea id="messageInput" class="message-input" placeholder="메시지를 입력하세요..."></textarea>
     <button class="send-btn" onclick="sendMessage()">전송</button>
   </div>
-  
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    
+
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-    
-    const currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
-    if (!currentUser) {
+
+    // Supabase 실제 로그인 확인
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       alert('로그인이 필요합니다.');
       window.location.href = 'login.html';
     }
-    
+
+    const cachedUser = JSON.parse(localStorage.getItem('snsUser') || 'null');
+    const myNickname = cachedUser?.nickname || '나';
+
     const urlParams = new URLSearchParams(window.location.search);
     let roomId = urlParams.get('room');
     const otherUserId = urlParams.get('user');
     const otherUserName = decodeURIComponent(urlParams.get('name') || '알 수 없음');
-    
+
     document.getElementById('headerTitle').textContent = otherUserName;
-    
+
     async function initDMRoom() {
-      if (!roomId) {
-        const { data: existingRoom } = await supabase
+      if (!roomId && otherUserId) {
+        // 기존 방 찾기
+        const { data: myRooms } = await supabase
           .from('dm_room_members')
           .select('room_id')
-          .eq('user_id', currentUser.id);
-        
-        if (existingRoom) {
-          for (const room of existingRoom) {
-            const { data: check } = await supabase
+          .eq('user_id', user.id);
+
+        if (myRooms) {
+          for (const r of myRooms) {
+            const { data: found } = await supabase
               .from('dm_room_members')
               .select('room_id')
-              .eq('room_id', room.room_id)
+              .eq('room_id', r.room_id)
               .eq('user_id', otherUserId)
               .single();
-            
-            if (check) {
-              roomId = room.room_id;
+
+            if (found) {
+              roomId = r.room_id;
               break;
             }
           }
         }
-        
+
+        // 없으면 새 방 생성
         if (!roomId) {
           const { data: newRoom } = await supabase
             .from('dm_rooms')
             .insert({})
             .select()
             .single();
-          
+
           roomId = newRoom.id;
-          
+
           await supabase.from('dm_room_members').insert([
-            { room_id: roomId, user_id: currentUser.id },
+            { room_id: roomId, user_id: user.id },
             { room_id: roomId, user_id: otherUserId }
           ]);
         }
       }
-      
+
       loadMessages();
       subscribeToMessages();
     }
-    
+
     async function loadMessages() {
-      const { data: messages } = await supabase
+      const { data: messages, error } = await supabase
         .from('dm_messages')
         .select('*')
         .eq('room_id', roomId)
         .order('created_at', { ascending: true });
-      
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
       displayMessages(messages || []);
     }
-    
+
     function displayMessages(messages) {
       const container = document.getElementById('messageContainer');
       container.innerHTML = '';
-      
+
       messages.forEach(msg => {
-        const isMine = msg.sender_id === currentUser.id;
+        const isMine = msg.sender_id === user.id;
         const div = document.createElement('div');
         div.className = `message ${isMine ? 'mine' : ''}`;
-        
+
         div.innerHTML = `
           ${!isMine ? `<div class="message-avatar">${otherUserName[0].toUpperCase()}</div>` : ''}
           <div class="message-bubble">${msg.content}</div>
-          ${isMine ? `<div class="message-avatar">${currentUser.nickname[0].toUpperCase()}</div>` : ''}
+          ${isMine ? `<div class="message-avatar">${myNickname[0].toUpperCase()}</div>` : ''}
         `;
-        
+
         container.appendChild(div);
       });
-      
+
       container.scrollTop = container.scrollHeight;
     }
-    
+
     function subscribeToMessages() {
       supabase
         .channel(`dm:${roomId}`)
@@ -238,29 +233,40 @@
           schema: 'public',
           table: 'dm_messages',
           filter: `room_id=eq.${roomId}`
-        }, () => loadMessages())
+        }, payload => {
+          // 새 메시지 도착 시 바로 다시 로드
+          loadMessages();
+        })
         .subscribe();
     }
-    
+
     window.sendMessage = async function() {
       const input = document.getElementById('messageInput');
       const content = input.value.trim();
-      
       if (!content) return;
-      
-      await supabase.from('dm_messages').insert({
-        room_id: roomId,
-        sender_id: currentUser.id,
-        content: content
-      });
-      
-      input.value = '';
+
+      const { error } = await supabase
+        .from('dm_messages')
+        .insert({
+          room_id: roomId,
+          sender_id: user.id,
+          content: content
+        });
+
+      if (error) {
+        alert('메시지 전송 실패');
+        console.error(error);
+      } else {
+        input.value = '';
+        // 실시간으로 바로 반영 (로드 다시)
+        loadMessages();
+      }
     };
-    
+
     window.goBack = function() {
       window.location.href = 'dm.html';
     };
-    
+
     initDMRoom();
   </script>
 </body>
