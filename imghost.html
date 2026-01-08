@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>이미지 업로드 테스트</title>
+
+  <!-- imgbb 업로드 플러그인 -->
+  <script async src="https://imgbb.com/upload.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 10px;
+    }
+    img {
+      max-width: 100%;
+      margin-top: 15px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>이미지 업로드</h2>
+
+  <!-- imgbb 업로드 버튼 -->
+  <button data-imgbb-upload>
+    이미지 업로드
+  </button>
+
+  <!-- imgbb가 자동으로 URL을 삽입할 영역 -->
+  <textarea id="imgbb-result" placeholder="업로드된 이미지 링크가 여기에 표시됩니다"></textarea>
+
+  <!-- 이미지 미리보기 -->
+  <img id="preview" alt="업로드된 이미지 미리보기">
+
+  <script>
+    const textarea = document.getElementById('imgbb-result');
+    const preview = document.getElementById('preview');
+
+    // textarea 값이 바뀌면 이미지 미리보기 업데이트
+    textarea.addEventListener('input', () => {
+      const value = textarea.value.trim();
+
+      // URL이 있으면 img에 표시
+      if (value.startsWith('http')) {
+        preview.src = value;
+      }
+    });
+  </script>
+
+</body>
+</html>
