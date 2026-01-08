@@ -29,93 +29,18 @@
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      animation: fadeIn 0.4s ease-out forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .sidebar-container {
-      width: 250px;
-      min-width: 250px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      z-index: 100;
-    }
-    .sidebar-container iframe {
-      width: 250px !important;
-      height: 100%;
-      border: none;
-    }
-    .main-wrapper {
-      margin-left: 250px;
-      width: calc(100% - 250px);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    .main-content {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 20px;
-      overflow-y: auto;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: slideUp 0.6s ease-out 0.2s forwards;
-    }
-    @keyframes slideUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .feed-container {
-      max-width: 600px;
-      width: 100%;
-    }
-    .recommend-container {
-      width: 250px;
-      margin-left: 20px;
-      position: sticky;
-      top: 20px;
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 0.6s forwards;
-    }
-    @keyframes fadeInText {
-      to { opacity: 1; }
-    }
-    .recommend-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: #fff;
-    }
-    .profile-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-      cursor: pointer;
-      transition: background 0.3s;
-      opacity: 0;
-      transform: translateX(20px);
-      animation: slideInLeft 0.5s ease-out forwards;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sidebar-container { width: 250px; min-width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 250px !important; height: 100%; border: none; }
+    .main-wrapper { margin-left: 250px; width: calc(100% - 250px); display: flex; flex-direction: column; min-height: 100vh; }
+    .main-content { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 20px; overflow-y: auto; opacity: 0; transform: translateY(30px); animation: slideUp 0.6s ease-out 0.2s forwards; }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+    .feed-container { max-width: 600px; width: 100%; }
+    .recommend-container { width: 250px; margin-left: 20px; position: sticky; top: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); opacity: 0; animation: fadeInText 0.5s ease-out 0.6s forwards; }
+    @keyframes fadeInText { to { opacity: 1; } }
+    .recommend-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #fff; }
+    .profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; transition: background 0.3s; opacity: 0; transform: translateX(20px); animation: slideInLeft 0.5s ease-out forwards; }
     .profile-item:nth-child(1) { animation-delay: 0.7s; }
     .profile-item:nth-child(2) { animation-delay: 0.75s; }
     .profile-item:nth-child(3) { animation-delay: 0.8s; }
@@ -123,352 +48,75 @@
     .profile-item:nth-child(5) { animation-delay: 0.9s; }
     .profile-item:nth-child(6) { animation-delay: 0.95s; }
     .profile-item:nth-child(7) { animation-delay: 1s; }
-    @keyframes slideInLeft {
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    .profile-item:hover {
-      background: #2c2c2c;
-      border-radius: 8px;
-    }
-    .profile-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: bold;
-      flex-shrink: 0;
-    }
-    .profile-nickname {
-      font-size: 14px;
-      color: #fff;
-    }
+    @keyframes slideInLeft { to { opacity: 1; transform: translateX(0); } }
+    .profile-item:hover { background: #2c2c2c; border-radius: 8px; }
+    .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; }
+    .profile-nickname { font-size: 14px; color: #fff; }
     /* 스켈레톤 스타일 */
-    .skeleton {
-      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s ease-in-out infinite;
-      border-radius: 4px;
-    }
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .skeleton-profile-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-    }
-    .skeleton-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-    .skeleton-nickname {
-      width: 100px;
-      height: 16px;
-      border-radius: 4px;
-    }
+    .skeleton { background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 4px; }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skeleton-profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+    .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+    .skeleton-nickname { width: 100px; height: 16px; border-radius: 4px; }
     @media (max-width: 768px) {
-      .recommend-container {
-        display: none;
-      }
-      .sidebar-container {
-        width: 80px;
-        min-width: 80px;
-      }
-      .sidebar-container iframe {
-        width: 80px !important;
-      }
+      .recommend-container { display: none; }
+      .sidebar-container { width: 80px; min-width: 80px; }
+      .sidebar-container iframe { width: 80px !important; }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
-      .post-card {
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid #333;
-        border-radius: 0;
-        box-shadow: none;
-        margin-bottom: 0;
-      }
-      .post-card:last-child {
-        border-bottom: none;
-      }
-      .post-card:hover {
-        transform: none;
-        border-color: #333;
-        box-shadow: none;
-      }
     }
-    .verification-badge {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      margin-left: 5px;
-      vertical-align: middle;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
-      background-size: contain;
-      background-repeat: no-repeat;
-    }
-    .skeleton-post {
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      padding: 16px;
-    }
-    .skeleton-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .skeleton-author {
-      width: 120px;
-      height: 16px;
-    }
-    .skeleton-image {
-      width: 100%;
-      height: 400px;
-      margin-bottom: 12px;
-      border-radius: 8px;
-    }
-    .skeleton-content {
-      width: 100%;
-      height: 16px;
-      margin-bottom: 8px;
-    }
-    .skeleton-content:last-of-type {
-      width: 60%;
-    }
-    .skeleton-time {
-      width: 100px;
-      height: 14px;
-      margin-top: 8px;
-    }
-    .auth-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-    }
-    .auth-modal.active {
-      display: flex;
-    }
-    .auth-box {
-      background: #1e1e1e;
-      border-radius: 16px;
-      padding: 40px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
-      position: relative;
-    }
-    .auth-close {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 24px;
-      cursor: pointer;
-      padding: 5px 10px;
-    }
-    .auth-close:hover {
-      color: #ff6b6b;
-    }
-    .auth-box h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #fff;
-    }
-    .auth-box input {
-      width: 100%;
-      padding: 12px 20px;
-      border-radius: 12px;
-      border: 2px solid #333;
-      font-size: 16px;
-      margin-bottom: 15px;
-      outline: none;
-      background: #2c2c2c;
-      color: #fff;
-      box-sizing: border-box;
-    }
-    .auth-box input:focus {
-      border-color: #3663FF;
-    }
-    .auth-box button {
-      width: 100%;
-      padding: 12px 24px;
-      border-radius: 30px;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      background: #3663FF;
-      color: #fff;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      margin-bottom: 10px;
-    }
-    .auth-box button:hover {
-      transform: translateY(-4px) scale(1.02);
-    }
-    .auth-box button:active {
-      background: #2952CC;
-    }
-    .auth-box button.secondary {
-      background: #2c2c2c;
-    }
-    .auth-box button.secondary:hover {
-      background: #3c3c3c;
-    }
-    .error-message {
-      color: #ff6b6b;
-      font-size: 14px;
-      margin-top: -10px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    .success-message {
-      color: #00ff00;
-      font-size: 14px;
-      margin-top: -10px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    .create-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-      backdrop-filter: blur(5px);
-    }
-    .create-modal.active {
-      display: flex;
-    }
-    .create-modal-content {
-      background: #1e1e1e;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
-    }
-    .create-modal-header {
-      padding: 16px;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .create-modal-header h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #fff;
-    }
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #fff;
-    }
-    .create-modal-body {
-      padding: 20px;
-    }
-    .create-modal textarea {
-      width: 100%;
-      border: 2px solid #333;
-      resize: vertical;
-      min-height: 150px;
-      font-size: 16px;
-      font-family: inherit;
-      outline: none;
-      background: #2c2c2c;
-      color: #fff;
-      padding: 12px;
-      border-radius: 12px;
-      box-sizing: border-box;
-    }
-    .create-modal textarea:focus {
-      border-color: #3663FF;
-    }
-    .image-preview-container {
-      margin-top: 15px;
-    }
-    .image-preview {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      border-radius: 12px;
-      display: none;
-    }
-    .[image-preview.show](http://image-preview.show) {
-      display: block;
-    }
-    .upload-btn {
-      background: #2c2c2c;
-      border: 2px solid #333;
-      padding: 10px 20px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: 10px;
-      color: #fff;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    .upload-btn:hover {
-      background: #3663FF;
-      transform: translateY(-4px) scale(1.05);
-    }
-    .post-btn {
-      background: #3663FF;
-      color: white;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    .post-btn:hover {
-      transform: translateY(-4px) scale(1.05);
-    }
-    .post-btn:active {
-      background: #2952CC;
-    }
-    .post-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .verification-badge { display: inline-block; width: 18px; height: 18px; margin-left: 5px; vertical-align: middle; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
+    .skeleton-post { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; margin-bottom: 20px; padding: 16px; }
+    .skeleton-header { display: flex; align-items: center; margin-bottom: 12px; }
+    .skeleton-author { width: 120px; height: 16px; }
+    .skeleton-image { width: 100%; height: 400px; margin-bottom: 12px; border-radius: 8px; }
+    .skeleton-content { width: 100%; height: 16px; margin-bottom: 8px; }
+    .skeleton-content:last-of-type { width: 60%; }
+    .skeleton-time { width: 100px; height: 14px; margin-top: 8px; }
+    .auth-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
+    .auth-modal.active { display: flex; }
+    .auth-box { background: #1e1e1e; border-radius: 16px; padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.6); position: relative; }
+    .auth-close { position: absolute; top: 15px; left: 15px; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 5px 10px; }
+    .auth-close:hover { color: #ff6b6b; }
+    .auth-box h2 { text-align: center; margin-bottom: 30px; color: #fff; }
+    .auth-box input { width: 100%; padding: 12px 20px; border-radius: 12px; border: 2px solid #333; font-size: 16px; margin-bottom: 15px; outline: none; background: #2c2c2c; color: #fff; box-sizing: border-box; }
+    .auth-box input:focus { border-color: #3663FF; }
+    .auth-box button { width: 100%; padding: 12px 24px; border-radius: 30px; border: none; font-size: 16px; cursor: pointer; background: #3663FF; color: #fff; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); margin-bottom: 10px; }
+    .auth-box button:hover { transform: translateY(-4px) scale(1.02); }
+    .auth-box button:active { background: #2952CC; }
+    .auth-box button.secondary { background: #2c2c2c; }
+    .auth-box button.secondary:hover { background: #3c3c3c; }
+    .error-message { color: #ff6b6b; font-size: 14px; margin-top: -10px; margin-bottom: 10px; text-align: center; }
+    .success-message { color: #00ff00; font-size: 14px; margin-top: -10px; margin-bottom: 10px; text-align: center; }
+    .create-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 999; backdrop-filter: blur(5px); }
+    .create-modal.active { display: flex; }
+    .create-modal-content { background: #1e1e1e; border-radius: 16px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 30px rgba(0, 0, 0, 0.6); }
+    .create-modal-header { padding: 16px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .create-modal-header h3 { font-size: 18px; font-weight: 600; color: #fff; }
+    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #fff; }
+    .create-modal-body { padding: 20px; }
+    .create-modal textarea { width: 100%; border: 2px solid #333; resize: vertical; min-height: 150px; font-size: 16px; font-family: inherit; outline: none; background: #2c2c2c; color: #fff; padding: 12px; border-radius: 12px; box-sizing: border-box; }
+    .create-modal textarea:focus { border-color: #3663FF; }
+    .image-preview-container { margin-top: 15px; }
+    .image-preview { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; display: none; }
+    .image-preview.show { display: block; }
+    .upload-btn { background: #2c2c2c; border: 2px solid #333; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-size: 14px; margin-top: 10px; color: #fff; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .upload-btn:hover { background: #3663FF; transform: translateY(-4px) scale(1.05); }
+    .post-btn { background: #3663FF; color: white; border: none; padding: 10px 24px; border-radius: 30px; cursor: pointer; font-weight: 600; font-size: 14px; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .post-btn:hover { transform: translateY(-4px) scale(1.05); }
+    .post-btn:active { background: #2952CC; }
+    .post-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* 🔹 변경된 부분: 카드 제거 → 리스트형 피드 UI */
     .post-card {
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      transition: all 0.3s ease;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #2a2a2a;
+      border-radius: 0;
+      margin-bottom: 0;
+      padding: 20px 0;
+      box-shadow: none;
       cursor: pointer;
+      transition: background 0.2s ease;
       opacity: 0;
       transform: translateY(20px);
       animation: slideUpFade 0.6s ease-out forwards;
@@ -480,126 +128,35 @@
     .post-card:nth-child(5) { animation-delay: 0.8s; }
     .post-card:nth-child(6) { animation-delay: 0.9s; }
     .post-card:nth-child(7) { animation-delay: 1.0s; }
-    @keyframes slideUpFade {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
     .post-card:hover {
-      transform: translateY(-2px);
-      border-color: #3663FF;
-      box-shadow: 0 4px 12px rgba(54, 99, 255, 0.3);
+      background: rgba(255, 255, 255, 0.03);
     }
-    .post-header {
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .post-card:last-child {
+      border-bottom: none;
     }
-    .post-author-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
-    .post-author-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: bold;
-      flex-shrink: 0;
-    }
-    .post-author-name {
-      font-weight: 600;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      color: #fff;
-    }
-    .post-image {
-      width: 100%;
-      max-height: 600px;
-      object-fit: cover;
-    }
-    .post-content {
-      padding: 14px 16px;
-      font-size: 14px;
-      line-height: 1.6;
-      color: #fff;
-      white-space: pre-wrap;
-    }
-    .post-time {
-      padding: 0 16px 16px;
-      font-size: 12px;
-      color: #aaa;
-    }
-    .no-posts {
-      text-align: center;
-      padding: 60px 20px;
-      color: #aaa;
-    }
-    .delete-btn {
-      background: #ff4444;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 12px;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    .delete-btn:hover {
-      transform: translateY(-4px) scale(1.05);
-    }
-    .delete-btn:active {
-      background: #cc0000;
-    }
-    .footer {
-      background: #1e1e1e;
-      border-top: 1px solid #333;
-      padding: 30px 20px;
-      text-align: center;
-      color: #aaa;
-      font-size: 14px;
-      margin-top: auto;
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 1.1s forwards;
-    }
-    .footer-links {
-      margin-bottom: 15px;
-    }
-    .footer-links a {
-      color: #3663FF;
-      text-decoration: none;
-      margin: 0 15px;
-      transition: color 0.3s;
-    }
-    .footer-links a:hover {
-      color: #00aaff;
-      text-decoration: underline;
-    }
-    .footer-text {
-      color: #666;
-      font-size: 12px;
-    }
+
+    .post-header { padding: 0; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .post-author-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .post-author-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; }
+    .post-author-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; color: #fff; }
+    .post-image { width: 100%; max-height: 600px; object-fit: cover; border-radius: 12px; margin: 12px 0; }
+    .post-content { font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-wrap; }
+    .post-time { padding: 6px 0 0; font-size: 12px; color: #888; }
+    .no-posts { text-align: center; padding: 60px 20px; color: #aaa; }
+    .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 12px; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .delete-btn:hover { transform: translateY(-4px) scale(1.05); }
+    .delete-btn:active { background: #cc0000; }
+    .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: auto; opacity: 0; animation: fadeInText 0.5s ease-out 1.1s forwards; }
+    .footer-links { margin-bottom: 15px; }
+    .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
+    .footer-links a:hover { color: #00aaff; text-decoration: underline; }
+    .footer-text { color: #666; font-size: 12px; }
   </style>
 </head>
 <body>
   <div class="sidebar-container">
-    <iframe
-      src="sidebar.html"
-      id="sidebarFrame"
-      width="250"
-      height="100%"
-      frameborder="0"
-    ></iframe>
+    <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
   <div class="main-wrapper">
     <div class="auth-modal" id="loginModal">
@@ -685,7 +242,6 @@
       </div>
       <div class="recommend-container" id="recommendProfiles">
         <div class="recommend-title">프로필 추천</div>
-        <!-- 스켈레톤 UI (초기 7개 표시) -->
         <div id="recommendSkeleton">
           <div class="skeleton-profile-item">
             <div class="skeleton skeleton-avatar"></div>
@@ -724,22 +280,25 @@
         <a href="https://sharer.jbjb.r-e.kr/policy">이용약관</a>
         <a href="mailto:alexeom97@outlook.com">문의하기</a>
       </div>
-      <div class="footer-text">
-        © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
-      </div>
+      <div class="footer-text"> © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved. </div>
     </div>
   </div>
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
     const cloudName = 'dretlhsrk';
     const uploadPreset = 'unsigned_preset';
+
     let currentUser = null;
     let selectedImage = null;
     let verificationCode = "";
     let isVerifying = false;
+
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -747,25 +306,22 @@
         updateSidebar();
       }
     }
+
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          type: 'updateUser',
-          user: currentUser
-        }, '*');
+        iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
       }
     }
+
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          type: 'setNarrowMode',
-          narrow: narrow
-        }, '*');
+        iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow: narrow }, '*');
       }
     }
+
     window.addEventListener('message', (event) => {
       const { type, page } = event.data || {};
       if (type === 'navigate') {
@@ -784,11 +340,13 @@
         updateSidebar();
       }
     });
+
     initCurrentUser();
     updateSidebarMode();
     loadPosts();
     loadRecommendedProfiles();
     window.addEventListener('resize', updateSidebarMode);
+
     window.closeLoginModal = function() {
       document.getElementById('loginModal').classList.remove('active');
       document.getElementById('loginId').value = '';
@@ -796,6 +354,7 @@
       document.getElementById('loginError').textContent = '';
       document.getElementById('loginSuccess').textContent = '';
     }
+
     window.closeSignupModal = function() {
       document.getElementById('signupModal').classList.remove('active');
       document.getElementById('signupNickname').value = '';
@@ -806,14 +365,17 @@
       document.getElementById('signupError').textContent = '';
       document.getElementById('signupSuccess').textContent = '';
     }
+
     window.showSignup = function() {
       closeLoginModal();
       document.getElementById('signupModal').classList.add('active');
     }
+
     window.backToLogin = function() {
       closeSignupModal();
       document.getElementById('loginModal').classList.add('active');
     }
+
     async function sendVerificationEmail(code) {
       try {
         const response = await fetch('https://api.web3forms.com/submit', {
@@ -824,11 +386,8 @@
             subject: '🔐 정빈777 개발자 인증 코드',
             from_name: '정빈777 SNS',
             to_email: 'alexeom97@outlook.com',
-            message: `━━━━━━━━━━━━━━━━━━━━
-정빈777 개발자 인증
-━━━━━━━━━━━━━━━━━━━━
-요청하신 인증 코드입니다:
- ${code}
+            message: `━━━━━━━━━━━━━━━━━━━━ 정빈777 개발자 인증 ━━━━━━━━━━━━━━━━━━━━
+요청하신 인증 코드입니다: ${code}
 이 코드를 SNS 사이트에 입력해주세요.
 ━━━━━━━━━━━━━━━━━━━━
 본인이 요청하지 않았다면 이 메일을 무시하세요.`
@@ -848,6 +407,7 @@
         return true;
       }
     }
+
     window.handleLogin = async function() {
       const id = document.getElementById('loginId').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
@@ -855,10 +415,12 @@
       const successDiv = document.getElementById('loginSuccess');
       errorDiv.textContent = '';
       successDiv.textContent = '';
+
       if (!id || !password) {
         errorDiv.textContent = '아이디와 비밀번호를 입력하세요.';
         return;
       }
+
       if (id === "정빈777" && password === "정빈777") {
         if (!isVerifying) {
           isVerifying = true;
@@ -872,11 +434,7 @@
           return;
         } else {
           if (id === verificationCode) {
-            currentUser = {
-              id: "정빈777",
-              nickname: "JB777",
-              isVerified: true
-            };
+            currentUser = { id: "정빈777", nickname: "JB777", isVerified: true };
             localStorage.setItem('snsUser', JSON.stringify(currentUser));
             updateSidebar();
             closeLoginModal();
@@ -890,12 +448,14 @@
           return;
         }
       }
+
       try {
         const { data, error } = await supabase
           .from('users')
           .select('*')
           .eq('id', id)
           .single();
+
         if (error || !data) {
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
           return;
@@ -904,11 +464,8 @@
           errorDiv.textContent = '아이디 또는 비밀번호가 일치하지 않습니다.';
           return;
         }
-        currentUser = {
-          id: id,
-          nickname: data.nickname,
-          isVerified: false
-        };
+
+        currentUser = { id: id, nickname: data.nickname, isVerified: false };
         localStorage.setItem('snsUser', JSON.stringify(currentUser));
         updateSidebar();
         closeLoginModal();
@@ -918,6 +475,7 @@
         errorDiv.textContent = '로그인에 실패했습니다. 다시 시도해주세요.';
       }
     }
+
     window.handleSignup = async function() {
       const nickname = document.getElementById('signupNickname').value.trim();
       const id = document.getElementById('signupId').value.trim();
@@ -926,10 +484,12 @@
       const nicknameErrorDiv = document.getElementById('nicknameError');
       const errorDiv = document.getElementById('signupError');
       const successDiv = document.getElementById('signupSuccess');
+
       idErrorDiv.textContent = '';
       nicknameErrorDiv.textContent = '';
       errorDiv.textContent = '';
       successDiv.textContent = '';
+
       if (!nickname || !id || !password) {
         errorDiv.textContent = '모든 필드를 입력하세요.';
         return;
@@ -942,36 +502,36 @@
         nicknameErrorDiv.textContent = '이 닉네임은 사용할 수 없습니다.';
         return;
       }
+
       try {
         const { data: idCheck } = await supabase
           .from('users')
           .select('id')
           .eq('id', id)
           .maybeSingle();
+
         if (idCheck) {
           idErrorDiv.textContent = '아이디가 겹치는 사용자가 있습니다.';
           return;
         }
+
         const { data: nicknameCheck } = await supabase
           .from('users')
           .select('nickname')
           .eq('nickname', nickname)
           .maybeSingle();
+
         if (nicknameCheck) {
           nicknameErrorDiv.textContent = '겹치는 닉네임이 있습니다.';
           return;
         }
+
         const { error } = await supabase
           .from('users')
-          .insert([
-            {
-              id: id,
-              nickname: nickname,
-              password: password,
-              created_at: new Date().toISOString()
-            }
-          ]);
+          .insert([ { id: id, nickname: nickname, password: password, created_at: new Date().toISOString() } ]);
+
         if (error) throw error;
+
         successDiv.textContent = '회원가입이 완료되었습니다!';
         setTimeout(() => {
           closeSignupModal();
@@ -982,6 +542,7 @@
         errorDiv.textContent = error.message || '회원가입에 실패했습니다. 다시 시도해주세요.';
       }
     }
+
     function handleCreatePost() {
       if (!currentUser) {
         document.getElementById('loginModal').classList.add('active');
@@ -992,12 +553,15 @@
       document.getElementById('imagePreview').classList.remove('show');
       selectedImage = null;
     }
+
     document.getElementById('closeModal').onclick = () => {
       document.getElementById('createModal').classList.remove('active');
     };
+
     document.getElementById('uploadBtn').onclick = () => {
       document.getElementById('imageInput').click();
     };
+
     document.getElementById('imageInput').onchange = (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -1011,6 +575,7 @@
         reader.readAsDataURL(file);
       }
     };
+
     async function uploadImageToCloudinary(file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -1028,34 +593,39 @@
         throw error;
       }
     }
+
     document.getElementById('modalPostBtn').onclick = async () => {
       const content = document.getElementById('postContent').value.trim();
       const messageDiv = document.getElementById('postMessage');
       const postButton = document.getElementById('modalPostBtn');
+
       if (!content && !selectedImage) {
         messageDiv.innerHTML = '<span style="color: #ff6b6b;">내용 또는 이미지를 추가해주세요.</span>';
         return;
       }
+
       postButton.disabled = true;
       messageDiv.innerHTML = '<span style="color: #aaa;">게시 중...</span>';
+
       try {
         let imageUrl = null;
         if (selectedImage) {
           messageDiv.innerHTML = '<span style="color: #aaa;">이미지 업로드 중...</span>';
           imageUrl = await uploadImageToCloudinary(selectedImage);
         }
+
         const { error } = await supabase
           .from('posts')
-          .insert([
-            {
-              author: currentUser.nickname,
-              author_id: currentUser.id,
-              content: content,
-              image_url: imageUrl,
-              created_at: new Date().toISOString()
-            }
-          ]);
+          .insert([ {
+            author: currentUser.nickname,
+            author_id: currentUser.id,
+            content: content,
+            image_url: imageUrl,
+            created_at: new Date().toISOString()
+          } ]);
+
         if (error) throw error;
+
         messageDiv.innerHTML = '<span style="color: #00ff00;">게시글이 작성되었습니다!</span>';
         setTimeout(() => {
           document.getElementById('createModal').classList.remove('active');
@@ -1069,6 +639,34 @@
         postButton.disabled = false;
       }
     };
+
+    // 🔹 새로 추가: 시간 포맷 함수
+    function formatPostTime(dateString) {
+      const now = new Date();
+      const date = new Date(dateString);
+
+      const diffMs = now - date;
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffHour = Math.floor(diffMin / 60);
+
+      const isToday =
+        now.getFullYear() === date.getFullYear() &&
+        now.getMonth() === date.getMonth() &&
+        now.getDate() === date.getDate();
+
+      if (isToday) {
+        if (diffMin < 1) return '방금 전';
+        if (diffMin < 60) return `${diffMin}분 전`;
+        return `${diffHour}시간 전`;
+      }
+
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+
+      return `${y}.${m}.${d}`;
+    }
+
     async function loadPosts() {
       const feedDiv = document.getElementById('postsFeed');
       try {
@@ -1076,26 +674,44 @@
           .from('posts')
           .select('*, author_id')
           .order('created_at', { ascending: false });
+
         if (error) throw error;
+
         if (!posts || posts.length === 0) {
           feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
           return;
         }
+
         feedDiv.innerHTML = '';
+
         for (const post of posts) {
           const authorNickname = post.author || '알 수 없음';
           const authorId = post.author_id || '';
           const firstLetter = authorNickname ? authorNickname[0].toUpperCase() : '?';
-          const timeStr = new Date(post.created_at).toLocaleString('ko-KR');
+          const timeStr = formatPostTime(post.created_at);  // 🔹 변경: 새로운 시간 포맷 사용
           const isVerified = authorNickname === "JB777";
-          const authorDisplay = isVerified ?
-            `${escapeHtml(authorNickname)}<span class="verification-badge"></span>` :
-            escapeHtml(authorNickname);
+          const authorDisplay = isVerified ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>` : escapeHtml(authorNickname);
           const canDelete = currentUser && currentUser.nickname === "JB777" && currentUser.isVerified;
-          const deleteButton = canDelete ?
-            `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>` : '';
+          const deleteButton = canDelete ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>` : '';
+
           const postCard = document.createElement('div');
           postCard.className = 'post-card';
+
+          // 🔹 변경: 내용 첫 줄을 제목(볼드)으로 처리
+          let contentHTML = '';
+          if (post.content) {
+            const lines = escapeHtml(post.content).split('\n');
+            const title = lines.shift() || '';
+            const bodyLines = lines.filter(line => line.trim() !== '');
+            const body = bodyLines.join('<br>');
+            contentHTML = `
+              <div class="post-content">
+                <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${title}</div>
+                ${body ? `<div style="color:#ddd; font-size:14px; line-height:1.6;">${body}</div>` : ''}
+              </div>
+            `;
+          }
+
           postCard.innerHTML = `
             <div class="post-header">
               <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${authorId}', '${escapeHtml(authorNickname)}')">
@@ -1105,12 +721,14 @@
               ${deleteButton}
             </div>
             ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
-            ${post.content ? `<div class="post-content">${escapeHtml(post.content)}</div>` : ''}
+            ${contentHTML}
             <div class="post-time">${timeStr}</div>
           `;
+
           postCard.onclick = () => {
             window.location.href = `view.html?id=${post.id}`;
           };
+
           feedDiv.appendChild(postCard);
         }
       } catch (error) {
@@ -1118,6 +736,7 @@
         feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
       }
     }
+
     async function loadRecommendedProfiles() {
       const recommendDiv = document.getElementById('recommendProfiles');
       const skeletonDiv = document.getElementById('recommendSkeleton');
@@ -1125,21 +744,25 @@
         let { data: users, error } = await supabase
           .from('users')
           .select('id, nickname');
+
         if (error) throw error;
+
         if (!users || users.length === 0) {
           skeletonDiv.remove();
           recommendDiv.innerHTML += '<div style="text-align: center; color: #aaa; padding: 12px 0;">사용자 없음</div>';
           return;
         }
+
         // Fisher-Yates shuffle
         for (let i = users.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [users[i], users[j]] = [users[j], users[i]];
         }
-        // 최대 7명
+
         users = users.slice(0, 7);
-        // 스켈레톤 제거
+
         skeletonDiv.remove();
+
         users.forEach(user => {
           const firstLetter = user.nickname ? user.nickname[0].toUpperCase() : '?';
           const profileItem = document.createElement('div');
@@ -1158,22 +781,19 @@
         skeletonDiv.innerHTML = '<div style="text-align: center; color: #aaa; padding: 12px 0;">로드 실패</div>';
       }
     }
+
     function escapeHtml(text) {
       if (!text) return '';
-      const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
       return text.replace(/[&<>"']/g, m => map[m]);
     }
+
     window.goToProfile = function(userId, nickname) {
       if (userId && nickname) {
         window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
       }
     };
+
     window.deletePost = async (postId) => {
       if (confirm('이 게시물을 삭제하시겠습니까?')) {
         try {
@@ -1181,7 +801,9 @@
             .from('posts')
             .delete()
             .eq('id', postId);
+
           if (error) throw error;
+
           loadPosts();
         } catch (error) {
           console.error('삭제 오류:', error);
