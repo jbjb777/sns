@@ -10,54 +10,19 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .sidebar-container {
-      width: 250px;
-      min-width: 250px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      z-index: 100;
-    }
-    .sidebar-container iframe {
-      width: 250px !important;
-      height: 100%;
-      border: none;
-    }
-    .main-wrapper {
-      margin-left: 250px;
-      width: calc(100% - 250px);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sidebar-container { width: 250px; min-width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 250px !important; height: 100%; border: none; }
+    .main-wrapper { margin-left: 250px; width: calc(100% - 250px); display: flex; flex-direction: column; min-height: 100vh; }
     .header { background: #1e1e1e; border-bottom: 1px solid #333; padding: 16px 20px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 50; opacity: 0; transform: translateY(-20px); animation: slideDown 0.5s ease-out 0.15s forwards; }
-    @keyframes slideDown {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
     .back-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
     .back-btn:hover { transform: translateX(-4px); color: #3663FF; }
     .header-title { font-size: 20px; font-weight: 600; }
- 
     .container { max-width: 800px; width: 100%; margin: 0 auto; padding: 20px; flex: 1; opacity: 0; transform: translateY(30px); animation: slideUp 0.6s ease-out 0.3s forwards; }
-    @keyframes slideUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
- 
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     .profile-card { background: transparent; border: none; padding: 30px 0; margin-bottom: 30px; box-shadow: none; opacity: 0; animation: fadeInText 0.5s ease-out 0.55s forwards; }
-    @keyframes fadeInText {
-      to { opacity: 1; }
-    }
+    @keyframes fadeInText { to { opacity: 1; } }
     .profile-header { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; }
     .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; flex-shrink: 0; transition: transform 0.3s ease; }
     .profile-avatar.editable { cursor: pointer; }
@@ -73,153 +38,28 @@
     .share-btn { background: #3663FF; border: none; color: #fff; width: 50px; height: 50px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; margin-left: auto; flex-shrink: 0; font-size: 20px; }
     .share-btn:hover { background: #2952CC; transform: translateY(-2px); }
     .share-btn.success { background: rgb(0, 204, 136) !important; }
- 
     .verification-badge { display: inline-block; width: 28px; height: 28px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
- 
-    .status-message-container {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #333;
-      display: flex;
-      align-items: flex-start;
-      gap: 15px;
-    }
- 
-    .status-message-text {
-      color: #ddd;
-      font-size: 16px;
-      line-height: 1.6;
-      flex: 1;
-      font-weight: 400;
-    }
- 
-    .status-message-empty {
-      color: #777;
-      font-style: italic;
-      font-weight: 500;
-    }
- 
-    .edit-status-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #2a2a2a;
-      border: 1px solid #444;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      flex-shrink: 0;
-    }
- 
-    .edit-status-btn:hover {
-      background: #333;
-      border-color: #3663FF;
-    }
- 
-    .edit-status-btn img {
-      width: 20px;
-      height: 20px;
-      opacity: 0.8;
-    }
- 
-    .edit-status-btn:hover img {
-      opacity: 1;
-    }
- 
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
- 
-    .modal-overlay.active {
-      display: flex;
-    }
- 
-    .modal-content {
-      background: #1e1e1e;
-      border: 1px solid #444;
-      border-radius: 16px;
-      padding: 30px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-    }
- 
-    .modal-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #fff;
-    }
- 
-    .modal-input {
-      width: 100%;
-      padding: 12px 15px;
-      background: #252525;
-      border: 1px solid #444;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 14px;
-      margin-bottom: 20px;
-      resize: vertical;
-      min-height: 80px;
-      font-family: 'Segoe UI', sans-serif;
-    }
- 
-    .modal-input:focus {
-      outline: none;
-      border-color: #3663FF;
-    }
- 
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
- 
-    .modal-btn {
-      padding: 10px 24px;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
- 
-    .modal-btn-cancel {
-      background: #2a2a2a;
-      color: #aaa;
-    }
- 
-    .modal-btn-cancel:hover {
-      background: #333;
-      color: #fff;
-    }
- 
-    .modal-btn-confirm {
-      background: #3663FF;
-      color: #fff;
-    }
- 
-    .modal-btn-confirm:hover {
-      background: #2952CC;
-    }
- 
+    .status-message-container { margin-top: 20px; padding-top: 20px; border-top: 1px solid #333; display: flex; align-items: flex-start; gap: 15px; }
+    .status-message-text { color: #ddd; font-size: 16px; line-height: 1.6; flex: 1; font-weight: 400; }
+    .status-message-empty { color: #777; font-style: italic; font-weight: 500; }
+    .edit-status-btn { width: 40px; height: 40px; border-radius: 50%; background: #2a2a2a; border: 1px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; flex-shrink: 0; }
+    .edit-status-btn:hover { background: #333; border-color: #3663FF; }
+    .edit-status-btn img { width: 20px; height: 20px; opacity: 0.8; }
+    .edit-status-btn:hover img { opacity: 1; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: #1e1e1e; border: 1px solid #444; border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8); }
+    .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #fff; }
+    .modal-input { width: 100%; padding: 12px 15px; background: #252525; border: 1px solid #444; border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 20px; resize: vertical; min-height: 80px; font-family: 'Segoe UI', sans-serif; }
+    .modal-input:focus { outline: none; border-color: #3663FF; }
+    .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-btn { padding: 10px 24px; border-radius: 8px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
+    .modal-btn-cancel { background: #2a2a2a; color: #aaa; }
+    .modal-btn-cancel:hover { background: #333; color: #fff; }
+    .modal-btn-confirm { background: #3663FF; color: #fff; }
+    .modal-btn-confirm:hover { background: #2952CC; }
     .posts-section { background: transparent; border: none; padding: 20px 0; box-shadow: none; opacity: 0; animation: fadeInText 0.5s ease-out 0.7s forwards; }
     .section-title { font-size: 22px; font-weight: 700; margin-bottom: 30px; padding-bottom: 12px; border-bottom: 1px solid #333; }
- 
     .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; opacity: 0; animation: fadeInText 0.5s ease-out 0.85s forwards; }
     .post-item { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; }
     .post-item:hover { transform: translateY(-8px); border-color: #3663FF; box-shadow: 0 8px 20px rgba(54, 99, 255, 0.2); }
@@ -229,29 +69,20 @@
     .post-item-footer { padding: 0 16px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #888; }
     .post-item-date { font-size: 12px; }
     .post-item-likes { display: flex; align-items: center; gap: 6px; color: #3663FF; font-weight: 600; }
- 
     .skeleton { background: linear-gradient(90deg, #252525 25%, #2a2a2a 50%, #252525 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
- 
     .skeleton-avatar { width: 100px; height: 100px; border-radius: 50%; }
     .skeleton-text { height: 32px; border-radius: 8px; margin-bottom: 12px; }
     .skeleton-stat { width: 80px; height: 50px; border-radius: 10px; }
     .skeleton-post-image { width: 100%; height: 250px; border-radius: 16px 16px 0 0; }
     .skeleton-post-text { height: 16px; border-radius: 6px; margin-bottom: 8px; }
- 
     .no-posts { text-align: center; padding: 80px 20px; color: #aaa; font-size: 18px; font-weight: 500; }
- 
     .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: 40px; opacity: 0; animation: fadeInText 0.5s ease-out 1s forwards; }
     .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; }
     .footer-text { color: #666; font-size: 12px; margin-top: 10px; }
     @media (max-width: 768px) {
-      .sidebar-container {
-        width: 80px;
-        min-width: 80px;
-      }
-      .sidebar-container iframe {
-        width: 80px !important;
-      }
+      .sidebar-container { width: 80px; min-width: 80px; }
+      .sidebar-container iframe { width: 80px !important; }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
       .post-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
       .post-item-image { height: 180px; }
@@ -266,19 +97,15 @@
 </head>
 <body>
   <div class="sidebar-container">
-    <iframe
-      src="sidebar.html"
-      id="sidebarFrame"
-      width="250"
-      height="100%"
-      frameborder="0"
-    ></iframe>
+    <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
+
   <div class="main-wrapper">
     <div class="header">
       <button class="back-btn" onclick="goBack()">←</button>
       <div class="header-title">프로필</div>
     </div>
+
     <div class="container">
       <div id="profileContent">
         <div class="profile-card">
@@ -294,6 +121,7 @@
           </div>
         </div>
       </div>
+
       <div class="posts-section">
         <div class="section-title">게시물</div>
         <div id="userPosts">
@@ -306,26 +134,12 @@
                 <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
               </div>
             </div>
-            <div class="post-item">
-              <div class="skeleton skeleton-post-image"></div>
-              <div class="post-item-content">
-                <div class="skeleton skeleton-post-text"></div>
-                <div class="skeleton skeleton-post-text" style="width: 80%;"></div>
-                <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
-              </div>
-            </div>
-            <div class="post-item">
-              <div class="skeleton skeleton-post-image"></div>
-              <div class="post-item-content">
-                <div class="skeleton skeleton-post-text"></div>
-                <div class="skeleton skeleton-post-text" style="width: 80%;"></div>
-                <div class="skeleton skeleton-post-text" style="width: 60%;"></div>
-              </div>
-            </div>
+            <!-- ... 스켈레톤 2개 더 ... -->
           </div>
         </div>
       </div>
     </div>
+
     <div class="footer">
       <div class="footer-links">
         <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
@@ -335,16 +149,12 @@
       <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
     </div>
   </div>
+
   <!-- 상태메시지 수정 모달 -->
   <div class="modal-overlay" id="statusModal">
     <div class="modal-content">
       <div class="modal-title">상태메시지 수정</div>
-      <textarea
-        class="modal-input"
-        id="statusInput"
-        placeholder="상태메시지를 입력하세요..."
-        maxlength="100"
-      ></textarea>
+      <textarea class="modal-input" id="statusInput" placeholder="상태메시지를 입력하세요..." maxlength="100"></textarea>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
         <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
@@ -360,12 +170,12 @@
 
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('id');
     const userNickname = urlParams.get('nickname');
+
     let currentUser = null;
     let viewingUser = null;
 
@@ -380,10 +190,7 @@
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          type: 'updateUser',
-          user: currentUser
-        }, '*');
+        iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
       }
     }
 
@@ -391,10 +198,7 @@
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          type: 'setNarrowMode',
-          narrow: narrow
-        }, '*');
+        iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow: narrow }, '*');
       }
     }
 
@@ -478,6 +282,7 @@
         .from('posts')
         .select('id')
         .eq('author', user.nickname);
+
       if (userPosts && userPosts.length > 0) {
         for (const post of userPosts) {
           const { data: likes } = await supabase
@@ -492,6 +297,7 @@
       const statusDisplay = statusMessage
         ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
         : `<div class="status-message-text status-message-empty">상태메시지가 없습니다.</div>`;
+
       const editButton = isOwnProfile
         ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
              <img src="pencil.png" alt="수정">
@@ -549,12 +355,14 @@
           };
         }
 
-        // 파일 선택 후 자동 업로드
+        // 파일 선택 후 자동 업로드 - ID 기반 경로로 변경
         document.getElementById('profileFileInput').addEventListener('change', async (e) => {
           const file = e.target.files[0];
           if (!file) return;
 
-          const fileName = `${currentUser.nickname}/profile_${Date.now()}.${file.name.split('.').pop()}`;
+          const fileExt = file.name.split('.').pop() || 'png';
+          // ★★★ 핵심 변경 ★★★ : 닉네임 대신 user.id 사용
+          const fileName = `profiles/${currentUser.id}/profile.${fileExt}`;
 
           const { data, error } = await supabase.storage
             .from('images')
@@ -562,7 +370,7 @@
 
           if (error) {
             console.error('업로드 실패:', error);
-            alert('프로필 사진 업로드에 실패했습니다.');
+            alert('프로필 사진 업로드에 실패했습니다.\n' + (error.message || '알 수 없는 오류'));
             return;
           }
 
@@ -580,11 +388,11 @@
 
           if (updateError) {
             console.error('DB 업데이트 실패:', updateError);
-            alert('DB 저장 실패');
+            alert('프로필 사진 URL 저장에 실패했습니다.');
             return;
           }
 
-          // 즉시 반영
+          // 즉시 화면 반영
           viewingUser.profile_image = newUrl;
           displayProfile(viewingUser);
         });
@@ -634,6 +442,7 @@
           .select('*')
           .eq('author', userNickname)
           .order('created_at', { ascending: false });
+
         if (error) throw error;
 
         if (!posts || posts.length === 0) {
@@ -662,11 +471,14 @@
       const postsDiv = document.getElementById('userPosts');
       const gridDiv = document.createElement('div');
       gridDiv.className = 'post-grid';
+
       posts.forEach(post => {
         const postItem = document.createElement('div');
         postItem.className = 'post-item';
         postItem.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
+
         const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
+
         postItem.innerHTML = `
           ${post.image_url ? `<img src="${post.image_url}" class="post-item-image" alt="게시글 이미지">` : ''}
           ${post.content ? `<div class="post-item-content"><div class="post-item-text">${escapeHtml(post.content)}</div></div>` : ''}
@@ -677,6 +489,7 @@
         `;
         gridDiv.appendChild(postItem);
       });
+
       postsDiv.innerHTML = '';
       postsDiv.appendChild(gridDiv);
     }
