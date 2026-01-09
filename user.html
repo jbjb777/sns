@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>프로필 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <script async src="https://imgbb.com/upload.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
@@ -43,7 +44,7 @@
     .back-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
     .back-btn:hover { transform: translateX(-4px); color: #3663FF; }
     .header-title { font-size: 20px; font-weight: 600; }
-  
+ 
     .container { max-width: 800px; width: 100%; margin: 0 auto; padding: 20px; flex: 1; opacity: 0; transform: translateY(30px); animation: slideUp 0.6s ease-out 0.3s forwards; }
     @keyframes slideUp {
       to {
@@ -51,13 +52,16 @@
         transform: translateY(0);
       }
     }
-  
+ 
     .profile-card { background: transparent; border: none; padding: 30px 0; margin-bottom: 30px; box-shadow: none; opacity: 0; animation: fadeInText 0.5s ease-out 0.55s forwards; }
     @keyframes fadeInText {
       to { opacity: 1; }
     }
     .profile-header { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; }
-    .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; flex-shrink: 0; }
+    .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; flex-shrink: 0; transition: transform 0.3s ease; }
+    .profile-avatar.editable { cursor: pointer; }
+    .profile-avatar.editable:hover { transform: scale(1.1); }
+    img.profile-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; flex-shrink: 0; transition: transform 0.3s ease; }
     .profile-info { flex: 1; }
     .profile-name { font-size: 32px; font-weight: 800; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; letter-spacing: -0.5px; }
     .profile-stats { display: flex; gap: 50px; color: #aaa; font-size: 16px; align-items: center; }
@@ -67,9 +71,9 @@
     .share-btn { background: #3663FF; border: none; color: #fff; width: 50px; height: 50px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; margin-left: auto; flex-shrink: 0; font-size: 20px; }
     .share-btn:hover { background: #2952CC; transform: translateY(-2px); }
     .share-btn.success { background: rgb(0, 204, 136) !important; }
-  
+ 
     .verification-badge { display: inline-block; width: 28px; height: 28px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
-  
+ 
     .status-message-container {
       margin-top: 20px;
       padding-top: 20px;
@@ -78,7 +82,7 @@
       align-items: flex-start;
       gap: 15px;
     }
-  
+ 
     .status-message-text {
       color: #ddd;
       font-size: 16px;
@@ -86,13 +90,13 @@
       flex: 1;
       font-weight: 400;
     }
-  
+ 
     .status-message-empty {
       color: #777;
       font-style: italic;
       font-weight: 500;
     }
-  
+ 
     .edit-status-btn {
       width: 40px;
       height: 40px;
@@ -106,22 +110,22 @@
       transition: all 0.3s ease;
       flex-shrink: 0;
     }
-  
+ 
     .edit-status-btn:hover {
       background: #333;
       border-color: #3663FF;
     }
-  
+ 
     .edit-status-btn img {
       width: 20px;
       height: 20px;
       opacity: 0.8;
     }
-  
+ 
     .edit-status-btn:hover img {
       opacity: 1;
     }
-  
+ 
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -135,11 +139,11 @@
       justify-content: center;
       z-index: 1000;
     }
-  
+ 
     .modal-overlay.active {
       display: flex;
     }
-  
+ 
     .modal-content {
       background: #1e1e1e;
       border: 1px solid #444;
@@ -149,14 +153,14 @@
       max-width: 500px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     }
-  
+ 
     .modal-title {
       font-size: 20px;
       font-weight: 600;
       margin-bottom: 20px;
       color: #fff;
     }
-  
+ 
     .modal-input {
       width: 100%;
       padding: 12px 15px;
@@ -170,18 +174,18 @@
       min-height: 80px;
       font-family: 'Segoe UI', sans-serif;
     }
-  
+ 
     .modal-input:focus {
       outline: none;
       border-color: #3663FF;
     }
-  
+ 
     .modal-buttons {
       display: flex;
       gap: 10px;
       justify-content: flex-end;
     }
-  
+ 
     .modal-btn {
       padding: 10px 24px;
       border-radius: 8px;
@@ -191,29 +195,29 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-  
+ 
     .modal-btn-cancel {
       background: #2a2a2a;
       color: #aaa;
     }
-  
+ 
     .modal-btn-cancel:hover {
       background: #333;
       color: #fff;
     }
-  
+ 
     .modal-btn-confirm {
       background: #3663FF;
       color: #fff;
     }
-  
+ 
     .modal-btn-confirm:hover {
       background: #2952CC;
     }
-  
+ 
     .posts-section { background: transparent; border: none; padding: 20px 0; box-shadow: none; opacity: 0; animation: fadeInText 0.5s ease-out 0.7s forwards; }
     .section-title { font-size: 22px; font-weight: 700; margin-bottom: 30px; padding-bottom: 12px; border-bottom: 1px solid #333; }
-  
+ 
     .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; opacity: 0; animation: fadeInText 0.5s ease-out 0.85s forwards; }
     .post-item { background: #1e1e1e; border: 1px solid #333; border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; }
     .post-item:hover { transform: translateY(-8px); border-color: #3663FF; box-shadow: 0 8px 20px rgba(54, 99, 255, 0.2); }
@@ -223,19 +227,19 @@
     .post-item-footer { padding: 0 16px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #888; }
     .post-item-date { font-size: 12px; }
     .post-item-likes { display: flex; align-items: center; gap: 6px; color: #3663FF; font-weight: 600; }
-  
+ 
     .skeleton { background: linear-gradient(90deg, #252525 25%, #2a2a2a 50%, #252525 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-  
+ 
     .skeleton-avatar { width: 100px; height: 100px; border-radius: 50%; }
     .skeleton-text { height: 32px; border-radius: 8px; margin-bottom: 12px; }
     .skeleton-text-small { height: 20px; border-radius: 6px; }
     .skeleton-stat { width: 80px; height: 50px; border-radius: 10px; }
     .skeleton-post-image { width: 100%; height: 250px; border-radius: 16px 16px 0 0; }
     .skeleton-post-text { height: 16px; border-radius: 6px; margin-bottom: 8px; }
-  
+ 
     .no-posts { text-align: center; padding: 80px 20px; color: #aaa; font-size: 18px; font-weight: 500; }
-  
+ 
     .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: 40px; opacity: 0; animation: fadeInText 0.5s ease-out 1s forwards; }
     .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; }
     .footer-text { color: #666; font-size: 12px; margin-top: 10px; }
@@ -346,12 +350,15 @@
       </div>
     </div>
   </div>
+  <!-- ImgBB 업로드 히든 요소 -->
+  <button id="uploadBtn" data-imgbb-upload style="display:none;">업로드</button>
+  <textarea id="uploadResult" style="display:none;"></textarea>
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-  
+ 
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-  
+ 
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('id');
@@ -467,7 +474,7 @@
             .from('likes')
             .select('id')
             .eq('post_id', post.id);
-        
+       
           totalLikes += likes ? likes.length : 0;
         }
       }
@@ -480,10 +487,14 @@
              <img src="pencil.png" alt="수정">
            </button>`
         : '';
+      const avatarClass = isOwnProfile ? 'profile-avatar editable' : 'profile-avatar';
+      const avatarHtml = user.image 
+        ? `<img src="${user.image}" class="${avatarClass}" alt="프로필 이미지">`
+        : `<div class="${avatarClass}">${user.nickname ? user.nickname[0].toUpperCase() : '?'}</div>`;
       contentDiv.innerHTML = `
         <div class="profile-card">
           <div class="profile-header">
-            <div class="profile-avatar">${user.nickname ? user.nickname[0].toUpperCase() : '?'}</div>
+            ${avatarHtml}
             <div class="profile-info">
               <div class="profile-name">
                 ${escapeHtml(user.nickname)}
@@ -513,6 +524,14 @@
           </div>
         </div>
       `;
+      if (isOwnProfile) {
+        const avatarElement = contentDiv.querySelector('.profile-avatar');
+        if (avatarElement) {
+          avatarElement.onclick = () => {
+            document.getElementById('uploadBtn').click();
+          };
+        }
+      }
     }
     window.openStatusModal = function() {
       const modal = document.getElementById('statusModal');
@@ -552,7 +571,7 @@
     });
     async function loadUserPosts() {
       const postsDiv = document.getElementById('userPosts');
-    
+   
       try {
         const { data: posts, error } = await supabase
           .from('posts')
@@ -570,7 +589,7 @@
               .from('likes')
               .select('id')
               .eq('post_id', post.id);
-          
+         
             return {
               ...post,
               likeCount: likes ? likes.length : 0
@@ -631,7 +650,7 @@
     window.goBack = () => window.history.back();
     window.showPrivacyPolicy = () => window.location.href = "privacy.html";
     window.showTerms = () => window.location.href = "policy.html";
-  
+ 
     window.copyProfileLink = function() {
       navigator.clipboard.writeText(window.location.href).then(() => {
         const btn = document.getElementById('shareBtn');
@@ -642,6 +661,26 @@
         alert('링크 복사에 실패했습니다.');
       });
     }
+    // ImgBB 업로드 결과 처리
+    const uploadResult = document.getElementById('uploadResult');
+    uploadResult.addEventListener('input', async () => {
+      const url = uploadResult.value.trim();
+      if (url && url.startsWith('http')) {
+        try {
+          const { error } = await supabase
+            .from('users')
+            .update({ image: url })
+            .eq('nickname', currentUser.nickname);
+          if (error) throw error;
+          viewingUser.image = url;
+          await loadUserProfile();
+          uploadResult.value = ''; // 클리어
+        } catch (e) {
+          console.error('프로필 이미지 업데이트 오류:', e);
+          alert('이미지 업데이트에 실패했습니다.');
+        }
+      }
+    });
   </script>
 </body>
 </html>
