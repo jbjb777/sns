@@ -40,10 +40,9 @@
 </div>
 
 <script>
-  // 🔥 Supabase 정보
-  const supabaseUrl = "https://hoeevmstbhulbzqyfsug.supabase.co";
-  const supabaseKey = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
   const supabase = supabase.createClient(
     supabaseUrl,
     supabaseKey
