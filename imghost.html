@@ -2,146 +2,99 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>ImgBB 이미지 업로드</title>
+  <title>ImgBB 이미지 업로드 + 즉시 미리보기</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ImgBB 업로드 플러그인 로드 (키 필요 없음!) -->
+  <script async src="https://imgbb.com/upload.js"></script>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-    }
-
-    .upload-box {
-      border: 2px dashed #aaa;
+      background: #f8f9fa;
       padding: 30px;
-      text-align: center;
-      background: #fff;
-      border-radius: 10px;
-      cursor: pointer;
+      max-width: 800px;
+      margin: 0 auto;
     }
-
-    .upload-box.dragover {
-      border-color: #4caf50;
-      background: #f0fff0;
+    h2 {
+      color: #333;
     }
-
-    input[type="file"], input[type="text"] {
-      margin-top: 10px;
-      width: 100%;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px 15px;
-      border: none;
-      background: #4caf50;
+    button[data-imgbb-upload] {
+      padding: 12px 20px;
+      background: #28a745;
       color: white;
-      border-radius: 5px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
       cursor: pointer;
     }
-
-    img {
-      max-width: 100%;
-      margin-top: 20px;
-      border-radius: 8px;
+    button[data-imgbb-upload]:hover {
+      background: #218838;
     }
-
-    .result {
-      margin-top: 10px;
-      word-break: break-all;
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin: 15px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       font-size: 14px;
+    }
+    #preview {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    .info {
+      font-size: 14px;
+      color: #666;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-<h2>ImgBB 이미지 업로드</h2>
+  <h2>ImgBB로 이미지 업로드하기</h2>
+  <p>버튼을 누르면 ImgBB 업로드 창이 뜹니다. 이미지를 올리면 자동으로 URL이 아래에 들어오고 바로 미리보기가 보여요!</p>
 
-<div class="upload-box" id="dropZone">
-  <p>여기에 이미지를 끌어다 놓거나</p>
-  <p>Ctrl + V 로 붙여넣기</p>
-  <p>또는 파일 선택</p>
-  <input type="file" id="fileInput" accept="image/*">
-</div>
+  <!-- ImgBB 업로드 버튼 -->
+  <button data-imgbb-upload>📤 이미지 업로드</button>
 
-<input type="text" id="imageUrl" placeholder="이미지 URL 입력 (선택)">
-<button onclick="uploadFromUrl()">URL로 업로드</button>
+  <!-- 업로드된 URL이 자동 삽입될 textarea -->
+  <textarea id="imgbb-result" placeholder="업로드 완료되면 이미지 URL이 여기 자동으로 들어옵니다..."></textarea>
 
-<div class="result" id="result"></div>
-<img id="preview">
+  <!-- 미리보기 이미지 -->
+  <img id="preview" src="" alt="업로드된 이미지 미리보기" style="display:none;">
 
-<script>
-  const API_KEY = "ff5a9178d1b2450ff7aafc8fa50d9f50";
-  const dropZone = document.getElementById("dropZone");
-  const fileInput = document.getElementById("fileInput");
-  const preview = document.getElementById("preview");
-  const result = document.getElementById("result");
+  <div class="info">
+    ✔ 드래그 앤 드롭, 붙여넣기, URL 업로드 모두 지원<br>
+    ✔ 서버 코드 없이 순수 HTML/JS로 동작<br>
+    ✔ 업로드 후 바로 화면에서 확인 가능
+  </div>
 
-  /* ---------- 업로드 함수 ---------- */
-  async function uploadImage(imageData) {
-    const formData = new FormData();
-    formData.append("image", imageData);
+  <script>
+    const textarea = document.getElementById('imgbb-result');
+    const preview = document.getElementById('preview');
 
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {
-      method: "POST",
-      body: formData
+    // textarea 내용 바뀔 때마다 체크
+    textarea.addEventListener('input', () => {
+      const value = textarea.value.trim();
+
+      if (value && value.startsWith('http')) {
+        preview.src = value;
+        preview.style.display = 'block';  // 이미지 보이게
+      } else {
+        preview.style.display = 'none';
+      }
     });
 
-    const json = await res.json();
-
-    if (json.success) {
-      preview.src = json.data.url;
-      result.innerHTML = `
-        ✔ 업로드 성공<br>
-        이미지 URL:<br>
-        <a href="${json.data.url}" target="_blank">${json.data.url}</a>
-      `;
-    } else {
-      alert("업로드 실패");
+    // 페이지 로드 시 이미 값이 있으면 미리보기
+    if (textarea.value.trim()) {
+      textarea.dispatchEvent(new Event('input'));
     }
-  }
-
-  /* ---------- 파일 선택 ---------- */
-  fileInput.addEventListener("change", () => {
-    if (fileInput.files[0]) {
-      uploadImage(fileInput.files[0]);
-    }
-  });
-
-  /* ---------- 드래그 앤 드롭 ---------- */
-  dropZone.addEventListener("dragover", e => {
-    e.preventDefault();
-    dropZone.classList.add("dragover");
-  });
-
-  dropZone.addEventListener("dragleave", () => {
-    dropZone.classList.remove("dragover");
-  });
-
-  dropZone.addEventListener("drop", e => {
-    e.preventDefault();
-    dropZone.classList.remove("dragover");
-    if (e.dataTransfer.files[0]) {
-      uploadImage(e.dataTransfer.files[0]);
-    }
-  });
-
-  /* ---------- 붙여넣기 ---------- */
-  document.addEventListener("paste", e => {
-    const item = [...e.clipboardData.items].find(i => i.type.startsWith("image"));
-    if (item) {
-      uploadImage(item.getAsFile());
-    }
-  });
-
-  /* ---------- URL 업로드 ---------- */
-  function uploadFromUrl() {
-    const url = document.getElementById("imageUrl").value.trim();
-    if (!url) return alert("URL을 입력하세요");
-    uploadImage(url);
-  }
-</script>
+  </script>
 
 </body>
 </html>
