@@ -2,99 +2,82 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>ImgBB 이미지 업로드 + 즉시 미리보기</title>
+  <title>Supabase 이미지 업로드</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ImgBB 업로드 플러그인 로드 (키 필요 없음!) -->
-  <script async src="https://imgbb.com/upload.js"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      padding: 30px;
-      max-width: 800px;
-      margin: 0 auto;
+      background: #f4f4f4;
+      padding: 20px;
     }
-    h2 {
-      color: #333;
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
     }
-    button[data-imgbb-upload] {
-      padding: 12px 20px;
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button[data-imgbb-upload]:hover {
-      background: #218838;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin: 15px 0;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    #preview {
+    img {
       max-width: 100%;
-      height: auto;
+      margin-top: 10px;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      margin-top: 20px;
-    }
-    .info {
-      font-size: 14px;
-      color: #666;
-      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h2>ImgBB로 이미지 업로드하기</h2>
-  <p>버튼을 누르면 ImgBB 업로드 창이 뜹니다. 이미지를 올리면 자동으로 URL이 아래에 들어오고 바로 미리보기가 보여요!</p>
+<div class="box">
+  <h2>이미지 업로드 (누구나 가능)</h2>
+  <input type="file" id="file" accept="image/*">
+  <button onclick="upload()">업로드</button>
 
-  <!-- ImgBB 업로드 버튼 -->
-  <button data-imgbb-upload>📤 이미지 업로드</button>
+  <h3>업로드된 이미지</h3>
+  <img id="preview">
+</div>
 
-  <!-- 업로드된 URL이 자동 삽입될 textarea -->
-  <textarea id="imgbb-result" placeholder="업로드 완료되면 이미지 URL이 여기 자동으로 들어옵니다..."></textarea>
+<script>
+  // 🔥 Supabase 정보
+  const supabaseUrl = "https://YOUR_PROJECT_ID.supabase.co";
+  const supabaseKey = "YOUR_ANON_PUBLIC_KEY";
 
-  <!-- 미리보기 이미지 -->
-  <img id="preview" src="" alt="업로드된 이미지 미리보기" style="display:none;">
+  const supabase = supabase.createClient(
+    supabaseUrl,
+    supabaseKey
+  );
 
-  <div class="info">
-    ✔ 드래그 앤 드롭, 붙여넣기, URL 업로드 모두 지원<br>
-    ✔ 서버 코드 없이 순수 HTML/JS로 동작<br>
-    ✔ 업로드 후 바로 화면에서 확인 가능
-  </div>
+  async function upload() {
+    const fileInput = document.getElementById("file");
+    const file = fileInput.files[0];
 
-  <script>
-    const textarea = document.getElementById('imgbb-result');
-    const preview = document.getElementById('preview');
-
-    // textarea 내용 바뀔 때마다 체크
-    textarea.addEventListener('input', () => {
-      const value = textarea.value.trim();
-
-      if (value && value.startsWith('http')) {
-        preview.src = value;
-        preview.style.display = 'block';  // 이미지 보이게
-      } else {
-        preview.style.display = 'none';
-      }
-    });
-
-    // 페이지 로드 시 이미 값이 있으면 미리보기
-    if (textarea.value.trim()) {
-      textarea.dispatchEvent(new Event('input'));
+    if (!file) {
+      alert("이미지를 선택하세요");
+      return;
     }
-  </script>
+
+    const fileName = Date.now() + "_" + file.name;
+
+    const { data, error } = await supabase
+      .storage
+      .from("images")
+      .upload(fileName, file);
+
+    if (error) {
+      alert("업로드 실패: " + error.message);
+      return;
+    }
+
+    const { data: urlData } = supabase
+      .storage
+      .from("images")
+      .getPublicUrl(fileName);
+
+    document.getElementById("preview").src = urlData.publicUrl;
+  }
+</script>
 
 </body>
 </html>
