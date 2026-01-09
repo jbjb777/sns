@@ -103,36 +103,33 @@
       top: -100px;
       left: 50%;
       transform: translateX(-50%);
-      background: linear-gradient(135deg, #3663FF, #2952CC);
+      background: rgba(54, 99, 255, 0.25);
       color: white;
       padding: 16px 32px;
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(54, 99, 255, 0.4);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       z-index: 9999;
-      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: top 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       display: flex;
       align-items: center;
       gap: 12px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: none;
     }
     .login-alert.show {
       top: 20px;
-      animation: bounce 0.6s ease;
     }
     .login-alert:hover {
-      transform: translateX(-50%) scale(1.05);
-      box-shadow: 0 12px 32px rgba(54, 99, 255, 0.6);
+      transform: translateX(-50%) scale(1.03);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
     }
     .login-alert-icon {
       font-size: 20px;
       animation: pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-10px); }
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
@@ -325,10 +322,10 @@
   </div>
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-  
+ 
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-  
+ 
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
     let currentPost = null;
