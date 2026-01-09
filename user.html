@@ -557,7 +557,7 @@
           const fileName = `${currentUser.nickname}/profile_${Date.now()}.${file.name.split('.').pop()}`;
 
           const { data, error } = await supabase.storage
-            .from('profiles')
+            .from('images')
             .upload(fileName, file, { upsert: true });
 
           if (error) {
@@ -567,7 +567,7 @@
           }
 
           const { data: urlData } = supabase.storage
-            .from('profiles')
+            .from('images')
             .getPublicUrl(fileName);
 
           const newUrl = urlData.publicUrl;
