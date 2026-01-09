@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>프로필 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
-  <script async src="https://imgbb.com/upload.js"></script>
+  <!-- ImgBB 플러그인 제거하고 Supabase Storage 직접 사용 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
@@ -60,8 +61,9 @@
     .profile-header { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; }
     .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; flex-shrink: 0; transition: transform 0.3s ease; }
     .profile-avatar.editable { cursor: pointer; }
-    .profile-avatar.editable:hover { transform: scale(1.1); }
-    img.profile-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; flex-shrink: 0; transition: transform 0.3s ease; }
+    .profile-avatar.editable:hover { transform: scale(1.15); }
+    img.profile-avatar-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; flex-shrink: 0; transition: transform 0.3s ease; }
+    img.profile-avatar-img.editable:hover { transform: scale(1.15); }
     .profile-info { flex: 1; }
     .profile-name { font-size: 32px; font-weight: 800; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; letter-spacing: -0.5px; }
     .profile-stats { display: flex; gap: 50px; color: #aaa; font-size: 16px; align-items: center; }
@@ -233,7 +235,6 @@
  
     .skeleton-avatar { width: 100px; height: 100px; border-radius: 50%; }
     .skeleton-text { height: 32px; border-radius: 8px; margin-bottom: 12px; }
-    .skeleton-text-small { height: 20px; border-radius: 6px; }
     .skeleton-stat { width: 80px; height: 50px; border-radius: 10px; }
     .skeleton-post-image { width: 100%; height: 250px; border-radius: 16px 16px 0 0; }
     .skeleton-post-text { height: 16px; border-radius: 6px; margin-bottom: 8px; }
@@ -256,7 +257,7 @@
       .post-item-image { height: 180px; }
       .profile-header { flex-direction: column; text-align: center; gap: 20px; }
       .profile-stats { justify-content: center; gap: 40px; }
-      .profile-avatar { width: 90px; height: 90px; font-size: 42px; }
+      .profile-avatar, img.profile-avatar-img { width: 90px; height: 90px; font-size: 42px; }
       .profile-name { font-size: 28px; }
       .stat-number { font-size: 24px; }
       .modal-content { width: 95%; padding: 20px; }
@@ -350,21 +351,24 @@
       </div>
     </div>
   </div>
-  <!-- ImgBB 업로드 히든 요소 -->
-  <button id="uploadBtn" data-imgbb-upload style="display:none;">업로드</button>
-  <textarea id="uploadResult" style="display:none;"></textarea>
+
+  <!-- 숨겨진 파일 입력 (프로필 사진 업로드용) -->
+  <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
- 
+
     const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
- 
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('id');
     const userNickname = urlParams.get('nickname');
     let currentUser = null;
     let viewingUser = null;
+
     function initCurrentUser() {
       const savedUser = localStorage.getItem('snsUser');
       if (savedUser) {
@@ -372,6 +376,7 @@
         updateSidebar();
       }
     }
+
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe && iframe.contentWindow) {
@@ -381,6 +386,7 @@
         }, '*');
       }
     }
+
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
@@ -391,6 +397,7 @@
         }, '*');
       }
     }
+
     window.addEventListener('message', (event) => {
       const { type, page } = event.data || {};
       if (type === 'navigate') {
@@ -406,38 +413,38 @@
         updateSidebar();
       }
     });
+
     initCurrentUser();
     updateSidebarMode();
     window.addEventListener('resize', updateSidebarMode);
+
     if (!userId && !userNickname) {
       showError('사용자 정보가 없습니다.');
     } else {
       loadUserProfile();
       loadUserPosts();
     }
+
     async function loadUserProfile() {
       try {
         let userData = null;
-        // Supabase에서 조회 시도
         const { data, error } = await supabase
           .from('users')
           .select('*')
           .eq('nickname', userNickname)
           .single();
+
         if (userNickname === "JB777" || userNickname === "진정오") {
-          // JB777 또는 진정오인 경우 Supabase에 없으면 기본값으로 생성
           if (error || !data) {
             userData = {
               nickname: userNickname,
               id: userNickname.toLowerCase(),
               isVerified: true,
-              message: null
+              message: null,
+              profile_image: null
             };
           } else {
-            userData = {
-              ...data,
-              isVerified: true
-            };
+            userData = { ...data, isVerified: true };
           }
         } else {
           if (error || !data) {
@@ -446,6 +453,7 @@
           }
           userData = data;
         }
+
         viewingUser = userData;
         displayProfile(userData);
       } catch (e) {
@@ -453,31 +461,33 @@
         showError('오류가 발생했습니다.');
       }
     }
+
     async function displayProfile(user) {
       const contentDiv = document.getElementById('profileContent');
-      // JB777 또는 진정오이면 무조건 인증 배지 표시
       const isVerified = user.nickname === "JB777" || user.nickname === "진정오" || user.isVerified;
       const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
+
       const { data: posts } = await supabase
         .from('posts')
         .select('id')
         .eq('author', user.nickname);
       const postCount = posts ? posts.length : 0;
+
+      let totalLikes = 0;
       const { data: userPosts } = await supabase
         .from('posts')
         .select('id')
         .eq('author', user.nickname);
-      let totalLikes = 0;
       if (userPosts && userPosts.length > 0) {
         for (const post of userPosts) {
           const { data: likes } = await supabase
             .from('likes')
             .select('id')
             .eq('post_id', post.id);
-       
           totalLikes += likes ? likes.length : 0;
         }
       }
+
       const statusMessage = user.message || '';
       const statusDisplay = statusMessage
         ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
@@ -487,10 +497,15 @@
              <img src="pencil.png" alt="수정">
            </button>`
         : '';
-      const avatarClass = isOwnProfile ? 'profile-avatar editable' : 'profile-avatar';
-      const avatarHtml = user.image 
-        ? `<img src="${user.image}" class="${avatarClass}" alt="프로필 이미지">`
-        : `<div class="${avatarClass}">${user.nickname ? user.nickname[0].toUpperCase() : '?'}</div>`;
+
+      // 프로필 사진 HTML
+      let avatarHtml = '';
+      if (user.profile_image) {
+        avatarHtml = `<img src="${user.profile_image}" class="profile-avatar-img${isOwnProfile ? ' editable' : ''}" alt="프로필 사진">`;
+      } else {
+        avatarHtml = `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">${user.nickname ? user.nickname[0].toUpperCase() : '?'}</div>`;
+      }
+
       contentDiv.innerHTML = `
         <div class="profile-card">
           <div class="profile-header">
@@ -524,38 +539,80 @@
           </div>
         </div>
       `;
+
+      // 내 프로필일 때만 클릭으로 업로드 트리거
       if (isOwnProfile) {
-        const avatarElement = contentDiv.querySelector('.profile-avatar');
+        const avatarElement = contentDiv.querySelector('.profile-avatar, .profile-avatar-img');
         if (avatarElement) {
           avatarElement.onclick = () => {
-            document.getElementById('uploadBtn').click();
+            document.getElementById('profileFileInput').click();
           };
         }
+
+        // 파일 선택 후 자동 업로드
+        document.getElementById('profileFileInput').addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const fileName = `${currentUser.nickname}/profile_${Date.now()}.${file.name.split('.').pop()}`;
+
+          const { data, error } = await supabase.storage
+            .from('profiles')
+            .upload(fileName, file, { upsert: true });
+
+          if (error) {
+            console.error('업로드 실패:', error);
+            alert('프로필 사진 업로드에 실패했습니다.');
+            return;
+          }
+
+          const { data: urlData } = supabase.storage
+            .from('profiles')
+            .getPublicUrl(fileName);
+
+          const newUrl = urlData.publicUrl;
+
+          // DB에 URL 저장
+          const { error: updateError } = await supabase
+            .from('users')
+            .update({ profile_image: newUrl })
+            .eq('nickname', currentUser.nickname);
+
+          if (updateError) {
+            console.error('DB 업데이트 실패:', updateError);
+            alert('DB 저장 실패');
+            return;
+          }
+
+          // 즉시 반영
+          viewingUser.profile_image = newUrl;
+          displayProfile(viewingUser);
+        });
       }
     }
+
     window.openStatusModal = function() {
       const modal = document.getElementById('statusModal');
       const input = document.getElementById('statusInput');
       input.value = viewingUser.message || '';
       modal.classList.add('active');
     }
+
     window.closeStatusModal = function() {
       const modal = document.getElementById('statusModal');
       modal.classList.remove('active');
     }
+
     window.saveStatusMessage = async function() {
       const input = document.getElementById('statusInput');
       const newMessage = input.value.trim();
       try {
-        // 모든 사용자 (JB777, 진정오 포함) Supabase에 저장
         const { error } = await supabase
           .from('users')
           .update({ message: newMessage })
           .eq('nickname', currentUser.nickname);
-        if (error) {
-          console.error('Supabase 업데이트 오류:', error);
-          throw error;
-        }
+        if (error) throw error;
+
         viewingUser.message = newMessage;
         await displayProfile(viewingUser);
         closeStatusModal();
@@ -564,14 +621,13 @@
         alert('상태메시지 저장에 실패했습니다.');
       }
     }
+
     document.getElementById('statusModal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeStatusModal();
-      }
+      if (e.target === this) closeStatusModal();
     });
+
     async function loadUserPosts() {
       const postsDiv = document.getElementById('userPosts');
-   
       try {
         const { data: posts, error } = await supabase
           .from('posts')
@@ -579,29 +635,29 @@
           .eq('author', userNickname)
           .order('created_at', { ascending: false });
         if (error) throw error;
+
         if (!posts || posts.length === 0) {
           postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
           return;
         }
+
         const postsWithLikes = await Promise.all(
           posts.map(async (post) => {
             const { data: likes } = await supabase
               .from('likes')
               .select('id')
               .eq('post_id', post.id);
-         
-            return {
-              ...post,
-              likeCount: likes ? likes.length : 0
-            };
+            return { ...post, likeCount: likes ? likes.length : 0 };
           })
         );
+
         displayPosts(postsWithLikes);
       } catch (e) {
         console.error('게시물 로드 오류:', e);
         postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
       }
     }
+
     function displayPosts(posts) {
       const postsDiv = document.getElementById('userPosts');
       const gridDiv = document.createElement('div');
@@ -609,9 +665,7 @@
       posts.forEach(post => {
         const postItem = document.createElement('div');
         postItem.className = 'post-item';
-        postItem.onclick = () => {
-          window.location.href = `view.html?id=${post.id}`;
-        };
+        postItem.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
         const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
         postItem.innerHTML = `
           ${post.image_url ? `<img src="${post.image_url}" class="post-item-image" alt="게시글 이미지">` : ''}
@@ -626,6 +680,7 @@
       postsDiv.innerHTML = '';
       postsDiv.appendChild(gridDiv);
     }
+
     function showError(msg) {
       document.getElementById('profileContent').innerHTML = `
         <div class="profile-card">
@@ -637,20 +692,16 @@
       `;
       document.getElementById('userPosts').innerHTML = '';
     }
+
     function escapeHtml(t) {
       if (!t) return '';
-      return t.replace(/[&<>"']/g, m => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      }[m]));
+      return t.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
     }
+
     window.goBack = () => window.history.back();
     window.showPrivacyPolicy = () => window.location.href = "privacy.html";
     window.showTerms = () => window.location.href = "policy.html";
- 
+
     window.copyProfileLink = function() {
       navigator.clipboard.writeText(window.location.href).then(() => {
         const btn = document.getElementById('shareBtn');
@@ -661,26 +712,6 @@
         alert('링크 복사에 실패했습니다.');
       });
     }
-    // ImgBB 업로드 결과 처리
-    const uploadResult = document.getElementById('uploadResult');
-    uploadResult.addEventListener('input', async () => {
-      const url = uploadResult.value.trim();
-      if (url && url.startsWith('http')) {
-        try {
-          const { error } = await supabase
-            .from('users')
-            .update({ image: url })
-            .eq('nickname', currentUser.nickname);
-          if (error) throw error;
-          viewingUser.image = url;
-          await loadUserProfile();
-          uploadResult.value = ''; // 클리어
-        } catch (e) {
-          console.error('프로필 이미지 업데이트 오류:', e);
-          alert('이미지 업데이트에 실패했습니다.');
-        }
-      }
-    });
   </script>
 </body>
 </html>
