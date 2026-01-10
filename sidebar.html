@@ -127,7 +127,6 @@
     .create-btn:hover {
       box-shadow: none;
     }
-
     /* 그라데이션 배경 확대 레이어 */
     .create-btn::before {
       content: '';
@@ -141,12 +140,10 @@
       pointer-events: none;
       z-index: -1;
     }
-
     /* hover 시 그라데이션 배경만 더 크게 확대 */
     .create-btn:hover::before {
       transform: scale(1.15);
     }
-
     .create-btn .btn-icon-img {
       width: 24px;
       height: 24px;
@@ -196,6 +193,12 @@
       font-weight: bold;
       color: #fff;
       flex-shrink: 0;
+      overflow: hidden;
+    }
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     .user-details {
       display: flex;
@@ -359,7 +362,7 @@
       <img src="new.png" alt="만들기" class="btn-icon-img">
       <span class="btn-text">만들기</span>
     </button>
-   
+  
     <div class="user-info" id="userInfo" style="display: none;">
       <div class="user-avatar-wrapper">
         <div class="user-avatar" id="userAvatar"></div>
@@ -376,6 +379,7 @@
       </button>
     </div>
   </div>
+
   <script>
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
@@ -385,25 +389,32 @@
     const userInfo = document.getElementById('userInfo');
     const userNickname = document.getElementById('userNickname');
     const userAvatar = document.getElementById('userAvatar');
+
     let isLoggedIn = false;
     let currentUserId = null;
     let currentUserNickname = null;
+    let currentUserProfileImage = null; // ← 추가: 프로필 이미지 URL 저장
+
     // 🔥 로고 클릭 → index.html
     logoContainer.onclick = () => {
       parent.location.href = 'index.html';
     };
+
     // 🔥 홈 클릭
     homeNav.onclick = () => {
       parent.postMessage({ type: 'navigate', page: 'home' }, '*');
     };
+
     // 🔥 탐색 클릭
     exploreNav.onclick = () => {
       parent.postMessage({ type: 'navigate', page: 'explore' }, '*');
     };
+
     // 🔥 Discord 클릭 → 새 탭에서 열기
     discordNav.onclick = () => {
       window.open('https://discord.gg/8s6XuWkfQb', '_blank');
     };
+
     // 🔥 만들기 클릭 → 로그인 여부에 따라 분기
     createBtn.onclick = () => {
       if (isLoggedIn) {
@@ -412,48 +423,69 @@
         parent.location.href = 'login.html';
       }
     };
+
     // 🔥 내 페이지 클릭
     userInfo.onclick = () => {
       if (isLoggedIn && currentUserId && currentUserNickname) {
         parent.location.href = `user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
       }
     };
+
     // 🔥 로그아웃 버튼 클릭 (이벤트 전파 방지)
     window.handleLogout = (event) => {
       event.stopPropagation(); // 부모 요소(userInfo) 클릭 이벤트 방지
       parent.postMessage({ type: 'logout' }, '*');
     };
+
     // 🔥 메시지 수신
     window.addEventListener('message', (event) => {
       const data = event.data;
       if (!data?.type) return;
+
       // explore.html에서 보내는 active 신호
       if (data.type === 'activateExplore') {
         homeNav.classList.remove('active');
         exploreNav.classList.add('active');
       }
+
       // 유저 정보 업데이트
       if (data.type === 'updateUser') {
         if (data.user) {
           isLoggedIn = true;
           currentUserId = data.user.id;
           currentUserNickname = data.user.nickname;
-         
-          userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
-          userNickname.innerHTML = data.user.nickname;
-         
+          currentUserProfileImage = data.user.profile_image; // ← 추가
+
+          // 닉네임 표시
+          userNickname.innerHTML = escapeHtml(data.user.nickname || '?');
           if (data.user.isVerified) {
             userNickname.innerHTML += '<span class="verification-badge"></span>';
           }
-         
+
+          // 프로필 사진 표시 (우선순위: profile_image → 닉네임 첫글자)
+          if (currentUserProfileImage) {
+            const img = document.createElement('img');
+            img.src = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
+            img.alt = data.user.nickname || '프로필';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            userAvatar.innerHTML = '';
+            userAvatar.appendChild(img);
+          } else {
+            userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
+          }
+
           userInfo.style.display = 'flex';
         } else {
           isLoggedIn = false;
           currentUserId = null;
           currentUserNickname = null;
+          currentUserProfileImage = null;
           userInfo.style.display = 'none';
         }
       }
+
       // narrow 모드 (모바일)
       if (data.type === 'setNarrowMode') {
         const sidebar = document.querySelector('.sidebar');
@@ -464,7 +496,18 @@
         }
       }
     });
-    // 기본 상태: 유저 정보 요청
+
+    // HTML 이스케이프 헬퍼 함수 (XSS 방지)
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // 페이지 로드 시 유저 정보 즉시 요청
     parent.postMessage({ type: 'requestUserInfo' }, '*');
   </script>
 </body>
