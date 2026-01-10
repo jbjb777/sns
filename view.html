@@ -8,58 +8,25 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .sidebar-container {
-      width: 250px;
-      min-width: 250px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      z-index: 100;
-    }
-    .sidebar-container iframe {
-      width: 250px !important;
-      height: 100%;
-      border: none;
-    }
-    .main-wrapper {
-      margin-left: 250px;
-      width: calc(100% - 250px);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sidebar-container { width: 250px; min-width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 250px !important; height: 100%; border: none; }
+    .main-wrapper { margin-left: 250px; width: calc(100% - 250px); display: flex; flex-direction: column; min-height: 100vh; }
     .header { background: #1e1e1e; border-bottom: 1px solid #333; padding: 16px 20px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 50; opacity: 0; transform: translateY(-20px); animation: slideDown 0.5s ease-out 0.15s forwards; }
-    @keyframes slideDown {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
     .back-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
     .back-btn:hover { transform: translateX(-4px); color: #3663FF; }
     .header-title { font-size: 20px; font-weight: 600; }
     .container { max-width: 900px; width: 100%; margin: 0 auto; padding: 30px 20px; flex: 1; opacity: 0; transform: translateY(30px); animation: slideUp 0.6s ease-out 0.3s forwards; }
-    @keyframes slideUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     .post-detail-card { background: transparent; border: none; box-shadow: none; margin-bottom: 50px; opacity: 0; animation: fadeInText 0.5s ease-out 0.55s forwards; }
-    @keyframes fadeInText {
-      to { opacity: 1; }
-    }
+    @keyframes fadeInText { to { opacity: 1; } }
     .post-detail-header { padding: 30px 0; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
     .header-actions { display: flex; align-items: center; gap: 15px; }
     .author-info { display: flex; align-items: center; gap: 18px; cursor: pointer; transition: opacity 0.3s ease; }
     .author-info:hover { opacity: 0.8; }
-    .author-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; flex-shrink: 0; }
-    .author-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .author-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; overflow: hidden; }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .author-details { display: flex; flex-direction: column; gap: 8px; }
     .author-name { font-weight: 800; font-size: 24px; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
     .post-timestamp { font-size: 15px; color: #aaa; font-weight: 500; }
@@ -92,61 +59,18 @@
     .comment-header { display: flex; justify-content: space-between; align-items: center; }
     .comment-author-wrapper { display: flex; align-items: center; gap: 12px; cursor: pointer; transition: opacity 0.3s ease; }
     .comment-author-wrapper:hover { opacity: 0.8; }
-    .comment-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
-    .comment-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .comment-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; overflow: hidden; }
+    .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .comment-author { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
     .comment-content { font-size: 16px; color: #eee; line-height: 1.7; white-space: pre-wrap; }
     .comment-content a { color: #00bfff; text-decoration: underline; }
     .comment-content a:hover { color: #53b6f9; }
     .comment-date { font-size: 14px; color: #888; font-weight: 500; }
     .comment-del-btn { background: none; border: none; color: #ff4444; font-size: 14px; font-weight: 600; cursor: pointer; padding: 6px; }
-    .login-alert {
-      position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(54, 99, 255, 0.25);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      z-index: 9999;
-      transition: top 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: none;
-    }
-    .login-alert.show {
-      top: 20px;
-    }
-    .login-alert:hover {
-      transform: translateX(-50%) scale(1.03);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-    }
-    .login-alert-icon {
-      font-size: 20px;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.1); }
-    }
-    .skeleton {
-      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s ease-in-out infinite;
-      border-radius: 8px;
-    }
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
+    .login-alert { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(54, 99, 255, 0.25); color: white; padding: 16px 32px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); font-size: 15px; font-weight: 600; cursor: pointer; z-index: 9999; transition: top 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); display: flex; align-items: center; gap: 12px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: none; }
+    .login-alert.show { top: 20px; }
+    .skeleton { background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 8px; }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     .skeleton-avatar { width: 60px; height: 60px; border-radius: 50%; }
     .skeleton-name { width: 180px; height: 24px; margin-bottom: 10px; }
     .skeleton-time { width: 200px; height: 16px; }
@@ -168,91 +92,30 @@
       .post-detail-image { max-height: 600px; }
       .comment-input-wrapper { flex-direction: column; }
       .comment-submit-btn { width: 100%; padding: 16px; }
-      .login-alert { max-width: 90%; padding: 14px 24px; font-size: 14px; }
     }
-    /* 삭제 확인 모달 */
-    .delete-modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-    .delete-modal-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .delete-modal {
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 20px;
-      padding: 40px 30px;
-      text-align: center;
-      max-width: 420px;
-      width: 90%;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-      transform: scale(0.7);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .delete-modal-overlay.show .delete-modal {
-      transform: scale(1);
-    }
-    .delete-modal img {
-      width: 140px;
-      height: 140px;
-      margin-bottom: 24px;
-    }
-    .delete-modal-title {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 32px;
-      color: #fff;
-    }
-    .delete-modal-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-    }
-    .delete-modal-btn {
-      padding: 12px 32px;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .delete-modal-btn.cancel {
-      background: #444;
-      color: #ddd;
-      border: none;
-    }
-    .delete-modal-btn.cancel:hover {
-      background: #555;
-      transform: scale(1.05);
-    }
-    .delete-modal-btn.delete {
-      background: #ff4444;
-      color: #fff;
-      border: none;
-    }
-    .delete-modal-btn.delete:hover {
-      background: #cc0000;
-      transform: scale(1.05);
-    }
+    .delete-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+    .delete-modal-overlay.show { opacity: 1; visibility: visible; }
+    .delete-modal { background: #1e1e1e; border: 1px solid #333; border-radius: 20px; padding: 40px 30px; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 12px 40px rgba(0,0,0,0.6); transform: scale(0.7); transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+    .delete-modal-overlay.show .delete-modal { transform: scale(1); }
+    .delete-modal img { width: 140px; height: 140px; margin-bottom: 24px; }
+    .delete-modal-title { font-size: 22px; font-weight: 600; margin-bottom: 32px; color: #fff; }
+    .delete-modal-buttons { display: flex; gap: 16px; justify-content: center; }
+    .delete-modal-btn { padding: 12px 32px; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .delete-modal-btn.cancel { background: #444; color: #ddd; border: none; }
+    .delete-modal-btn.cancel:hover { background: #555; transform: scale(1.05); }
+    .delete-modal-btn.delete { background: #ff4444; color: #fff; border: none; }
+    .delete-modal-btn.delete:hover { background: #cc0000; transform: scale(1.05); }
   </style>
 </head>
 <body>
+
+  <!-- 로그인 알림 -->
   <div class="login-alert" id="loginAlert">
     <span class="login-alert-icon">🔐</span>
     <span>로그인 후 사용 가능합니다</span>
   </div>
-  <!-- 삭제 확인 모달 -->
+
+  <!-- 게시물 삭제 확인 모달 -->
   <div class="delete-modal-overlay" id="deleteModal">
     <div class="delete-modal">
       <img src="careful.png" alt="주의">
@@ -276,34 +139,7 @@
 
     <div class="container">
       <div id="postContent">
-        <!-- 스켈레톤 UI (초기) -->
-        <div class="post-detail-card">
-          <div class="post-detail-header">
-            <div class="author-info" style="pointer-events: none;">
-              <div class="skeleton skeleton-avatar"></div>
-              <div class="author-details" style="flex: 1;">
-                <div class="skeleton skeleton-name"></div>
-                <div class="skeleton skeleton-time"></div>
-              </div>
-            </div>
-            <div class="header-actions">
-              <div class="skeleton skeleton-button"></div>
-            </div>
-          </div>
-          <div class="skeleton skeleton-image"></div>
-          <div class="post-detail-content">
-            <div class="skeleton skeleton-text"></div>
-            <div class="skeleton skeleton-text"></div>
-            <div class="skeleton skeleton-text" style="width: 70%;"></div>
-          </div>
-          <div class="share-container">
-            <div class="share-label">게시물 공유하기</div>
-            <div class="share-box-wrapper">
-              <div class="skeleton skeleton-share"></div>
-              <div class="skeleton" style="width: 56px; height: 56px; border-radius: 14px;"></div>
-            </div>
-          </div>
-        </div>
+        <!-- 초기 스켈레톤 -->
       </div>
 
       <div class="comment-section">
@@ -311,11 +147,7 @@
           <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
           <button class="comment-submit-btn" onclick="addComment()">업로드</button>
         </div>
-        <div id="commentList" class="comment-list">
-          <div class="skeleton skeleton-comment"></div>
-          <div class="skeleton skeleton-comment"></div>
-          <div class="skeleton skeleton-comment"></div>
-        </div>
+        <div id="commentList" class="comment-list"></div>
       </div>
     </div>
 
@@ -344,26 +176,20 @@
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
 
-    // 🔔 알림 생성 함수
+    // 알림 생성
     async function createNotification(targetUserId, detail, link) {
       if (!targetUserId || targetUserId === currentUser?.id) return;
       try {
-        const { error } = await supabase
-          .from('notification')
-          .insert([{
-            user: targetUserId,
-            detail: detail,
-            link: link,
-            isread: 1,
-            created_at: new Date().toISOString()
-          }]);
-        if (error) console.error('❌ 알림 생성 실패:', error);
-      } catch (e) {
-        console.error('알림 생성 예외:', e);
-      }
+        await supabase.from('notification').insert([{
+          user: targetUserId,
+          detail,
+          link,
+          isread: 1,
+          created_at: new Date().toISOString()
+        }]);
+      } catch (e) {}
     }
 
-    // 링크 자동 감지 + HTML 이스케이프
     function linkify(text) {
       text = escapeHtml(text);
       const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
@@ -376,24 +202,21 @@
     function showLoginAlert() {
       const alert = document.getElementById('loginAlert');
       alert.classList.add('show');
-      const hideTimeout = setTimeout(() => alert.classList.remove('show'), 3000);
-      alert.onclick = () => {
-        clearTimeout(hideTimeout);
-        window.location.href = 'login.html';
-      };
+      setTimeout(() => alert.classList.remove('show'), 3000);
+      alert.onclick = () => window.location.href = 'login.html';
     }
 
     function initCurrentUser() {
-      const savedUser = localStorage.getItem('snsUser');
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
+      const saved = localStorage.getItem('snsUser');
+      if (saved) {
+        currentUser = JSON.parse(saved);
         updateSidebar();
       }
     }
 
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
-      if (iframe && iframe.contentWindow) {
+      if (iframe?.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
       }
     }
@@ -401,8 +224,8 @@
     function updateSidebarMode() {
       const iframe = document.getElementById('sidebarFrame');
       const narrow = window.innerWidth <= 768;
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow: narrow }, '*');
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
       }
     }
 
@@ -420,7 +243,7 @@
       if (type === 'requestUserInfo') updateSidebar();
     });
 
-    document.getElementById('commentInput').addEventListener('focus', function() {
+    document.getElementById('commentInput')?.addEventListener('focus', function() {
       if (!currentUser) {
         this.blur();
         showLoginAlert();
@@ -438,51 +261,68 @@
       listenComments(postId);
     }
 
+    // 프로필 이미지 가져오기 헬퍼
+    async function getProfileImage(userId) {
+      if (!userId) return null;
+      try {
+        const { data } = await supabase
+          .from('users')
+          .select('profile_image')
+          .eq('id', userId)
+          .single();
+        return data?.profile_image || null;
+      } catch (e) {
+        return null;
+      }
+    }
+
     async function loadPost(postId) {
       try {
-        // 게시물 + 작성자 프로필 이미지 함께 조회
         const { data: post, error } = await supabase
           .from('posts')
-          .select(`
-            *,
-            users!posts_author_id_fkey (profile_image)
-          `)
+          .select('*')
           .eq('id', postId)
           .single();
 
         if (error || !post) {
+          console.error('게시물 조회 실패:', error);
           showError('게시물을 찾을 수 없습니다.');
           return;
         }
 
-        currentPost = post;
-        displayPost(post, postId);
+        // 작성자 프로필 사진 별도 조회
+        const authorProfileImage = await getProfileImage(post.author_id);
+
+        currentPost = { ...post, author_profile_image: authorProfileImage };
+        displayPost(currentPost, postId);
         loadLikes(postId);
       } catch (e) {
-        console.error('게시물 로드 오류:', e);
-        showError('오류가 발생했습니다.');
+        console.error('loadPost 오류:', e);
+        showError('게시물 로드 중 오류가 발생했습니다.');
       }
     }
 
     function displayPost(post, postId) {
       const contentDiv = document.getElementById('postContent');
+      const timeStr = new Date(post.created_at).toLocaleString('ko-KR', {
+        year: 'numeric', month: 'numeric', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
 
-      const timeStr = new Date(post.created_at).toLocaleString('ko-KR');
-      const isVerified = post.author === "JB777" || post.author === "진정오";
+      const isVerified = ["JB777", "진정오"].includes(post.author);
       const canDelete = currentUser && (
         currentUser.nickname === post.author ||
         currentUser.id === post.author_id ||
         (currentUser.nickname === "JB777" && currentUser.isVerified)
       );
 
-      // 프로필 이미지 처리 (캐시 방지 + fallback)
-      let avatarHtml = '';
-      const profileImage = post.users?.profile_image;
-      if (profileImage) {
-        const cacheBuster = profileImage.includes('?') ? '&' : '?';
-        avatarHtml = `<img src="${profileImage}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(post.author)}">`;
-      } else {
-        avatarHtml = post.author ? post.author[0].toUpperCase() : '?';
+      // 작성자 아바타
+      let avatarContent = post.author ? post.author[0].toUpperCase() : '?';
+      if (post.author_profile_image) {
+        const url = post.author_profile_image.includes('?')
+          ? `${post.author_profile_image}&v=${Date.now()}`
+          : `${post.author_profile_image}?v=${Date.now()}`;
+        avatarContent = `<img src="${url}" alt="${escapeHtml(post.author)}">`;
       }
 
       const linkedContent = linkify(post.content || '');
@@ -491,21 +331,24 @@
         <div class="post-detail-card">
           <div class="post-detail-header">
             <div class="author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
-              <div class="author-avatar">
-                ${avatarHtml}
-              </div>
+              <div class="author-avatar">${avatarContent}</div>
               <div class="author-details">
-                <div class="author-name">${escapeHtml(post.author)}${isVerified ? '<span class="verification-badge"></span>' : ''}</div>
+                <div class="author-name">
+                  ${escapeHtml(post.author)}
+                  ${isVerified ? '<span class="verification-badge"></span>' : ''}
+                </div>
                 <div class="post-timestamp">${timeStr}</div>
               </div>
             </div>
             <div class="header-actions">
-              <button class="like-btn" id="likeBtn" onclick="toggleLike()">👍 좋아요: <span id="likeCount">0</span></button>
+              <button class="like-btn" id="likeBtn" onclick="toggleLike()">
+                👍 좋아요: <span id="likeCount">0</span>
+              </button>
               ${canDelete ? `<button class="delete-btn" onclick="openDeleteModal('${postId}')">삭제</button>` : ''}
             </div>
           </div>
 
-          ${post.image_url ? `<img src="${post.image_url}" class="post-detail-image">` : ''}
+          ${post.image_url ? `<img src="${post.image_url}" class="post-detail-image" alt="게시물 이미지">` : ''}
 
           <div class="post-detail-content">
             <div class="post-text">${linkedContent}</div>
@@ -529,23 +372,21 @@
 
     async function loadLikes(postId) {
       try {
-        const { data: likes, error } = await supabase
+        const { data: likes } = await supabase
           .from('likes')
-          .select('*')
+          .select('user_id')
           .eq('post_id', postId);
-        if (error) throw error;
         updateLikeUI(likes || []);
-      } catch (e) {
-        console.error('좋아요 로드 오류:', e);
-      }
+      } catch (e) {}
     }
 
     function updateLikeUI(likes) {
       const btn = document.getElementById('likeBtn');
-      const count = document.getElementById('likeCount');
-      if (!btn) return;
-      count.textContent = likes.length;
-      if (currentUser && likes.some(like => like.user_id === currentUser.id)) {
+      const countEl = document.getElementById('likeCount');
+      if (!btn || !countEl) return;
+
+      countEl.textContent = likes.length;
+      if (currentUser && likes.some(l => l.user_id === currentUser.id)) {
         btn.classList.add('liked');
       } else {
         btn.classList.remove('liked');
@@ -554,16 +395,26 @@
 
     async function listenComments(postId) {
       try {
-        const { data: comments, error } = await supabase
+        const { data: comments } = await supabase
           .from('comments')
           .select('*')
           .eq('post_id', postId)
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        // 댓글 작성자들 프로필사진 미리 가져오기
+        const userIds = [...new Set(comments.map(c => c.user_id))];
+        const profileImages = {};
 
-        displayComments(comments || []);
+        await Promise.all(
+          userIds.map(async (uid) => {
+            const img = await getProfileImage(uid);
+            if (img) profileImages[uid] = img;
+          })
+        );
 
+        displayComments(comments || [], profileImages);
+
+        // 실시간 구독
         supabase
           .channel(`comments:${postId}`)
           .on('postgres_changes', {
@@ -578,64 +429,69 @@
       }
     }
 
-    function displayComments(comments) {
-      const listDiv = document.getElementById('commentList');
-      listDiv.innerHTML = '';
+    function displayComments(comments, profileImages = {}) {
+      const list = document.getElementById('commentList');
+      list.innerHTML = '';
 
-      if (!comments || comments.length === 0) {
-        listDiv.innerHTML = '<div style="text-align:center; color:#888; font-size:18px; padding:40px; font-weight:500;">첫 댓글을 남겨보세요!</div>';
+      if (comments.length === 0) {
+        list.innerHTML = '<div style="text-align:center; color:#888; padding:60px 20px; font-size:17px;">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>';
         return;
       }
 
-      comments.forEach(comment => {
-        const isMyComment = currentUser && (currentUser.id === comment.user_id);
-        const date = new Date(comment.created_at).toLocaleString('ko-KR');
-        const isCommentVerified = comment.user_name === "JB777" || comment.user_name === "진정오";
-        const linkedCommentText = linkify(comment.text);
+      comments.forEach(c => {
+        const isMine = currentUser?.id === c.user_id;
+        const date = new Date(c.created_at).toLocaleString('ko-KR', {
+          year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        const isVerified = ["JB777", "진정오"].includes(c.user_name);
 
-        const div = document.createElement('div');
-        div.className = 'comment-item';
-        div.innerHTML = `
+        let avatarContent = c.user_name ? c.user_name[0].toUpperCase() : '?';
+        if (profileImages[c.user_id]) {
+          const url = profileImages[c.user_id].includes('?')
+            ? `${profileImages[c.user_id]}&v=${Date.now()}`
+            : `${profileImages[c.user_id]}?v=${Date.now()}`;
+          avatarContent = `<img src="${url}" alt="${escapeHtml(c.user_name)}">`;
+        }
+
+        const linkedText = linkify(c.text);
+
+        const item = document.createElement('div');
+        item.className = 'comment-item';
+        item.innerHTML = `
           <div class="comment-header">
-            <div class="comment-author-wrapper" onclick="goToProfile('${comment.user_id}', '${escapeHtml(comment.user_name)}')">
-              <div class="comment-avatar">${comment.user_name ? comment.user_name[0].toUpperCase() : '?'}</div>
-              <span class="comment-author">${escapeHtml(comment.user_name)}${isCommentVerified ? '<span class="verification-badge" style="width:20px; height:20px;"></span>' : ''}</span>
+            <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
+              <div class="comment-avatar">${avatarContent}</div>
+              <span class="comment-author">
+                ${escapeHtml(c.user_name)}
+                ${isVerified ? '<span class="verification-badge" style="width:20px;height:20px;"></span>' : ''}
+              </span>
             </div>
-            ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}')">삭제</button>` : ''}
+            ${isMine ? `<button class="comment-del-btn" onclick="deleteComment('${c.id}')">삭제</button>` : ''}
           </div>
-          <div class="comment-content">${linkedCommentText}</div>
+          <div class="comment-content">${linkedText}</div>
           <div class="comment-date">${date}</div>
         `;
-        listDiv.appendChild(div);
+        list.appendChild(item);
       });
     }
 
     function showError(msg) {
       document.getElementById('postContent').innerHTML = `
-        <div class="post-detail-card" style="padding: 60px;">
-          <div style="text-align: center;">
-            <div style="color: #ff6b6b; font-size: 18px; margin-bottom: 30px;">${msg}</div>
-            <button onclick="window.history.back()" style="background: #3663FF; color: white; border: none; padding: 14px 28px; border-radius: 14px; cursor: pointer; font-size:16px;">돌아가기</button>
-          </div>
+        <div style="padding:80px 20px; text-align:center;">
+          <div style="color:#ff6b6b; font-size:18px; margin-bottom:24px;">${msg}</div>
+          <button onclick="window.history.back()" style="background:#3663FF; color:white; border:none; padding:14px 32px; border-radius:12px; font-size:16px; cursor:pointer;">돌아가기</button>
         </div>
       `;
-      document.getElementById('commentList').innerHTML = '';
     }
 
-    function escapeHtml(t) {
-      if (!t) return '';
-      return t.replace(/[&<>"']/g, m => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      }[m]));
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
     }
 
-    // ===== 전역(window) 함수 등록 =====
-    window.openDeleteModal = function(postIdToDelete) {
-      pendingDeletePostId = postIdToDelete;
+    // window 전역 함수들
+    window.openDeleteModal = function(id) {
+      pendingDeletePostId = id;
       document.getElementById('deleteModal').classList.add('show');
       document.body.style.overflow = 'hidden';
     };
@@ -647,71 +503,66 @@
     };
 
     window.goToProfile = function(userId, nickname) {
-      window.location.href = `user.html?id=${userId}&nickname=${nickname}`;
+      window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
     };
 
     window.toggleLike = async function() {
-      if (!currentUser) { showLoginAlert(); return; }
+      if (!currentUser) return showLoginAlert();
       if (!currentPost) return;
 
       try {
-        const { data: existingLike } = await supabase
+        const { data: like } = await supabase
           .from('likes')
-          .select('*')
+          .select('id')
           .eq('post_id', postId)
           .eq('user_id', currentUser.id)
-          .single();
+          .maybeSingle();
 
-        if (existingLike) {
-          await supabase.from('likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+        if (like) {
+          await supabase.from('likes').delete().eq('id', like.id);
         } else {
-          await supabase.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
-          await createNotification(currentPost.author_id, `${currentUser.nickname}님이 당신의 게시물에 좋아요를 남겼습니다`, `view.html?id=${postId}`);
+          await supabase.from('likes').insert({
+            post_id: postId,
+            user_id: currentUser.id
+          });
+          createNotification(currentPost.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
         }
-
         loadLikes(postId);
-      } catch (e) {
-        console.error('좋아요 오류:', e);
-      }
+      } catch (e) {}
     };
 
     window.addComment = async function() {
       const input = document.getElementById('commentInput');
       const text = input.value.trim();
 
-      if (!currentUser) { showLoginAlert(); return; }
+      if (!currentUser) return showLoginAlert();
       if (!text || !currentPost) return;
 
       try {
-        const { error } = await supabase.from('comments').insert([{
+        await supabase.from('comments').insert({
           post_id: postId,
           user_id: currentUser.id,
           user_name: currentUser.nickname,
-          text: text,
+          text,
           created_at: new Date().toISOString()
-        }]);
+        });
 
-        if (error) throw error;
-
-        await createNotification(currentPost.author_id, `${currentUser.nickname}님이 당신의 게시물에 댓글을 남겼습니다`, `view.html?id=${postId}`);
+        createNotification(currentPost.author_id, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${postId}`);
 
         input.value = '';
         listenComments(postId);
       } catch (e) {
-        console.error('댓글 업로드 오류:', e);
-        alert('댓글 업로드 실패');
+        alert('댓글 작성 실패');
       }
     };
 
     window.deleteComment = async function(commentId) {
       if (!confirm('댓글을 삭제하시겠습니까?')) return;
       try {
-        const { error } = await supabase.from('comments').delete().eq('id', commentId);
-        if (error) throw error;
+        await supabase.from('comments').delete().eq('id', commentId);
         listenComments(postId);
       } catch (e) {
-        console.error('댓글 삭제 오류:', e);
-        alert('삭제 실패');
+        alert('댓글 삭제 실패');
       }
     };
 
@@ -723,12 +574,11 @@
       });
     };
 
-    window.goHome = function() { window.location.href = "index.html"; };
-    window.showPrivacyPolicy = function() { window.location.href = "privacy.html"; };
-    window.showTerms = function() { window.location.href = "policy.html"; };
+    window.goHome = () => window.location.href = "index.html";
+    window.showPrivacyPolicy = () => window.location.href = "privacy.html";
+    window.showTerms = () => window.location.href = "policy.html";
 
-    // 모달 내 삭제 버튼 클릭 시 실제 삭제
-    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    document.getElementById('confirmDeleteBtn').onclick = async () => {
       if (!pendingDeletePostId) return;
       try {
         await supabase.from('comments').delete().eq('post_id', pendingDeletePostId);
@@ -736,10 +586,9 @@
         await supabase.from('posts').delete().eq('id', pendingDeletePostId);
         window.location.href = 'index.html';
       } catch (e) {
-        console.error('삭제 오류:', e);
-        alert('삭제에 실패했습니다.');
+        alert('게시물 삭제 실패');
       }
-    });
+    };
   </script>
 </body>
 </html>
