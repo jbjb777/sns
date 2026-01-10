@@ -572,16 +572,17 @@
     updateSidebarMode();
     window.addEventListener('resize', updateSidebarMode);
 
-    // 프로필 사진 업로드 이벤트 - 페이지 로드 시 딱 1번만 등록
+    // 프로필 사진 업로드 이벤트
     document.getElementById('profileFileInput').addEventListener('change', async (e) => {
       const file = e.target.files?.[0];
-      if (!file || !currentUser) return;
+      if (!file || !currentUser || !currentUser.id) return;
 
       console.log('파일 선택됨:', file.name);
 
       const fileExt = file.name.split('.').pop() || 'png';
-      const safeUserId = currentUser.nickname;
-      const fileName = `profiles/${safeUserId}/profile.${fileExt}`;
+      // ★ 변경 ★ : 닉네임 대신 로그인된 user.id 사용
+      const userIdForPath = currentUser.id;
+      const fileName = `profiles/${userIdForPath}/profile.${fileExt}`;
 
       console.log('업로드 경로:', fileName);
 
@@ -596,13 +597,13 @@
           .from('images')
           .getPublicUrl(fileName);
 
-        // ★★★ 여기서 캐시 무효화 쿼리 파라미터 추가 ★★★
         const imageUrl = `${urlData.publicUrl}?v=${Date.now()}`;
 
+        // ★ 변경 ★ : users 테이블 업데이트도 id 기준으로
         const { error: dbError } = await supabase
           .from('users')
           .update({ profile_image: imageUrl })
-          .eq('nickname', currentUser.nickname);
+          .eq('id', currentUser.id);
 
         if (dbError) throw dbError;
 
@@ -738,7 +739,6 @@
         </div>
       `;
 
-      // 본인 프로필인 경우에만 클릭 이벤트 연결
       if (isOwnProfile) {
         const avatarElement = contentDiv.querySelector('.profile-avatar, .profile-avatar-img.editable');
         if (avatarElement) {
