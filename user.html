@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>프로필 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg" />
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -115,8 +113,12 @@
       flex-shrink: 0;
       transition: transform 0.3s ease;
     }
-    .profile-avatar.editable { cursor: pointer; }
-    .profile-avatar.editable:hover { transform: scale(1.15); }
+    .profile-avatar.editable {
+      cursor: pointer;
+    }
+    .profile-avatar.editable:hover {
+      transform: scale(1.15);
+    }
     img.profile-avatar-img {
       width: 100px;
       height: 100px;
@@ -125,7 +127,9 @@
       flex-shrink: 0;
       transition: transform 0.3s ease;
     }
-    img.profile-avatar-img.editable:hover { transform: scale(1.15); }
+    img.profile-avatar-img.editable:hover {
+      transform: scale(1.15);
+    }
     .profile-info { flex: 1; }
     .profile-name {
       font-size: 32px;
@@ -143,7 +147,10 @@
       font-size: 16px;
       align-items: center;
     }
-    .stat-item { display: flex; flex-direction: column; }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
     .stat-number {
       font-size: 28px;
       font-weight: 700;
@@ -174,7 +181,9 @@
       background: #2952CC;
       transform: translateY(-2px);
     }
-    .share-btn.success { background: rgb(0, 204, 136) !important; }
+    .share-btn.success {
+      background: rgb(0, 204, 136) !important;
+    }
     .verification-badge {
       display: inline-block;
       width: 28px;
@@ -225,10 +234,15 @@
       height: 20px;
       opacity: 0.8;
     }
-    .edit-status-btn:hover img { opacity: 1; }
+    .edit-status-btn:hover img {
+      opacity: 1;
+    }
     .modal-overlay {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background: rgba(0,0,0,0.7);
       backdrop-filter: blur(5px);
       display: none;
@@ -236,7 +250,9 @@
       justify-content: center;
       z-index: 1000;
     }
-    .modal-overlay.active { display: flex; }
+    .modal-overlay.active {
+      display: flex;
+    }
     .modal-content {
       background: #1e1e1e;
       border: 1px solid #444;
@@ -295,7 +311,9 @@
       background: #3663FF;
       color: #fff;
     }
-    .modal-btn-confirm:hover { background: #2952CC; }
+    .modal-btn-confirm:hover {
+      background: #2952CC;
+    }
     .posts-section {
       background: transparent;
       border: none;
@@ -337,7 +355,9 @@
       object-fit: cover;
       background: #000;
     }
-    .post-item-content { padding: 16px; }
+    .post-item-content {
+      padding: 16px;
+    }
     .post-item-text {
       font-size: 15px;
       line-height: 1.6;
@@ -358,7 +378,9 @@
       font-size: 13px;
       color: #888;
     }
-    .post-item-date { font-size: 12px; }
+    .post-item-date {
+      font-size: 12px;
+    }
     .post-item-likes {
       display: flex;
       align-items: center;
@@ -371,7 +393,10 @@
       background-size: 200% 100%;
       animation: loading 1.5s infinite;
     }
-    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
     .skeleton-avatar { width:100px; height:100px; border-radius:50%; }
     .skeleton-text { height:32px; border-radius:8px; margin-bottom:12px; }
     .skeleton-stat { width:80px; height:50px; border-radius:10px; }
@@ -421,441 +446,450 @@
   </style>
 </head>
 <body>
-
-<div class="sidebar-container">
-  <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
-</div>
-
-<div class="main-wrapper">
-  <div class="header">
-    <button class="back-btn" onclick="goBack()">←</button>
-    <div class="header-title">프로필</div>
+  <div class="sidebar-container">
+    <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
 
-  <div class="container">
-    <div id="profileContent">
-      <!-- 초기 스켈레톤 UI -->
-      <div class="profile-card">
-        <div class="profile-header">
-          <div class="skeleton skeleton-avatar"></div>
-          <div class="profile-info" style="flex:1;">
-            <div class="skeleton skeleton-text" style="width:250px;"></div>
-            <div class="profile-stats">
-              <div class="skeleton skeleton-stat"></div>
-              <div class="skeleton skeleton-stat"></div>
+  <div class="main-wrapper">
+    <div class="header">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="header-title">프로필</div>
+    </div>
+
+    <div class="container">
+      <div id="profileContent">
+        <!-- 초기 스켈레톤 UI -->
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="profile-info" style="flex:1;">
+              <div class="skeleton skeleton-text" style="width:250px;"></div>
+              <div class="profile-stats">
+                <div class="skeleton skeleton-stat"></div>
+                <div class="skeleton skeleton-stat"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="posts-section">
+        <div class="section-title">게시물</div>
+        <div id="userPosts">
+          <div class="post-grid">
+            <div class="post-item">
+              <div class="skeleton skeleton-post-image"></div>
+              <div class="post-item-content">
+                <div class="skeleton skeleton-post-text"></div>
+                <div class="skeleton skeleton-post-text" style="width:80%;"></div>
+                <div class="skeleton skeleton-post-text" style="width:60%;"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="posts-section">
-      <div class="section-title">게시물</div>
-      <div id="userPosts">
-        <div class="post-grid">
-          <div class="post-item">
-            <div class="skeleton skeleton-post-image"></div>
-            <div class="post-item-content">
-              <div class="skeleton skeleton-post-text"></div>
-              <div class="skeleton skeleton-post-text" style="width:80%;"></div>
-              <div class="skeleton skeleton-post-text" style="width:60%;"></div>
-            </div>
-          </div>
-        </div>
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
+        <a href="#" onclick="showTerms(); return false;">이용약관</a>
+        <a href="mailto:alexeom97@outlook.com">문의하기</a>
+      </div>
+      <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
+    </div>
+  </div>
+
+  <!-- 상태메시지 수정 모달 -->
+  <div class="modal-overlay" id="statusModal">
+    <div class="modal-content">
+      <div class="modal-title">상태메시지 수정</div>
+      <textarea class="modal-input" id="statusInput" placeholder="상태메시지를 입력하세요..." maxlength="100"></textarea>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
+        <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
       </div>
     </div>
   </div>
 
-  <div class="footer">
-    <div class="footer-links">
-      <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
-      <a href="#" onclick="showTerms(); return false;">이용약관</a>
-      <a href="mailto:alexeom97@outlook.com">문의하기</a>
-    </div>
-    <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
-  </div>
-</div>
+  <!-- 프로필 사진 업로드용 숨김 input -->
+  <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
 
-<!-- 상태메시지 수정 모달 -->
-<div class="modal-overlay" id="statusModal">
-  <div class="modal-content">
-    <div class="modal-title">상태메시지 수정</div>
-    <textarea class="modal-input" id="statusInput" placeholder="상태메시지를 입력하세요..." maxlength="100"></textarea>
-    <div class="modal-buttons">
-      <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
-      <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
-    </div>
-  </div>
-</div>
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-<!-- 프로필 사진 업로드용 숨김 input -->
-<input type="file" id="profileFileInput" accept="image/*" style="display:none;">
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
 
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
+    const urlParams = new URLSearchParams(window.location.search);
+    const userNickname = urlParams.get('nickname');
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    let currentUser = null;
+    let viewingUser = null;
 
-const urlParams = new URLSearchParams(window.location.search);
-const userNickname = urlParams.get('nickname');
-
-let currentUser = null;
-let viewingUser = null;
-
-function initCurrentUser() {
-  const savedUser = localStorage.getItem('snsUser');
-  if (savedUser) {
-    currentUser = JSON.parse(savedUser);
-    updateSidebar();
-  }
-}
-
-function updateSidebar() {
-  const iframe = document.getElementById('sidebarFrame');
-  if (iframe?.contentWindow) {
-    iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
-  }
-}
-
-function updateSidebarMode() {
-  const iframe = document.getElementById('sidebarFrame');
-  const narrow = window.innerWidth <= 768;
-  if (iframe?.contentWindow) {
-    iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-  }
-}
-
-window.addEventListener('message', (event) => {
-  const { type, page } = event.data || {};
-  if (type === 'navigate') {
-    if (page === 'home') location.href = 'index.html';
-    if (page === 'explore') location.href = 'explore.html';
-  }
-  if (type === 'logout') {
-    localStorage.removeItem('snsUser');
-    currentUser = null;
-    location.href = 'index.html';
-  }
-  if (type === 'requestUserInfo') {
-    updateSidebar();
-  }
-});
-
-initCurrentUser();
-updateSidebarMode();
-window.addEventListener('resize', updateSidebarMode);
-
-// 프로필 사진 업로드 이벤트 - 페이지 로드 시 딱 1번만 등록
-document.getElementById('profileFileInput').addEventListener('change', async (e) => {
-  const file = e.target.files?.[0];
-  if (!file || !currentUser) return;
-
-  console.log('파일 선택됨:', file.name);
-
-  const fileExt = file.name.split('.').pop() || 'png';
-  const safeUserId = currentUser.nickname;
-  const fileName = `profiles/${safeUserId}/profile.${fileExt}`;
-
-  console.log('업로드 경로:', fileName);
-
-  try {
-    const { error: uploadError } = await supabase.storage
-      .from('images')
-      .upload(fileName, file, { upsert: true });
-
-    if (uploadError) throw uploadError;
-
-    const { data: urlData } = supabase.storage
-      .from('images')
-      .getPublicUrl(fileName);
-
-    const imageUrl = urlData.publicUrl;
-
-    const { error: dbError } = await supabase
-      .from('users')
-      .update({ profile_image: imageUrl })
-      .eq('nickname', currentUser.nickname);
-
-    if (dbError) throw dbError;
-
-    console.log('프로필 사진 업데이트 완료');
-
-    viewingUser.profile_image = imageUrl;
-    await displayProfile(viewingUser);
-
-    e.target.value = ''; // 같은 파일 재선택 가능하게 초기화
-  } catch (err) {
-    console.error('프로필 사진 업로드/저장 실패:', err);
-    alert('프로필 사진 변경 실패\n' + (err.message || '알 수 없는 오류'));
-  }
-});
-
-if (!userNickname) {
-  showError('사용자 정보(nickname)가 없습니다.');
-} else {
-  loadUserProfile();
-  loadUserPosts();
-}
-
-async function loadUserProfile() {
-  try {
-    let userData = null;
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('nickname', userNickname)
-      .single();
-
-    if (userNickname === "JB777" || userNickname === "진정오") {
-      if (error || !data) {
-        userData = {
-          nickname: userNickname,
-          isVerified: true,
-          message: null,
-          profile_image: null
-        };
-      } else {
-        userData = { ...data, isVerified: true };
+    function initCurrentUser() {
+      const savedUser = localStorage.getItem('snsUser');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        updateSidebar();
       }
+    }
+
+    function updateSidebar() {
+      const iframe = document.getElementById('sidebarFrame');
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+      }
+    }
+
+    function updateSidebarMode() {
+      const iframe = document.getElementById('sidebarFrame');
+      const narrow = window.innerWidth <= 768;
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+      }
+    }
+
+    window.addEventListener('message', (event) => {
+      const { type, page } = event.data || {};
+      if (type === 'navigate') {
+        if (page === 'home') location.href = 'index.html';
+        if (page === 'explore') location.href = 'explore.html';
+      }
+      if (type === 'logout') {
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        location.href = 'index.html';
+      }
+      if (type === 'requestUserInfo') {
+        updateSidebar();
+      }
+    });
+
+    initCurrentUser();
+    updateSidebarMode();
+    window.addEventListener('resize', updateSidebarMode);
+
+    // 프로필 사진 업로드 이벤트 - 페이지 로드 시 딱 1번만 등록
+    document.getElementById('profileFileInput').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file || !currentUser) return;
+
+      console.log('파일 선택됨:', file.name);
+
+      const fileExt = file.name.split('.').pop() || 'png';
+      const safeUserId = currentUser.nickname;
+      const fileName = `profiles/${safeUserId}/profile.${fileExt}`;
+
+      console.log('업로드 경로:', fileName);
+
+      try {
+        const { error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(fileName, file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('images')
+          .getPublicUrl(fileName);
+
+        // ★★★ 여기서 캐시 무효화 쿼리 파라미터 추가 ★★★
+        const imageUrl = `${urlData.publicUrl}?v=${Date.now()}`;
+
+        const { error: dbError } = await supabase
+          .from('users')
+          .update({ profile_image: imageUrl })
+          .eq('nickname', currentUser.nickname);
+
+        if (dbError) throw dbError;
+
+        console.log('프로필 사진 업데이트 완료');
+
+        viewingUser.profile_image = imageUrl;
+        await displayProfile(viewingUser);
+
+        e.target.value = ''; // 같은 파일 재선택 가능하게 초기화
+      } catch (err) {
+        console.error('프로필 사진 업로드/저장 실패:', err);
+        alert('프로필 사진 변경 실패\n' + (err.message || '알 수 없는 오류'));
+      }
+    });
+
+    if (!userNickname) {
+      showError('사용자 정보(nickname)가 없습니다.');
     } else {
-      if (error || !data) {
-        showError('사용자를 찾을 수 없습니다.');
-        return;
+      loadUserProfile();
+      loadUserPosts();
+    }
+
+    async function loadUserProfile() {
+      try {
+        let userData = null;
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('nickname', userNickname)
+          .single();
+
+        if (userNickname === "JB777" || userNickname === "진정오") {
+          if (error || !data) {
+            userData = {
+              nickname: userNickname,
+              isVerified: true,
+              message: null,
+              profile_image: null
+            };
+          } else {
+            userData = { ...data, isVerified: true };
+          }
+        } else {
+          if (error || !data) {
+            showError('사용자를 찾을 수 없습니다.');
+            return;
+          }
+          userData = data;
+        }
+
+        viewingUser = userData;
+        await displayProfile(userData);
+      } catch (e) {
+        console.error('프로필 로드 오류:', e);
+        showError('프로필을 불러오는 중 오류가 발생했습니다.');
       }
-      userData = data;
     }
 
-    viewingUser = userData;
-    await displayProfile(userData);
-  } catch (e) {
-    console.error('프로필 로드 오류:', e);
-    showError('프로필을 불러오는 중 오류가 발생했습니다.');
-  }
-}
+    async function displayProfile(user) {
+      const contentDiv = document.getElementById('profileContent');
+      const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
+      const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
-async function displayProfile(user) {
-  const contentDiv = document.getElementById('profileContent');
-  const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
-  const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
+      const { data: posts } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('author', user.nickname);
 
-  const { data: posts } = await supabase
-    .from('posts')
-    .select('id')
-    .eq('author', user.nickname);
-  const postCount = posts?.length ?? 0;
+      const postCount = posts?.length ?? 0;
 
-  let totalLikes = 0;
-  const { data: userPosts } = await supabase
-    .from('posts')
-    .select('id')
-    .eq('author', user.nickname);
+      let totalLikes = 0;
+      const { data: userPosts } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('author', user.nickname);
 
-  if (userPosts?.length) {
-    for (const post of userPosts) {
-      const { count } = await supabase
-        .from('likes')
-        .select('id', { count: 'exact', head: true })
-        .eq('post_id', post.id);
-      totalLikes += count ?? 0;
-    }
-  }
+      if (userPosts?.length) {
+        for (const post of userPosts) {
+          const { count } = await supabase
+            .from('likes')
+            .select('id', { count: 'exact', head: true })
+            .eq('post_id', post.id);
+          totalLikes += count ?? 0;
+        }
+      }
 
-  const statusMessage = user.message || '';
-  const statusDisplay = statusMessage
-    ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
-    : `<div class="status-message-text status-message-empty">상태메시지가 없습니다.</div>`;
+      const statusMessage = user.message || '';
+      const statusDisplay = statusMessage
+        ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
+        : `<div class="status-message-text status-message-empty">상태메시지가 없습니다.</div>`;
 
-  const editButton = isOwnProfile
-    ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
-         <img src="pencil.png" alt="수정">
-       </button>` : '';
+      const editButton = isOwnProfile
+        ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
+             <img src="pencil.png" alt="수정">
+           </button>`
+        : '';
 
-  let avatarHtml = user.profile_image
-    ? `<img src="${user.profile_image}" class="profile-avatar-img${isOwnProfile ? ' editable' : ''}" alt="프로필 사진">`
-    : `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">${user.nickname?.[0]?.toUpperCase() ?? '?'}</div>`;
+      let avatarHtml = user.profile_image
+        ? `<img src="${user.profile_image}" class="profile-avatar-img${isOwnProfile ? ' editable' : ''}" alt="프로필 사진">`
+        : `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">${user.nickname?.[0]?.toUpperCase() ?? '?'}</div>`;
 
-  contentDiv.innerHTML = `
-    <div class="profile-card">
-      <div class="profile-header">
-        ${avatarHtml}
-        <div class="profile-info">
-          <div class="profile-name">
-            ${escapeHtml(user.nickname)}
-            ${isVerified ? '<span class="verification-badge"></span>' : ''}
+      contentDiv.innerHTML = `
+        <div class="profile-card">
+          <div class="profile-header">
+            ${avatarHtml}
+            <div class="profile-info">
+              <div class="profile-name">
+                ${escapeHtml(user.nickname)}
+                ${isVerified ? '<span class="verification-badge"></span>' : ''}
+              </div>
+              <div class="profile-stats">
+                <div class="stat-item">
+                  <div class="stat-number">${postCount}</div>
+                  <div class="stat-label">게시물</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">${totalLikes}</div>
+                  <div class="stat-label">좋아요</div>
+                </div>
+                <button class="share-btn" id="shareBtn" onclick="copyProfileLink()" title="프로필 링크 복사">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="profile-stats">
-            <div class="stat-item">
-              <div class="stat-number">${postCount}</div>
-              <div class="stat-label">게시물</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number">${totalLikes}</div>
-              <div class="stat-label">좋아요</div>
-            </div>
-            <button class="share-btn" id="shareBtn" onclick="copyProfileLink()" title="프로필 링크 복사">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-            </button>
+          <div class="status-message-container">
+            ${statusDisplay}
+            ${editButton}
           </div>
         </div>
-      </div>
-      <div class="status-message-container">
-        ${statusDisplay}
-        ${editButton}
-      </div>
-    </div>
-  `;
+      `;
 
-  // 본인 프로필인 경우에만 클릭 이벤트 연결
-  if (isOwnProfile) {
-    const avatarElement = contentDiv.querySelector('.profile-avatar, .profile-avatar-img.editable');
-    if (avatarElement) {
-      avatarElement.onclick = () => {
-        document.getElementById('profileFileInput').click();
-      };
-    }
-  }
-}
-
-async function loadUserPosts() {
-  const postsDiv = document.getElementById('userPosts');
-  try {
-    const { data: posts, error } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('author', userNickname)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    if (!posts || posts.length === 0) {
-      postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
-      return;
+      // 본인 프로필인 경우에만 클릭 이벤트 연결
+      if (isOwnProfile) {
+        const avatarElement = contentDiv.querySelector('.profile-avatar, .profile-avatar-img.editable');
+        if (avatarElement) {
+          avatarElement.onclick = () => {
+            document.getElementById('profileFileInput').click();
+          };
+        }
+      }
     }
 
-    const postsWithLikes = await Promise.all(
-      posts.map(async (post) => {
-        const { count } = await supabase
-          .from('likes')
-          .select('id', { count: 'exact', head: true })
-          .eq('post_id', post.id);
-        return { ...post, likeCount: count ?? 0 };
-      })
-    );
+    async function loadUserPosts() {
+      const postsDiv = document.getElementById('userPosts');
 
-    displayPosts(postsWithLikes);
-  } catch (e) {
-    console.error('게시물 로드 오류:', e);
-    postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
-  }
-}
+      try {
+        const { data: posts, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('author', userNickname)
+          .order('created_at', { ascending: false });
 
-function displayPosts(posts) {
-  const postsDiv = document.getElementById('userPosts');
-  const gridDiv = document.createElement('div');
-  gridDiv.className = 'post-grid';
+        if (error) throw error;
 
-  posts.forEach(post => {
-    const postItem = document.createElement('div');
-    postItem.className = 'post-item';
-    postItem.onclick = () => {
-      window.location.href = `view.html?id=${post.id}`;
+        if (!posts || posts.length === 0) {
+          postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
+          return;
+        }
+
+        const postsWithLikes = await Promise.all(
+          posts.map(async (post) => {
+            const { count } = await supabase
+              .from('likes')
+              .select('id', { count: 'exact', head: true })
+              .eq('post_id', post.id);
+            return { ...post, likeCount: count ?? 0 };
+          })
+        );
+
+        displayPosts(postsWithLikes);
+      } catch (e) {
+        console.error('게시물 로드 오류:', e);
+        postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+      }
+    }
+
+    function displayPosts(posts) {
+      const postsDiv = document.getElementById('userPosts');
+      const gridDiv = document.createElement('div');
+      gridDiv.className = 'post-grid';
+
+      posts.forEach(post => {
+        const postItem = document.createElement('div');
+        postItem.className = 'post-item';
+        postItem.onclick = () => {
+          window.location.href = `view.html?id=${post.id}`;
+        };
+
+        const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
+
+        postItem.innerHTML = `
+          ${post.image_url ? `<img src="${post.image_url}" class="post-item-image" alt="게시글 이미지">` : ''}
+          ${post.content ? `
+            <div class="post-item-content">
+              <div class="post-item-text">${escapeHtml(post.content)}</div>
+            </div>
+          ` : ''}
+          <div class="post-item-footer">
+            <div class="post-item-date">${timeStr}</div>
+            <div class="post-item-likes">👍 ${post.likeCount}</div>
+          </div>
+        `;
+
+        gridDiv.appendChild(postItem);
+      });
+
+      postsDiv.innerHTML = '';
+      postsDiv.appendChild(gridDiv);
+    }
+
+    function escapeHtml(t) {
+      if (!t) return '';
+      return t.replace(/[&<>"']/g, m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[m]));
+    }
+
+    function showError(msg) {
+      document.getElementById('profileContent').innerHTML = `
+        <div class="profile-card">
+          <div style="text-align:center; padding:40px 20px;">
+            <div style="color:#ff6b6b; font-size:16px; margin-bottom:20px;">${msg}</div>
+            <button onclick="window.history.back()" style="background:#3663FF; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">돌아가기</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('userPosts').innerHTML = '';
+    }
+
+    window.openStatusModal = function() {
+      const modal = document.getElementById('statusModal');
+      const input = document.getElementById('statusInput');
+      input.value = viewingUser?.message || '';
+      modal.classList.add('active');
     };
 
-    const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
+    window.closeStatusModal = function() {
+      document.getElementById('statusModal').classList.remove('active');
+    };
 
-    postItem.innerHTML = `
-      ${post.image_url ? `<img src="${post.image_url}" class="post-item-image" alt="게시글 이미지">` : ''}
-      ${post.content ? `
-        <div class="post-item-content">
-          <div class="post-item-text">${escapeHtml(post.content)}</div>
-        </div>
-      ` : ''}
-      <div class="post-item-footer">
-        <div class="post-item-date">${timeStr}</div>
-        <div class="post-item-likes">👍 ${post.likeCount}</div>
-      </div>
-    `;
-    gridDiv.appendChild(postItem);
-  });
+    window.saveStatusMessage = async function() {
+      const input = document.getElementById('statusInput');
+      const newMessage = input.value.trim();
 
-  postsDiv.innerHTML = '';
-  postsDiv.appendChild(gridDiv);
-}
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ message: newMessage })
+          .eq('nickname', currentUser.nickname);
 
-function escapeHtml(t) {
-  if (!t) return '';
-  return t.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
-}
+        if (error) throw error;
 
-function showError(msg) {
-  document.getElementById('profileContent').innerHTML = `
-    <div class="profile-card">
-      <div style="text-align:center; padding:40px 20px;">
-        <div style="color:#ff6b6b; font-size:16px; margin-bottom:20px;">${msg}</div>
-        <button onclick="window.history.back()" style="background:#3663FF; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">돌아가기</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('userPosts').innerHTML = '';
-}
+        viewingUser.message = newMessage;
+        await displayProfile(viewingUser);
+        closeStatusModal();
+      } catch (e) {
+        console.error('상태메시지 저장 실패:', e);
+        alert('상태메시지 저장에 실패했습니다.');
+      }
+    };
 
-window.openStatusModal = function() {
-  const modal = document.getElementById('statusModal');
-  const input = document.getElementById('statusInput');
-  input.value = viewingUser?.message || '';
-  modal.classList.add('active');
-};
+    document.getElementById('statusModal').addEventListener('click', function(e) {
+      if (e.target === this) closeStatusModal();
+    });
 
-window.closeStatusModal = function() {
-  document.getElementById('statusModal').classList.remove('active');
-};
+    window.goBack = () => window.history.back();
+    window.showPrivacyPolicy = () => window.location.href = "privacy.html";
+    window.showTerms = () => window.location.href = "policy.html";
 
-window.saveStatusMessage = async function() {
-  const input = document.getElementById('statusInput');
-  const newMessage = input.value.trim();
-
-  try {
-    const { error } = await supabase
-      .from('users')
-      .update({ message: newMessage })
-      .eq('nickname', currentUser.nickname);
-
-    if (error) throw error;
-
-    viewingUser.message = newMessage;
-    await displayProfile(viewingUser);
-    closeStatusModal();
-  } catch (e) {
-    console.error('상태메시지 저장 실패:', e);
-    alert('상태메시지 저장에 실패했습니다.');
-  }
-};
-
-document.getElementById('statusModal').addEventListener('click', function(e) {
-  if (e.target === this) closeStatusModal();
-});
-
-window.goBack = () => window.history.back();
-
-window.showPrivacyPolicy = () => window.location.href = "privacy.html";
-window.showTerms = () => window.location.href = "policy.html";
-
-window.copyProfileLink = function() {
-  navigator.clipboard.writeText(window.location.href).then(() => {
-    const btn = document.getElementById('shareBtn');
-    btn.classList.add('success');
-    setTimeout(() => btn.classList.remove('success'), 1500);
-  }).catch(err => {
-    console.error('링크 복사 실패:', err);
-    alert('링크 복사에 실패했습니다.');
-  });
-};
-</script>
+    window.copyProfileLink = function() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        const btn = document.getElementById('shareBtn');
+        btn.classList.add('success');
+        setTimeout(() => btn.classList.remove('success'), 1500);
+      }).catch(err => {
+        console.error('링크 복사 실패:', err);
+        alert('링크 복사에 실패했습니다.');
+      });
+    };
+  </script>
 </body>
 </html>
