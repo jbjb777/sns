@@ -10,7 +10,6 @@
   <meta name="keywords" content="Sharer, 커뮤니티, SNS, 정빈777, 정빈정빈">
   <meta name="author" content="정빈777">
   <meta name="robots" content="index, follow">
-
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Sharer | 커뮤니티 · SNS">
@@ -20,31 +19,24 @@
   <meta property="og:image:width" content="512">
   <meta property="og:image:height" content="512">
   <meta property="og:site_name" content="Sharer">
-
   <!-- Twitter(X) -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Sharer | 커뮤니티 · SNS">
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
     .sidebar-container { width: 250px; min-width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
     .sidebar-container iframe { width: 250px !important; height: 100%; border: none; }
-
     .main-wrapper { margin-left: 250px; width: calc(100% - 250px); display: flex; flex-direction: column; min-height: 100vh; }
     .main-content { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 20px; overflow-y: auto; opacity: 0; transform: translateY(30px); animation: slideUp 0.6s ease-out 0.2s forwards; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-
     .feed-container { max-width: 600px; width: 100%; }
     .recommend-container { width: 250px; margin-left: 20px; position: sticky; top: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); opacity: 0; animation: fadeInText 0.5s ease-out 0.6s forwards; }
     @keyframes fadeInText { to { opacity: 1; } }
-
     .recommend-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #fff; }
-
     .profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; transition: background 0.3s; opacity: 0; transform: translateX(20px); animation: slideInLeft 0.5s ease-out forwards; }
     .profile-item:nth-child(1) { animation-delay: 0.7s; }
     .profile-item:nth-child(2) { animation-delay: 0.75s; }
@@ -54,19 +46,67 @@
     .profile-item:nth-child(6) { animation-delay: 0.95s; }
     .profile-item:nth-child(7) { animation-delay: 1s; }
     @keyframes slideInLeft { to { opacity: 1; transform: translateX(0); } }
-
     .profile-item:hover { background: #2c2c2c; border-radius: 8px; }
-
     .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; background-size: cover; background-position: center; }
     .profile-nickname { font-size: 14px; color: #fff; }
 
-    /* 스켈레톤 */
-    .skeleton { background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 4px; }
+    /* 스켈레톤 개선 */
+    .skeleton {
+      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 6px;
+    }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-    .skeleton-profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
-    .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
-    .skeleton-nickname { width: 100px; height: 16px; border-radius: 4px; }
+    .skeleton-post {
+      padding: 20px 0;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .skeleton-post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .skeleton-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .skeleton-username {
+      width: 140px;
+      height: 16px;
+    }
+    .skeleton-post-image {
+      width: 100%;
+      height: 400px;
+      border-radius: 12px;
+      margin: 12px 0;
+    }
+    .skeleton-text {
+      height: 14px;
+      margin: 6px 0;
+    }
+    .text-short   { width: 60%; }
+    .text-medium  { width: 85%; }
+    .text-long    { width: 100%; }
+
+    .skeleton-profile-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .skeleton-profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .skeleton-profile-nickname {
+      width: 110px;
+      height: 16px;
+    }
 
     @media (max-width: 768px) {
       .recommend-container { display: none; }
@@ -74,9 +114,7 @@
       .sidebar-container iframe { width: 80px !important; }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
     }
-
     .verification-badge { display: inline-block; width: 18px; height: 18px; margin-left: 5px; vertical-align: middle; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
-
     .post-card {
       background: transparent;
       border: none;
@@ -91,7 +129,6 @@
       transform: translateY(20px);
       animation: slideUpFade 0.6s ease-out forwards;
     }
-
     .post-card:nth-child(1) { animation-delay: 0.4s; }
     .post-card:nth-child(2) { animation-delay: 0.5s; }
     .post-card:nth-child(3) { animation-delay: 0.6s; }
@@ -99,33 +136,25 @@
     .post-card:nth-child(5) { animation-delay: 0.8s; }
     .post-card:nth-child(6) { animation-delay: 0.9s; }
     .post-card:nth-child(7) { animation-delay: 1.0s; }
-
     @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
-
     .post-card:hover { background: rgba(255, 255, 255, 0.03); }
     .post-card:last-child { border-bottom: none; }
-
     .post-header { padding: 0; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .post-author-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
     .post-author-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; }
     .post-author-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; color: #fff; }
-
     .post-image { width: 100%; max-height: 600px; object-fit: cover; border-radius: 12px; margin: 12px 0; }
     .post-content { font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-wrap; }
     .post-time { padding: 6px 0 0; font-size: 12px; color: #888; }
-
     .no-posts { text-align: center; padding: 60px 20px; color: #aaa; }
-
     .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 12px; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
     .delete-btn:hover { transform: translateY(-4px) scale(1.05); }
     .delete-btn:active { background: #cc0000; }
-
     .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: auto; opacity: 0; animation: fadeInText 0.5s ease-out 1.1s forwards; }
     .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
     .footer-links a:hover { color: #00aaff; text-decoration: underline; }
     .footer-text { color: #666; font-size: 12px; }
-
-    /* 모달 관련 스타일 (생략없이 전체 포함) */
+    /* 모달 관련 스타일 */
     .auth-modal, .create-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
     .auth-modal.active, .create-modal.active { display: flex; }
     .auth-box, .create-modal-content { background: #1e1e1e; border-radius: 16px; padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(0,0,0,0.6); position: relative; }
@@ -146,13 +175,10 @@
   </style>
 </head>
 <body>
-
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
-
   <div class="main-wrapper">
-
     <!-- 로그인 모달 -->
     <div class="auth-modal" id="loginModal">
       <div class="auth-box">
@@ -166,7 +192,6 @@
         <button class="secondary" onclick="showSignup()">회원가입</button>
       </div>
     </div>
-
     <!-- 회원가입 모달 -->
     <div class="auth-modal" id="signupModal">
       <div class="auth-box">
@@ -183,7 +208,6 @@
         <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
       </div>
     </div>
-
     <!-- 게시물 작성 모달 -->
     <div class="create-modal" id="createModal">
       <div class="create-modal-content">
@@ -209,19 +233,51 @@
     <div class="main-content">
       <div class="feed-container">
         <div id="postsFeed">
-          <!-- 스켈레톤 로딩 UI -->
-          <div class="skeleton-post">...</div>
-          <div class="skeleton-post">...</div>
-          <div class="skeleton-post">...</div>
+          <!-- 개선된 게시물 스켈레톤 (3개) -->
+          <div class="skeleton-post">
+            <div class="skeleton-post-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-username"></div>
+            </div>
+            <div class="skeleton skeleton-post-image"></div>
+            <div class="skeleton text text-long"></div>
+            <div class="skeleton text text-medium"></div>
+            <div class="skeleton text text-short"></div>
+          </div>
+
+          <div class="skeleton-post">
+            <div class="skeleton-post-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-username"></div>
+            </div>
+            <div class="skeleton skeleton-post-image"></div>
+            <div class="skeleton text text-long"></div>
+            <div class="skeleton text text-long"></div>
+          </div>
+
+          <div class="skeleton-post">
+            <div class="skeleton-post-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-username"></div>
+            </div>
+            <div class="skeleton text text-medium"></div>
+            <div class="skeleton text text-long"></div>
+            <div class="skeleton text text-short"></div>
+          </div>
         </div>
       </div>
 
       <div class="recommend-container" id="recommendProfiles">
         <div class="recommend-title">프로필 추천</div>
         <div id="recommendSkeleton">
-          <!-- 스켈레톤 7개 -->
-          <div class="skeleton-profile-item">...</div>
-          <!-- ... 6개 더 ... -->
+          <!-- 개선된 추천 프로필 스켈레톤 7개 -->
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
         </div>
       </div>
     </div>
@@ -238,21 +294,18 @@
 
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
   const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
   const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
   const cloudName = 'dretlhsrk';
   const uploadPreset = 'unsigned_preset';
-
   let currentUser = null;
   let selectedImage = null;
   let verificationCode = "";
   let isVerifying = false;
 
   // -------------------------------
-  //          기본 함수들
+  // 기본 함수들
   // -------------------------------
   function initCurrentUser() {
     const savedUser = localStorage.getItem('snsUser');
@@ -297,7 +350,7 @@
   window.addEventListener('resize', updateSidebarMode);
 
   // -------------------------------
-  //       모달 관련 함수들
+  // 모달 관련 함수들
   // -------------------------------
   window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
   window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
@@ -332,18 +385,16 @@
   };
 
   // -------------------------------
-  //       Cloudinary 업로드
+  // Cloudinary 업로드
   // -------------------------------
   async function uploadImageToCloudinary(file) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', uploadPreset);
-
     const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
       method: 'POST',
       body: formData
     });
-
     if (!response.ok) throw new Error('이미지 업로드 실패');
     const data = await response.json();
     return data.secure_url;
@@ -381,6 +432,7 @@
       if (error) throw error;
 
       messageDiv.innerHTML = '<span style="color:#00ff00;">게시글이 작성되었습니다!</span>';
+
       setTimeout(() => {
         document.getElementById('createModal').classList.remove('active');
         messageDiv.innerHTML = '';
@@ -396,7 +448,7 @@
   };
 
   // -------------------------------
-  //       프로필 사진 포함 게시물 로드
+  // 프로필 사진 포함 게시물 로드
   // -------------------------------
   function formatPostTime(dateString) {
     const now = new Date();
@@ -416,7 +468,6 @@
 
   async function loadPosts() {
     const feedDiv = document.getElementById('postsFeed');
-
     try {
       const { data: posts, error } = await supabase
         .from('posts')
@@ -433,7 +484,6 @@
       feedDiv.innerHTML = '';
 
       for (const post of posts) {
-        // 작성자 프로필 정보 가져오기
         const { data: author } = await supabase
           .from('users')
           .select('nickname, profile_image')
@@ -443,7 +493,6 @@
         const authorNickname = author?.nickname || post.author || '알 수 없음';
         const authorAvatar = author?.profile_image || null;
         const isVerified = authorNickname === "JB777";
-
         const timeStr = formatPostTime(post.created_at);
         const canDelete = currentUser?.nickname === "JB777" && currentUser?.isVerified;
 
@@ -486,7 +535,6 @@
           ${contentHTML}
           <div class="post-time">${timeStr}</div>
         `;
-
         postCard.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
         feedDiv.appendChild(postCard);
       }
@@ -497,18 +545,18 @@
   }
 
   // -------------------------------
-  //       추천 프로필 (프로필사진 포함)
+  // 추천 프로필 (프로필사진 포함)
   // -------------------------------
   async function loadRecommendedProfiles() {
     const container = document.getElementById('recommendProfiles');
     const skeleton = document.getElementById('recommendSkeleton');
-
     try {
       let { data: users, error } = await supabase
         .from('users')
         .select('id, nickname, profile_image');
 
       if (error) throw error;
+
       if (!users?.length) {
         skeleton?.remove();
         container.innerHTML += '<div style="text-align:center; color:#aaa; padding:12px 0;">사용자 없음</div>';
@@ -573,7 +621,6 @@
   // 초기 로드
   loadPosts();
   loadRecommendedProfiles();
-
 </script>
 </body>
 </html>
