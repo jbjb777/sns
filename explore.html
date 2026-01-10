@@ -731,15 +731,22 @@
         return profileImageCache.get(userId);
       }
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('users')
           .select('profile_image')
           .eq('id', userId)
-          .single();
+          .maybeSingle();  // ← single() 대신 maybeSingle() 사용 (데이터 없어도 에러 안 남)
+
+        if (error) {
+          console.warn('프로필 이미지 조회 오류:', error);
+          return null;
+        }
+
         const url = data?.profile_image || null;
         profileImageCache.set(userId, url);
         return url;
       } catch (e) {
+        console.warn('getProfileImage 예외:', e);
         return null;
       }
     }
@@ -859,7 +866,12 @@
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+          console.error('posts 조회 에러:', error);
+          showError();
+          return;
+        }
+
         if (!posts || posts.length === 0) {
           showNoPosts();
           return;
@@ -868,7 +880,7 @@
         allPosts = posts;
         shuffleAndDisplay();
       } catch (error) {
-        console.error('게시물 로드 오류:', error);
+        console.error('loadAllPosts 전체 오류:', error);
         showError();
       }
     }
@@ -889,12 +901,14 @@
       for (let i = 0; i < INITIAL_LOAD; i++) {
         const post = getNextPost();
         if (post) {
-          const shortItem = createShortItem(post, i);
-          container.appendChild(shortItem);
-          loadedPostIndices.add(i);
+          createShortItem(post, i).then(shortItem => {
+            container.appendChild(shortItem);
+            loadedPostIndices.add(i);
+          });
         }
       }
-      loadLikesAndComments();
+      // 비동기 후 좋아요/댓글 로드
+      setTimeout(loadLikesAndComments, 300);
     }
 
     function getNextPost() {
@@ -912,11 +926,12 @@
       if (!loadedPostIndices.has(nextIndex)) {
         const post = getNextPost();
         if (post) {
-          const shortItem = createShortItem(post, nextIndex);
-          container.appendChild(shortItem);
-          loadedPostIndices.add(nextIndex);
-          loadLikesAndComments();
-          updateNavButtons();
+          createShortItem(post, nextIndex).then(shortItem => {
+            container.appendChild(shortItem);
+            loadedPostIndices.add(nextIndex);
+            loadLikesAndComments();
+            updateNavButtons();
+          });
         }
       }
     }
@@ -946,11 +961,11 @@
     }
 
     async function createShortItem(post, index) {
-      const isVerified = post.author === "JB777" || post.author === "진정오";
-      const hasImage = post.image_url;
-      const hasContent = post.content && post.content.trim();
+      const isVerified = ["JB777", "진정오"].includes(post.author);
+      const hasImage = !!post.image_url;
+      const hasContent = !!post.content?.trim();
 
-      // 작성자 프로필 이미지 가져오기
+      // 작성자 프로필 이미지 비동기 가져오기
       const authorProfileUrl = await getProfileImage(post.author_id);
       let avatarHTML = post.author ? post.author[0].toUpperCase() : '?';
       if (authorProfileUrl) {
@@ -1019,9 +1034,9 @@
 
     async function loadLikesAndComments() {
       try {
-        const { data: likes } = await supabase.from('likes').select('*');
+        const { data: likes } = await supabase.from('likes').select('post_id, user_id');
         displayedPosts.forEach(post => {
-          const postLikes = likes?.filter(like => like.post_id === post.id) || [];
+          const postLikes = likes?.filter(l => l.post_id === post.id) || [];
           updateLikeUI(post.id, postLikes);
         });
 
@@ -1039,11 +1054,8 @@
     function updateLikeUI(postId, likes) {
       const btn = document.querySelector(`[data-like-btn="${postId}"]`);
       const count = document.querySelector(`[data-like-count="${postId}"]`);
-
       if (!btn || !count) return;
-
       count.textContent = likes.length;
-
       if (currentUser && likes.some(like => like.user_id === currentUser.id)) {
         btn.classList.add('liked');
       } else {
