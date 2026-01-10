@@ -393,7 +393,7 @@
     let isLoggedIn = false;
     let currentUserId = null;
     let currentUserNickname = null;
-    let currentUserProfileImage = null; // ← 추가: 프로필 이미지 URL 저장
+    let currentUserProfileImage = null;
 
     // 🔥 로고 클릭 → index.html
     logoContainer.onclick = () => {
@@ -450,11 +450,13 @@
 
       // 유저 정보 업데이트
       if (data.type === 'updateUser') {
+        console.log('받은 유저 데이터:', data.user); // ← 디버깅용: 어떤 값이 오는지 확인
+
         if (data.user) {
           isLoggedIn = true;
           currentUserId = data.user.id;
           currentUserNickname = data.user.nickname;
-          currentUserProfileImage = data.user.profile_image; // ← 추가
+          currentUserProfileImage = data.user.profile_image;
 
           // 닉네임 표시
           userNickname.innerHTML = escapeHtml(data.user.nickname || '?');
@@ -462,17 +464,33 @@
             userNickname.innerHTML += '<span class="verification-badge"></span>';
           }
 
-          // 프로필 사진 표시 (우선순위: profile_image → 닉네임 첫글자)
-          if (currentUserProfileImage) {
+          // 프로필 사진 표시
+          if (currentUserProfileImage && typeof currentUserProfileImage === 'string' && currentUserProfileImage.trim() !== '') {
+            console.log('프로필 이미지 URL:', currentUserProfileImage); // ← 이 값이 실제 이미지 URL인지 확인
+
             const img = document.createElement('img');
-            img.src = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
+            // 캐시 방지 + URL 정규화
+            const url = currentUserProfileImage + 
+                        (currentUserProfileImage.includes('?') ? '&' : '?') + 
+                        'v=' + Date.now();
+
+            img.src = url;
             img.alt = data.user.nickname || '프로필';
             img.style.width = '100%';
             img.style.height = '100%';
             img.style.objectFit = 'cover';
+
+            // 이미지 로드 실패 시 fallback
+            img.onerror = () => {
+              console.log('이미지 로드 실패 → fallback 적용:', url);
+              userAvatar.innerHTML = '';
+              userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
+            };
+
             userAvatar.innerHTML = '';
             userAvatar.appendChild(img);
           } else {
+            console.log('프로필 이미지 없음 → 닉네임 첫글자 표시');
             userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
           }
 
