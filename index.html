@@ -535,23 +535,33 @@ async function toggleLike(postId, button) {
   let currentCount = parseInt(countEl.textContent, 10) || 0;
   const wasLiked = button.classList.contains('liked');
 
-  // 낙관적 UI 업데이트
+  // 1. 낙관적 UI 업데이트
   const newLiked = !wasLiked;
   const newCount = wasLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
-
   button.classList.toggle('liked', newLiked);
   countEl.textContent = newCount;
 
-  // 서버 요청
   try {
     if (wasLiked) {
       // 좋아요 취소
-      const likeRecord = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
-      if (likeRecord?.[0]?.id) {
-        await api(`/likes?id=eq.${likeRecord[0].id}`, { method: "DELETE" });
+      const records = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
+      if (records?.length > 0) {
+        await api(`/likes?id=eq.${records[0].id}`, { method: "DELETE" });
       }
     } else {
-      // 좋아요 추가
+      // 좋아요 추가 - 중복 확인 후 진행
+      const existing = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
+
+      if (existing?.length > 0) {
+        // 이미 존재 → UI만 서버와 맞춤
+        console.log('이미 좋아요 누른 상태 → UI 동기화');
+        button.classList.add('liked');
+        const realCount = await getLikeCount(postId);
+        countEl.textContent = realCount;
+        return;
+      }
+
+      // 실제 추가
       await api("/likes", {
         method: "POST",
         body: JSON.stringify({
@@ -561,13 +571,13 @@ async function toggleLike(postId, button) {
       });
     }
 
-    // 최종 동기화
+    // 최종 서버 값으로 동기화
     const serverCount = await getLikeCount(postId);
     countEl.textContent = serverCount;
 
   } catch (err) {
     console.error("좋아요 처리 실패:", err);
-    // 실패 시 복구
+    // 실패 시 UI 원상복구
     button.classList.toggle('liked', wasLiked);
     countEl.textContent = currentCount;
   }
