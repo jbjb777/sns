@@ -515,16 +515,6 @@ async function getLikeCount(postId) {
   }
 }
 
-async function isLikedByMe(postId) {
-  if (!currentUser) return false;
-  try {
-    const myLike = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
-    return !!myLike?.length;
-  } catch {
-    return false;
-  }
-}
-
 async function toggleLike(postId, button) {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
@@ -532,36 +522,37 @@ async function toggleLike(postId, button) {
   }
 
   const countEl = button.querySelector('.like-count');
-  let currentCount = parseInt(countEl.textContent, 10) || 0;
-  const wasLiked = button.classList.contains('liked');
-
-  // 1. 낙관적 UI 업데이트
-  const newLiked = !wasLiked;
-  const newCount = wasLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
-  button.classList.toggle('liked', newLiked);
-  countEl.textContent = newCount;
 
   try {
-    if (wasLiked) {
-      // 좋아요 취소
-      const records = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
-      if (records?.length > 0) {
-        await api(`/likes?id=eq.${records[0].id}`, { method: "DELETE" });
+    // 1. 서버에서 현재 상태 실시간 확인
+    const [likeRecords, likeCountResult] = await Promise.all([
+      api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+      api(`/likes?post_id=eq.${postId}&select=count`)
+    ]);
+
+    const currentlyLiked = likeRecords?.length > 0;
+    const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
+
+    // 2. UI 현재 상태와 서버 상태 비교 후 동기화
+    const uiLiked = button.classList.contains('liked');
+    const uiCount = parseInt(countEl.textContent, 10) || 0;
+
+    if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
+      button.classList.toggle('liked', currentlyLiked);
+      countEl.textContent = currentServerCount;
+      console.log('UI와 서버 상태 불일치 → 자동 동기화');
+    }
+
+    // 3. 사용자가 원하는 동작 수행
+    if (currentlyLiked) {
+      // 취소
+      if (likeRecords?.[0]?.id) {
+        await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
       }
+      button.classList.remove('liked');
+      countEl.textContent = currentServerCount - 1;
     } else {
-      // 좋아요 추가 - 중복 확인 후 진행
-      const existing = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
-
-      if (existing?.length > 0) {
-        // 이미 존재 → UI만 서버와 맞춤
-        console.log('이미 좋아요 누른 상태 → UI 동기화');
-        button.classList.add('liked');
-        const realCount = await getLikeCount(postId);
-        countEl.textContent = realCount;
-        return;
-      }
-
-      // 실제 추가
+      // 추가
       await api("/likes", {
         method: "POST",
         body: JSON.stringify({
@@ -569,17 +560,27 @@ async function toggleLike(postId, button) {
           user_id: currentUser.id
         })
       });
+      button.classList.add('liked');
+      countEl.textContent = currentServerCount + 1;
     }
 
-    // 최종 서버 값으로 동기화
-    const serverCount = await getLikeCount(postId);
-    countEl.textContent = serverCount;
+    // 4. 최종 서버 값 확인 (안전장치)
+    const finalCount = await getLikeCount(postId);
+    countEl.textContent = finalCount;
 
   } catch (err) {
-    console.error("좋아요 처리 실패:", err);
-    // 실패 시 UI 원상복구
-    button.classList.toggle('liked', wasLiked);
-    countEl.textContent = currentCount;
+    console.error("좋아요 처리 중 오류:", err);
+    // 오류 시 서버 상태로 강제 복구
+    try {
+      const [records, countRes] = await Promise.all([
+        api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+        api(`/likes?post_id=eq.${postId}&select=count`)
+      ]);
+      button.classList.toggle('liked', records?.length > 0);
+      countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
+    } catch (recoveryErr) {
+      console.error("복구 실패:", recoveryErr);
+    }
   }
 }
 
@@ -641,7 +642,7 @@ async function loadPosts() {
       }
 
       const likeCount = await getLikeCount(post.id);
-      const liked = await isLikedByMe(post.id);
+      const liked = await api(`/likes?post_id=eq.${post.id}&user_id=eq.${currentUser?.id || '0'}&select=id`).then(r => r?.length > 0);
 
       const postCard = document.createElement('div');
       postCard.className = 'post-card';
