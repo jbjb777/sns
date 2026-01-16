@@ -287,122 +287,158 @@
     <div class="create-container">
       <h2><div class="create-profile-avatar" id="createAvatar"></div>무엇을 공유하시겠어요?</h2>
       <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
-    
+   
       <div class="image-preview-container">
         <img id="imagePreview" class="image-preview">
       </div>
-    
+   
       <input type="file" id="imageInput" accept="image/*" style="display: none;">
       <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
-    
+   
       <div id="postMessage" class="message"></div>
     </div>
   </div>
   <div class="footer">
     © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
   </div>
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-  
-    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-  
-    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-    const cloudName = 'dretlhsrk';
-    const uploadPreset = 'unsigned_preset';
-    let currentUser = null;
-    let selectedImage = null;
-    function initPage() {
-      const savedUser = localStorage.getItem('snsUser');
-      if (!savedUser) {
-        alert('로그인이 필요합니다.');
-        window.location.href = 'login.html';
-        return;
+
+<script>
+  // Cloudflare Worker API 프록시 주소 (키 노출 완전 제거)
+  const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
+  async function api(endpoint, options = {}) {
+    const url = API_BASE + endpoint;
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
+
+    if (!res.ok) {
+      let errorText;
+      try {
+        errorText = await res.text();
+      } catch {
+        errorText = "Unknown error";
       }
-      currentUser = JSON.parse(savedUser);
-      const avatarLetter = currentUser.nickname ? currentUser.nickname[0].toUpperCase() : '?';
-      document.getElementById('headerAvatar').innerHTML = avatarLetter;
-      document.getElementById('createAvatar').innerHTML = avatarLetter;
+      throw new Error(`API 오류 (${res.status}): ${errorText}`);
     }
-    window.goBack = function() {
-      window.history.back();
+
+    if (res.status === 204) return null; // DELETE 등 빈 응답
+    return res.json();
+  }
+
+  const cloudName = 'dretlhsrk';
+  const uploadPreset = 'unsigned_preset';
+  let currentUser = null;
+  let selectedImage = null;
+
+  function initPage() {
+    const savedUser = localStorage.getItem('snsUser');
+    if (!savedUser) {
+      alert('로그인이 필요합니다.');
+      window.location.href = 'login.html';
+      return;
     }
-    window.goHome = function() {
+    currentUser = JSON.parse(savedUser);
+    const avatarLetter = currentUser.nickname ? currentUser.nickname[0].toUpperCase() : '?';
+    document.getElementById('headerAvatar').innerHTML = avatarLetter;
+    document.getElementById('createAvatar').innerHTML = avatarLetter;
+  }
+
+  window.goBack = function() {
+    window.history.back();
+  }
+
+  window.goHome = function() {
+    window.location.href = 'index.html';
+  }
+
+  document.getElementById('uploadBtn').onclick = () => {
+    document.getElementById('imageInput').click();
+  };
+
+  document.getElementById('imageInput').onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      selectedImage = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const preview = document.getElementById('imagePreview');
+        preview.src = e.target.result;
+        preview.classList.add('show');
+      }
+      reader.readAsDataURL(file);
+    }
+  };
+
+  async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', uploadPreset);
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      if (!response.ok) throw new Error('이미지 업로드 실패');
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error('Cloudinary 업로드 오류:', error);
+      throw error;
+    }
+  }
+
+  document.getElementById('postBtn').onclick = async () => {
+    const content = document.getElementById('postContent').value.trim();
+    const messageDiv = document.getElementById('postMessage');
+    const postButton = document.getElementById('postBtn');
+
+    if (!content && !selectedImage) {
+      messageDiv.className = 'message error';
+      messageDiv.textContent = '내용 또는 이미지를 추가해주세요.';
+      return;
+    }
+
+    postButton.disabled = true;
+    postButton.classList.add('loading');
+    messageDiv.textContent = '';
+
+    try {
+      let imageUrl = null;
+      if (selectedImage) {
+        imageUrl = await uploadImageToCloudinary(selectedImage);
+      }
+
+      // Worker를 통해 게시물 생성
+      await api("/posts", {
+        method: "POST",
+        body: JSON.stringify({
+          author: currentUser.nickname,
+          author_id: currentUser.id,
+          content: content,
+          image_url: imageUrl,
+          created_at: new Date().toISOString()
+        })
+      });
+
+      // 성공 시 메인으로 이동
       window.location.href = 'index.html';
+
+    } catch (error) {
+      console.error('게시 오류:', error);
+      messageDiv.className = 'message error';
+      messageDiv.textContent = '게시에 실패했습니다. 다시 시도해주세요.';
+    } finally {
+      postButton.disabled = false;
+      postButton.classList.remove('loading');
     }
-    document.getElementById('uploadBtn').onclick = () => {
-      document.getElementById('imageInput').click();
-    };
-    document.getElementById('imageInput').onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        selectedImage = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const preview = document.getElementById('imagePreview');
-          preview.src = e.target.result;
-          preview.classList.add('show');
-        }
-        reader.readAsDataURL(file);
-      }
-    };
-    async function uploadImageToCloudinary(file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', uploadPreset);
-      try {
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-          method: 'POST',
-          body: formData
-        });
-        if (!response.ok) throw new Error('이미지 업로드 실패');
-        const data = await response.json();
-        return data.secure_url;
-      } catch (error) {
-        console.error('Cloudinary 업로드 오류:', error);
-        throw error;
-      }
-    }
-    document.getElementById('postBtn').onclick = async () => {
-      const content = document.getElementById('postContent').value.trim();
-      const messageDiv = document.getElementById('postMessage');
-      const postButton = document.getElementById('postBtn');
-      if (!content && !selectedImage) {
-        messageDiv.className = 'message error';
-        messageDiv.textContent = '내용 또는 이미지를 추가해주세요.';
-        return;
-      }
-      postButton.disabled = true;
-      postButton.classList.add('loading');
-      messageDiv.textContent = '';
-      try {
-        let imageUrl = null;
-        if (selectedImage) {
-          imageUrl = await uploadImageToCloudinary(selectedImage);
-        }
-        const { error } = await supabase
-          .from('posts')
-          .insert([
-            {
-              author: currentUser.nickname,
-              author_id: currentUser.id,
-              content: content,
-              image_url: imageUrl,
-              created_at: new Date().toISOString()
-            }
-          ]);
-        if (error) throw error;
-        window.location.href = 'index.html';
-      } catch (error) {
-        console.error('게시 오류:', error);
-        messageDiv.className = 'message error';
-        messageDiv.textContent = '게시에 실패했습니다. 다시 시도해주세요.';
-      
-        postButton.disabled = false;
-        postButton.classList.remove('loading');
-      }
-    };
-    initPage();
-  </script>
+  };
+
+  initPage();
+</script>
 </body>
 </html>
