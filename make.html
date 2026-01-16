@@ -306,7 +306,7 @@
   // Cloudflare Worker API 프록시 주소
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
-  // 안전한 api 헬퍼 함수 (204 처리 추가)
+  // 안전한 api 헬퍼 함수 (204 No Content 처리 포함)
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
     const res = await fetch(url, {
@@ -430,14 +430,14 @@
         })
       });
 
-      // 성공 메시지
+      // 성공 메시지 띄우고 → 강제로 리다이렉트
       messageDiv.className = 'message success';
       messageDiv.textContent = '게시물이 성공적으로 업로드되었습니다!';
-      
-      // 1.5초 후 메인으로 이동
+
+      // 1.2초 후 확실하게 이동 (타이밍 이슈 방지)
       setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 1500);
+        window.location.replace('index.html');  // replace 사용으로 히스토리 남기지 않고 이동
+      }, 1200);
 
     } catch (error) {
       console.error('게시 오류:', error);
