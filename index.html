@@ -141,11 +141,11 @@
     .post-author-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; color: #fff; }
     .post-image { width: 100%; max-height: 600px; object-fit: cover; border-radius: 12px; margin: 12px 0; }
     .post-content { font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-wrap; }
-    .post-time { padding: 6px 0 0; font-size: 12px; color: #888; }
+    .post-time { padding: 4px 0 12px 0; font-size: 12px; color: #888; }
 
     /* 좋아요 영역 스타일 */
     .post-actions {
-      margin-top: 12px;
+      margin: 8px 0 12px 0;
       display: flex;
       align-items: center;
       gap: 28px;
@@ -160,6 +160,7 @@
       gap: 8px;
       color: #ffffff;
       transition: all 0.2s ease;
+      font-size: 14px;
     }
     .like-button.liked {
       color: #ff6767;
@@ -172,6 +173,7 @@
     .like-count {
       font-weight: bold;
       font-size: 14px;
+      min-width: 20px;
       color: currentColor;
     }
 
@@ -297,7 +299,6 @@
       <div class="recommend-container" id="recommendProfiles">
         <div class="recommend-title">프로필 추천</div>
         <div id="recommendSkeleton">
-          <!-- 개선된 추천 프로필 스켈레톤 7개 -->
           <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
           <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
           <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
@@ -322,6 +323,7 @@
 <script>
 // ── Cloudflare Worker를 통한 안전한 API 호출 헬퍼 ──
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
 async function api(endpoint, options = {}) {
   const url = API_BASE + endpoint;
   const res = await fetch(url, {
@@ -506,8 +508,8 @@ function escapeHtml(text) {
 // 좋아요 관련 헬퍼 함수들
 async function getLikeCount(postId) {
   try {
-    const likes = await api(`/likes?post_id=eq.${postId}&select=count`);
-    return likes?.[0]?.count || 0;
+    const result = await api(`/likes?post_id=eq.${postId}&select=count`);
+    return Math.max(0, result?.[0]?.count || 0);
   } catch {
     return 0;
   }
@@ -529,19 +531,24 @@ async function toggleLike(postId, button) {
     return;
   }
 
-  const heart = button.querySelector('.like-heart');
   const countEl = button.querySelector('.like-count');
-  let count = parseInt(countEl.textContent, 10);
+  let currentCount = parseInt(countEl.textContent, 10) || 0;
+  const wasLiked = button.classList.contains('liked');
 
+  // 낙관적 UI 업데이트
+  const newLiked = !wasLiked;
+  const newCount = wasLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
+
+  button.classList.toggle('liked', newLiked);
+  countEl.textContent = newCount;
+
+  // 서버 요청
   try {
-    const alreadyLiked = await isLikedByMe(postId);
-
-    if (alreadyLiked) {
+    if (wasLiked) {
       // 좋아요 취소
       const likeRecord = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
       if (likeRecord?.[0]?.id) {
         await api(`/likes?id=eq.${likeRecord[0].id}`, { method: "DELETE" });
-        count--;
       }
     } else {
       // 좋아요 추가
@@ -552,13 +559,17 @@ async function toggleLike(postId, button) {
           user_id: currentUser.id
         })
       });
-      count++;
     }
 
-    button.classList.toggle('liked', !alreadyLiked);
-    countEl.textContent = count;
+    // 최종 동기화
+    const serverCount = await getLikeCount(postId);
+    countEl.textContent = serverCount;
+
   } catch (err) {
-    console.error("좋아요 토글 실패:", err);
+    console.error("좋아요 처리 실패:", err);
+    // 실패 시 복구
+    button.classList.toggle('liked', wasLiked);
+    countEl.textContent = currentCount;
   }
 }
 
@@ -580,7 +591,6 @@ async function loadPosts() {
       let authorNickname = post.author || '알 수 없음';
       let authorAvatar = null;
 
-      // 작성자 정보 가져오기
       try {
         const users = await api(`/users?id=eq.${post.author_id}&select=nickname,profile_image`);
         if (users?.length > 0) {
@@ -620,7 +630,6 @@ async function loadPosts() {
         `;
       }
 
-      // 좋아요 초기 상태 준비 (비동기라 나중에 업데이트)
       const likeCount = await getLikeCount(post.id);
       const liked = await isLikedByMe(post.id);
 
@@ -636,8 +645,6 @@ async function loadPosts() {
         </div>
         ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
         ${contentHTML}
-        <div class="post-time">${timeStr}</div>
-
         <div class="post-actions">
           <button class="like-button ${liked ? 'liked' : ''}" 
                   onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
@@ -647,6 +654,7 @@ async function loadPosts() {
             <span class="like-count">${likeCount}</span>
           </button>
         </div>
+        <div class="post-time">${timeStr}</div>
       `;
 
       postCard.onclick = (e) => {
@@ -663,7 +671,7 @@ async function loadPosts() {
   }
 }
 
-// 추천 프로필 로드 (변경 없음)
+// 추천 프로필 로드
 async function loadRecommendedProfiles() {
   const container = document.getElementById('recommendProfiles');
   const skeleton = document.getElementById('recommendSkeleton');
@@ -674,7 +682,6 @@ async function loadRecommendedProfiles() {
       container.innerHTML += '<div style="text-align:center; color:#aaa; padding:12px 0;">사용자 없음</div>';
       return;
     }
-    // Fisher-Yates shuffle + 상위 7개
     for (let i = users.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [users[i], users[j]] = [users[j], users[i]];
