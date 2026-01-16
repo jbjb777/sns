@@ -49,7 +49,6 @@
     .profile-item:hover { background: #2c2c2c; border-radius: 8px; }
     .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; background-size: cover; background-position: center; }
     .profile-nickname { font-size: 14px; color: #fff; }
-
     /* 스켈레톤 개선 */
     .skeleton {
       background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
@@ -58,7 +57,6 @@
       border-radius: 6px;
     }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
     .skeleton-post {
       padding: 20px 0;
       border-bottom: 1px solid #2a2a2a;
@@ -88,10 +86,9 @@
       height: 14px;
       margin: 6px 0;
     }
-    .text-short   { width: 60%; }
-    .text-medium  { width: 85%; }
-    .text-long    { width: 100%; }
-
+    .text-short { width: 60%; }
+    .text-medium { width: 85%; }
+    .text-long { width: 100%; }
     .skeleton-profile-item {
       display: flex;
       align-items: center;
@@ -107,7 +104,6 @@
       width: 110px;
       height: 16px;
     }
-
     @media (max-width: 768px) {
       .recommend-container { display: none; }
       .sidebar-container { width: 80px; min-width: 80px; }
@@ -146,6 +142,39 @@
     .post-image { width: 100%; max-height: 600px; object-fit: cover; border-radius: 12px; margin: 12px 0; }
     .post-content { font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-wrap; }
     .post-time { padding: 6px 0 0; font-size: 12px; color: #888; }
+
+    /* 좋아요 영역 스타일 */
+    .post-actions {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .like-button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffffff;
+      transition: all 0.2s ease;
+    }
+    .like-button.liked {
+      color: #ff6767;
+    }
+    .like-heart {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+    .like-count {
+      font-weight: bold;
+      font-size: 14px;
+      color: currentColor;
+    }
+
     .no-posts { text-align: center; padding: 60px 20px; color: #aaa; }
     .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 12px; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
     .delete-btn:hover { transform: translateY(-4px) scale(1.05); }
@@ -244,7 +273,6 @@
             <div class="skeleton text text-medium"></div>
             <div class="skeleton text text-short"></div>
           </div>
-
           <div class="skeleton-post">
             <div class="skeleton-post-header">
               <div class="skeleton skeleton-avatar"></div>
@@ -254,7 +282,6 @@
             <div class="skeleton text text-long"></div>
             <div class="skeleton text text-long"></div>
           </div>
-
           <div class="skeleton-post">
             <div class="skeleton-post-header">
               <div class="skeleton skeleton-avatar"></div>
@@ -293,346 +320,409 @@
   </div>
 
 <script>
-  // ── Cloudflare Worker를 통한 안전한 API 호출 헬퍼 ──
-  const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-
-  async function api(endpoint, options = {}) {
-    const url = API_BASE + endpoint;
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers || {}),
-      },
-    });
-
-    if (!res.ok) {
-      let errorText;
-      try {
-        errorText = await res.text();
-      } catch {
-        errorText = "";
-      }
-      throw new Error(`API 오류 (${res.status}): ${errorText}`);
-    }
-
-    // DELETE 등 빈 응답 처리
-    if (res.status === 204) return null;
-
-    return res.json();
-  }
-
-  let currentUser = null;
-  let selectedImage = null;
-
-  const cloudName = 'dretlhsrk';
-  const uploadPreset = 'unsigned_preset';
-
-  // 기본 함수들
-  function initCurrentUser() {
-    const savedUser = localStorage.getItem('snsUser');
-    if (savedUser) {
-      currentUser = JSON.parse(savedUser);
-      updateSidebar();
-    }
-  }
-
-  function updateSidebar() {
-    const iframe = document.getElementById('sidebarFrame');
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
-    }
-  }
-
-  function updateSidebarMode() {
-    const iframe = document.getElementById('sidebarFrame');
-    const narrow = window.innerWidth <= 768;
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-    }
-  }
-
-  window.addEventListener('message', (event) => {
-    const { type, page } = event.data || {};
-    if (type === 'navigate') {
-      if (page === 'home') location.href = 'index.html';
-      if (page === 'explore') location.href = 'explore.html';
-    }
-    if (type === 'createPost') handleCreatePost();
-    if (type === 'logout') {
-      localStorage.removeItem('snsUser');
-      currentUser = null;
-      location.reload();
-    }
-    if (type === 'requestUserInfo') updateSidebar();
+// ── Cloudflare Worker를 통한 안전한 API 호출 헬퍼 ──
+const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+async function api(endpoint, options = {}) {
+  const url = API_BASE + endpoint;
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
   });
-
-  initCurrentUser();
-  updateSidebarMode();
-  window.addEventListener('resize', updateSidebarMode);
-
-  // 모달 관련 함수들
-  window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
-  window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
-  window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
-  window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
-
-  function handleCreatePost() {
-    if (!currentUser) {
-      document.getElementById('loginModal').classList.add('active');
-      return;
-    }
-    document.getElementById('createModal').classList.add('active');
-    document.getElementById('postContent').value = '';
-    document.getElementById('imagePreview').classList.remove('show');
-    selectedImage = null;
+  if (!res.ok) {
+    let errorText;
+    try { errorText = await res.text(); } catch { errorText = ""; }
+    throw new Error(`API 오류 (${res.status}): ${errorText}`);
   }
+  if (res.status === 204) return null;
+  return res.json();
+}
 
-  document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
-  document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
+let currentUser = null;
+let selectedImage = null;
+const cloudName = 'dretlhsrk';
+const uploadPreset = 'unsigned_preset';
 
-  document.getElementById('imageInput').onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    selectedImage = file;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const preview = document.getElementById('imagePreview');
-      preview.src = ev.target.result;
-      preview.classList.add('show');
-    };
-    reader.readAsDataURL(file);
+// 기본 함수들
+function initCurrentUser() {
+  const savedUser = localStorage.getItem('snsUser');
+  if (savedUser) {
+    currentUser = JSON.parse(savedUser);
+    updateSidebar();
+  }
+}
+
+function updateSidebar() {
+  const iframe = document.getElementById('sidebarFrame');
+  if (iframe?.contentWindow) {
+    iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+  }
+}
+
+function updateSidebarMode() {
+  const iframe = document.getElementById('sidebarFrame');
+  const narrow = window.innerWidth <= 768;
+  if (iframe?.contentWindow) {
+    iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+  }
+}
+
+window.addEventListener('message', (event) => {
+  const { type, page } = event.data || {};
+  if (type === 'navigate') {
+    if (page === 'home') location.href = 'index.html';
+    if (page === 'explore') location.href = 'explore.html';
+  }
+  if (type === 'createPost') handleCreatePost();
+  if (type === 'logout') {
+    localStorage.removeItem('snsUser');
+    currentUser = null;
+    location.reload();
+  }
+  if (type === 'requestUserInfo') updateSidebar();
+});
+
+initCurrentUser();
+updateSidebarMode();
+window.addEventListener('resize', updateSidebarMode);
+
+// 모달 관련 함수들
+window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
+window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
+window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
+window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
+
+function handleCreatePost() {
+  if (!currentUser) {
+    document.getElementById('loginModal').classList.add('active');
+    return;
+  }
+  document.getElementById('createModal').classList.add('active');
+  document.getElementById('postContent').value = '';
+  document.getElementById('imagePreview').classList.remove('show');
+  selectedImage = null;
+}
+
+document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
+document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
+document.getElementById('imageInput').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  selectedImage = file;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const preview = document.getElementById('imagePreview');
+    preview.src = ev.target.result;
+    preview.classList.add('show');
   };
+  reader.readAsDataURL(file);
+};
 
-  // Cloudinary 업로드
-  async function uploadImageToCloudinary(file) {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', uploadPreset);
-    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-      method: 'POST',
-      body: formData
-    });
-    if (!response.ok) throw new Error('이미지 업로드 실패');
-    const data = await response.json();
-    return data.secure_url;
+// Cloudinary 업로드
+async function uploadImageToCloudinary(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', uploadPreset);
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: 'POST',
+    body: formData
+  });
+  if (!response.ok) throw new Error('이미지 업로드 실패');
+  const data = await response.json();
+  return data.secure_url;
+}
+
+// 게시물 작성
+document.getElementById('modalPostBtn').onclick = async () => {
+  const content = document.getElementById('postContent').value.trim();
+  const messageDiv = document.getElementById('postMessage');
+  const postButton = document.getElementById('modalPostBtn');
+
+  if (!content && !selectedImage) {
+    messageDiv.innerHTML = '<span style="color:#ff6b6b;">내용 또는 이미지를 추가해주세요.</span>';
+    return;
   }
 
-  // 게시물 작성
-  document.getElementById('modalPostBtn').onclick = async () => {
-    const content = document.getElementById('postContent').value.trim();
-    const messageDiv = document.getElementById('postMessage');
-    const postButton = document.getElementById('modalPostBtn');
+  postButton.disabled = true;
+  messageDiv.innerHTML = '<span style="color:#aaa;">게시 중...</span>';
 
-    if (!content && !selectedImage) {
-      messageDiv.innerHTML = '<span style="color:#ff6b6b;">내용 또는 이미지를 추가해주세요.</span>';
-      return;
+  try {
+    let imageUrl = null;
+    if (selectedImage) {
+      messageDiv.innerHTML = '<span style="color:#aaa;">이미지 업로드 중...</span>';
+      imageUrl = await uploadImageToCloudinary(selectedImage);
     }
 
-    postButton.disabled = true;
-    messageDiv.innerHTML = '<span style="color:#aaa;">게시 중...</span>';
+    await api("/posts", {
+      method: "POST",
+      body: JSON.stringify({
+        author: currentUser.nickname,
+        author_id: currentUser.id,
+        content,
+        image_url: imageUrl,
+        created_at: new Date().toISOString()
+      })
+    });
 
-    try {
-      let imageUrl = null;
-      if (selectedImage) {
-        messageDiv.innerHTML = '<span style="color:#aaa;">이미지 업로드 중...</span>';
-        imageUrl = await uploadImageToCloudinary(selectedImage);
+    messageDiv.innerHTML = '<span style="color:#00ff00;">게시글이 작성되었습니다!</span>';
+    setTimeout(() => {
+      document.getElementById('createModal').classList.remove('active');
+      messageDiv.innerHTML = '';
+      loadPosts();
+    }, 1200);
+  } catch (err) {
+    console.error('게시 오류:', err);
+    messageDiv.innerHTML = '<span style="color:#ff6b6b;">게시에 실패했습니다.</span>';
+  } finally {
+    postButton.disabled = false;
+  }
+};
+
+// 시간 포맷
+function formatPostTime(dateString) {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now - date;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHour = Math.floor(diffMin / 60);
+  const isToday = now.toDateString() === date.toDateString();
+
+  if (isToday) {
+    if (diffMin < 1) return '방금 전';
+    if (diffMin < 60) return `${diffMin}분 전`;
+    return `${diffHour}시간 전`;
+  }
+  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('.', '.');
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// 좋아요 관련 헬퍼 함수들
+async function getLikeCount(postId) {
+  try {
+    const likes = await api(`/likes?post_id=eq.${postId}&select=count`);
+    return likes?.[0]?.count || 0;
+  } catch {
+    return 0;
+  }
+}
+
+async function isLikedByMe(postId) {
+  if (!currentUser) return false;
+  try {
+    const myLike = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
+    return !!myLike?.length;
+  } catch {
+    return false;
+  }
+}
+
+async function toggleLike(postId, button) {
+  if (!currentUser) {
+    document.getElementById('loginModal').classList.add('active');
+    return;
+  }
+
+  const heart = button.querySelector('.like-heart');
+  const countEl = button.querySelector('.like-count');
+  let count = parseInt(countEl.textContent, 10);
+
+  try {
+    const alreadyLiked = await isLikedByMe(postId);
+
+    if (alreadyLiked) {
+      // 좋아요 취소
+      const likeRecord = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
+      if (likeRecord?.[0]?.id) {
+        await api(`/likes?id=eq.${likeRecord[0].id}`, { method: "DELETE" });
+        count--;
       }
-
-      await api("/posts", {
+    } else {
+      // 좋아요 추가
+      await api("/likes", {
         method: "POST",
         body: JSON.stringify({
-          author: currentUser.nickname,
-          author_id: currentUser.id,
-          content,
-          image_url: imageUrl,
-          created_at: new Date().toISOString()
+          post_id: postId,
+          user_id: currentUser.id
         })
       });
-
-      messageDiv.innerHTML = '<span style="color:#00ff00;">게시글이 작성되었습니다!</span>';
-
-      setTimeout(() => {
-        document.getElementById('createModal').classList.remove('active');
-        messageDiv.innerHTML = '';
-        loadPosts();
-      }, 1200);
-
-    } catch (err) {
-      console.error('게시 오류:', err);
-      messageDiv.innerHTML = '<span style="color:#ff6b6b;">게시에 실패했습니다.</span>';
-    } finally {
-      postButton.disabled = false;
+      count++;
     }
-  };
 
-  // 시간 포맷
-  function formatPostTime(dateString) {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffMs = now - date;
-    const diffMin = Math.floor(diffMs / 60000);
-    const diffHour = Math.floor(diffMin / 60);
-    const isToday = now.toDateString() === date.toDateString();
+    button.classList.toggle('liked', !alreadyLiked);
+    countEl.textContent = count;
+  } catch (err) {
+    console.error("좋아요 토글 실패:", err);
+  }
+}
 
-    if (isToday) {
-      if (diffMin < 1) return '방금 전';
-      if (diffMin < 60) return `${diffMin}분 전`;
-      return `${diffHour}시간 전`;
+// 게시물 로드
+async function loadPosts() {
+  const feedDiv = document.getElementById('postsFeed');
+
+  try {
+    const posts = await api("/posts?select=*,author_id&order=created_at.desc");
+
+    if (!posts?.length) {
+      feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
+      return;
     }
-    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('.', '.');
-  }
 
-  function escapeHtml(text) {
-    if (!text) return '';
-    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-    return text.replace(/[&<>"']/g, m => map[m]);
-  }
+    feedDiv.innerHTML = '';
 
-  // 게시물 로드
-  async function loadPosts() {
-    const feedDiv = document.getElementById('postsFeed');
-    try {
-      const posts = await api("/posts?select=*,author_id&order=created_at.desc");
+    for (const post of posts) {
+      let authorNickname = post.author || '알 수 없음';
+      let authorAvatar = null;
 
-      if (!posts?.length) {
-        feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
-        return;
+      // 작성자 정보 가져오기
+      try {
+        const users = await api(`/users?id=eq.${post.author_id}&select=nickname,profile_image`);
+        if (users?.length > 0) {
+          authorNickname = users[0].nickname || authorNickname;
+          authorAvatar = users[0].profile_image;
+        }
+      } catch (e) {
+        console.warn("작성자 정보 로드 실패:", e);
       }
 
-      feedDiv.innerHTML = '';
+      const isVerified = authorNickname === "JB777";
+      const timeStr = formatPostTime(post.created_at);
+      const canDelete = currentUser?.nickname === "JB777";
 
-      for (const post of posts) {
-        let authorNickname = post.author || '알 수 없음';
-        let authorAvatar = null;
+      const avatarHTML = authorAvatar
+        ? `<img src="${authorAvatar}" class="post-author-avatar" alt="${authorNickname}" onerror="this.style.display='flex';this.textContent='${authorNickname[0]?.toUpperCase()||'?'}'">`
+        : `<div class="post-author-avatar">${authorNickname[0]?.toUpperCase() || '?'}</div>`;
 
-        // 작성자 정보 가져오기
-        try {
-          const users = await api(`/users?id=eq.${post.author_id}&select=nickname,profile_image`);
-          if (users?.length > 0) {
-            authorNickname = users[0].nickname || authorNickname;
-            authorAvatar = users[0].profile_image;
-          }
-        } catch (e) {
-          console.warn("작성자 정보 로드 실패:", e);
-        }
+      const authorDisplay = isVerified
+        ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
+        : escapeHtml(authorNickname);
 
-        const isVerified = authorNickname === "JB777";
-        const timeStr = formatPostTime(post.created_at);
-        const canDelete = currentUser?.nickname === "JB777";
+      const deleteButton = canDelete
+        ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
+        : '';
 
-        const avatarHTML = authorAvatar
-          ? `<img src="${authorAvatar}" class="post-author-avatar" alt="${authorNickname}" onerror="this.style.display='flex';this.textContent='${authorNickname[0]?.toUpperCase()||'?'}'">`
-          : `<div class="post-author-avatar">${authorNickname[0]?.toUpperCase() || '?'}</div>`;
-
-        const authorDisplay = isVerified
-          ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
-          : escapeHtml(authorNickname);
-
-        const deleteButton = canDelete
-          ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
-          : '';
-
-        let contentHTML = '';
-        if (post.content) {
-          const lines = escapeHtml(post.content).split('\n');
-          const title = lines.shift() || '';
-          const body = lines.filter(l => l.trim()).join('<br>');
-          contentHTML = `
-            <div class="post-content">
-              <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${title}</div>
-              ${body ? `<div style="color:#ddd; font-size:14px; line-height:1.6;">${body}</div>` : ''}
-            </div>
-          `;
-        }
-
-        const postCard = document.createElement('div');
-        postCard.className = 'post-card';
-        postCard.innerHTML = `
-          <div class="post-header">
-            <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(authorNickname)}')">
-              ${avatarHTML}
-              <div class="post-author-name">${authorDisplay}</div>
-            </div>
-            ${deleteButton}
+      let contentHTML = '';
+      if (post.content) {
+        const lines = escapeHtml(post.content).split('\n');
+        const title = lines.shift() || '';
+        const body = lines.filter(l => l.trim()).join('<br>');
+        contentHTML = `
+          <div class="post-content">
+            <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${title}</div>
+            ${body ? `<div style="color:#ddd; font-size:14px; line-height:1.6;">${body}</div>` : ''}
           </div>
-          ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
-          ${contentHTML}
-          <div class="post-time">${timeStr}</div>
         `;
-        postCard.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
-        feedDiv.appendChild(postCard);
       }
-    } catch (err) {
-      console.error('게시물 로드 오류:', err);
-      feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+
+      // 좋아요 초기 상태 준비 (비동기라 나중에 업데이트)
+      const likeCount = await getLikeCount(post.id);
+      const liked = await isLikedByMe(post.id);
+
+      const postCard = document.createElement('div');
+      postCard.className = 'post-card';
+      postCard.innerHTML = `
+        <div class="post-header">
+          <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(authorNickname)}')">
+            ${avatarHTML}
+            <div class="post-author-name">${authorDisplay}</div>
+          </div>
+          ${deleteButton}
+        </div>
+        ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
+        ${contentHTML}
+        <div class="post-time">${timeStr}</div>
+
+        <div class="post-actions">
+          <button class="like-button ${liked ? 'liked' : ''}" 
+                  onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
+            <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
+              <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
+            </svg>
+            <span class="like-count">${likeCount}</span>
+          </button>
+        </div>
+      `;
+
+      postCard.onclick = (e) => {
+        if (!e.target.closest('.like-button')) {
+          window.location.href = `view.html?id=${post.id}`;
+        }
+      };
+
+      feedDiv.appendChild(postCard);
     }
+  } catch (err) {
+    console.error('게시물 로드 오류:', err);
+    feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
   }
+}
 
-  // 추천 프로필 로드
-  async function loadRecommendedProfiles() {
-    const container = document.getElementById('recommendProfiles');
-    const skeleton = document.getElementById('recommendSkeleton');
-    try {
-      let users = await api("/users?select=id,nickname,profile_image");
-
-      if (!users?.length) {
-        skeleton?.remove();
-        container.innerHTML += '<div style="text-align:center; color:#aaa; padding:12px 0;">사용자 없음</div>';
-        return;
-      }
-
-      // Fisher-Yates shuffle + 상위 7개
-      for (let i = users.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [users[i], users[j]] = [users[j], users[i]];
-      }
-      users = users.slice(0, 7);
-
+// 추천 프로필 로드 (변경 없음)
+async function loadRecommendedProfiles() {
+  const container = document.getElementById('recommendProfiles');
+  const skeleton = document.getElementById('recommendSkeleton');
+  try {
+    let users = await api("/users?select=id,nickname,profile_image");
+    if (!users?.length) {
       skeleton?.remove();
-
-      users.forEach(user => {
-        const avatarHTML = user.profile_image
-          ? `<img src="${user.profile_image}" class="profile-avatar" alt="${user.nickname}" onerror="this.style.display='flex';this.textContent='${user.nickname?.[0]?.toUpperCase()||'?'}'">`
-          : `<div class="profile-avatar">${user.nickname?.[0]?.toUpperCase() || '?'}</div>`;
-
-        const item = document.createElement('div');
-        item.className = 'profile-item';
-        item.innerHTML = `
-          ${avatarHTML}
-          <span class="profile-nickname">${escapeHtml(user.nickname)}</span>
-        `;
-        item.onclick = () => {
-          window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`;
-        };
-        container.appendChild(item);
-      });
-    } catch (err) {
-      console.error('추천 프로필 로드 오류:', err);
-      if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:#aaa; padding:12px 0;">로드 실패</div>';
+      container.innerHTML += '<div style="text-align:center; color:#aaa; padding:12px 0;">사용자 없음</div>';
+      return;
     }
+    // Fisher-Yates shuffle + 상위 7개
+    for (let i = users.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [users[i], users[j]] = [users[j], users[i]];
+    }
+    users = users.slice(0, 7);
+
+    skeleton?.remove();
+    users.forEach(user => {
+      const avatarHTML = user.profile_image
+        ? `<img src="${user.profile_image}" class="profile-avatar" alt="${user.nickname}" onerror="this.style.display='flex';this.textContent='${user.nickname?.[0]?.toUpperCase()||'?'}'">`
+        : `<div class="profile-avatar">${user.nickname?.[0]?.toUpperCase() || '?'}</div>`;
+      const item = document.createElement('div');
+      item.className = 'profile-item';
+      item.innerHTML = `
+        ${avatarHTML}
+        <span class="profile-nickname">${escapeHtml(user.nickname)}</span>
+      `;
+      item.onclick = () => {
+        window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`;
+      };
+      container.appendChild(item);
+    });
+  } catch (err) {
+    console.error('추천 프로필 로드 오류:', err);
+    if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:#aaa; padding:12px 0;">로드 실패</div>';
   }
+}
 
-  window.goToProfile = (userId, nickname) => {
-    if (userId && nickname) {
-      window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
-    }
-  };
+window.goToProfile = (userId, nickname) => {
+  if (userId && nickname) {
+    window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
+  }
+};
 
-  window.deletePost = async (postId) => {
-    if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
-    try {
-      await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
-      loadPosts();
-    } catch (err) {
-      console.error('삭제 오류:', err);
-      alert('삭제에 실패했습니다.');
-    }
-  };
+window.deletePost = async (postId) => {
+  if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
+  try {
+    await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
+    loadPosts();
+  } catch (err) {
+    console.error('삭제 오류:', err);
+    alert('삭제에 실패했습니다.');
+  }
+};
 
-  // 초기 로드
-  loadPosts();
-  loadRecommendedProfiles();
+// 초기 로드
+loadPosts();
+loadRecommendedProfiles();
 </script>
 </body>
 </html>
