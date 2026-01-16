@@ -284,25 +284,49 @@
 
     <div class="footer">
       <div class="footer-links">
-        <a href="https://sharer.jbjb.r-e.kr/privacy">개인정보처리방침</a>
-        <a href="https://sharer.jbjb.r-e.kr/policy">이용약관</a>
+        <a href="/privacy.html">개인정보처리방침</a>
+        <a href="/policy.html">이용약관</a>
         <a href="mailto:alexeom97@outlook.com">문의하기</a>
       </div>
       <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
     </div>
   </div>
 
-<script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-  const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-  const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-  const cloudName = 'dretlhsrk';
-  const uploadPreset = 'unsigned_preset';
+<script>
+  // Cloudflare Worker를 통한 API 호출 헬퍼
+  const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
+  async function api(endpoint, options = {}) {
+    const url = API_BASE + endpoint;
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
+
+    if (!res.ok) {
+      let errorText;
+      try {
+        errorText = await res.text();
+      } catch {
+        errorText = "Unknown error";
+      }
+      throw new Error(`API 오류 (${res.status}): ${errorText}`);
+    }
+
+    // 빈 응답(DELETE 등)은 그냥 반환
+    if (res.status === 204) return null;
+
+    return res.json();
+  }
+
   let currentUser = null;
   let selectedImage = null;
-  let verificationCode = "";
-  let isVerifying = false;
+
+  const cloudName = 'dretlhsrk';
+  const uploadPreset = 'unsigned_preset';
 
   // -------------------------------
   // 기본 함수들
@@ -400,7 +424,9 @@
     return data.secure_url;
   }
 
+  // -------------------------------
   // 게시물 작성
+  // -------------------------------
   document.getElementById('modalPostBtn').onclick = async () => {
     const content = document.getElementById('postContent').value.trim();
     const messageDiv = document.getElementById('postMessage');
@@ -421,15 +447,16 @@
         imageUrl = await uploadImageToCloudinary(selectedImage);
       }
 
-      const { error } = await supabase.from('posts').insert([{
-        author: currentUser.nickname,
-        author_id: currentUser.id,
-        content,
-        image_url: imageUrl,
-        created_at: new Date().toISOString()
-      }]);
-
-      if (error) throw error;
+      await api("/posts", {
+        method: "POST",
+        body: JSON.stringify({
+          author: currentUser.nickname,
+          author_id: currentUser.id,
+          content,
+          image_url: imageUrl,
+          created_at: new Date().toISOString()
+        })
+      });
 
       messageDiv.innerHTML = '<span style="color:#00ff00;">게시글이 작성되었습니다!</span>';
 
@@ -448,7 +475,7 @@
   };
 
   // -------------------------------
-  // 프로필 사진 포함 게시물 로드
+  // 시간 포맷 함수
   // -------------------------------
   function formatPostTime(dateString) {
     const now = new Date();
@@ -466,15 +493,19 @@
     return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('.', '.');
   }
 
+  function escapeHtml(text) {
+    if (!text) return '';
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  // -------------------------------
+  // 게시물 로드
+  // -------------------------------
   async function loadPosts() {
     const feedDiv = document.getElementById('postsFeed');
     try {
-      const { data: posts, error } = await supabase
-        .from('posts')
-        .select('*, author_id')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const posts = await api("/posts?select=*,author_id&order=created_at.desc");
 
       if (!posts?.length) {
         feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
@@ -484,17 +515,23 @@
       feedDiv.innerHTML = '';
 
       for (const post of posts) {
-        const { data: author } = await supabase
-          .from('users')
-          .select('nickname, profile_image')
-          .eq('id', post.author_id)
-          .maybeSingle();
+        let authorNickname = post.author || '알 수 없음';
+        let authorAvatar = null;
 
-        const authorNickname = author?.nickname || post.author || '알 수 없음';
-        const authorAvatar = author?.profile_image || null;
+        // 작성자 정보 가져오기
+        try {
+          const users = await api(`/users?id=eq.${post.author_id}&select=nickname,profile_image`);
+          if (users?.length > 0) {
+            authorNickname = users[0].nickname || authorNickname;
+            authorAvatar = users[0].profile_image;
+          }
+        } catch (e) {
+          console.warn("작성자 정보 로드 실패:", e);
+        }
+
         const isVerified = authorNickname === "JB777";
         const timeStr = formatPostTime(post.created_at);
-        const canDelete = currentUser?.nickname === "JB777" && currentUser?.isVerified;
+        const canDelete = currentUser?.nickname === "JB777";
 
         const avatarHTML = authorAvatar
           ? `<img src="${authorAvatar}" class="post-author-avatar" alt="${authorNickname}" onerror="this.style.display='flex';this.textContent='${authorNickname[0]?.toUpperCase()||'?'}'">`
@@ -545,17 +582,13 @@
   }
 
   // -------------------------------
-  // 추천 프로필 (프로필사진 포함)
+  // 추천 프로필 로드
   // -------------------------------
   async function loadRecommendedProfiles() {
     const container = document.getElementById('recommendProfiles');
     const skeleton = document.getElementById('recommendSkeleton');
     try {
-      let { data: users, error } = await supabase
-        .from('users')
-        .select('id, nickname, profile_image');
-
-      if (error) throw error;
+      let users = await api("/users?select=id,nickname,profile_image");
 
       if (!users?.length) {
         skeleton?.remove();
@@ -594,12 +627,6 @@
     }
   }
 
-  function escapeHtml(text) {
-    if (!text) return '';
-    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-    return text.replace(/[&<>"']/g, m => map[m]);
-  }
-
   window.goToProfile = (userId, nickname) => {
     if (userId && nickname) {
       window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
@@ -609,8 +636,7 @@
   window.deletePost = async (postId) => {
     if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
     try {
-      const { error } = await supabase.from('posts').delete().eq('id', postId);
-      if (error) throw error;
+      await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
       loadPosts();
     } catch (err) {
       console.error('삭제 오류:', err);
