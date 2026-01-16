@@ -8,7 +8,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; overflow: hidden; }
-   
+  
     .sidebar-container {
       width: 250px;
       min-width: 250px;
@@ -629,7 +629,7 @@
       .comment-modal {
         height: 80vh;
       }
-     
+    
       .nav-buttons {
         display: none;
       }
@@ -682,12 +682,10 @@
       </div>
     </div>
   </div>
-
   <div class="nav-buttons" id="navButtons">
     <div class="nav-btn" id="navUpBtn" onclick="scrollToPrevious()">▲</div>
     <div class="nav-btn" id="navDownBtn" onclick="scrollToNext()">▼</div>
   </div>
-
   <div class="comment-modal-overlay" id="commentOverlay" onclick="closeComments()"></div>
   <div class="comment-modal" id="commentModal">
     <div class="comment-modal-header">
@@ -705,589 +703,568 @@
     </div>
   </div>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<script>
+  // Cloudflare Worker API 프록시 주소 (키 노출 완전 제거)
+  const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
-    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QQCVYix-A8r3vCipAnu0Xg_hST_0xBa";
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
-    let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
-    let allPosts = [];
-    let displayedPosts = [];
-    let currentPostIndex = 0;
-    let currentCommentPostId = null;
-    let currentScrollIndex = 0;
-    let loadedPostIndices = new Set();
-    const INITIAL_LOAD = 2;
-
-    // 프로필 이미지 캐시 (user_id → url)
-    const profileImageCache = new Map();
-
-    async function getProfileImage(userId) {
-      if (!userId) return null;
-      if (profileImageCache.has(userId)) {
-        return profileImageCache.get(userId);
-      }
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('profile_image')
-          .eq('id', userId)
-          .maybeSingle();  // ← single() 대신 maybeSingle() 사용 (데이터 없어도 에러 안 남)
-
-        if (error) {
-          console.warn('프로필 이미지 조회 오류:', error);
-          return null;
-        }
-
-        const url = data?.profile_image || null;
-        profileImageCache.set(userId, url);
-        return url;
-      } catch (e) {
-        console.warn('getProfileImage 예외:', e);
-        return null;
-      }
-    }
-
-    function linkify(text) {
-      text = escapeHtml(text);
-      const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
-      return text.replace(urlRegex, url => {
-        let href = url.startsWith('http') ? url : 'https://' + url;
-        return `<a href="${href}" target="_blank">${url}</a>`;
-      });
-    }
-
-    function initCurrentUser() {
-      const savedUser = localStorage.getItem('snsUser');
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        updateSidebar();
-      }
-    }
-
-    function updateSidebar() {
-      const iframe = document.getElementById('sidebarFrame');
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
-      }
-    }
-
-    function updateSidebarMode() {
-      const iframe = document.getElementById('sidebarFrame');
-      const narrow = window.innerWidth <= 768;
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-      }
-    }
-
-    window.addEventListener('message', (event) => {
-      const { type, page } = event.data || {};
-      if (type === 'navigate') {
-        if (page === 'home') location.href = 'index.html';
-        if (page === 'explore') location.href = 'explore.html';
-      }
-      if (type === 'logout') {
-        localStorage.removeItem('snsUser');
-        currentUser = null;
-        location.reload();
-      }
-      if (type === 'requestUserInfo') {
-        updateSidebar();
-      }
+  async function api(endpoint, options = {}) {
+    const url = API_BASE + endpoint;
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const iframe = document.getElementById('sidebarFrame');
-      function activateExplore() {
-        if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage({ type: 'activateExplore' }, '*');
-        }
-      }
-      activateExplore();
-      iframe.addEventListener('load', activateExplore);
-    });
-
-    initCurrentUser();
-    updateSidebarMode();
-    window.addEventListener('resize', updateSidebarMode);
-
-    window.scrollToNext = function() {
-      const container = document.getElementById('shortsContainer');
-      const items = container.querySelectorAll('.short-item');
-
-      if (currentScrollIndex < items.length - 1) {
-        currentScrollIndex++;
-        items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
-        updateNavButtons();
-        preloadNextPost();
-      } else {
-        preloadNextPost();
-        setTimeout(() => {
-          const updatedItems = container.querySelectorAll('.short-item');
-          if (updatedItems.length > items.length) {
-            currentScrollIndex++;
-            updatedItems[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
-            updateNavButtons();
-          }
-        }, 100);
-      }
-    };
-
-    window.scrollToPrevious = function() {
-      const container = document.getElementById('shortsContainer');
-      const items = container.querySelectorAll('.short-item');
-
-      if (currentScrollIndex > 0) {
-        currentScrollIndex--;
-        items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
-        updateNavButtons();
-      }
-    };
-
-    function updateNavButtons() {
-      const container = document.getElementById('shortsContainer');
-      const items = container.querySelectorAll('.short-item');
-      const upBtn = document.getElementById('navUpBtn');
-      const downBtn = document.getElementById('navDownBtn');
-
-      if (upBtn && downBtn) {
-        upBtn.classList.toggle('disabled', currentScrollIndex === 0);
-        downBtn.classList.remove('disabled');
-      }
-    }
-
-    async function loadAllPosts() {
+    if (!res.ok) {
+      let errorText = "";
       try {
-        const { data: posts, error } = await supabase
-          .from('posts')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('posts 조회 에러:', error);
-          showError();
-          return;
-        }
-
-        if (!posts || posts.length === 0) {
-          showNoPosts();
-          return;
-        }
-
-        allPosts = posts;
-        shuffleAndDisplay();
-      } catch (error) {
-        console.error('loadAllPosts 전체 오류:', error);
-        showError();
-      }
+        errorText = await res.text();
+      } catch {}
+      throw new Error(`API 오류 (${res.status}): ${errorText || "알 수 없는 오류"}`);
     }
 
-    function shuffleAndDisplay() {
-      displayedPosts = [...allPosts].sort(() => Math.random() - 0.5);
-      currentPostIndex = 0;
-      currentScrollIndex = 0;
-      loadedPostIndices.clear();
-      renderInitialPosts();
-      setupScrollTracking();
+    // 204 No Content 또는 본문 길이 0이면 성공으로 간주
+    if (res.status === 204 || res.headers.get("content-length") === "0") {
+      return null;
+    }
+
+    // JSON 파싱 시도 (실패해도 무시하고 null 반환)
+    try {
+      return await res.json();
+    } catch (e) {
+      console.warn("JSON 파싱 실패했지만 성공으로 처리:", e);
+      return null;
+    }
+  }
+
+  let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
+  let allPosts = [];
+  let displayedPosts = [];
+  let currentPostIndex = 0;
+  let currentCommentPostId = null;
+  let currentScrollIndex = 0;
+  let loadedPostIndices = new Set();
+  const INITIAL_LOAD = 2;
+
+  // 프로필 이미지 캐시 (user_id → url)
+  const profileImageCache = new Map();
+
+  async function getProfileImage(userId) {
+    if (!userId) return null;
+    if (profileImageCache.has(userId)) {
+      return profileImageCache.get(userId);
+    }
+    try {
+      const users = await api(`/users?id=eq.${userId}&select=profile_image`);
+      const url = users?.[0]?.profile_image || null;
+      profileImageCache.set(userId, url);
+      return url;
+    } catch (e) {
+      console.warn('getProfileImage 오류:', e);
+      return null;
+    }
+  }
+
+  function linkify(text) {
+    text = escapeHtml(text);
+    const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
+    return text.replace(urlRegex, url => {
+      let href = url.startsWith('http') ? url : 'https://' + url;
+      return `<a href="${href}" target="_blank">${url}</a>`;
+    });
+  }
+
+  function initCurrentUser() {
+    const savedUser = localStorage.getItem('snsUser');
+    if (savedUser) {
+      currentUser = JSON.parse(savedUser);
+      updateSidebar();
+    }
+  }
+
+  function updateSidebar() {
+    const iframe = document.getElementById('sidebarFrame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+    }
+  }
+
+  function updateSidebarMode() {
+    const iframe = document.getElementById('sidebarFrame');
+    const narrow = window.innerWidth <= 768;
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    const { type, page } = event.data || {};
+    if (type === 'navigate') {
+      if (page === 'home') location.href = 'index.html';
+      if (page === 'explore') location.href = 'explore.html';
+    }
+    if (type === 'logout') {
+      localStorage.removeItem('snsUser');
+      currentUser = null;
+      location.reload();
+    }
+    if (type === 'requestUserInfo') {
+      updateSidebar();
+    }
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const iframe = document.getElementById('sidebarFrame');
+    function activateExplore() {
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'activateExplore' }, '*');
+      }
+    }
+    activateExplore();
+    iframe.addEventListener('load', activateExplore);
+  });
+
+  initCurrentUser();
+  updateSidebarMode();
+  window.addEventListener('resize', updateSidebarMode);
+
+  window.scrollToNext = function() {
+    const container = document.getElementById('shortsContainer');
+    const items = container.querySelectorAll('.short-item');
+    if (currentScrollIndex < items.length - 1) {
+      currentScrollIndex++;
+      items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      updateNavButtons();
+      preloadNextPost();
+    } else {
+      preloadNextPost();
+      setTimeout(() => {
+        const updatedItems = container.querySelectorAll('.short-item');
+        if (updatedItems.length > items.length) {
+          currentScrollIndex++;
+          updatedItems[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+          updateNavButtons();
+        }
+      }, 100);
+    }
+  };
+
+  window.scrollToPrevious = function() {
+    const container = document.getElementById('shortsContainer');
+    const items = container.querySelectorAll('.short-item');
+    if (currentScrollIndex > 0) {
+      currentScrollIndex--;
+      items[currentScrollIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
       updateNavButtons();
     }
+  };
 
-    function renderInitialPosts() {
-      const container = document.getElementById('shortsContainer');
-      container.innerHTML = '';
-      for (let i = 0; i < INITIAL_LOAD; i++) {
-        const post = getNextPost();
-        if (post) {
-          createShortItem(post, i).then(shortItem => {
-            container.appendChild(shortItem);
-            loadedPostIndices.add(i);
-          });
-        }
-      }
-      // 비동기 후 좋아요/댓글 로드
-      setTimeout(loadLikesAndComments, 300);
+  function updateNavButtons() {
+    const container = document.getElementById('shortsContainer');
+    const items = container.querySelectorAll('.short-item');
+    const upBtn = document.getElementById('navUpBtn');
+    const downBtn = document.getElementById('navDownBtn');
+    if (upBtn && downBtn) {
+      upBtn.classList.toggle('disabled', currentScrollIndex === 0);
+      downBtn.classList.remove('disabled');
     }
+  }
 
-    function getNextPost() {
-      if (currentPostIndex >= displayedPosts.length) {
-        const newShuffled = [...allPosts].sort(() => Math.random() - 0.5);
-        displayedPosts = [...displayedPosts, ...newShuffled];
+  async function loadAllPosts() {
+    try {
+      const posts = await api("/posts?select=*&order=created_at.desc");
+      if (!posts || posts.length === 0) {
+        showNoPosts();
+        return;
       }
-      return displayedPosts[currentPostIndex++];
+      allPosts = posts;
+      shuffleAndDisplay();
+    } catch (error) {
+      console.error('loadAllPosts 전체 오류:', error);
+      showError();
     }
+  }
 
-    function preloadNextPost() {
-      const container = document.getElementById('shortsContainer');
-      const nextIndex = container.children.length;
+  function shuffleAndDisplay() {
+    displayedPosts = [...allPosts].sort(() => Math.random() - 0.5);
+    currentPostIndex = 0;
+    currentScrollIndex = 0;
+    loadedPostIndices.clear();
+    renderInitialPosts();
+    setupScrollTracking();
+    updateNavButtons();
+  }
 
-      if (!loadedPostIndices.has(nextIndex)) {
-        const post = getNextPost();
-        if (post) {
-          createShortItem(post, nextIndex).then(shortItem => {
-            container.appendChild(shortItem);
-            loadedPostIndices.add(nextIndex);
-            loadLikesAndComments();
-            updateNavButtons();
-          });
-        }
-      }
-    }
-
-    function setupScrollTracking() {
-      const container = document.getElementById('shortsContainer');
-
-      container.addEventListener('scroll', () => {
-        const scrollPosition = container.scrollTop;
-        const windowHeight = container.clientHeight;
-        const items = container.querySelectorAll('.short-item');
-
-        items.forEach((item, index) => {
-          const itemTop = item.offsetTop;
-          const itemHeight = item.clientHeight;
-
-          if (scrollPosition >= itemTop - windowHeight / 2 &&
-              scrollPosition < itemTop + itemHeight - windowHeight / 2) {
-            if (currentScrollIndex !== index) {
-              currentScrollIndex = index;
-              updateNavButtons();
-              preloadNextPost();
-            }
-          }
+  function renderInitialPosts() {
+    const container = document.getElementById('shortsContainer');
+    container.innerHTML = '';
+    for (let i = 0; i < INITIAL_LOAD; i++) {
+      const post = getNextPost();
+      if (post) {
+        createShortItem(post, i).then(shortItem => {
+          container.appendChild(shortItem);
+          loadedPostIndices.add(i);
         });
+      }
+    }
+    // 비동기 후 좋아요/댓글 로드
+    setTimeout(loadLikesAndComments, 300);
+  }
+
+  function getNextPost() {
+    if (currentPostIndex >= displayedPosts.length) {
+      const newShuffled = [...allPosts].sort(() => Math.random() - 0.5);
+      displayedPosts = [...displayedPosts, ...newShuffled];
+    }
+    return displayedPosts[currentPostIndex++];
+  }
+
+  function preloadNextPost() {
+    const container = document.getElementById('shortsContainer');
+    const nextIndex = container.children.length;
+    if (!loadedPostIndices.has(nextIndex)) {
+      const post = getNextPost();
+      if (post) {
+        createShortItem(post, nextIndex).then(shortItem => {
+          container.appendChild(shortItem);
+          loadedPostIndices.add(nextIndex);
+          loadLikesAndComments();
+          updateNavButtons();
+        });
+      }
+    }
+  }
+
+  function setupScrollTracking() {
+    const container = document.getElementById('shortsContainer');
+    container.addEventListener('scroll', () => {
+      const scrollPosition = container.scrollTop;
+      const windowHeight = container.clientHeight;
+      const items = container.querySelectorAll('.short-item');
+      items.forEach((item, index) => {
+        const itemTop = item.offsetTop;
+        const itemHeight = item.clientHeight;
+        if (scrollPosition >= itemTop - windowHeight / 2 &&
+            scrollPosition < itemTop + itemHeight - windowHeight / 2) {
+          if (currentScrollIndex !== index) {
+            currentScrollIndex = index;
+            updateNavButtons();
+            preloadNextPost();
+          }
+        }
       });
+    });
+  }
+
+  async function createShortItem(post, index) {
+    const isVerified = ["JB777", "진정오"].includes(post.author);
+    const hasImage = !!post.image_url;
+    const hasContent = !!post.content?.trim();
+
+    // 작성자 프로필 이미지 비동기 가져오기
+    const authorProfileUrl = await getProfileImage(post.author_id);
+    let avatarHTML = post.author ? post.author[0].toUpperCase() : '?';
+    if (authorProfileUrl) {
+      const cacheBuster = authorProfileUrl.includes('?') ? '&' : '?';
+      avatarHTML = `<img src="${authorProfileUrl}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(post.author)}">`;
     }
 
-    async function createShortItem(post, index) {
-      const isVerified = ["JB777", "진정오"].includes(post.author);
-      const hasImage = !!post.image_url;
-      const hasContent = !!post.content?.trim();
-
-      // 작성자 프로필 이미지 비동기 가져오기
-      const authorProfileUrl = await getProfileImage(post.author_id);
-      let avatarHTML = post.author ? post.author[0].toUpperCase() : '?';
-      if (authorProfileUrl) {
-        const cacheBuster = authorProfileUrl.includes('?') ? '&' : '?';
-        avatarHTML = `<img src="${authorProfileUrl}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(post.author)}">`;
-      }
-
-      let contentHTML = '';
-      if (hasImage && hasContent) {
-        const linkedContent = linkify(post.content);
-        contentHTML = `
-          <div class="short-content">
-            <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
-            <div class="short-caption">
-              <div class="short-caption-text">${linkedContent}</div>
-            </div>
-          </div>
-        `;
-      } else if (hasImage && !hasContent) {
-        contentHTML = `
-          <div class="short-content">
-            <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
-          </div>
-        `;
-      } else if (!hasImage && hasContent) {
-        const linkedContent = linkify(post.content);
-        contentHTML = `
-          <div class="short-content">
-            <div class="short-text-only">
-              <div class="short-text-content">${linkedContent}</div>
-            </div>
-          </div>
-        `;
-      }
-
-      const shortItem = document.createElement('div');
-      shortItem.className = 'short-item';
-      shortItem.dataset.postId = post.id;
-      shortItem.dataset.index = index;
-
-      shortItem.innerHTML = `
-        ${contentHTML}
-        <div class="short-info-bar">
-          <div class="short-author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
-            <div class="short-avatar">${avatarHTML}</div>
-            <div class="short-author-name">
-              ${escapeHtml(post.author)}
-              ${isVerified ? '<span class="verification-badge"></span>' : ''}
-            </div>
-          </div>
-        </div>
-        <div class="short-actions">
-          <div class="action-btn" onclick="toggleLike('${post.id}')" data-like-btn="${post.id}">
-            👍
-            <div class="action-count" data-like-count="${post.id}">0</div>
-          </div>
-          <div class="action-btn" onclick="openComments('${post.id}')">
-            💬
-            <div class="action-count" data-comment-count="${post.id}">0</div>
+    let contentHTML = '';
+    if (hasImage && hasContent) {
+      const linkedContent = linkify(post.content);
+      contentHTML = `
+        <div class="short-content">
+          <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
+          <div class="short-caption">
+            <div class="short-caption-text">${linkedContent}</div>
           </div>
         </div>
       `;
-
-      return shortItem;
+    } else if (hasImage && !hasContent) {
+      contentHTML = `
+        <div class="short-content">
+          <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
+        </div>
+      `;
+    } else if (!hasImage && hasContent) {
+      const linkedContent = linkify(post.content);
+      contentHTML = `
+        <div class="short-content">
+          <div class="short-text-only">
+            <div class="short-text-content">${linkedContent}</div>
+          </div>
+        </div>
+      `;
     }
 
-    async function loadLikesAndComments() {
-      try {
-        const { data: likes } = await supabase.from('likes').select('post_id, user_id');
-        displayedPosts.forEach(post => {
-          const postLikes = likes?.filter(l => l.post_id === post.id) || [];
-          updateLikeUI(post.id, postLikes);
-        });
+    const shortItem = document.createElement('div');
+    shortItem.className = 'short-item';
+    shortItem.dataset.postId = post.id;
+    shortItem.dataset.index = index;
+    shortItem.innerHTML = `
+      ${contentHTML}
+      <div class="short-info-bar">
+        <div class="short-author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
+          <div class="short-avatar">${avatarHTML}</div>
+          <div class="short-author-name">
+            ${escapeHtml(post.author)}
+            ${isVerified ? '<span class="verification-badge"></span>' : ''}
+          </div>
+        </div>
+      </div>
+      <div class="short-actions">
+        <div class="action-btn" onclick="toggleLike('${post.id}')" data-like-btn="${post.id}">
+          👍
+          <div class="action-count" data-like-count="${post.id}">0</div>
+        </div>
+        <div class="action-btn" onclick="openComments('${post.id}')">
+          💬
+          <div class="action-count" data-comment-count="${post.id}">0</div>
+        </div>
+      </div>
+    `;
+    return shortItem;
+  }
 
-        const { data: comments } = await supabase.from('comments').select('post_id');
-        displayedPosts.forEach(post => {
-          const postComments = comments?.filter(c => c.post_id === post.id) || [];
-          const countEl = document.querySelector(`[data-comment-count="${post.id}"]`);
-          if (countEl) countEl.textContent = postComments.length;
-        });
-      } catch (e) {
-        console.error('좋아요/댓글 카운트 로드 오류:', e);
+  async function loadLikesAndComments() {
+    try {
+      // 전체 likes 조회 (post_id별 그룹화)
+      const likes = await api("/likes?select=post_id,user_id");
+      
+      displayedPosts.forEach(post => {
+        const postLikes = likes?.filter(l => l.post_id === post.id) || [];
+        updateLikeUI(post.id, postLikes);
+      });
+
+      // 전체 comments 조회 (post_id별 카운트)
+      const comments = await api("/comments?select=post_id");
+      displayedPosts.forEach(post => {
+        const postComments = comments?.filter(c => c.post_id === post.id) || [];
+        const countEl = document.querySelector(`[data-comment-count="${post.id}"]`);
+        if (countEl) countEl.textContent = postComments.length;
+      });
+    } catch (e) {
+      console.error('좋아요/댓글 카운트 로드 오류:', e);
+    }
+  }
+
+  function updateLikeUI(postId, likes) {
+    const btn = document.querySelector(`[data-like-btn="${postId}"]`);
+    const count = document.querySelector(`[data-like-count="${postId}"]`);
+    if (!btn || !count) return;
+    count.textContent = likes.length;
+    if (currentUser && likes.some(like => like.user_id === currentUser.id)) {
+      btn.classList.add('liked');
+    } else {
+      btn.classList.remove('liked');
+    }
+  }
+
+  window.toggleLike = async function(postId) {
+    if (!currentUser) {
+      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
+        window.location.href = 'index.html';
       }
+      return;
     }
+    try {
+      const likes = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
 
-    function updateLikeUI(postId, likes) {
-      const btn = document.querySelector(`[data-like-btn="${postId}"]`);
-      const count = document.querySelector(`[data-like-count="${postId}"]`);
-      if (!btn || !count) return;
-      count.textContent = likes.length;
-      if (currentUser && likes.some(like => like.user_id === currentUser.id)) {
-        btn.classList.add('liked');
+      if (likes?.length > 0) {
+        // 이미 좋아요 → 삭제
+        await api(`/likes?id=eq.${likes[0].id}`, { method: "DELETE" });
       } else {
-        btn.classList.remove('liked');
-      }
-    }
-
-    window.toggleLike = async function(postId) {
-      if (!currentUser) {
-        if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
-          window.location.href = 'index.html';
-        }
-        return;
-      }
-      try {
-        const { data: existing } = await supabase
-          .from('likes')
-          .select('id')
-          .eq('post_id', postId)
-          .eq('user_id', currentUser.id)
-          .maybeSingle();
-
-        if (existing) {
-          await supabase.from('likes').delete().eq('id', existing.id);
-        } else {
-          await supabase.from('likes').insert({
+        // 좋아요 추가
+        await api("/likes", {
+          method: "POST",
+          body: JSON.stringify({
             post_id: postId,
             user_id: currentUser.id
-          });
-        }
-
-        const { data: likes } = await supabase
-          .from('likes')
-          .select('*')
-          .eq('post_id', postId);
-
-        updateLikeUI(postId, likes || []);
-      } catch (e) {
-        console.error('좋아요 토글 오류:', e);
-      }
-    };
-
-    window.openComments = async function(postId) {
-      currentCommentPostId = postId;
-      document.getElementById('commentOverlay').classList.add('active');
-      document.getElementById('commentModal').classList.add('active');
-
-      await loadComments(postId);
-    };
-
-    window.closeComments = function() {
-      document.getElementById('commentOverlay').classList.remove('active');
-      document.getElementById('commentModal').classList.remove('active');
-      currentCommentPostId = null;
-
-      document.getElementById('commentInput').value = '';
-      document.getElementById('commentList').innerHTML = '';
-    };
-
-    async function loadComments(postId) {
-      const listDiv = document.getElementById('commentList');
-      listDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 40px 20px;">댓글을 불러오는 중...</div>';
-
-      try {
-        const { data: comments, error } = await supabase
-          .from('comments')
-          .select('*')
-          .eq('post_id', postId)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        document.getElementById('commentCountTitle').textContent = comments?.length || 0;
-
-        if (!comments || comments.length === 0) {
-          listDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 40px 20px;">첫 댓글을 남겨보세요!</div>';
-          return;
-        }
-
-        listDiv.innerHTML = '';
-
-        // 댓글 작성자 프로필 사진 미리 로드
-        const uniqueUserIds = [...new Set(comments.map(c => c.user_id))];
-        const profileMap = {};
-
-        await Promise.all(
-          uniqueUserIds.map(async uid => {
-            const url = await getProfileImage(uid);
-            if (url) profileMap[uid] = url;
           })
-        );
-
-        comments.forEach(comment => {
-          const isMyComment = currentUser && currentUser.id === comment.user_id;
-          const date = new Date(comment.created_at).toLocaleString('ko-KR');
-          const isVerified = ["JB777", "진정오"].includes(comment.user_name);
-
-          let avatarHTML = comment.user_name ? comment.user_name[0].toUpperCase() : '?';
-          if (profileMap[comment.user_id]) {
-            const url = profileMap[comment.user_id];
-            const cacheBuster = url.includes('?') ? '&' : '?';
-            avatarHTML = `<img src="${url}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(comment.user_name)}">`;
-          }
-
-          const linkedText = linkify(comment.text);
-
-          const div = document.createElement('div');
-          div.className = 'comment-item';
-          div.innerHTML = `
-            <div class="comment-header">
-              <div class="comment-author-wrapper" onclick="goToProfile('${comment.user_id}', '${escapeHtml(comment.user_name)}')">
-                <div class="comment-avatar">${avatarHTML}</div>
-                <span class="comment-author">
-                  ${escapeHtml(comment.user_name)}
-                  ${isVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}
-                </span>
-              </div>
-              ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}', '${postId}')">삭제</button>` : ''}
-            </div>
-            <div class="comment-content">${linkedText}</div>
-            <div class="comment-date">${date}</div>
-          `;
-          listDiv.appendChild(div);
         });
-      } catch (e) {
-        console.error('댓글 로드 오류:', e);
-        listDiv.innerHTML = '<div style="text-align: center; color: #ff6b6b; padding: 40px 20px;">댓글을 불러오는데 실패했습니다.</div>';
       }
-    }
 
-    window.submitComment = async function() {
-      if (!currentUser) {
-        if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
-          window.location.href = 'index.html';
-        }
+      // 업데이트된 좋아요 목록 가져오기
+      const updatedLikes = await api(`/likes?post_id=eq.${postId}&select=user_id`);
+      updateLikeUI(postId, updatedLikes || []);
+    } catch (e) {
+      console.error('좋아요 토글 오류:', e);
+    }
+  };
+
+  window.openComments = async function(postId) {
+    currentCommentPostId = postId;
+    document.getElementById('commentOverlay').classList.add('active');
+    document.getElementById('commentModal').classList.add('active');
+    await loadComments(postId);
+  };
+
+  window.closeComments = function() {
+    document.getElementById('commentOverlay').classList.remove('active');
+    document.getElementById('commentModal').classList.remove('active');
+    currentCommentPostId = null;
+    document.getElementById('commentInput').value = '';
+    document.getElementById('commentList').innerHTML = '';
+  };
+
+  async function loadComments(postId) {
+    const listDiv = document.getElementById('commentList');
+    listDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 40px 20px;">댓글을 불러오는 중...</div>';
+    try {
+      const comments = await api(`/comments?post_id=eq.${postId}&select=*&order=created_at.desc`);
+
+      document.getElementById('commentCountTitle').textContent = comments?.length || 0;
+
+      if (!comments || comments.length === 0) {
+        listDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 40px 20px;">첫 댓글을 남겨보세요!</div>';
         return;
       }
 
-      const input = document.getElementById('commentInput');
-      const text = input.value.trim();
-      if (!text) return;
+      listDiv.innerHTML = '';
 
-      const submitBtn = document.getElementById('commentSubmitBtn');
-      submitBtn.disabled = true;
+      // 댓글 작성자 프로필 사진 미리 로드
+      const uniqueUserIds = [...new Set(comments.map(c => c.user_id))];
+      const profileMap = {};
+      await Promise.all(
+        uniqueUserIds.map(async uid => {
+          const url = await getProfileImage(uid);
+          if (url) profileMap[uid] = url;
+        })
+      );
 
-      try {
-        const { error } = await supabase.from('comments').insert([{
+      comments.forEach(comment => {
+        const isMyComment = currentUser && currentUser.id === comment.user_id;
+        const date = new Date(comment.created_at).toLocaleString('ko-KR');
+        const isVerified = ["JB777", "진정오"].includes(comment.user_name);
+        let avatarHTML = comment.user_name ? comment.user_name[0].toUpperCase() : '?';
+        if (profileMap[comment.user_id]) {
+          const url = profileMap[comment.user_id];
+          const cacheBuster = url.includes('?') ? '&' : '?';
+          avatarHTML = `<img src="${url}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(comment.user_name)}">`;
+        }
+        const linkedText = linkify(comment.text);
+        const div = document.createElement('div');
+        div.className = 'comment-item';
+        div.innerHTML = `
+          <div class="comment-header">
+            <div class="comment-author-wrapper" onclick="goToProfile('${comment.user_id}', '${escapeHtml(comment.user_name)}')">
+              <div class="comment-avatar">${avatarHTML}</div>
+              <span class="comment-author">
+                ${escapeHtml(comment.user_name)}
+                ${isVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}
+              </span>
+            </div>
+            ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}', '${postId}')">삭제</button>` : ''}
+          </div>
+          <div class="comment-content">${linkedText}</div>
+          <div class="comment-date">${date}</div>
+        `;
+        listDiv.appendChild(div);
+      });
+    } catch (e) {
+      console.error('댓글 로드 오류:', e);
+      listDiv.innerHTML = '<div style="text-align: center; color: #ff6b6b; padding: 40px 20px;">댓글을 불러오는데 실패했습니다.</div>';
+    }
+  }
+
+  window.submitComment = async function() {
+    if (!currentUser) {
+      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
+        window.location.href = 'index.html';
+      }
+      return;
+    }
+    const input = document.getElementById('commentInput');
+    const text = input.value.trim();
+    if (!text) return;
+    const submitBtn = document.getElementById('commentSubmitBtn');
+    submitBtn.disabled = true;
+    try {
+      await api("/comments", {
+        method: "POST",
+        body: JSON.stringify({
           post_id: currentCommentPostId,
           user_id: currentUser.id,
           user_name: currentUser.nickname,
           text,
           created_at: new Date().toISOString()
-        }]);
+        })
+      });
 
-        if (error) throw error;
+      input.value = '';
+      await loadComments(currentCommentPostId);
 
-        input.value = '';
-        await loadComments(currentCommentPostId);
-
-        const countEl = document.querySelector(`[data-comment-count="${currentCommentPostId}"]`);
-        if (countEl) {
-          countEl.textContent = parseInt(countEl.textContent || '0') + 1;
-        }
-      } catch (e) {
-        console.error('댓글 업로드 오류:', e);
-        alert('댓글 업로드에 실패했습니다.');
-      } finally {
-        submitBtn.disabled = false;
+      const countEl = document.querySelector(`[data-comment-count="${currentCommentPostId}"]`);
+      if (countEl) {
+        countEl.textContent = parseInt(countEl.textContent || '0') + 1;
       }
-    };
+    } catch (e) {
+      console.error('댓글 업로드 오류:', e);
+      alert('댓글 업로드에 실패했습니다.');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  };
 
-    window.deleteComment = async function(commentId, postId) {
-      if (!confirm('댓글을 삭제하시겠습니까?')) return;
-
-      try {
-        const { error } = await supabase.from('comments').delete().eq('id', commentId);
-        if (error) throw error;
-
-        await loadComments(postId);
-
-        const countEl = document.querySelector(`[data-comment-count="${postId}"]`);
-        if (countEl) {
-          countEl.textContent = Math.max(0, parseInt(countEl.textContent || '0') - 1);
-        }
-      } catch (e) {
-        console.error('댓글 삭제 오류:', e);
-        alert('삭제에 실패했습니다.');
+  window.deleteComment = async function(commentId, postId) {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    try {
+      await api(`/comments?id=eq.${commentId}`, { method: "DELETE" });
+      await loadComments(postId);
+      const countEl = document.querySelector(`[data-comment-count="${postId}"]`);
+      if (countEl) {
+        countEl.textContent = Math.max(0, parseInt(countEl.textContent || '0') - 1);
       }
-    };
+    } catch (e) {
+      console.error('댓글 삭제 오류:', e);
+      alert('삭제에 실패했습니다.');
+    }
+  };
 
-    window.goToProfile = function(userId, nickname) {
-      window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
-    };
+  window.goToProfile = function(userId, nickname) {
+    window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
+  };
 
-    function showNoPosts() {
-      document.getElementById('shortsContainer').innerHTML = `
-        <div class="no-posts">
-          <div class="no-posts-icon">📭</div>
-          <div class="no-posts-text">
-            아직 게시물이 없습니다.<br>
-            첫 번째 게시물을 작성해보세요!
-          </div>
+  function showNoPosts() {
+    document.getElementById('shortsContainer').innerHTML = `
+      <div class="no-posts">
+        <div class="no-posts-icon">📭</div>
+        <div class="no-posts-text">
+          아직 게시물이 없습니다.<br>
+          첫 번째 게시물을 작성해보세요!
         </div>
-      `;
-    }
+      </div>
+    `;
+  }
 
-    function showError() {
-      document.getElementById('shortsContainer').innerHTML = `
-        <div class="no-posts">
-          <div class="no-posts-icon">⚠️</div>
-          <div class="no-posts-text">
-            게시물을 불러오는데 실패했습니다.<br>
-            잠시 후 다시 시도해주세요.
-          </div>
+  function showError() {
+    document.getElementById('shortsContainer').innerHTML = `
+      <div class="no-posts">
+        <div class="no-posts-icon">⚠️</div>
+        <div class="no-posts-text">
+          게시물을 불러오는데 실패했습니다.<br>
+          잠시 후 다시 시도해주세요.
         </div>
-      `;
-    }
+      </div>
+    `;
+  }
 
-    function escapeHtml(text) {
-      if (!text) return '';
-      const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
-      return text.replace(/[&<>"']/g, m => map[m]);
-    }
+  function escapeHtml(text) {
+    if (!text) return '';
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
 
-    // 초기 로드
-    loadAllPosts();
-  </script>
+  // 초기 로드
+  loadAllPosts();
+</script>
 </body>
 </html>
