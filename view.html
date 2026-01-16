@@ -31,8 +31,28 @@
     .author-name { font-weight: 800; font-size: 24px; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
     .post-timestamp { font-size: 15px; color: #aaa; font-weight: 500; }
     .verification-badge { display: inline-block; width: 26px; height: 26px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
-    .like-btn { background: transparent; border: 2px solid #3663FF; color: #3663FF; cursor: pointer; font-size: 16px; font-weight: 700; padding: 12px 24px; border-radius: 14px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
-    .like-btn.liked { background: #3663FF; color: #fff; }
+    .like-btn { 
+      background: transparent; 
+      border: 2px solid #3663FF; 
+      color: #3663FF; 
+      cursor: pointer; 
+      font-size: 16px; 
+      font-weight: 700; 
+      padding: 12px 24px; 
+      border-radius: 14px; 
+      transition: all 0.3s ease; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
+    .like-btn.liked { 
+      background: #ff6767; 
+      color: #fff; 
+      border-color: #ff6767; 
+    }
+    .like-btn:hover:not(.liked) { 
+      background: rgba(54, 99, 255, 0.1); 
+    }
     .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 15px; font-weight: 700; padding: 12px 24px; border-radius: 14px; transition: all 0.3s ease; }
     .delete-btn:hover { background: #cc0000; transform: translateY(-3px); }
     .post-detail-image { width: 100%; max-height: 900px; object-fit: contain; background: #000; border-radius: 20px; margin: 40px 0; }
@@ -113,6 +133,7 @@
     <span class="login-alert-icon">🔐</span>
     <span>로그인 후 사용 가능합니다</span>
   </div>
+
   <!-- 게시물 삭제 확인 모달 -->
   <div class="delete-modal-overlay" id="deleteModal">
     <div class="delete-modal">
@@ -124,18 +145,22 @@
       </div>
     </div>
   </div>
+
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
+
   <div class="main-wrapper">
     <div class="header">
       <button class="back-btn" onclick="goHome()">←</button>
       <div class="header-title">게시물</div>
     </div>
+
     <div class="container">
       <div id="postContent">
         <!-- 초기 스켈레톤 -->
       </div>
+
       <div class="comment-section">
         <div class="comment-input-wrapper">
           <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
@@ -144,6 +169,7 @@
         <div id="commentList" class="comment-list"></div>
       </div>
     </div>
+
     <div class="footer">
       <div class="footer-links">
         <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
@@ -155,7 +181,7 @@
   </div>
 
 <script>
-  // Cloudflare Worker API 프록시 주소 (키 노출 완전 제거)
+  // Cloudflare Worker API 프록시
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
   async function api(endpoint, options = {}) {
@@ -178,18 +204,17 @@
       throw new Error(`API 오류 (${res.status}): ${errorText}`);
     }
 
-    if (res.status === 204) return null; // DELETE 등 빈 응답
+    if (res.status === 204) return null;
     return res.json();
   }
 
   let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
   let currentPost = null;
   let pendingDeletePostId = null;
-
   const urlParams = new URLSearchParams(window.location.search);
   const postId = urlParams.get('id');
 
-  // 알림 생성 (Worker로 프록시)
+  // 알림 생성
   async function createNotification(targetUserId, detail, link) {
     if (!targetUserId || targetUserId === currentUser?.id) return;
     try {
@@ -274,12 +299,12 @@
     showError('게시물 ID가 없습니다.');
   } else {
     loadPost(postId);
-    // 실시간 구독 대신 8초마다 새로고침 (임시 대체)
+    // 실시간 구독 대신 8초마다 새로고침 (임시)
     setInterval(() => listenComments(postId), 8000);
-    listenComments(postId); // 최초 1회
+    listenComments(postId);
   }
 
-  // 프로필 이미지 가져오기 헬퍼 (Worker 경유)
+  // 프로필 이미지 가져오기 헬퍼
   async function getProfileImage(userId) {
     if (!userId) return null;
     try {
@@ -314,6 +339,7 @@
       year: 'numeric', month: 'numeric', day: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
+
     const isVerified = ["JB777", "진정오"].includes(post.author);
     const canDelete = currentUser && (
       currentUser.nickname === post.author ||
@@ -330,6 +356,7 @@
     }
 
     const linkedContent = linkify(post.content || '');
+
     contentDiv.innerHTML = `
       <div class="post-detail-card">
         <div class="post-detail-header">
@@ -345,7 +372,7 @@
           </div>
           <div class="header-actions">
             <button class="like-btn" id="likeBtn" onclick="toggleLike()">
-              👍 좋아요: <span id="likeCount">0</span>
+              ❤️ 좋아요 <span id="likeCount">0</span>
             </button>
             ${canDelete ? `<button class="delete-btn" onclick="openDeleteModal('${postId}')">삭제</button>` : ''}
           </div>
@@ -370,11 +397,14 @@
     `;
   }
 
+  // 좋아요 상태 로드 (기존)
   async function loadLikes(postId) {
     try {
       const likes = await api(`/likes?post_id=eq.${postId}&select=user_id`);
       updateLikeUI(likes || []);
-    } catch (e) {}
+    } catch (e) {
+      console.error('loadLikes 오류:', e);
+    }
   }
 
   function updateLikeUI(likes) {
@@ -389,11 +419,79 @@
     }
   }
 
+  // 개선된 toggleLike - 서버 상태를 항상 우선 확인하는 방식
+  window.toggleLike = async function() {
+    if (!currentUser) return showLoginAlert();
+    if (!currentPost) return;
+
+    const btn = document.getElementById('likeBtn');
+    const countEl = document.getElementById('likeCount');
+
+    try {
+      // 1. 서버에서 현재 상태 실시간 확인 (가장 중요!)
+      const [likeRecords, likeCountResult] = await Promise.all([
+        api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+        api(`/likes?post_id=eq.${postId}&select=count`)
+      ]);
+
+      const currentlyLiked = likeRecords?.length > 0;
+      const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
+
+      // 2. UI와 서버 상태 비교 후 동기화
+      const uiLiked = btn.classList.contains('liked');
+      const uiCount = parseInt(countEl.textContent, 10) || 0;
+
+      if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
+        btn.classList.toggle('liked', currentlyLiked);
+        countEl.textContent = currentServerCount;
+        console.log('UI-서버 불일치 감지 → 자동 동기화');
+      }
+
+      // 3. 사용자가 원하는 동작 수행
+      if (currentlyLiked) {
+        // 취소
+        if (likeRecords?.[0]?.id) {
+          await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
+        }
+        btn.classList.remove('liked');
+        countEl.textContent = currentServerCount - 1;
+      } else {
+        // 추가
+        await api("/likes", {
+          method: "POST",
+          body: JSON.stringify({
+            post_id: postId,
+            user_id: currentUser.id
+          })
+        });
+        btn.classList.add('liked');
+        countEl.textContent = currentServerCount + 1;
+        createNotification(currentPost.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
+      }
+
+      // 4. 최종 서버 값으로 안전하게 동기화
+      const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`);
+      countEl.textContent = Math.max(0, finalCount?.[0]?.count || 0);
+
+    } catch (err) {
+      console.error("좋아요 처리 오류:", err);
+      // 오류 발생 시 서버 상태로 강제 복구
+      try {
+        const [records, countRes] = await Promise.all([
+          api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+          api(`/likes?post_id=eq.${postId}&select=count`)
+        ]);
+        btn.classList.toggle('liked', records?.length > 0);
+        countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
+      } catch (recoveryErr) {
+        console.error("복구 실패:", recoveryErr);
+      }
+    }
+  };
+
   async function listenComments(postId) {
     try {
       const comments = await api(`/comments?post_id=eq.${postId}&select=*&order=created_at.desc`);
-
-      // 댓글 작성자 프로필 이미지 미리 가져오기
       const userIds = [...new Set(comments.map(c => c.user_id))];
       const profileImages = {};
       await Promise.all(
@@ -402,7 +500,6 @@
           if (img) profileImages[uid] = img;
         })
       );
-
       displayComments(comments || [], profileImages);
     } catch (e) {
       console.error('댓글 로드 오류:', e);
@@ -464,7 +561,6 @@
     return text.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
   }
 
-  // window 전역 함수들
   window.openDeleteModal = function(id) {
     pendingDeletePostId = id;
     document.getElementById('deleteModal').classList.add('show');
@@ -479,29 +575,6 @@
 
   window.goToProfile = function(userId, nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
-  };
-
-  window.toggleLike = async function() {
-    if (!currentUser) return showLoginAlert();
-    if (!currentPost) return;
-    try {
-      const likes = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
-      if (likes?.length > 0) {
-        // 이미 좋아요 → 삭제
-        await api(`/likes?id=eq.${likes[0].id}`, { method: "DELETE" });
-      } else {
-        // 좋아요 추가
-        await api("/likes", {
-          method: "POST",
-          body: JSON.stringify({
-            post_id: postId,
-            user_id: currentUser.id
-          })
-        });
-        createNotification(currentPost.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
-      }
-      loadLikes(postId);
-    } catch (e) {}
   };
 
   window.addComment = async function() {
