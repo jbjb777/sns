@@ -293,7 +293,7 @@
   </div>
 
 <script>
-  // Cloudflare Worker를 통한 API 호출 헬퍼
+  // ── Cloudflare Worker를 통한 안전한 API 호출 헬퍼 ──
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
   async function api(endpoint, options = {}) {
@@ -311,12 +311,12 @@
       try {
         errorText = await res.text();
       } catch {
-        errorText = "Unknown error";
+        errorText = "";
       }
       throw new Error(`API 오류 (${res.status}): ${errorText}`);
     }
 
-    // 빈 응답(DELETE 등)은 그냥 반환
+    // DELETE 등 빈 응답 처리
     if (res.status === 204) return null;
 
     return res.json();
@@ -328,9 +328,7 @@
   const cloudName = 'dretlhsrk';
   const uploadPreset = 'unsigned_preset';
 
-  // -------------------------------
   // 기본 함수들
-  // -------------------------------
   function initCurrentUser() {
     const savedUser = localStorage.getItem('snsUser');
     if (savedUser) {
@@ -373,9 +371,7 @@
   updateSidebarMode();
   window.addEventListener('resize', updateSidebarMode);
 
-  // -------------------------------
   // 모달 관련 함수들
-  // -------------------------------
   window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
   window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
   window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
@@ -408,9 +404,7 @@
     reader.readAsDataURL(file);
   };
 
-  // -------------------------------
   // Cloudinary 업로드
-  // -------------------------------
   async function uploadImageToCloudinary(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -424,9 +418,7 @@
     return data.secure_url;
   }
 
-  // -------------------------------
   // 게시물 작성
-  // -------------------------------
   document.getElementById('modalPostBtn').onclick = async () => {
     const content = document.getElementById('postContent').value.trim();
     const messageDiv = document.getElementById('postMessage');
@@ -474,9 +466,7 @@
     }
   };
 
-  // -------------------------------
-  // 시간 포맷 함수
-  // -------------------------------
+  // 시간 포맷
   function formatPostTime(dateString) {
     const now = new Date();
     const date = new Date(dateString);
@@ -499,9 +489,7 @@
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 
-  // -------------------------------
   // 게시물 로드
-  // -------------------------------
   async function loadPosts() {
     const feedDiv = document.getElementById('postsFeed');
     try {
@@ -581,9 +569,7 @@
     }
   }
 
-  // -------------------------------
   // 추천 프로필 로드
-  // -------------------------------
   async function loadRecommendedProfiles() {
     const container = document.getElementById('recommendProfiles');
     const skeleton = document.getElementById('recommendSkeleton');
