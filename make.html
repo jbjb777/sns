@@ -306,7 +306,7 @@
   // Cloudflare Worker API 프록시 주소
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
-  // 안전한 api 헬퍼 함수 (204 No Content 처리 포함)
+  // 안전한 api 헬퍼 함수 (204 처리 강화 + body 유무 확인)
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
     const res = await fetch(url, {
@@ -325,13 +325,18 @@
       throw new Error(`API 오류 (${res.status}): ${errorText || "알 수 없는 오류"}`);
     }
 
-    // 204 No Content → 성공으로 간주하고 null 반환 (INSERT/DELETE 성공 시)
-    if (res.status === 204) {
+    // 204거나 Content-Length가 0이면 성공으로 간주 (본문 없음)
+    if (res.status === 204 || res.headers.get("content-length") === "0") {
       return null;
     }
 
-    // 정상 JSON 응답만 파싱
-    return res.json();
+    // 그 외에는 안전하게 json() 시도
+    try {
+      return await res.json();
+    } catch (e) {
+      console.warn("JSON 파싱 실패했지만 2xx 성공으로 간주:", e);
+      return null; // 파싱 실패해도 성공으로 처리 (INSERT 성공 시 흔함)
+    }
   }
 
   const cloudName = 'dretlhsrk';
@@ -418,7 +423,7 @@
         imageUrl = await uploadImageToCloudinary(selectedImage);
       }
 
-      // Worker를 통해 게시물 생성 (204 성공 예상)
+      console.log('게시 요청 시작...');
       await api("/posts", {
         method: "POST",
         body: JSON.stringify({
@@ -430,14 +435,18 @@
         })
       });
 
-      // 성공 메시지 띄우고 → 강제로 리다이렉트
+      console.log('게시 성공! 리다이렉트 시도');
+
       messageDiv.className = 'message success';
       messageDiv.textContent = '게시물이 성공적으로 업로드되었습니다!';
 
-      // 1.2초 후 확실하게 이동 (타이밍 이슈 방지)
+      // 0.1초만 기다리고 바로 이동 (거의 즉시)
       setTimeout(() => {
-        window.location.replace('index.html');  // replace 사용으로 히스토리 남기지 않고 이동
-      }, 1200);
+        console.log('location.href 실행');
+        window.location.href = 'index.html';
+        // 혹시 모르니 replace도 같이
+        // window.location.replace('index.html');
+      }, 100);
 
     } catch (error) {
       console.error('게시 오류:', error);
