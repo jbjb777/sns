@@ -142,10 +142,9 @@
     .post-image { width: 100%; max-height: 600px; object-fit: cover; border-radius: 12px; margin: 12px 0; }
     .post-content { font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-wrap; }
     .post-time { padding: 4px 0 12px 0; font-size: 12px; color: #888; }
-
     /* 좋아요 영역 스타일 */
     .post-actions {
-      margin: 8px 0 12px 0;
+      margin: 8px 0 8px 0; /* 날짜 위로 붙이기 위해 아래 여백 줄임 */
       display: flex;
       align-items: center;
       gap: 28px;
@@ -158,16 +157,16 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #ffffff;
+      color: #7d7d7d; /* 누르지 않았을 때 기본 회색 */
       transition: all 0.2s ease;
       font-size: 14px;
     }
     .like-button.liked {
-      color: #ff6767;
+      color: #ff6767; /* 누르면 빨간색 */
     }
     .like-heart {
-      width: 22px;
-      height: 22px;
+      width: 20px; /* 아이콘 크기 조금 작게 조정 */
+      height: 20px;
       fill: currentColor;
     }
     .like-count {
@@ -176,7 +175,6 @@
       min-width: 20px;
       color: currentColor;
     }
-
     .no-posts { text-align: center; padding: 60px 20px; color: #aaa; }
     .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 12px; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
     .delete-btn:hover { transform: translateY(-4px) scale(1.05); }
@@ -260,7 +258,6 @@
         </div>
       </div>
     </div>
-
     <div class="main-content">
       <div class="feed-container">
         <div id="postsFeed">
@@ -295,7 +292,6 @@
           </div>
         </div>
       </div>
-
       <div class="recommend-container" id="recommendProfiles">
         <div class="recommend-title">프로필 추천</div>
         <div id="recommendSkeleton">
@@ -309,7 +305,6 @@
         </div>
       </div>
     </div>
-
     <div class="footer">
       <div class="footer-links">
         <a href="/privacy.html">개인정보처리방침</a>
@@ -319,11 +314,9 @@
       <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
     </div>
   </div>
-
 <script>
 // ── Cloudflare Worker를 통한 안전한 API 호출 헬퍼 ──
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-
 async function api(endpoint, options = {}) {
   const url = API_BASE + endpoint;
   const res = await fetch(url, {
@@ -341,12 +334,10 @@ async function api(endpoint, options = {}) {
   if (res.status === 204) return null;
   return res.json();
 }
-
 let currentUser = null;
 let selectedImage = null;
 const cloudName = 'dretlhsrk';
 const uploadPreset = 'unsigned_preset';
-
 // 기본 함수들
 function initCurrentUser() {
   const savedUser = localStorage.getItem('snsUser');
@@ -355,14 +346,12 @@ function initCurrentUser() {
     updateSidebar();
   }
 }
-
 function updateSidebar() {
   const iframe = document.getElementById('sidebarFrame');
   if (iframe?.contentWindow) {
     iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
   }
 }
-
 function updateSidebarMode() {
   const iframe = document.getElementById('sidebarFrame');
   const narrow = window.innerWidth <= 768;
@@ -370,7 +359,6 @@ function updateSidebarMode() {
     iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
   }
 }
-
 window.addEventListener('message', (event) => {
   const { type, page } = event.data || {};
   if (type === 'navigate') {
@@ -385,17 +373,14 @@ window.addEventListener('message', (event) => {
   }
   if (type === 'requestUserInfo') updateSidebar();
 });
-
 initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
-
 // 모달 관련 함수들
 window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
 window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
 window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
 window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
-
 function handleCreatePost() {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
@@ -406,7 +391,6 @@ function handleCreatePost() {
   document.getElementById('imagePreview').classList.remove('show');
   selectedImage = null;
 }
-
 document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
 document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
 document.getElementById('imageInput').onchange = (e) => {
@@ -421,7 +405,6 @@ document.getElementById('imageInput').onchange = (e) => {
   };
   reader.readAsDataURL(file);
 };
-
 // Cloudinary 업로드
 async function uploadImageToCloudinary(file) {
   const formData = new FormData();
@@ -435,28 +418,23 @@ async function uploadImageToCloudinary(file) {
   const data = await response.json();
   return data.secure_url;
 }
-
 // 게시물 작성
 document.getElementById('modalPostBtn').onclick = async () => {
   const content = document.getElementById('postContent').value.trim();
   const messageDiv = document.getElementById('postMessage');
   const postButton = document.getElementById('modalPostBtn');
-
   if (!content && !selectedImage) {
     messageDiv.innerHTML = '<span style="color:#ff6b6b;">내용 또는 이미지를 추가해주세요.</span>';
     return;
   }
-
   postButton.disabled = true;
   messageDiv.innerHTML = '<span style="color:#aaa;">게시 중...</span>';
-
   try {
     let imageUrl = null;
     if (selectedImage) {
       messageDiv.innerHTML = '<span style="color:#aaa;">이미지 업로드 중...</span>';
       imageUrl = await uploadImageToCloudinary(selectedImage);
     }
-
     await api("/posts", {
       method: "POST",
       body: JSON.stringify({
@@ -467,7 +445,6 @@ document.getElementById('modalPostBtn').onclick = async () => {
         created_at: new Date().toISOString()
       })
     });
-
     messageDiv.innerHTML = '<span style="color:#00ff00;">게시글이 작성되었습니다!</span>';
     setTimeout(() => {
       document.getElementById('createModal').classList.remove('active');
@@ -481,7 +458,6 @@ document.getElementById('modalPostBtn').onclick = async () => {
     postButton.disabled = false;
   }
 };
-
 // 시간 포맷
 function formatPostTime(dateString) {
   const now = new Date();
@@ -490,7 +466,6 @@ function formatPostTime(dateString) {
   const diffMin = Math.floor(diffMs / 60000);
   const diffHour = Math.floor(diffMin / 60);
   const isToday = now.toDateString() === date.toDateString();
-
   if (isToday) {
     if (diffMin < 1) return '방금 전';
     if (diffMin < 60) return `${diffMin}분 전`;
@@ -498,13 +473,11 @@ function formatPostTime(dateString) {
   }
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('.', '.');
 }
-
 function escapeHtml(text) {
   if (!text) return '';
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return text.replace(/[&<>"']/g, m => map[m]);
 }
-
 // 좋아요 관련 헬퍼 함수들
 async function getLikeCount(postId) {
   try {
@@ -514,35 +487,28 @@ async function getLikeCount(postId) {
     return 0;
   }
 }
-
 async function toggleLike(postId, button) {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
     return;
   }
-
   const countEl = button.querySelector('.like-count');
-
   try {
     // 1. 서버에서 현재 상태 실시간 확인
     const [likeRecords, likeCountResult] = await Promise.all([
       api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
       api(`/likes?post_id=eq.${postId}&select=count`)
     ]);
-
     const currentlyLiked = likeRecords?.length > 0;
     const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
-
     // 2. UI 현재 상태와 서버 상태 비교 후 동기화
     const uiLiked = button.classList.contains('liked');
     const uiCount = parseInt(countEl.textContent, 10) || 0;
-
     if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
       button.classList.toggle('liked', currentlyLiked);
       countEl.textContent = currentServerCount;
       console.log('UI와 서버 상태 불일치 → 자동 동기화');
     }
-
     // 3. 사용자가 원하는 동작 수행
     if (currentlyLiked) {
       // 취소
@@ -563,11 +529,9 @@ async function toggleLike(postId, button) {
       button.classList.add('liked');
       countEl.textContent = currentServerCount + 1;
     }
-
     // 4. 최종 서버 값 확인 (안전장치)
     const finalCount = await getLikeCount(postId);
     countEl.textContent = finalCount;
-
   } catch (err) {
     console.error("좋아요 처리 중 오류:", err);
     // 오류 시 서버 상태로 강제 복구
@@ -583,25 +547,19 @@ async function toggleLike(postId, button) {
     }
   }
 }
-
 // 게시물 로드
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
-
   try {
     const posts = await api("/posts?select=*,author_id&order=created_at.desc");
-
     if (!posts?.length) {
       feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
       return;
     }
-
     feedDiv.innerHTML = '';
-
     for (const post of posts) {
       let authorNickname = post.author || '알 수 없음';
       let authorAvatar = null;
-
       try {
         const users = await api(`/users?id=eq.${post.author_id}&select=nickname,profile_image`);
         if (users?.length > 0) {
@@ -611,23 +569,18 @@ async function loadPosts() {
       } catch (e) {
         console.warn("작성자 정보 로드 실패:", e);
       }
-
       const isVerified = authorNickname === "JB777";
       const timeStr = formatPostTime(post.created_at);
       const canDelete = currentUser?.nickname === "JB777";
-
       const avatarHTML = authorAvatar
         ? `<img src="${authorAvatar}" class="post-author-avatar" alt="${authorNickname}" onerror="this.style.display='flex';this.textContent='${authorNickname[0]?.toUpperCase()||'?'}'">`
         : `<div class="post-author-avatar">${authorNickname[0]?.toUpperCase() || '?'}</div>`;
-
       const authorDisplay = isVerified
         ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
         : escapeHtml(authorNickname);
-
       const deleteButton = canDelete
         ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
         : '';
-
       let contentHTML = '';
       if (post.content) {
         const lines = escapeHtml(post.content).split('\n');
@@ -640,10 +593,8 @@ async function loadPosts() {
           </div>
         `;
       }
-
       const likeCount = await getLikeCount(post.id);
       const liked = await api(`/likes?post_id=eq.${post.id}&user_id=eq.${currentUser?.id || '0'}&select=id`).then(r => r?.length > 0);
-
       const postCard = document.createElement('div');
       postCard.className = 'post-card';
       postCard.innerHTML = `
@@ -657,7 +608,7 @@ async function loadPosts() {
         ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
         ${contentHTML}
         <div class="post-actions">
-          <button class="like-button ${liked ? 'liked' : ''}" 
+          <button class="like-button ${liked ? 'liked' : ''}"
                   onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
             <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
               <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
@@ -667,13 +618,11 @@ async function loadPosts() {
         </div>
         <div class="post-time">${timeStr}</div>
       `;
-
       postCard.onclick = (e) => {
         if (!e.target.closest('.like-button')) {
           window.location.href = `view.html?id=${post.id}`;
         }
       };
-
       feedDiv.appendChild(postCard);
     }
   } catch (err) {
@@ -681,7 +630,6 @@ async function loadPosts() {
     feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
   }
 }
-
 // 추천 프로필 로드
 async function loadRecommendedProfiles() {
   const container = document.getElementById('recommendProfiles');
@@ -698,7 +646,6 @@ async function loadRecommendedProfiles() {
       [users[i], users[j]] = [users[j], users[i]];
     }
     users = users.slice(0, 7);
-
     skeleton?.remove();
     users.forEach(user => {
       const avatarHTML = user.profile_image
@@ -720,13 +667,11 @@ async function loadRecommendedProfiles() {
     if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:#aaa; padding:12px 0;">로드 실패</div>';
   }
 }
-
 window.goToProfile = (userId, nickname) => {
   if (userId && nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   }
 };
-
 window.deletePost = async (postId) => {
   if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
   try {
@@ -737,7 +682,6 @@ window.deletePost = async (postId) => {
     alert('삭제에 실패했습니다.');
   }
 };
-
 // 초기 로드
 loadPosts();
 loadRecommendedProfiles();
