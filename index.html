@@ -144,7 +144,7 @@
     .post-time { padding: 4px 0 12px 0; font-size: 12px; color: #888; }
     /* 좋아요 영역 스타일 */
     .post-actions {
-      margin: 8px 0 8px 0; /* 날짜 위로 붙이기 위해 아래 여백 줄임 */
+      margin: 8px 0 8px 0;
       display: flex;
       align-items: center;
       gap: 28px;
@@ -157,23 +157,25 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #7d7d7d; /* 누르지 않았을 때 기본 회색 */
+      color: #7d7d7d;
       transition: all 0.2s ease;
       font-size: 14px;
     }
     .like-button.liked {
-      color: #ff6767; /* 누르면 빨간색 */
+      color: #ff6767;
     }
     .like-heart {
-      width: 20px; /* 아이콘 크기 조금 작게 조정 */
+      width: 20px;
       height: 20px;
       fill: currentColor;
     }
     .like-count {
       font-weight: bold;
-      font-size: 14px;
-      min-width: 20px;
+      font-size: 16px;          /* 숫자 크기 증가 */
+      line-height: 20px;        /* 아이콘 높이와 맞춤 */
+      min-width: 24px;
       color: currentColor;
+      vertical-align: middle;   /* 수직 정렬 보정 */
     }
     .no-posts { text-align: center; padding: 60px 20px; color: #aaa; }
     .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 12px; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
@@ -494,14 +496,12 @@ async function toggleLike(postId, button) {
   }
   const countEl = button.querySelector('.like-count');
   try {
-    // 1. 서버에서 현재 상태 실시간 확인
     const [likeRecords, likeCountResult] = await Promise.all([
       api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
       api(`/likes?post_id=eq.${postId}&select=count`)
     ]);
     const currentlyLiked = likeRecords?.length > 0;
     const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
-    // 2. UI 현재 상태와 서버 상태 비교 후 동기화
     const uiLiked = button.classList.contains('liked');
     const uiCount = parseInt(countEl.textContent, 10) || 0;
     if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
@@ -509,16 +509,13 @@ async function toggleLike(postId, button) {
       countEl.textContent = currentServerCount;
       console.log('UI와 서버 상태 불일치 → 자동 동기화');
     }
-    // 3. 사용자가 원하는 동작 수행
     if (currentlyLiked) {
-      // 취소
       if (likeRecords?.[0]?.id) {
         await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
       }
       button.classList.remove('liked');
       countEl.textContent = currentServerCount - 1;
     } else {
-      // 추가
       await api("/likes", {
         method: "POST",
         body: JSON.stringify({
@@ -529,12 +526,10 @@ async function toggleLike(postId, button) {
       button.classList.add('liked');
       countEl.textContent = currentServerCount + 1;
     }
-    // 4. 최종 서버 값 확인 (안전장치)
     const finalCount = await getLikeCount(postId);
     countEl.textContent = finalCount;
   } catch (err) {
     console.error("좋아요 처리 중 오류:", err);
-    // 오류 시 서버 상태로 강제 복구
     try {
       const [records, countRes] = await Promise.all([
         api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
