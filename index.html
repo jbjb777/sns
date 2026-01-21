@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>홈 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.png">
+
   <!-- 검색 결과 설명 -->
   <meta name="description" content="Sharer는 이미지와 텍스트를 업로드하고 사람들과 소통할 수 있는 무료 커뮤니티·SNS 서비스입니다. 정빈777이 만들었습니다.">
   <meta name="keywords" content="Sharer, 커뮤니티, SNS, 정빈777, 정빈정빈">
   <meta name="author" content="정빈777">
   <meta name="robots" content="index, follow">
+
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Sharer | 커뮤니티 · SNS">
@@ -19,306 +21,352 @@
   <meta property="og:image:width" content="512">
   <meta property="og:image:height" content="512">
   <meta property="og:site_name" content="Sharer">
+
   <!-- Twitter(X) -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Sharer | 커뮤니티 · SNS">
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
+
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .sidebar-container { width: 250px; min-width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
-    .sidebar-container iframe { width: 250px !important; height: 100%; border: none; }
-    .main-wrapper { margin-left: 250px; width: calc(100% - 250px); display: flex; flex-direction: column; min-height: 100vh; }
-    .main-content { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 20px; overflow-y: auto; opacity: 0; transform: translateY(30px); animation: slideUp 0.6s ease-out 0.2s forwards; }
-    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .sidebar-container {
+      width: 250px;
+      min-width: 250px;
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      z-index: 100;
+    }
+    .sidebar-container iframe {
+      width: 250px !important;
+      height: 100%;
+      border: none;
+    }
+    .main-wrapper {
+      margin-left: 250px;
+      width: calc(100% - 250px);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      overflow-y: auto;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: slideUp 0.6s ease-out 0.2s forwards;
+    }
+    @keyframes slideUp { to { opacity:1; transform:translateY(0); } }
     .feed-container { max-width: 600px; width: 100%; }
-    .recommend-container { width: 250px; margin-left: 20px; position: sticky; top: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); opacity: 0; animation: fadeInText 0.5s ease-out 0.6s forwards; }
-    @keyframes fadeInText { to { opacity: 1; } }
-    .recommend-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #fff; }
-    .profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; transition: background 0.3s; opacity: 0; transform: translateX(20px); animation: slideInLeft 0.5s ease-out forwards; }
-    .profile-item:nth-child(1) { animation-delay: 0.7s; }
-    .profile-item:nth-child(2) { animation-delay: 0.75s; }
-    .profile-item:nth-child(3) { animation-delay: 0.8s; }
-    .profile-item:nth-child(4) { animation-delay: 0.85s; }
-    .profile-item:nth-child(5) { animation-delay: 0.9s; }
-    .profile-item:nth-child(6) { animation-delay: 0.95s; }
-    .profile-item:nth-child(7) { animation-delay: 1s; }
-    @keyframes slideInLeft { to { opacity: 1; transform: translateX(0); } }
-    .profile-item:hover { background: #2c2c2c; border-radius: 8px; }
-    .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; background-size: cover; background-position: center; }
-    .profile-nickname { font-size: 14px; color: #fff; }
-    /* 스켈레톤 개선 */
+    .recommend-container {
+      width: 250px;
+      margin-left: 20px;
+      position: sticky;
+      top: 20px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      opacity: 0;
+      animation: fadeInText 0.5s ease-out 0.6s forwards;
+    }
+    @keyframes fadeInText { to { opacity:1; } }
+    .recommend-title { font-size:16px; font-weight:600; margin-bottom:16px; color:#fff; }
+    .profile-item {
+      display:flex; align-items:center; gap:12px; padding:8px 0;
+      cursor:pointer; transition:background 0.3s;
+      opacity:0; transform:translateX(20px);
+      animation:slideInLeft 0.5s ease-out forwards;
+    }
+    .profile-item:nth-child(1){animation-delay:0.7s}
+    .profile-item:nth-child(2){animation-delay:0.75s}
+    .profile-item:nth-child(3){animation-delay:0.8s}
+    .profile-item:nth-child(4){animation-delay:0.85s}
+    .profile-item:nth-child(5){animation-delay:0.9s}
+    .profile-item:nth-child(6){animation-delay:0.95s}
+    .profile-item:nth-child(7){animation-delay:1s}
+    @keyframes slideInLeft { to { opacity:1; transform:translateX(0); } }
+    .profile-item:hover { background:#2c2c2c; border-radius:8px; }
+    .profile-avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:linear-gradient(135deg,#3478f6,#53b6f9);
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; font-weight:bold; flex-shrink:0;
+      background-size:cover; background-position:center;
+    }
+    .profile-nickname { font-size:14px; color:#fff; }
+
+    /* 스켈레톤 */
     .skeleton {
       background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
       background-size: 200% 100%;
       animation: loading 1.5s ease-in-out infinite;
-      border-radius: 6px;
+      border-radius:6px;
     }
-    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .skeleton-post {
-      padding: 20px 0;
-      border-bottom: 1px solid #2a2a2a;
-    }
-    .skeleton-post-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .skeleton-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-    .skeleton-username {
-      width: 140px;
-      height: 16px;
-    }
-    .skeleton-post-image {
-      width: 100%;
-      height: 400px;
-      border-radius: 12px;
-      margin: 12px 0;
-    }
-    .skeleton-text {
-      height: 14px;
-      margin: 6px 0;
-    }
-    .text-short { width: 60%; }
-    .text-medium { width: 85%; }
-    .text-long { width: 100%; }
-    .skeleton-profile-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-    }
-    .skeleton-profile-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-    .skeleton-profile-nickname {
-      width: 110px;
-      height: 16px;
-    }
-    @media (max-width: 768px) {
-      .recommend-container { display: none; }
-      .sidebar-container { width: 80px; min-width: 80px; }
-      .sidebar-container iframe { width: 80px !important; }
-      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
-    }
-    .verification-badge { display: inline-block; width: 18px; height: 18px; margin-left: 5px; vertical-align: middle; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
+    @keyframes loading { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skeleton-post { padding:20px 0; border-bottom:1px solid #2a2a2a; }
+    .skeleton-post-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .skeleton-avatar { width:40px; height:40px; border-radius:50%; }
+    .skeleton-username { width:140px; height:16px; }
+    .skeleton-post-image { width:100%; height:400px; border-radius:12px; margin:12px 0; }
+    .skeleton-text { height:14px; margin:6px 0; }
+    .text-short { width:60%; }
+    .text-medium { width:85%; }
+    .text-long { width:100%; }
+
     .post-card {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid #2a2a2a;
-      border-radius: 0;
-      margin-bottom: 0;
-      padding: 20px 0;
-      box-shadow: none;
-      cursor: pointer;
-      transition: background 0.2s ease;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: slideUpFade 0.6s ease-out forwards;
+      background:transparent; border:none; border-bottom:1px solid #2a2a2a;
+      border-radius:0; margin-bottom:0; padding:20px 0; box-shadow:none;
+      cursor:pointer; transition:background 0.2s ease;
+      opacity:0; transform:translateY(20px);
+      animation:slideUpFade 0.6s ease-out forwards;
     }
-    .post-card:nth-child(1) { animation-delay: 0.4s; }
-    .post-card:nth-child(2) { animation-delay: 0.5s; }
-    .post-card:nth-child(3) { animation-delay: 0.6s; }
-    .post-card:nth-child(4) { animation-delay: 0.7s; }
-    .post-card:nth-child(5) { animation-delay: 0.8s; }
-    .post-card:nth-child(6) { animation-delay: 0.9s; }
-    .post-card:nth-child(7) { animation-delay: 1.0s; }
-    @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
-    .post-card:hover { background: rgba(255, 255, 255, 0.03); }
-    .post-card:last-child { border-bottom: none; }
-    .post-header { padding: 0; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .post-author-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .post-author-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; }
-    .post-author-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; color: #fff; }
-    .post-image { width: 100%; max-height: 600px; object-fit: cover; border-radius: 12px; margin: 12px 0; }
-    .post-content { font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-wrap; }
-    .post-time { padding: 4px 0 12px 0; font-size: 12px; color: #888; }
-    /* 좋아요 영역 스타일 */
-    .post-actions {
-      margin: 8px 0 8px 0;
-      display: flex;
-      align-items: center;
-      gap: 28px;
+    .post-card:nth-child(1){animation-delay:0.4s}
+    .post-card:nth-child(2){animation-delay:0.5s}
+    .post-card:nth-child(3){animation-delay:0.6s}
+    .post-card:nth-child(4){animation-delay:0.7s}
+    .post-card:nth-child(5){animation-delay:0.8s}
+    .post-card:nth-child(6){animation-delay:0.9s}
+    .post-card:nth-child(7){animation-delay:1.0s}
+    @keyframes slideUpFade { to { opacity:1; transform:translateY(0); } }
+    .post-card:hover { background:rgba(255,255,255,0.03); }
+    .post-card:last-child { border-bottom:none; }
+
+    .post-header { padding:0; display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .post-author-info { display:flex; align-items:center; gap:10px; cursor:pointer; }
+    .post-author-avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:linear-gradient(135deg,#3478f6,#53b6f9);
+      background-size:cover; background-position:center;
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; font-weight:bold; flex-shrink:0;
     }
+    .post-author-name { font-weight:600; font-size:14px; display:flex; align-items:center; color:#fff; }
+    .post-image { width:100%; max-height:600px; object-fit:cover; border-radius:12px; margin:12px 0; }
+    .post-content { font-size:14px; line-height:1.6; color:#fff; white-space:pre-wrap; }
+    .post-time { padding:4px 0 12px 0; font-size:12px; color:#888; }
+
+    .post-actions { margin:8px 0; display:flex; align-items:center; gap:28px; }
     .like-button {
-      background: none;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #7d7d7d;
-      transition: all 0.2s ease;
-      font-size: 14px;
+      background:none; border:none; padding:0; cursor:pointer;
+      display:flex; align-items:center; gap:8px; color:#7d7d7d;
+      transition:all 0.2s ease; font-size:14px;
     }
-    .like-button.liked {
-      color: #ff6767;
+    .like-button.liked { color:#ff6767; }
+    .like-heart { width:20px; height:20px; fill:currentColor; }
+    .like-count { font-weight:bold; font-size:16px; min-width:24px; color:currentColor; vertical-align:middle; }
+
+    .no-posts { text-align:center; padding:60px 20px; color:#aaa; }
+    .delete-btn {
+      background:#ff4444; border:none; color:#fff; cursor:pointer;
+      font-size:12px; font-weight:600; padding:4px 8px; border-radius:12px;
+      transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);
     }
-    .like-heart {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
+    .delete-btn:hover { transform:translateY(-4px) scale(1.05); }
+    .delete-btn:active { background:#cc0000; }
+
+    .footer {
+      background:#1e1e1e; border-top:1px solid #333; padding:30px 20px;
+      text-align:center; color:#aaa; font-size:14px; margin-top:auto;
+      opacity:0; animation:fadeInText 0.5s ease-out 1.1s forwards;
     }
-    .like-count {
-      font-weight: bold;
-      font-size: 16px;          /* 숫자 크기 증가 */
-      line-height: 20px;        /* 아이콘 높이와 맞춤 */
-      min-width: 24px;
-      color: currentColor;
-      vertical-align: middle;   /* 수직 정렬 보정 */
+    .footer-links a { color:#3663FF; text-decoration:none; margin:0 15px; transition:color 0.3s; }
+    .footer-links a:hover { color:#00aaff; text-decoration:underline; }
+    .footer-text { color:#666; font-size:12px; }
+
+    .auth-modal, .create-modal {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center;
+      z-index:1000; backdrop-filter:blur(10px);
     }
-    .no-posts { text-align: center; padding: 60px 20px; color: #aaa; }
-    .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 12px; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-    .delete-btn:hover { transform: translateY(-4px) scale(1.05); }
-    .delete-btn:active { background: #cc0000; }
-    .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: auto; opacity: 0; animation: fadeInText 0.5s ease-out 1.1s forwards; }
-    .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
-    .footer-links a:hover { color: #00aaff; text-decoration: underline; }
-    .footer-text { color: #666; font-size: 12px; }
-    /* 모달 관련 스타일 */
-    .auth-modal, .create-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
-    .auth-modal.active, .create-modal.active { display: flex; }
-    .auth-box, .create-modal-content { background: #1e1e1e; border-radius: 16px; padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(0,0,0,0.6); position: relative; }
-    .create-modal-content { max-width: 600px; max-height: 90vh; overflow-y: auto; }
-    .auth-close, .close-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
-    .auth-box h2, .create-modal-header h3 { text-align: center; margin-bottom: 30px; color: #fff; }
-    .auth-box input, .create-modal textarea { width: 100%; padding: 12px 20px; border-radius: 12px; border: 2px solid #333; font-size: 16px; margin-bottom: 15px; outline: none; background: #2c2c2c; color: #fff; }
-    .auth-box input:focus, .create-modal textarea:focus { border-color: #3663FF; }
-    .auth-box button { width: 100%; padding: 12px 24px; border-radius: 30px; border: none; font-size: 16px; cursor: pointer; background: #3663FF; color: #fff; margin-bottom: 10px; }
-    .auth-box button.secondary { background: #2c2c2c; }
-    .error-message, .success-message { color: #ff6b6b; font-size: 14px; margin-top: -10px; margin-bottom: 10px; text-align: center; }
-    .success-message { color: #00ff00; }
-    .create-modal-header { padding: 16px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-    .image-preview-container { margin-top: 15px; }
-    .image-preview { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; display: none; }
-    .image-preview.show { display: block; }
-    .upload-btn { background: #2c2c2c; border: 2px solid #333; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-size: 14px; margin-top: 10px; color: #fff; }
+    .auth-modal.active, .create-modal.active { display:flex; }
+    .auth-box, .create-modal-content {
+      background:#1e1e1e; border-radius:16px; padding:40px;
+      width:90%; max-width:400px; box-shadow:0 0 30px rgba(0,0,0,0.6);
+      position:relative;
+    }
+    .create-modal-content { max-width:600px; max-height:90vh; overflow-y:auto; }
+    .auth-close, .close-btn { background:none; border:none; color:#fff; font-size:24px; cursor:pointer; }
+    .auth-box h2, .create-modal-header h3 { text-align:center; margin-bottom:30px; color:#fff; }
+    .auth-box input, .create-modal textarea {
+      width:100%; padding:12px 20px; border-radius:12px;
+      border:2px solid #333; font-size:16px; margin-bottom:15px;
+      outline:none; background:#2c2c2c; color:#fff;
+    }
+    .auth-box input:focus, .create-modal textarea:focus { border-color:#3663FF; }
+    .auth-box button {
+      width:100%; padding:12px 24px; border-radius:30px;
+      border:none; font-size:16px; cursor:pointer;
+      background:#3663FF; color:#fff; margin-bottom:10px;
+    }
+    .auth-box button.secondary { background:#2c2c2c; }
+    .error-message, .success-message { color:#ff6b6b; font-size:14px; margin-top:-10px; margin-bottom:10px; text-align:center; }
+    .success-message { color:#00ff00; }
+    .create-modal-header {
+      padding:16px; border-bottom:1px solid #333;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .image-preview-container { margin-top:15px; }
+    .image-preview { width:100%; max-height:400px; object-fit:cover; border-radius:12px; display:none; }
+    .image-preview.show { display:block; }
+    .upload-btn {
+      background:#2c2c2c; border:2px solid #333; padding:10px 20px;
+      border-radius:30px; cursor:pointer; font-size:14px; margin-top:10px; color:#fff;
+    }
+
+    @media (max-width:768px) {
+      .recommend-container { display:none; }
+      .sidebar-container { width:80px; min-width:80px; }
+      .sidebar-container iframe { width:80px !important; }
+      .main-wrapper { margin-left:80px; width:calc(100% - 80px); }
+    }
+    .verification-badge {
+      display:inline-block; width:18px; height:18px; margin-left:5px; vertical-align:middle;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
+      background-size:contain; background-repeat:no-repeat;
+    }
   </style>
 </head>
 <body>
-  <div class="sidebar-container">
-    <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
-  </div>
-  <div class="main-wrapper">
-    <!-- 로그인 모달 -->
-    <div class="auth-modal" id="loginModal">
-      <div class="auth-box">
-        <button class="auth-close" onclick="closeLoginModal()">✕</button>
-        <h2>로그인</h2>
-        <input type="text" id="loginId" placeholder="아이디">
-        <input type="password" id="loginPassword" placeholder="비밀번호">
-        <div class="error-message" id="loginError"></div>
-        <div class="success-message" id="loginSuccess"></div>
-        <button onclick="handleLogin()">로그인</button>
-        <button class="secondary" onclick="showSignup()">회원가입</button>
-      </div>
-    </div>
-    <!-- 회원가입 모달 -->
-    <div class="auth-modal" id="signupModal">
-      <div class="auth-box">
-        <button class="auth-close" onclick="closeSignupModal()">✕</button>
-        <h2>회원가입</h2>
-        <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
-        <div class="error-message" id="nicknameError"></div>
-        <input type="text" id="signupId" placeholder="아이디">
-        <div class="error-message" id="idError"></div>
-        <input type="password" id="signupPassword" placeholder="비밀번호">
-        <div class="error-message" id="signupError"></div>
-        <div class="success-message" id="signupSuccess"></div>
-        <button onclick="handleSignup()">가입</button>
-        <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
-      </div>
-    </div>
-    <!-- 게시물 작성 모달 -->
-    <div class="create-modal" id="createModal">
-      <div class="create-modal-content">
-        <div class="create-modal-header">
-          <h3>새 게시물 만들기</h3>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button class="post-btn" id="modalPostBtn">공유하기</button>
-            <button class="close-btn" id="closeModal">×</button>
-          </div>
-        </div>
-        <div class="create-modal-body">
-          <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
-          <div class="image-preview-container">
-            <img id="imagePreview" class="image-preview">
-          </div>
-          <input type="file" id="imageInput" accept="image/*" style="display: none;">
-          <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
-          <div id="postMessage" style="margin-top: 10px; font-size: 14px;"></div>
-        </div>
-      </div>
-    </div>
-    <div class="main-content">
-      <div class="feed-container">
-        <div id="postsFeed">
-          <!-- 개선된 게시물 스켈레톤 (3개) -->
-          <div class="skeleton-post">
-            <div class="skeleton-post-header">
-              <div class="skeleton skeleton-avatar"></div>
-              <div class="skeleton skeleton-username"></div>
-            </div>
-            <div class="skeleton skeleton-post-image"></div>
-            <div class="skeleton text text-long"></div>
-            <div class="skeleton text text-medium"></div>
-            <div class="skeleton text text-short"></div>
-          </div>
-          <div class="skeleton-post">
-            <div class="skeleton-post-header">
-              <div class="skeleton skeleton-avatar"></div>
-              <div class="skeleton skeleton-username"></div>
-            </div>
-            <div class="skeleton skeleton-post-image"></div>
-            <div class="skeleton text text-long"></div>
-            <div class="skeleton text text-long"></div>
-          </div>
-          <div class="skeleton-post">
-            <div class="skeleton-post-header">
-              <div class="skeleton skeleton-avatar"></div>
-              <div class="skeleton skeleton-username"></div>
-            </div>
-            <div class="skeleton text text-medium"></div>
-            <div class="skeleton text text-long"></div>
-            <div class="skeleton text text-short"></div>
-          </div>
-        </div>
-      </div>
-      <div class="recommend-container" id="recommendProfiles">
-        <div class="recommend-title">프로필 추천</div>
-        <div id="recommendSkeleton">
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        </div>
-      </div>
-    </div>
-    <div class="footer">
-      <div class="footer-links">
-        <a href="/privacy.html">개인정보처리방침</a>
-        <a href="/policy.html">이용약관</a>
-        <a href="mailto:alexeom97@outlook.com">문의하기</a>
-      </div>
-      <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
+
+<div class="sidebar-container">
+  <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
+</div>
+
+<div class="main-wrapper">
+
+  <!-- 로그인 모달 -->
+  <div class="auth-modal" id="loginModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeLoginModal()">✕</button>
+      <h2>로그인</h2>
+      <input type="text" id="loginId" placeholder="아이디">
+      <input type="password" id="loginPassword" placeholder="비밀번호">
+      <div class="error-message" id="loginError"></div>
+      <div class="success-message" id="loginSuccess"></div>
+      <button onclick="handleLogin()">로그인</button>
+      <button class="secondary" onclick="showSignup()">회원가입</button>
     </div>
   </div>
+
+  <!-- 회원가입 모달 -->
+  <div class="auth-modal" id="signupModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeSignupModal()">✕</button>
+      <h2>회원가입</h2>
+      <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
+      <div class="error-message" id="nicknameError"></div>
+      <input type="text" id="signupId" placeholder="아이디">
+      <div class="error-message" id="idError"></div>
+      <input type="password" id="signupPassword" placeholder="비밀번호">
+      <div class="error-message" id="signupError"></div>
+      <div class="success-message" id="signupSuccess"></div>
+      <button onclick="handleSignup()">가입</button>
+      <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
+    </div>
+  </div>
+
+  <!-- 게시물 작성 모달 -->
+  <div class="create-modal" id="createModal">
+    <div class="create-modal-content">
+      <div class="create-modal-header">
+        <h3>새 게시물 만들기</h3>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="post-btn" id="modalPostBtn">공유하기</button>
+          <button class="close-btn" id="closeModal">×</button>
+        </div>
+      </div>
+      <div class="create-modal-body">
+        <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
+        <div class="image-preview-container">
+          <img id="imagePreview" class="image-preview">
+        </div>
+        <input type="file" id="imageInput" accept="image/*" style="display:none;">
+        <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
+        <div id="postMessage" style="margin-top:10px; font-size:14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="feed-container">
+      <div id="postsFeed">
+        <!-- 스켈레톤 3개 -->
+        <div class="skeleton-post">
+          <div class="skeleton-post-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-username"></div>
+          </div>
+          <div class="skeleton skeleton-post-image"></div>
+          <div class="skeleton text text-long"></div>
+          <div class="skeleton text text-medium"></div>
+          <div class="skeleton text text-short"></div>
+        </div>
+        <div class="skeleton-post">
+          <div class="skeleton-post-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-username"></div>
+          </div>
+          <div class="skeleton skeleton-post-image"></div>
+          <div class="skeleton text text-long"></div>
+          <div class="skeleton text text-long"></div>
+        </div>
+        <div class="skeleton-post">
+          <div class="skeleton-post-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-username"></div>
+          </div>
+          <div class="skeleton text text-medium"></div>
+          <div class="skeleton text text-long"></div>
+          <div class="skeleton text text-short"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommend-container" id="recommendProfiles">
+      <div class="recommend-title">프로필 추천</div>
+      <div id="recommendSkeleton">
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="/privacy.html">개인정보처리방침</a>
+      <a href="/policy.html">이용약관</a>
+      <a href="mailto:alexeom97@outlook.com">문의하기</a>
+    </div>
+    <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
+  </div>
+
+</div>
+
 <script>
-// ── Cloudflare Worker를 통한 안전한 API 호출 헬퍼 ──
+// ── API 헬퍼 ────────────────────────────────────────────────
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
 async function api(endpoint, options = {}) {
   const url = API_BASE + endpoint;
   const res = await fetch(url, {
@@ -329,31 +377,36 @@ async function api(endpoint, options = {}) {
     },
   });
   if (!res.ok) {
-    let errorText;
-    try { errorText = await res.text(); } catch { errorText = ""; }
+    let errorText = "";
+    try { errorText = await res.text(); } catch {}
     throw new Error(`API 오류 (${res.status}): ${errorText}`);
   }
   if (res.status === 204) return null;
   return res.json();
 }
+
+// ── 전역 변수 ────────────────────────────────────────────────
 let currentUser = null;
 let selectedImage = null;
 const cloudName = 'dretlhsrk';
 const uploadPreset = 'unsigned_preset';
-// 기본 함수들
+
+// ── 기본 함수들 ──────────────────────────────────────────────
 function initCurrentUser() {
-  const savedUser = localStorage.getItem('snsUser');
-  if (savedUser) {
-    currentUser = JSON.parse(savedUser);
+  const saved = localStorage.getItem('snsUser');
+  if (saved) {
+    currentUser = JSON.parse(saved);
     updateSidebar();
   }
 }
+
 function updateSidebar() {
   const iframe = document.getElementById('sidebarFrame');
   if (iframe?.contentWindow) {
     iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
   }
 }
+
 function updateSidebarMode() {
   const iframe = document.getElementById('sidebarFrame');
   const narrow = window.innerWidth <= 768;
@@ -361,6 +414,7 @@ function updateSidebarMode() {
     iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
   }
 }
+
 window.addEventListener('message', (event) => {
   const { type, page } = event.data || {};
   if (type === 'navigate') {
@@ -375,14 +429,17 @@ window.addEventListener('message', (event) => {
   }
   if (type === 'requestUserInfo') updateSidebar();
 });
+
 initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
-// 모달 관련 함수들
-window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
+
+// ── 모달 제어 ────────────────────────────────────────────────
+window.closeLoginModal  = () => document.getElementById('loginModal').classList.remove('active');
 window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
-window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
-window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
+window.showSignup       = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
+window.backToLogin      = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
+
 function handleCreatePost() {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
@@ -393,8 +450,10 @@ function handleCreatePost() {
   document.getElementById('imagePreview').classList.remove('show');
   selectedImage = null;
 }
+
 document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
 document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
+
 document.getElementById('imageInput').onchange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -407,36 +466,42 @@ document.getElementById('imageInput').onchange = (e) => {
   };
   reader.readAsDataURL(file);
 };
-// Cloudinary 업로드
+
+// ── Cloudinary 업로드 ───────────────────────────────────────
 async function uploadImageToCloudinary(file) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', uploadPreset);
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
     method: 'POST',
     body: formData
   });
-  if (!response.ok) throw new Error('이미지 업로드 실패');
-  const data = await response.json();
+  if (!res.ok) throw new Error('이미지 업로드 실패');
+  const data = await res.json();
   return data.secure_url;
 }
-// 게시물 작성
+
+// ── 게시물 작성 ──────────────────────────────────────────────
 document.getElementById('modalPostBtn').onclick = async () => {
   const content = document.getElementById('postContent').value.trim();
   const messageDiv = document.getElementById('postMessage');
   const postButton = document.getElementById('modalPostBtn');
+
   if (!content && !selectedImage) {
     messageDiv.innerHTML = '<span style="color:#ff6b6b;">내용 또는 이미지를 추가해주세요.</span>';
     return;
   }
+
   postButton.disabled = true;
   messageDiv.innerHTML = '<span style="color:#aaa;">게시 중...</span>';
+
   try {
     let imageUrl = null;
     if (selectedImage) {
       messageDiv.innerHTML = '<span style="color:#aaa;">이미지 업로드 중...</span>';
       imageUrl = await uploadImageToCloudinary(selectedImage);
     }
+
     await api("/posts", {
       method: "POST",
       body: JSON.stringify({
@@ -447,6 +512,7 @@ document.getElementById('modalPostBtn').onclick = async () => {
         created_at: new Date().toISOString()
       })
     });
+
     messageDiv.innerHTML = '<span style="color:#00ff00;">게시글이 작성되었습니다!</span>';
     setTimeout(() => {
       document.getElementById('createModal').classList.remove('active');
@@ -460,7 +526,8 @@ document.getElementById('modalPostBtn').onclick = async () => {
     postButton.disabled = false;
   }
 };
-// 시간 포맷
+
+// ── 시간 포맷 ─────────────────────────────────────────────────
 function formatPostTime(dateString) {
   const now = new Date();
   const date = new Date(dateString);
@@ -468,68 +535,184 @@ function formatPostTime(dateString) {
   const diffMin = Math.floor(diffMs / 60000);
   const diffHour = Math.floor(diffMin / 60);
   const isToday = now.toDateString() === date.toDateString();
+
   if (isToday) {
     if (diffMin < 1) return '방금 전';
     if (diffMin < 60) return `${diffMin}분 전`;
     return `${diffHour}시간 전`;
   }
-  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('.', '.');
+  return date.toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' }).replaceAll('.', '.');
 }
+
 function escapeHtml(text) {
   if (!text) return '';
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  const map = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' };
   return text.replace(/[&<>"']/g, m => map[m]);
 }
-// 좋아요 관련 헬퍼 함수들
-async function getLikeCount(postId) {
+
+// ── 최적화된 게시물 로드 (핵심 개선 부분) ────────────────────
+async function loadPosts() {
+  const feedDiv = document.getElementById('postsFeed');
+
   try {
-    const result = await api(`/likes?post_id=eq.${postId}&select=count`);
-    return Math.max(0, result?.[0]?.count || 0);
-  } catch {
-    return 0;
+    // 1. 게시물 목록 가져오기
+    const posts = await api("/posts?select=id,author,author_id,content,image_url,created_at&order=created_at.desc");
+
+    if (!posts?.length) {
+      feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
+      return;
+    }
+
+    // 2. 필요한 모든 ID 수집
+    const postIds   = posts.map(p => p.id);
+    const authorIds = [...new Set(posts.map(p => p.author_id))];
+
+    // 3. 병렬로 모든 데이터 가져오기 (가장 큰 성능 개선 지점)
+    const [users, likeCounts, myLikes] = await Promise.all([
+      // 작성자 정보 (한 번에 여러 명)
+      api(`/users?id=in.(${authorIds.join(',')})&select=id,nickname,profile_image`),
+      // 각 게시물의 좋아요 수
+      api(`/likes?post_id=in.(${postIds.join(',')})&select=post_id,count`),
+      // 내가 누른 좋아요 (로그인 상태일 때만)
+      currentUser
+        ? api(`/likes?post_id=in.(${postIds.join(',')})&user_id=eq.${currentUser.id}&select=post_id`)
+        : Promise.resolve([])
+    ]);
+
+    // 4. 빠른 검색을 위한 Map / Set 준비
+    const userMap = Object.fromEntries(users.map(u => [u.id, u]));
+    const likeCountMap = {};
+    likeCounts.forEach(l => likeCountMap[l.post_id] = Number(l.count) || 0);
+    const likedSet = new Set(myLikes.map(l => l.post_id));
+
+    // 5. DOM 비우고 렌더링
+    feedDiv.innerHTML = '';
+
+    posts.forEach(post => {
+      const user = userMap[post.author_id] || {};
+      const nickname     = user.nickname || post.author || '알 수 없음';
+      const avatar       = user.profile_image;
+      const isVerified   = nickname === "JB777";
+      const canDelete    = currentUser?.nickname === "JB777";
+      const timeStr      = formatPostTime(post.created_at);
+      const likeCount    = likeCountMap[post.id] || 0;
+      const liked        = likedSet.has(post.id);
+
+      const avatarHTML = avatar
+        ? `<img src="${avatar}" class="post-author-avatar" alt="${nickname}" onerror="this.style.display='flex';this.textContent='${nickname[0]?.toUpperCase()||'?'}'">`
+        : `<div class="post-author-avatar">${nickname[0]?.toUpperCase() || '?'}</div>`;
+
+      const authorDisplay = isVerified
+        ? `${escapeHtml(nickname)}<span class="verification-badge"></span>`
+        : escapeHtml(nickname);
+
+      const deleteButton = canDelete
+        ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
+        : '';
+
+      let contentHTML = '';
+      if (post.content) {
+        const lines = escapeHtml(post.content).split('\n');
+        const title = lines.shift() || '';
+        const body  = lines.filter(l => l.trim()).join('<br>');
+        contentHTML = `
+          <div class="post-content">
+            <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${title}</div>
+            ${body ? `<div style="color:#ddd; font-size:14px; line-height:1.6;">${body}</div>` : ''}
+          </div>
+        `;
+      }
+
+      const postCard = document.createElement('div');
+      postCard.className = 'post-card';
+      postCard.innerHTML = `
+        <div class="post-header">
+          <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(nickname)}')">
+            ${avatarHTML}
+            <div class="post-author-name">${authorDisplay}</div>
+          </div>
+          ${deleteButton}
+        </div>
+        ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
+        ${contentHTML}
+        <div class="post-actions">
+          <button class="like-button ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
+            <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
+              <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
+            </svg>
+            <span class="like-count">${likeCount}</span>
+          </button>
+        </div>
+        <div class="post-time">${timeStr}</div>
+      `;
+
+      postCard.onclick = (e) => {
+        if (!e.target.closest('.like-button')) {
+          window.location.href = `view.html?id=${post.id}`;
+        }
+      };
+
+      feedDiv.appendChild(postCard);
+    });
+
+  } catch (err) {
+    console.error('게시물 로드 오류:', err);
+    feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
   }
 }
+
+// ── 좋아요 토글 (기존과 동일) ────────────────────────────────
 async function toggleLike(postId, button) {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
     return;
   }
+
   const countEl = button.querySelector('.like-count');
+
   try {
     const [likeRecords, likeCountResult] = await Promise.all([
       api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
       api(`/likes?post_id=eq.${postId}&select=count`)
     ]);
+
     const currentlyLiked = likeRecords?.length > 0;
     const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
+
     const uiLiked = button.classList.contains('liked');
     const uiCount = parseInt(countEl.textContent, 10) || 0;
+
+    // UI와 서버 불일치 시 강제 동기화
     if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
       button.classList.toggle('liked', currentlyLiked);
       countEl.textContent = currentServerCount;
-      console.log('UI와 서버 상태 불일치 → 자동 동기화');
+      console.log('UI-서버 상태 불일치 → 자동 동기화');
     }
+
     if (currentlyLiked) {
+      // 좋아요 취소
       if (likeRecords?.[0]?.id) {
         await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
       }
       button.classList.remove('liked');
       countEl.textContent = currentServerCount - 1;
     } else {
+      // 좋아요 추가
       await api("/likes", {
         method: "POST",
-        body: JSON.stringify({
-          post_id: postId,
-          user_id: currentUser.id
-        })
+        body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
       });
       button.classList.add('liked');
       countEl.textContent = currentServerCount + 1;
     }
-    const finalCount = await getLikeCount(postId);
+
+    // 최종 확인
+    const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`).then(r => Math.max(0, r?.[0]?.count || 0));
     countEl.textContent = finalCount;
+
   } catch (err) {
     console.error("좋아요 처리 중 오류:", err);
+    // 복구 시도
     try {
       const [records, countRes] = await Promise.all([
         api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
@@ -542,93 +725,12 @@ async function toggleLike(postId, button) {
     }
   }
 }
-// 게시물 로드
-async function loadPosts() {
-  const feedDiv = document.getElementById('postsFeed');
-  try {
-    const posts = await api("/posts?select=*,author_id&order=created_at.desc");
-    if (!posts?.length) {
-      feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
-      return;
-    }
-    feedDiv.innerHTML = '';
-    for (const post of posts) {
-      let authorNickname = post.author || '알 수 없음';
-      let authorAvatar = null;
-      try {
-        const users = await api(`/users?id=eq.${post.author_id}&select=nickname,profile_image`);
-        if (users?.length > 0) {
-          authorNickname = users[0].nickname || authorNickname;
-          authorAvatar = users[0].profile_image;
-        }
-      } catch (e) {
-        console.warn("작성자 정보 로드 실패:", e);
-      }
-      const isVerified = authorNickname === "JB777";
-      const timeStr = formatPostTime(post.created_at);
-      const canDelete = currentUser?.nickname === "JB777";
-      const avatarHTML = authorAvatar
-        ? `<img src="${authorAvatar}" class="post-author-avatar" alt="${authorNickname}" onerror="this.style.display='flex';this.textContent='${authorNickname[0]?.toUpperCase()||'?'}'">`
-        : `<div class="post-author-avatar">${authorNickname[0]?.toUpperCase() || '?'}</div>`;
-      const authorDisplay = isVerified
-        ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
-        : escapeHtml(authorNickname);
-      const deleteButton = canDelete
-        ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
-        : '';
-      let contentHTML = '';
-      if (post.content) {
-        const lines = escapeHtml(post.content).split('\n');
-        const title = lines.shift() || '';
-        const body = lines.filter(l => l.trim()).join('<br>');
-        contentHTML = `
-          <div class="post-content">
-            <div style="font-weight:700; font-size:15px; margin-bottom:8px;">${title}</div>
-            ${body ? `<div style="color:#ddd; font-size:14px; line-height:1.6;">${body}</div>` : ''}
-          </div>
-        `;
-      }
-      const likeCount = await getLikeCount(post.id);
-      const liked = await api(`/likes?post_id=eq.${post.id}&user_id=eq.${currentUser?.id || '0'}&select=id`).then(r => r?.length > 0);
-      const postCard = document.createElement('div');
-      postCard.className = 'post-card';
-      postCard.innerHTML = `
-        <div class="post-header">
-          <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(authorNickname)}')">
-            ${avatarHTML}
-            <div class="post-author-name">${authorDisplay}</div>
-          </div>
-          ${deleteButton}
-        </div>
-        ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
-        ${contentHTML}
-        <div class="post-actions">
-          <button class="like-button ${liked ? 'liked' : ''}"
-                  onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
-            <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
-              <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
-            </svg>
-            <span class="like-count">${likeCount}</span>
-          </button>
-        </div>
-        <div class="post-time">${timeStr}</div>
-      `;
-      postCard.onclick = (e) => {
-        if (!e.target.closest('.like-button')) {
-          window.location.href = `view.html?id=${post.id}`;
-        }
-      };
-      feedDiv.appendChild(postCard);
-    }
-  } catch (err) {
-    console.error('게시물 로드 오류:', err);
-    feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
-  }
-}
-// 추천 프로필 로드
+
+// ── 추천 프로필 로드 (기존 유지, 필요하면 나중에 최적화) ──────
 async function loadRecommendedProfiles() {
   const container = document.getElementById('recommendProfiles');
   const skeleton = document.getElementById('recommendSkeleton');
+
   try {
     let users = await api("/users?select=id,nickname,profile_image");
     if (!users?.length) {
@@ -636,37 +738,43 @@ async function loadRecommendedProfiles() {
       container.innerHTML += '<div style="text-align:center; color:#aaa; padding:12px 0;">사용자 없음</div>';
       return;
     }
+
+    // 랜덤 섞기
     for (let i = users.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [users[i], users[j]] = [users[j], users[i]];
     }
     users = users.slice(0, 7);
+
     skeleton?.remove();
+
     users.forEach(user => {
       const avatarHTML = user.profile_image
         ? `<img src="${user.profile_image}" class="profile-avatar" alt="${user.nickname}" onerror="this.style.display='flex';this.textContent='${user.nickname?.[0]?.toUpperCase()||'?'}'">`
         : `<div class="profile-avatar">${user.nickname?.[0]?.toUpperCase() || '?'}</div>`;
+
       const item = document.createElement('div');
       item.className = 'profile-item';
-      item.innerHTML = `
-        ${avatarHTML}
-        <span class="profile-nickname">${escapeHtml(user.nickname)}</span>
-      `;
+      item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}</span>`;
       item.onclick = () => {
         window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`;
       };
       container.appendChild(item);
     });
+
   } catch (err) {
     console.error('추천 프로필 로드 오류:', err);
     if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:#aaa; padding:12px 0;">로드 실패</div>';
   }
 }
+
+// ── 기타 유틸 함수 ───────────────────────────────────────────
 window.goToProfile = (userId, nickname) => {
   if (userId && nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   }
 };
+
 window.deletePost = async (postId) => {
   if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
   try {
@@ -677,7 +785,8 @@ window.deletePost = async (postId) => {
     alert('삭제에 실패했습니다.');
   }
 };
-// 초기 로드
+
+// ── 초기 실행 ─────────────────────────────────────────────────
 loadPosts();
 loadRecommendedProfiles();
 </script>
