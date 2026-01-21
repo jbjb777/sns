@@ -273,7 +273,7 @@
 </div>
 
 <script>
-// ── Cloudflare Worker를 통한 안전한 API 호출 헬퍼 ──
+// ── API 헬퍼 ────────────────────────────────────────────────
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
 async function api(endpoint, options = {}) {
@@ -452,10 +452,11 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// 게시물 로드 - 개별 쿼리로 완전 안전하게 변경
+// 게시물 로드 - 최신순 보장 (order=created_at.desc)
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
   try {
+    // 서버에서 created_at 내림차순(최신순)으로 가져옴
     const posts = await api("/posts?select=*,author_id&order=created_at.desc");
     if (!posts?.length) {
       feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
@@ -477,7 +478,7 @@ async function loadPosts() {
         console.warn("작성자 정보 로드 실패:", e);
       }
 
-      // 좋아요 수 - 개별 쿼리 (group_by 없음, or 없음)
+      // 좋아요 수 - 개별 쿼리
       let likeCount = 0;
       try {
         const countRes = await api(`/likes?post_id=eq.${post.id}&select=count`);
