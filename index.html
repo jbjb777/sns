@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>홈 - Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.png">
-
   <!-- 검색 결과 설명 -->
   <meta name="description" content="Sharer는 이미지와 텍스트를 업로드하고 사람들과 소통할 수 있는 무료 커뮤니티·SNS 서비스입니다. 정빈777이 만들었습니다.">
   <meta name="keywords" content="Sharer, 커뮤니티, SNS, 정빈777, 정빈정빈">
   <meta name="author" content="정빈777">
   <meta name="robots" content="index, follow">
-
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Sharer | 커뮤니티 · SNS">
@@ -21,13 +19,11 @@
   <meta property="og:image:width" content="512">
   <meta property="og:image:height" content="512">
   <meta property="og:site_name" content="Sharer">
-
   <!-- Twitter(X) -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Sharer | 커뮤니티 · SNS">
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
@@ -53,36 +49,68 @@
     .profile-item:hover { background: #2c2c2c; border-radius: 8px; }
     .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; background-size: cover; background-position: center; }
     .profile-nickname { font-size: 14px; color: #fff; }
-
     /* 스켈레톤 개선 */
-    .skeleton { background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 6px; }
+    .skeleton {
+      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s ease-in-out infinite;
+      border-radius: 6px;
+    }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    .skeleton-post { padding: 20px 0; border-bottom: 1px solid #2a2a2a; }
-    .skeleton-post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
-    .skeleton-username { width: 140px; height: 16px; }
-    .skeleton-post-image { width: 100%; height: 400px; border-radius: 12px; margin: 12px 0; }
-    .skeleton-text { height: 14px; margin: 6px 0; }
+    .skeleton-post {
+      padding: 20px 0;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .skeleton-post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .skeleton-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .skeleton-username {
+      width: 140px;
+      height: 16px;
+    }
+    .skeleton-post-image {
+      width: 100%;
+      height: 400px;
+      border-radius: 12px;
+      margin: 12px 0;
+    }
+    .skeleton-text {
+      height: 14px;
+      margin: 6px 0;
+    }
     .text-short { width: 60%; }
     .text-medium { width: 85%; }
     .text-long { width: 100%; }
-    .skeleton-profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
-    .skeleton-profile-avatar { width: 40px; height: 40px; border-radius: 50%; }
-    .skeleton-profile-nickname { width: 110px; height: 16px; }
-
+    .skeleton-profile-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .skeleton-profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .skeleton-profile-nickname {
+      width: 110px;
+      height: 16px;
+    }
     @media (max-width: 768px) {
       .recommend-container { display: none; }
       .sidebar-container { width: 80px; min-width: 80px; }
       .sidebar-container iframe { width: 80px !important; }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
     }
-
-    .verification-badge { 
-      display: inline-block; width: 18px; height: 18px; margin-left: 5px; vertical-align: middle; 
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); 
-      background-size: contain; background-repeat: no-repeat; 
-    }
-
+    .verification-badge { display: inline-block; width: 18px; height: 18px; margin-left: 5px; vertical-align: middle; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); background-size: contain; background-repeat: no-repeat; }
     .post-card {
       background: transparent;
       border: none;
@@ -107,7 +135,6 @@
     @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
     .post-card:hover { background: rgba(255, 255, 255, 0.03); }
     .post-card:last-child { border-bottom: none; }
-
     .post-header { padding: 0; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .post-author-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
     .post-author-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; }
@@ -115,23 +142,50 @@
     .post-image { width: 100%; max-height: 600px; object-fit: cover; border-radius: 12px; margin: 12px 0; }
     .post-content { font-size: 14px; line-height: 1.6; color: #fff; white-space: pre-wrap; }
     .post-time { padding: 4px 0 12px 0; font-size: 12px; color: #888; }
-
-    .post-actions { margin: 8px 0 8px 0; display: flex; align-items: center; gap: 28px; }
-    .like-button { background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; gap: 8px; color: #7d7d7d; transition: all 0.2s ease; font-size: 14px; }
-    .like-button.liked { color: #ff6767; }
-    .like-heart { width: 20px; height: 20px; fill: currentColor; }
-    .like-count { font-weight: bold; font-size: 16px; line-height: 20px; min-width: 24px; color: currentColor; vertical-align: middle; }
-
+    /* 좋아요 영역 스타일 */
+    .post-actions {
+      margin: 8px 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .like-button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #7d7d7d;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    .like-button.liked {
+      color: #ff6767;
+    }
+    .like-heart {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    .like-count {
+      font-weight: bold;
+      font-size: 16px; /* 숫자 크기 증가 */
+      line-height: 20px; /* 아이콘 높이와 맞춤 */
+      min-width: 24px;
+      color: currentColor;
+      vertical-align: middle; /* 수직 정렬 보정 */
+    }
     .no-posts { text-align: center; padding: 60px 20px; color: #aaa; }
     .delete-btn { background: #ff4444; border: none; color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 12px; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
     .delete-btn:hover { transform: translateY(-4px) scale(1.05); }
     .delete-btn:active { background: #cc0000; }
-
     .footer { background: #1e1e1e; border-top: 1px solid #333; padding: 30px 20px; text-align: center; color: #aaa; font-size: 14px; margin-top: auto; opacity: 0; animation: fadeInText 0.5s ease-out 1.1s forwards; }
     .footer-links a { color: #3663FF; text-decoration: none; margin: 0 15px; transition: color 0.3s; }
     .footer-links a:hover { color: #00aaff; text-decoration: underline; }
     .footer-text { color: #666; font-size: 12px; }
-
+    /* 모달 관련 스타일 */
     .auth-modal, .create-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(10px); }
     .auth-modal.active, .create-modal.active { display: flex; }
     .auth-box, .create-modal-content { background: #1e1e1e; border-radius: 16px; padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(0,0,0,0.6); position: relative; }
@@ -273,7 +327,7 @@
 </div>
 
 <script>
-// ── API 헬퍼 ────────────────────────────────────────────────
+// ── Cloudflare Worker를 통한 안전한 API 호출 헬퍼 ──
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
 async function api(endpoint, options = {}) {
@@ -452,20 +506,83 @@ function escapeHtml(text) {
   return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// 게시물 로드 - 최신순 보장 (order=created_at.desc)
+// 좋아요 토글 함수 - 여기서 정의되어야 onclick에서 인식됨
+async function toggleLike(postId, button) {
+  if (!currentUser) {
+    document.getElementById('loginModal').classList.add('active');
+    return;
+  }
+
+  const countEl = button.querySelector('.like-count');
+
+  try {
+    const [likeRecords, likeCountResult] = await Promise.all([
+      api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+      api(`/likes?post_id=eq.${postId}&select=count`)
+    ]);
+
+    const currentlyLiked = likeRecords?.length > 0;
+    const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
+
+    const uiLiked = button.classList.contains('liked');
+    const uiCount = parseInt(countEl.textContent, 10) || 0;
+
+    if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
+      button.classList.toggle('liked', currentlyLiked);
+      countEl.textContent = currentServerCount;
+      console.log('UI와 서버 상태 불일치 → 자동 동기화');
+    }
+
+    if (currentlyLiked) {
+      if (likeRecords?.[0]?.id) {
+        await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
+      }
+      button.classList.remove('liked');
+      countEl.textContent = currentServerCount - 1;
+    } else {
+      await api("/likes", {
+        method: "POST",
+        body: JSON.stringify({
+          post_id: postId,
+          user_id: currentUser.id
+        })
+      });
+      button.classList.add('liked');
+      countEl.textContent = currentServerCount + 1;
+    }
+
+    // 최종 확인
+    const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`)
+      .then(r => Math.max(0, r?.[0]?.count || 0));
+    countEl.textContent = finalCount;
+
+  } catch (err) {
+    console.error("좋아요 처리 중 오류:", err);
+    // 복구 시도
+    try {
+      const [records, countRes] = await Promise.all([
+        api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+        api(`/likes?post_id=eq.${postId}&select=count`)
+      ]);
+      button.classList.toggle('liked', records?.length > 0);
+      countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
+    } catch (recoveryErr) {
+      console.error("복구 실패:", recoveryErr);
+    }
+  }
+}
+
+// 게시물 로드
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
   try {
-    // 서버에서 created_at 내림차순(최신순)으로 가져옴
     const posts = await api("/posts?select=*,author_id&order=created_at.desc");
     if (!posts?.length) {
       feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
       return;
     }
-
     feedDiv.innerHTML = '';
-
-    await Promise.all(posts.map(async (post) => {
+    for (const post of posts) {
       let authorNickname = post.author || '알 수 없음';
       let authorAvatar = null;
       try {
@@ -477,43 +594,18 @@ async function loadPosts() {
       } catch (e) {
         console.warn("작성자 정보 로드 실패:", e);
       }
-
-      // 좋아요 수 - 개별 쿼리
-      let likeCount = 0;
-      try {
-        const countRes = await api(`/likes?post_id=eq.${post.id}&select=count`);
-        likeCount = Math.max(0, countRes?.[0]?.count || 0);
-      } catch (e) {
-        console.warn(`좋아요 수 로드 실패 (post ${post.id}):`, e);
-      }
-
-      // 내가 좋아요 했는지 - 개별 쿼리
-      let liked = false;
-      if (currentUser) {
-        try {
-          const likedRes = await api(`/likes?post_id=eq.${post.id}&user_id=eq.${currentUser.id}&select=id`);
-          liked = likedRes?.length > 0;
-        } catch (e) {
-          console.warn(`좋아요 여부 로드 실패 (post ${post.id}):`, e);
-        }
-      }
-
       const isVerified = authorNickname === "JB777";
       const timeStr = formatPostTime(post.created_at);
       const canDelete = currentUser?.nickname === "JB777";
-
       const avatarHTML = authorAvatar
-        ? `<img src="${authorAvatar}" class="post-author-avatar" alt="${authorNickname}" onerror="this.style.display='flex';this.textContent='${authorNickname[0]?.toUpperCase() || '?'}'">`
+        ? `<img src="${authorAvatar}" class="post-author-avatar" alt="${authorNickname}" onerror="this.style.display='flex';this.textContent='${authorNickname[0]?.toUpperCase()||'?'}'">`
         : `<div class="post-author-avatar">${authorNickname[0]?.toUpperCase() || '?'}</div>`;
-
       const authorDisplay = isVerified
         ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
         : escapeHtml(authorNickname);
-
       const deleteButton = canDelete
         ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
         : '';
-
       let contentHTML = '';
       if (post.content) {
         const lines = escapeHtml(post.content).split('\n');
@@ -525,6 +617,26 @@ async function loadPosts() {
             ${body ? `<div style="color:#ddd; font-size:14px; line-height:1.6;">${body}</div>` : ''}
           </div>
         `;
+      }
+
+      // 좋아요 수 가져오기
+      let likeCount = 0;
+      try {
+        const countRes = await api(`/likes?post_id=eq.${post.id}&select=count`);
+        likeCount = Math.max(0, countRes?.[0]?.count || 0);
+      } catch (e) {
+        console.warn(`좋아요 수 로드 실패 (${post.id}):`, e);
+      }
+
+      // 내가 좋아요 했는지
+      let liked = false;
+      if (currentUser) {
+        try {
+          const likedRes = await api(`/likes?post_id=eq.${post.id}&user_id=eq.${currentUser.id}&select=id`);
+          liked = likedRes?.length > 0;
+        } catch (e) {
+          console.warn(`좋아요 여부 로드 실패 (${post.id}):`, e);
+        }
       }
 
       const postCard = document.createElement('div');
@@ -540,7 +652,7 @@ async function loadPosts() {
         ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
         ${contentHTML}
         <div class="post-actions">
-          <button class="like-button ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
+          <button class="like-button ${liked ? 'liked' : ''}" onclick="toggleLike('${post.id}', this)">
             <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
               <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
             </svg>
@@ -557,11 +669,10 @@ async function loadPosts() {
       };
 
       feedDiv.appendChild(postCard);
-    }));
-
+    }
   } catch (err) {
     console.error('게시물 로드 오류:', err);
-    feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.<br>콘솔(F12)을 확인해주세요.</div>';
+    feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
   }
 }
 
