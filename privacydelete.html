@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>개인정보 삭제 요청 방법 - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .header {
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    .logo-container:hover {
+      transform: scale(1.05);
+    }
+    .logo-svg {
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+    }
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px 20px 40px;
+    }
+    .request-container {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 40px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      line-height: 1.8;
+    }
+    .request-container h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 40px;
+      color: #fff;
+    }
+    .request-container h2 {
+      font-size: 22px;
+      margin: 40px 0 20px 0;
+      color: #3663FF;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #333;
+    }
+    .request-container p {
+      margin-bottom: 16px;
+      color: #ddd;
+    }
+    .request-container strong {
+      color: #fff;
+      font-weight: 700;
+    }
+    .request-container ol {
+      padding-left: 28px;
+      margin-bottom: 24px;
+    }
+    .request-container li {
+      margin-bottom: 14px;
+      color: #ddd;
+    }
+    .request-container .highlight-box {
+      background: rgba(54, 99, 255, 0.12);
+      border-left: 4px solid #3663FF;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 28px 0;
+      font-size: 15px;
+    }
+    .request-container .highlight-box strong {
+      color: #3663FF;
+    }
+    .request-container .contact {
+      margin-top: 50px;
+      padding: 20px;
+      background: #2c2c2c;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 15px;
+    }
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 20px;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+    @media (max-width: 768px) {
+      .request-container {
+        padding: 30px 20px;
+      }
+      .request-container h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container" onclick="window.location.href='index.html'">
+      <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
+      <span class="logo-text">Sharer</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="request-container">
+      <h1>개인정보 삭제 요청 방법</h1>
+      
+      <p>Sharer 서비스에서 수집된 개인정보(아이디, 닉네임, 비밀번호 등)를 삭제하고 싶으신 경우, 아래 방법으로 요청해 주세요.</p>
+
+      <h2>삭제 요청 방법</h2>
+      <p>현재 Sharer에서는 <strong>이메일로 직접 삭제 요청</strong>을 받고 있습니다.<br>
+      다음 주소로 메일을 보내주시면 운영자가 확인 후 처리해 드립니다.</p>
+
+      <div class="highlight-box">
+        <strong>삭제 요청 메일 보내실 주소</strong><br><br>
+        <a href="mailto:alexeom97@outlook.com" style="color:#3663FF; font-size: 17px; word-break: break-all;">alexeom97@outlook.com</a>
+      </div>
+
+      <h2>메일에 반드시 포함해야 하는 내용</h2>
+      <ol>
+        <li><strong>제목</strong> : [개인정보 삭제 요청] – 본인 닉네임 또는 아이디</li>
+        <li><strong>본문에 포함할 정보</strong> :
+          <ul style="margin-top: 8px; padding-left: 24px;">
+            <li>사용 중인 닉네임</li>
+            <li>사용 중인 아이디 (로그인할 때 사용하는 ID)</li>
+            <li>비밀번호 (본인 확인 용도이며, 처리 후 즉시 폐기됩니다)</li>
+            <li>삭제를 원하는 범위 (계정 전체 삭제 / 특정 게시물만 삭제 등)</li>
+            <li>추가 확인용 정보 (예: 가입한 대략적인 날짜, 최근 접속 날짜 등)</li>
+          </ul>
+        </li>
+        <li>가능하면 사용하던 기기나 브라우저 정보도 함께 적어주시면 더 빠른 확인이 가능합니다.</li>
+      </ol>
+
+      <p style="margin-top: 32px;">
+        <strong>처리 소요 기간</strong> : 요청 메일 접수 후 보통 <strong>3~7일 이내</strong> 처리 완료되며,<br>
+        완료 시 요청하신 이메일로 결과를 알려드립니다.
+      </p>
+
+      <p>
+        <strong>참고</strong> : 일부 법령에 따라 보관 의무가 있는 최소한의 로그 정보(예: 접속 기록 등)는 삭제 대상에서 제외될 수 있습니다.
+      </p>
+
+      <div class="contact">
+        <strong>개인정보 삭제 요청 문의</strong><br><br>
+        이메일: <a href="mailto:alexeom97@outlook.com" style="color:#3663FF;">alexeom97@outlook.com</a><br>
+        운영자: 정빈777
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
+  </div>
+
+  <script>
+    // 로고 클릭 시 홈으로 이동 (기존과 동일)
+    document.querySelector('.logo-container').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
