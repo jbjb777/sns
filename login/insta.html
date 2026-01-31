@@ -2,41 +2,45 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Instagram Login Test</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 40px; }
-    button { padding: 10px 16px; font-size: 16px; cursor: pointer; }
-    pre { background: #111; color: #0f0; padding: 12px; }
-  </style>
+  <title>Facebook Login Test</title>
 </head>
 <body>
-  <h2>Instagram 로그인 테스트</h2>
-  <button id="loginBtn">Instagram으로 로그인</button>
+  <h2>Facebook 로그인 테스트</h2>
+  <button onclick="fbLogin()">Facebook으로 로그인</button>
   <pre id="output"></pre>
 
   <script>
-    const CLIENT_ID = "4103243893321845"; // ← 여기에 앱 ID
-    const REDIRECT_URI = "http://localhost/insta.html";
+    const APP_ID = "900083875741505";
 
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-
-    if (code) {
-      document.getElementById("output").textContent =
-        "✅ 로그인 성공!\n\nAuthorization Code:\n" + code +
-        "\n\nEAA6T4OqwMHUBQvNZC4V1H24GjJRBELZBiek03x7ZBpje4cNAVRCTPvCTUtTECQZCzX2uMmlbC1oZA1zWtIA9L2Ih7pW3PhvnxmUIv8oDiMh5U1vfXRIPHQV3PWkQmHVon9zxvDPIu1d5lMWNFZBpY7WkJya0h6xZCEGCqrkGTgPSv2YIyNdG2hJyAouQhxXsyFiS2NMCoxQWgXMJelQyZA5qZCdIlRB1lbQv5YzMxSvQEdJZClzKV3H48xIR2vtsQvm4ZB9a4KrWoNisXbLE82yd7T0EyMVBnlSY2MwrwRhJrF4WaKWZA13bOnyH2BlpQ3ugwMeZBhyk862fx80Ltd6ZA4SXuIkJYaiwZDZD";
-    }
-
-    document.getElementById("loginBtn").onclick = () => {
-      const url =
-        `https://api.instagram.com/oauth/authorize` +
-        `?client_id=${CLIENT_ID}` +
-        `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-        `&scope=user_profile` +
-        `&response_type=code`;
-
-      location.href = url;
+    window.fbAsyncInit = function () {
+      FB.init({
+        appId: APP_ID,
+        cookie: true,
+        xfbml: false,
+        version: "v18.0"
+      });
     };
+
+    (function (d, s, id) {
+      if (d.getElementById(id)) return;
+      const js = d.createElement(s);
+      js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      d.getElementsByTagName(s)[0].parentNode.insertBefore(js, s);
+    })(document, "script", "facebook-jssdk");
+
+    function fbLogin() {
+      FB.login(function (response) {
+        if (response.authResponse) {
+          FB.api("/me?fields=id,name,email", function (user) {
+            document.getElementById("output").textContent =
+              "✅ 로그인 성공\n\n" + JSON.stringify(user, null, 2);
+          });
+        } else {
+          document.getElementById("output").textContent = "❌ 로그인 취소";
+        }
+      }, { scope: "public_profile,email" });
+    }
   </script>
 </body>
 </html>
