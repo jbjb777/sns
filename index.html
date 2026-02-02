@@ -24,83 +24,18 @@
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: 'Segoe UI', sans-serif; 
-      background: #121212; 
-      color: #fff; 
-      min-height: 100vh; 
-      display: flex; 
-      animation: fadeIn 0.4s ease-out forwards; 
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .sidebar-container { 
-      width: 250px; 
-      min-width: 250px; 
-      height: 100vh; 
-      position: fixed; 
-      left: 0; 
-      top: 0; 
-      z-index: 100; 
-    }
-    .sidebar-container iframe { 
-      width: 250px !important; 
-      height: 100%; 
-      border: none; 
-    }
-    .main-wrapper { 
-      margin-left: 250px; 
-      width: calc(100% - 250px); 
-      display: flex; 
-      flex-direction: column; 
-      min-height: 100vh; 
-    }
-    .main-content { 
-      flex: 1; 
-      display: flex; 
-      justify-content: center; 
-      align-items: flex-start; 
-      padding: 20px; 
-      overflow-y: auto; 
-      opacity: 0; 
-      transform: translateY(30px); 
-      animation: slideUp 0.6s ease-out 0.2s forwards; 
-    }
+    .sidebar-container { width: 250px; min-width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 250px !important; height: 100%; border: none; }
+    .main-wrapper { margin-left: 250px; width: calc(100% - 250px); display: flex; flex-direction: column; min-height: 100vh; }
+    .main-content { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 20px; overflow-y: auto; opacity: 0; transform: translateY(30px); animation: slideUp 0.6s ease-out 0.2s forwards; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-    .feed-container { 
-      max-width: 600px; 
-      width: 100%; 
-    }
-    .recommend-container { 
-      width: 250px; 
-      margin-left: 20px; 
-      position: sticky; 
-      top: 20px; 
-      background: #1e1e1e; 
-      border: 1px solid #333; 
-      border-radius: 16px; 
-      padding: 16px; 
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); 
-      opacity: 0; 
-      animation: fadeInText 0.5s ease-out 0.6s forwards; 
-    }
+    .feed-container { max-width: 600px; width: 100%; }
+    .recommend-container { width: 250px; margin-left: 20px; position: sticky; top: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); opacity: 0; animation: fadeInText 0.5s ease-out 0.6s forwards; }
     @keyframes fadeInText { to { opacity: 1; } }
-    .recommend-title { 
-      font-size: 16px; 
-      font-weight: 600; 
-      margin-bottom: 16px; 
-      color: #fff; 
-    }
-    .profile-item { 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-      padding: 8px 0; 
-      cursor: pointer; 
-      transition: background 0.3s; 
-      opacity: 0; 
-      transform: translateX(20px); 
-      animation: slideInLeft 0.5s ease-out forwards; 
-    }
+    .recommend-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #fff; }
+    .profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; transition: background 0.3s; opacity: 0; transform: translateX(20px); animation: slideInLeft 0.5s ease-out forwards; }
     .profile-item:nth-child(1) { animation-delay: 0.7s; }
     .profile-item:nth-child(2) { animation-delay: 0.75s; }
     .profile-item:nth-child(3) { animation-delay: 0.8s; }
@@ -110,30 +45,10 @@
     .profile-item:nth-child(7) { animation-delay: 1s; }
     @keyframes slideInLeft { to { opacity: 1; transform: translateX(0); } }
     .profile-item:hover { background: #2c2c2c; border-radius: 8px; }
-    .profile-avatar { 
-      width: 40px; 
-      height: 40px; 
-      border-radius: 50%; 
-      background: linear-gradient(135deg, #3478f6, #53b6f9); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 18px; 
-      font-weight: bold; 
-      flex-shrink: 0; 
-      background-size: cover; 
-      background-position: center; 
-    }
+    .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; background-size: cover; background-position: center; }
     .profile-nickname { font-size: 14px; color: #fff; }
-
-    .skeleton {
-      background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s ease-in-out infinite;
-      border-radius: 6px;
-    }
+    .skeleton { background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 6px; }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
     .skeleton-post { padding: 20px 0; border-bottom: 1px solid #2a2a2a; }
     .skeleton-post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
     .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
@@ -146,39 +61,22 @@
     .skeleton-profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
     .skeleton-profile-avatar { width: 40px; height: 40px; border-radius: 50%; }
     .skeleton-profile-nickname { width: 110px; height: 16px; }
-
     @media (max-width: 768px) {
       .recommend-container { display: none; }
-      .sidebar-container { 
-        width: 80px; 
-        min-width: 80px; 
-        position: fixed; 
-        left: 0; 
-        top: 0; 
-        height: 100vh; 
-        z-index: 1000; 
-      }
-      .sidebar-container iframe { 
-        width: 80px !important; 
-        height: 100vh !important; 
-      }
-      .main-wrapper { 
-        margin-left: 80px; 
-        width: calc(100% - 80px); 
-      }
+      .sidebar-container { width: 80px; min-width: 80px; position: fixed; left: 0; top: 0; height: 100vh; z-index: 1000; }
+      .sidebar-container iframe { width: 80px !important; height: 100vh !important; }
+      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
     }
-
-    .verification-badge { 
-      display: inline-block; 
-      width: 18px; 
-      height: 18px; 
-      margin-left: 5px; 
-      vertical-align: middle; 
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>'); 
-      background-size: contain; 
-      background-repeat: no-repeat; 
+    .verification-badge {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-left: 5px;
+      vertical-align: middle;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
+      background-size: contain;
+      background-repeat: no-repeat;
     }
-
     .post-card {
       background: transparent;
       border: none;
@@ -203,58 +101,57 @@
     @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
     .post-card:hover { background: rgba(255, 255, 255, 0.03); }
     .post-card:last-child { border-bottom: none; }
-
-    .post-header { 
-      padding: 0; 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      margin-bottom: 12px; 
+    .post-header {
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
-    .post-author-info { 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-      cursor: pointer; 
+    .post-author-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
     }
-    .post-author-avatar { 
-      width: 40px; 
-      height: 40px; 
-      border-radius: 50%; 
-      background: linear-gradient(135deg, #3478f6, #53b6f9); 
-      background-size: cover; 
-      background-position: center; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 18px; 
-      font-weight: bold; 
-      flex-shrink: 0; 
+    .post-author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      flex-shrink: 0;
     }
-    .post-author-name { 
-      font-weight: 600; 
-      font-size: 14px; 
-      display: flex; 
-      align-items: center; 
-      color: #fff; 
+    .post-author-name {
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      color: #fff;
     }
-    .post-image { 
-      width: 100%; 
-      max-height: 600px; 
-      object-fit: cover; 
-      border-radius: 12px; 
-      margin: 12px 0; 
+    .post-image {
+      width: 100%;
+      max-height: 600px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin: 12px 0;
     }
-    .post-content { 
-      font-size: 14px; 
-      line-height: 1.6; 
-      color: #fff; 
-      white-space: pre-wrap; 
+    .post-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #fff;
+      white-space: pre-wrap;
     }
-    .post-time { 
-      padding: 4px 0 12px 0; 
-      font-size: 12px; 
-      color: #888; 
+    .post-time {
+      padding: 4px 0 12px 0;
+      font-size: 12px;
+      color: #888;
     }
     .post-actions {
       margin: 8px 0 8px 0;
@@ -291,151 +188,146 @@
       vertical-align: middle;
     }
     .no-posts { text-align: center; padding: 60px 20px; color: #aaa; }
-    .delete-btn { 
-      background: #ff4444; 
-      border: none; 
-      color: #fff; 
-      cursor: pointer; 
-      font-size: 12px; 
-      font-weight: 600; 
-      padding: 4px 8px; 
-      border-radius: 12px; 
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+    .delete-btn {
+      background: #ff4444;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 12px;
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
     .delete-btn:hover { transform: translateY(-4px) scale(1.05); }
     .delete-btn:active { background: #cc0000; }
-
-    .footer { 
-      background: #1e1e1e; 
-      border-top: 1px solid #333; 
-      padding: 30px 20px; 
-      text-align: center; 
-      color: #aaa; 
-      font-size: 14px; 
-      margin-top: auto; 
-      opacity: 0; 
-      animation: fadeInText 0.5s ease-out 1.1s forwards; 
+    .footer {
+      background: #1e1e1e;
+      border-top: 1px solid #333;
+      padding: 30px 20px;
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin-top: auto;
+      opacity: 0;
+      animation: fadeInText 0.5s ease-out 1.1s forwards;
     }
-    .footer-links a { 
-      color: #3663FF; 
-      text-decoration: none; 
-      margin: 0 15px; 
-      transition: color 0.3s; 
+    .footer-links a {
+      color: #3663FF;
+      text-decoration: none;
+      margin: 0 15px;
+      transition: color 0.3s;
     }
-    .footer-links a:hover { 
-      color: #00aaff; 
-      text-decoration: underline; 
+    .footer-links a:hover {
+      color: #00aaff;
+      text-decoration: underline;
     }
     .footer-text { color: #666; font-size: 12px; }
-
-    .auth-modal, .create-modal { 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      height: 100%; 
-      background: rgba(0, 0, 0, 0.85); 
-      display: none; 
-      justify-content: center; 
-      align-items: center; 
-      z-index: 1000; 
-      backdrop-filter: blur(10px); 
+    .auth-modal, .create-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
     }
     .auth-modal.active, .create-modal.active { display: flex; }
-    .auth-box, .create-modal-content { 
-      background: #1e1e1e; 
-      border-radius: 16px; 
-      padding: 40px; 
-      width: 90%; 
-      max-width: 400px; 
-      box-shadow: 0 0 30px rgba(0,0,0,0.6); 
-      position: relative; 
+    .auth-box, .create-modal-content {
+      background: #1e1e1e;
+      border-radius: 16px;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+      position: relative;
     }
-    .create-modal-content { 
-      max-width: 600px; 
-      max-height: 90vh; 
-      overflow-y: auto; 
+    .create-modal-content {
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
-    .auth-close, .close-btn { 
-      background: none; 
-      border: none; 
-      color: #fff; 
-      font-size: 24px; 
-      cursor: pointer; 
+    .auth-close, .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
     }
-    .auth-box h2, .create-modal-header h3 { 
-      text-align: center; 
-      margin-bottom: 30px; 
-      color: #fff; 
+    .auth-box h2, .create-modal-header h3 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #fff;
     }
-    .auth-box input, .create-modal textarea { 
-      width: 100%; 
-      padding: 12px 20px; 
-      border-radius: 12px; 
-      border: 2px solid #333; 
-      font-size: 16px; 
-      margin-bottom: 15px; 
-      outline: none; 
-      background: #2c2c2c; 
-      color: #fff; 
+    .auth-box input, .create-modal textarea {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 2px solid #333;
+      font-size: 16px;
+      margin-bottom: 15px;
+      outline: none;
+      background: #2c2c2c;
+      color: #fff;
     }
     .auth-box input:focus, .create-modal textarea:focus { border-color: #3663FF; }
-    .auth-box button { 
-      width: 100%; 
-      padding: 12px 24px; 
-      border-radius: 30px; 
-      border: none; 
-      font-size: 16px; 
-      cursor: pointer; 
-      background: #3663FF; 
-      color: #fff; 
-      margin-bottom: 10px; 
+    .auth-box button {
+      width: 100%;
+      padding: 12px 24px;
+      border-radius: 30px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      background: #3663FF;
+      color: #fff;
+      margin-bottom: 10px;
     }
     .auth-box button.secondary { background: #2c2c2c; }
-    .error-message, .success-message { 
-      color: #ff6b6b; 
-      font-size: 14px; 
-      margin-top: -10px; 
-      margin-bottom: 10px; 
-      text-align: center; 
+    .error-message, .success-message {
+      color: #ff6b6b;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-align: center;
     }
     .success-message { color: #00ff00; }
-    .create-modal-header { 
-      padding: 16px; 
-      border-bottom: 1px solid #333; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
+    .create-modal-header {
+      padding: 16px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .image-preview-container { margin-top: 15px; }
-    .image-preview { 
-      width: 100%; 
-      max-height: 400px; 
-      object-fit: cover; 
-      border-radius: 12px; 
-      display: none; 
+    .image-preview {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: none;
     }
     .image-preview.show { display: block; }
-    .upload-btn { 
-      background: #2c2c2c; 
-      border: 2px solid #333; 
-      padding: 10px 20px; 
-      border-radius: 30px; 
-      cursor: pointer; 
-      font-size: 14px; 
-      margin-top: 10px; 
-      color: #fff; 
+    .upload-btn {
+      background: #2c2c2c;
+      border: 2px solid #333;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-
 <div class="sidebar-container">
   <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
 </div>
-
 <div class="main-wrapper">
-
   <div class="auth-modal" id="loginModal">
     <div class="auth-box">
       <button class="auth-close" onclick="closeLoginModal()">✕</button>
@@ -448,7 +340,6 @@
       <button class="secondary" onclick="showSignup()">회원가입</button>
     </div>
   </div>
-
   <div class="auth-modal" id="signupModal">
     <div class="auth-box">
       <button class="auth-close" onclick="closeSignupModal()">✕</button>
@@ -464,7 +355,6 @@
       <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
     </div>
   </div>
-
   <div class="create-modal" id="createModal">
     <div class="create-modal-content">
       <div class="create-modal-header">
@@ -485,7 +375,6 @@
       </div>
     </div>
   </div>
-
   <div class="main-content">
     <div class="feed-container">
       <div id="postsFeed">
@@ -519,7 +408,6 @@
         </div>
       </div>
     </div>
-
     <div class="recommend-container" id="recommendProfiles">
       <div class="recommend-title">프로필 추천</div>
       <div id="recommendSkeleton">
@@ -533,7 +421,6 @@
       </div>
     </div>
   </div>
-
   <div class="footer">
     <div class="footer-links">
       <a href="/privacy.html">개인정보처리방침</a>
@@ -542,12 +429,9 @@
     </div>
     <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
   </div>
-
 </div>
-
 <script>
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-
 async function api(endpoint, options = {}) {
   const url = API_BASE + endpoint;
   const res = await fetch(url, {
@@ -565,12 +449,10 @@ async function api(endpoint, options = {}) {
   if (res.status === 204) return null;
   return res.json();
 }
-
 let currentUser = null;
 let selectedImage = null;
 const cloudName = 'dretlhsrk';
 const uploadPreset = 'unsigned_preset';
-
 function initCurrentUser() {
   const savedUser = localStorage.getItem('snsUser');
   if (savedUser) {
@@ -578,14 +460,12 @@ function initCurrentUser() {
     updateSidebar();
   }
 }
-
 function updateSidebar() {
   const iframe = document.getElementById('sidebarFrame');
   if (iframe?.contentWindow) {
     iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
   }
 }
-
 function updateSidebarMode() {
   const iframe = document.getElementById('sidebarFrame');
   const narrow = window.innerWidth <= 768;
@@ -593,12 +473,12 @@ function updateSidebarMode() {
     iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
   }
 }
-
 window.addEventListener('message', (event) => {
   const { type, page } = event.data || {};
   if (type === 'navigate') {
     if (page === 'home') location.href = 'index.html';
     if (page === 'explore') location.href = 'explore.html';
+    if (page === 'chat') location.href = 'chat.html'; // ← 여기 추가! 채팅 클릭 시 이동
   }
   if (type === 'logout') {
     localStorage.removeItem('snsUser');
@@ -607,16 +487,13 @@ window.addEventListener('message', (event) => {
   }
   if (type === 'requestUserInfo') updateSidebar();
 });
-
 initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
-
 window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
 window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
 window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
 window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
-
 function handleCreatePost() {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
@@ -627,10 +504,8 @@ function handleCreatePost() {
   document.getElementById('imagePreview').classList.remove('show');
   selectedImage = null;
 }
-
 document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
 document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
-
 document.getElementById('imageInput').onchange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -643,7 +518,6 @@ document.getElementById('imageInput').onchange = (e) => {
   };
   reader.readAsDataURL(file);
 };
-
 async function uploadImageToCloudinary(file) {
   const formData = new FormData();
   formData.append('file', file);
@@ -656,7 +530,6 @@ async function uploadImageToCloudinary(file) {
   const data = await response.json();
   return data.secure_url;
 }
-
 document.getElementById('modalPostBtn').onclick = async () => {
   const content = document.getElementById('postContent').value.trim();
   const messageDiv = document.getElementById('postMessage');
@@ -696,7 +569,6 @@ document.getElementById('modalPostBtn').onclick = async () => {
     postButton.disabled = false;
   }
 };
-
 function formatPostTime(dateString) {
   const now = new Date();
   const date = new Date(dateString);
@@ -711,39 +583,31 @@ function formatPostTime(dateString) {
   }
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('.', '.');
 }
-
 function escapeHtml(text) {
   if (!text) return '';
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return text.replace(/[&<>"']/g, m => map[m]);
 }
-
 async function toggleLike(postId, button) {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
     return;
   }
-
   const countEl = button.querySelector('.like-count');
-
   try {
     const [likeRecords, likeCountResult] = await Promise.all([
       api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
       api(`/likes?post_id=eq.${postId}&select=count`)
     ]);
-
     const currentlyLiked = likeRecords?.length > 0;
     const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
-
     const uiLiked = button.classList.contains('liked');
     const uiCount = parseInt(countEl.textContent, 10) || 0;
-
     if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
       button.classList.toggle('liked', currentlyLiked);
       countEl.textContent = currentServerCount;
       console.log('UI와 서버 상태 불일치 → 자동 동기화');
     }
-
     if (currentlyLiked) {
       if (likeRecords?.[0]?.id) {
         await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
@@ -761,11 +625,9 @@ async function toggleLike(postId, button) {
       button.classList.add('liked');
       countEl.textContent = currentServerCount + 1;
     }
-
     const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`)
       .then(r => Math.max(0, r?.[0]?.count || 0));
     countEl.textContent = finalCount;
-
   } catch (err) {
     console.error("좋아요 처리 중 오류:", err);
     try {
@@ -780,7 +642,6 @@ async function toggleLike(postId, button) {
     }
   }
 }
-
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
   try {
@@ -814,7 +675,6 @@ async function loadPosts() {
       const deleteButton = canDelete
         ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
         : '';
-
       let contentHTML = '';
       if (post.content) {
         const lines = escapeHtml(post.content).split('\n');
@@ -825,7 +685,6 @@ async function loadPosts() {
             ${body ? `<div style="color:#ddd; font-size:14px; line-height:1.6;">${body}</div>` : ''}
           </div>`;
       }
-
       let likeCount = 0;
       try {
         const countRes = await api(`/likes?post_id=eq.${post.id}&select=count`);
@@ -833,7 +692,6 @@ async function loadPosts() {
       } catch (e) {
         console.warn(`좋아요 수 로드 실패 (${post.id}):`, e);
       }
-
       let liked = false;
       if (currentUser) {
         try {
@@ -843,7 +701,6 @@ async function loadPosts() {
           console.warn(`좋아요 여부 로드 실패 (${post.id}):`, e);
         }
       }
-
       const postCard = document.createElement('div');
       postCard.className = 'post-card';
       postCard.innerHTML = `
@@ -866,13 +723,11 @@ async function loadPosts() {
         </div>
         <div class="post-time">${timeStr}</div>
       `;
-
       postCard.onclick = (e) => {
         if (!e.target.closest('.like-button')) {
           window.location.href = `view.html?id=${post.id}`;
         }
       };
-
       feedDiv.appendChild(postCard);
     }
   } catch (err) {
@@ -880,7 +735,6 @@ async function loadPosts() {
     feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
   }
 }
-
 async function loadRecommendedProfiles() {
   const container = document.getElementById('recommendProfiles');
   const skeleton = document.getElementById('recommendSkeleton');
@@ -914,13 +768,11 @@ async function loadRecommendedProfiles() {
     if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:#aaa; padding:12px 0;">로드 실패</div>';
   }
 }
-
 window.goToProfile = (userId, nickname) => {
   if (userId && nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   }
 };
-
 window.deletePost = async (postId) => {
   if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
   try {
@@ -931,7 +783,6 @@ window.deletePost = async (postId) => {
     alert('삭제에 실패했습니다.');
   }
 };
-
 loadPosts();
 loadRecommendedProfiles();
 </script>
