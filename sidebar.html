@@ -372,32 +372,27 @@
     let currentUserNickname = null;
     let currentUserProfileImage = null;
 
-    // 로고 클릭 → 홈으로 전체 페이지 이동
+    // 모든 nav-item 클릭 시 전체 도메인으로 이동 (postMessage 없이 직접 이동)
     logoContainer.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
     };
 
-    // 홈 클릭 → 전체 페이지 이동
     homeNav.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
     };
 
-    // 탐색 클릭 → 전체 페이지 이동
     exploreNav.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/explore.html';
     };
 
-    // 채팅 클릭 → 전체 페이지 이동
     chatNav.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/chat.html';
     };
 
-    // Discord 클릭 → 외부 링크 새 탭
     discordNav.onclick = () => {
       window.open('https://discord.gg/8s6XuWkfQb', '_blank');
     };
 
-    // 만들기 버튼 클릭
     createBtn.onclick = () => {
       if (isLoggedIn) {
         window.top.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
@@ -406,7 +401,6 @@
       }
     };
 
-    // 사용자 정보 클릭
     userInfo.onclick = () => {
       if (isLoggedIn && currentUserId && currentUserNickname) {
         window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
@@ -422,6 +416,26 @@
       const data = event.data;
       if (!data?.type) return;
 
+      // active 클래스 제어 (부모 페이지에서 보낸 신호로 강조 표시)
+      if (data.type === 'activateHome' || data.type === 'default') {
+        homeNav.classList.add('active');
+        exploreNav.classList.remove('active');
+        chatNav.classList.remove('active');
+      }
+
+      if (data.type === 'activateExplore') {
+        homeNav.classList.remove('active');
+        exploreNav.classList.add('active');
+        chatNav.classList.remove('active');
+      }
+
+      if (data.type === 'activateChat') {
+        homeNav.classList.remove('active');
+        exploreNav.classList.remove('active');
+        chatNav.classList.add('active');
+      }
+
+      // 사용자 정보 업데이트 (기존 로직 그대로 유지)
       if (data.type === 'updateUser') {
         console.log('받은 유저 데이터:', data.user);
         if (data.user) {
@@ -486,7 +500,7 @@
         .replace(/'/g, "&#039;");
     }
 
-    // 기본적으로 홈 강조
+    // 페이지 로드 시 기본적으로 홈 강조
     homeNav.classList.add('active');
 
     parent.postMessage({ type: 'requestUserInfo' }, '*');
