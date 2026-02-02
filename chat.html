@@ -2,64 +2,112 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Web → Discord Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>채팅 - Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.png">
+  <meta name="description" content="Sharer 채팅 - 친구들과 실시간으로 대화해보세요.">
+  <meta name="keywords" content="Sharer, 채팅, DM, 실시간 대화">
+
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
       color: #fff;
+      min-height: 100vh;
+      display: flex;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sidebar-container {
+      width: 250px;
+      min-width: 250px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+    }
+    .sidebar-container iframe {
+      width: 250px !important;
+      height: 100%;
+      border: none;
+    }
+    .main-wrapper {
+      margin-left: 250px;
+      width: calc(100% - 250px);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .main-content {
+      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      padding: 20px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: slideUp 0.6s ease-out 0.2s forwards;
     }
-    .chat {
-      width: 300px;
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+    .chat-placeholder {
+      font-size: 24px;
+      color: #aaa;
+      max-width: 600px;
     }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      font-size: 14px;
+    .coming-soon {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #3663FF;
     }
-    button {
-      background: #5865F2;
-      color: white;
-      border: none;
-      cursor: pointer;
+    @media (max-width: 768px) {
+      .sidebar-container {
+        width: 80px;
+        min-width: 80px;
+      }
+      .main-wrapper {
+        margin-left: 80px;
+        width: calc(100% - 80px);
+      }
     }
   </style>
 </head>
 <body>
 
-<div class="chat">
-  <h3>웹 → 디스코드 테스트</h3>
-  <input id="name" placeholder="닉네임">
-  <input id="msg" placeholder="메시지">
-  <button onclick="send()">보내기</button>
+<div class="sidebar-container">
+  <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
+</div>
+
+<div class="main-wrapper">
+  <div class="main-content">
+    <div class="chat-placeholder">
+      <h1>채팅 페이지</h1>
+      <p class="coming-soon">실시간 채팅 기능 준비 중입니다... 곧 만나요! 💬</p>
+    </div>
+  </div>
 </div>
 
 <script>
-  const WEBHOOK_URL = "https://discord.com/oauth2/authorize?client_id=1455035799522513091&permissions=68608&integration_type=0&scope=bot+applications.commands";
+  // 페이지 로드 완료 후 sidebar에 "채팅 페이지"임을 알려줌 → 채팅 탭 강조
+  window.addEventListener('load', () => {
+    const iframe = document.getElementById('sidebarFrame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'activateChat' }, '*');
+    }
+  });
 
-  function send() {
-    const name = document.getElementById("name").value || "웹유저";
-    const msg = document.getElementById("msg").value;
-
-    if (!msg) return;
-
-    fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: name,
-        content: msg
-      })
-    });
-
-    document.getElementById("msg").value = "";
+  // 기존처럼 좁은 화면 모드 처리 (필요하면)
+  function updateSidebarMode() {
+    const iframe = document.getElementById('sidebarFrame');
+    const narrow = window.innerWidth <= 768;
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+    }
   }
+  window.addEventListener('resize', updateSidebarMode);
+  updateSidebarMode();
 </script>
-
 </body>
 </html>
