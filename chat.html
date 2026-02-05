@@ -3,22 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>채팅 - Sharer</title>
-  <link rel="icon" type="image/svg+xml" href="./logo.png">
-  <meta name="description" content="Sharer 채팅 - 친구들과 실시간으로 대화해보세요.">
-  <meta name="keywords" content="Sharer, 채팅, DM, 실시간 대화">
+  <title>채팅테스트</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 2000 2000">
+  <defs>
+    <linearGradient id="linearGradient1" x1="1576.7" y1="1817" x2="423.3" y2="183" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="%233478f6" />
+      <stop offset="1" stop-color="%2353b6f9" />
+    </linearGradient>
+    <filter id="filter1" x="0" y="0" width="2000" height="2000" color-interpolation-filters="sRGB">
+      <feFlood flood-color="%23000000" flood-opacity="0.52" />
+      <feComposite in2="SourceGraphic" operator="out" />
+      <feGaussianBlur stdDeviation="43" />
+      <feOffset dx="35" dy="24" />
+      <feComposite in2="SourceGraphic" operator="atop" />
+    </filter>
+  </defs>
+  <path fill="url(%23linearGradient1)" d="M 2000 1000 C 2000 448 1552 0 1000 0 C 448 0 0 448 0 1000 C 0 1552 448 2000 1000 2000 C 1552 2000 2000 1552 2000 1000 Z"/>
+  <path fill="%23fff" filter="url(%23filter1)" d="M 1137 506 C 1252 449 1369 497 1427 625 L 1459 696 C 1484 752 1488 821 1471 878 L 1472 877 C 1535 891 1581 939 1608 997 L 1632 1052 C 1698 1199 1657 1324 1544 1381 L 1175 1565 L 972 1114 C 1002 1241 946 1377 834 1433 L 776 1462 C 654 1523 518 1467 449 1343 L 596 1269 C 625 1309 663 1331 708 1308 L 758 1283 C 813 1256 830 1185 802 1124 L 525 509 L 672 435 L 784 683 L 1137 506 Z M 1444 1232 C 1488 1210 1504 1149 1480 1095 L 1476 1085 C 1452 1033 1397 1007 1353 1029 L 1151 1130 L 1242 1333 L 1444 1232 Z M 1184 679 L 991 775 L 1084 981 L 1276 885 C 1319 864 1336 802 1312 749 L 1306 736 C 1283 684 1226 658 1184 679 Z"/>
+</svg>' />
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      animation: fadeIn 0.4s ease-out forwards;
+      margin:0; padding:0; font-family:'Segoe UI', sans-serif;
+      background:#121212; color:#fff; display:flex; min-height:100vh;
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .sidebar-container {
       width: 250px;
       min-width: 250px;
@@ -40,28 +49,139 @@
       flex-direction: column;
       min-height: 100vh;
     }
-    .main-content {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      text-align: center;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: slideUp 0.6s ease-out 0.2s forwards;
+    .chat-wrapper {
+      display:flex; justify-content:center; align-items:center; flex:1; padding:20px;
     }
-    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-    .chat-placeholder {
-      font-size: 24px;
-      color: #aaa;
-      max-width: 600px;
+    .container {
+      background:#1e1e1e; padding:20px; border-radius:16px;
+      box-shadow:0 0 30px rgba(0,0,0,0.6); width:90%; max-width:600px; position:relative;
     }
-    .coming-soon {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #3663FF;
+    #userInfo {
+      position:absolute; top:20px; right:20px; display:none; align-items:center; gap:10px;
     }
+    #userInfo.active { display:flex; }
+    #userNickname { color:#ffffff; font-weight:600; font-size:14px; }
+    #logoutBtn {
+      background:#3663FF; color:#fff; border:none; border-radius:20px;
+      padding:6px 16px; cursor:pointer; transition:transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      font-size:13px; white-space:nowrap;
+    }
+    #logoutBtn:hover { transform:translateY(-4px) scale(1.05); }
+    #logoutBtn:active { background:#2952CC; }
+    h2 { text-align:center; margin-bottom:15px; color:#ffffff; }
+    #nicknameModal {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.85); display:flex; justify-content:center; align-items:center; z-index:1000;
+      backdrop-filter: blur(5px); flex-direction:column; gap:12px;
+    }
+    #nicknameModal h2 { color:#ffffff; }
+    #nicknameModal input {
+      padding:12px 20px; border-radius:12px; border:none; font-size:16px;
+      width:250px; outline:none; background:#2c2c2c; color:#fff;
+    }
+    #nicknameModal button {
+      padding:12px 24px; border-radius:30px; border:none; font-size:16px;
+      cursor:pointer; background:#3663FF; color:#fff;
+      transition:transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    #nicknameModal button:hover { transform:translateY(-8px) scale(1.05); }
+    #nicknameModal button:active { background:#2952CC; }
+    .error-message { color:#ff6b6b; font-size:14px; margin-top:8px; }
+    .verification-badge {
+      display:inline-block;
+      width:18px;
+      height:18px;
+      margin-left:5px;
+      vertical-align:middle;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+    #chat {
+      height:400px; overflow-y:auto; background:#121212;
+      border-radius:12px; padding:10px; margin-bottom:10px;
+      border:1px solid #444; scroll-behavior:smooth;
+    }
+    .msg {
+      background:linear-gradient(135deg,#00aaff,#0044ff); padding:8px 12px;
+      border-radius:12px; margin:5px 0; box-shadow:0 2px 8px rgba(0,0,0,0.5);
+      font-size:15px; color:#fff; position:relative; padding-right:60px;
+      transition:box-shadow 0.3s ease;
+    }
+    .msg.replyMessage {
+      background:linear-gradient(135deg,#0066cc,#002288);
+      cursor:pointer;
+    }
+    .msg.replyMessage:hover {
+      box-shadow:0 4px 16px rgba(0,150,255,0.6);
+    }
+    .msg.highlight {
+      box-shadow:0 0 20px rgba(255,215,0,0.8);
+      animation:highlightPulse 1s ease-in-out;
+    }
+    @keyframes highlightPulse {
+      0%, 100% { box-shadow:0 0 20px rgba(255,215,0,0.8); }
+      50% { box-shadow:0 0 30px rgba(255,215,0,1); }
+    }
+    .replyArrow {
+      position:absolute;
+      right:8px;
+      bottom:8px;
+      font-size:16px;
+      color:#99ccff;
+    }
+    .msg img {
+      max-width:200px; border-radius:8px; display:block; margin-top:5px;
+    }
+    .msg .nickname { font-weight:700; color:#ffffff; margin-bottom:3px; }
+    .msg .time { font-size:12px; color:#aaa; text-align:right; margin-top:3px; }
+    .msg .replyInfo { font-size:12px; color:#bbb; margin-bottom:3px; }
+    #inputBox { display:flex; gap:8px; margin-top:5px; flex-direction:column; }
+    #inputRow { display:flex; gap:8px; align-items:center; }
+    #msg { flex:1; padding:10px; border-radius:12px; border:none; background:#2c2c2c; color:#fff; outline:none; }
+    #imgInput { display:none; }
+    #imgUploadBtn {
+      background:#3663FF; color:#fff; border:none; border-radius:30px;
+      padding:12px 24px; cursor:pointer; transition:transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      white-space:nowrap;
+    }
+    #imgUploadBtn:hover { transform:translateY(-8px) scale(1.05); }
+    #imgUploadBtn:active { background:#2952CC; }
+    #send {
+      background:#3663FF; color:#fff; border:none; border-radius:30px;
+      padding:12px 24px; cursor:pointer; transition:transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    #send:hover { transform:translateY(-8px) scale(1.05); }
+    #send:active { background:#2952CC; }
+    #send:disabled {
+      background:#555; cursor:wait; opacity:0.6; transform:none;
+    }
+    #send:disabled:hover { transform:none; }
+    #replyBox {
+      display:none; width:100%; background:#2c2c2c; color:gray; padding:8px 12px;
+      border-radius:8px; font-size:13px; align-items:center; gap:8px;
+      overflow:hidden; white-space:nowrap; text-overflow:ellipsis; margin-bottom:8px;
+    }
+    #replyBox.active { display:flex; }
+    #replyBox svg { width:16px; height:16px; transform:rotate(90deg); fill:gray; flex-shrink:0; }
+    #replyBox span { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    #cancelReply { background:none; border:none; color:gray; cursor:pointer; font-size:18px; padding:0; margin-left:auto; flex-shrink:0; }
+    .replyBtn {
+      position:absolute; top:5px; right:5px;
+      background:#3663FF; border:none; border-radius:12px; padding:4px 8px; font-size:12px;
+      cursor:pointer; color:#fff; transition:transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    .replyBtn:hover { transform:translateY(-4px) scale(1.05); }
+    .replyBtn:active { background:#2952CC; }
+    .deleteBtn {
+      position:absolute; top:5px; right:60px;
+      background:#ff4444; border:none; border-radius:12px; padding:4px 8px; font-size:12px;
+      cursor:pointer; color:#fff; transition:transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    .deleteBtn:hover { transform:translateY(-4px) scale(1.05); }
+    .deleteBtn:active { background:#cc0000; }
+    .msg a { color:#00bfff; text-decoration:underline; }
+    .charCount { font-size:12px; color:#aaa; text-align:right; margin-top:2px; }
     @media (max-width: 768px) {
       .sidebar-container {
         width: 80px;
@@ -81,33 +201,431 @@
 </div>
 
 <div class="main-wrapper">
-  <div class="main-content">
-    <div class="chat-placeholder">
-      <h1>채팅 페이지</h1>
-      <p class="coming-soon">실시간 채팅 기능 준비 중입니다... 곧 만나요! 💬</p>
+  <div id="nicknameModal">
+    <h2>✏️ 여기에서 사용할 닉네임을 입력해주세요</h2>
+    <input id="nicknameInput" placeholder="닉네임" maxlength="10">
+    <div class="error-message" id="errorMessage"></div>
+    <button id="nicknameBtn">확인</button>
+  </div>
+
+  <div class="chat-wrapper">
+    <div class="container">
+      <div id="userInfo">
+        <span id="userNickname"></span>
+        <button id="logoutBtn">로그아웃</button>
+      </div>
+      <h2>㋡꧁정빈777꧂ 실시간 채팅</h2>
+      <div id="chat"></div>
+      <div id="inputBox">
+        <div id="replyBox">
+          <svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M4 12l1.41 1.41L11 7.83v12.34h2V7.83l5.59 5.58L20 12l-8-8-8 8z"/></svg>
+          <span id="replyPreview"></span>
+          <button id="cancelReply">×</button>
+        </div>
+        <div id="inputRow">
+          <button id="imgUploadBtn">🖼️ 이미지 업로드</button>
+          <input id="msg" placeholder="메시지를 입력하세요" autocomplete="off" maxlength="500">
+        </div>
+        <div class="charCount"><span id="charCount">0</span> / 500</div>
+        <input type="file" id="imgInput" accept="image/*">
+        <button id="send">💬 전송</button>
+      </div>
     </div>
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
-  // 페이지 로드 완료 후 sidebar에 "채팅 페이지"임을 알려줌 → 채팅 탭 강조
+const firebaseConfig = {
+  apiKey: "AIzaSyBfIl-EOdhEiJSZokBarnp8x4XhcCnPlPA",
+  authDomain: "chat-6086d.firebaseapp.com",
+  databaseURL: "https://chat-6086d-default-rtdb.firebaseio.com",
+  projectId: "chat-6086d",
+  storageBucket: "chat-6086d.firebasestorage.app",
+  messagingSenderId: "1050767904189",
+  appId: "1:1050767904189:web:8f23809cbccd9c98c256d4"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const chat = document.getElementById("chat");
+const msgInput = document.getElementById("msg");
+const sendBtn = document.getElementById("send");
+const imgInput = document.getElementById("imgInput");
+const imgUploadBtn = document.getElementById("imgUploadBtn");
+const replyBox = document.getElementById("replyBox");
+const replyPreview = document.getElementById("replyPreview");
+const cancelReply = document.getElementById("cancelReply");
+const userInfo = document.getElementById("userInfo");
+const userNickname = document.getElementById("userNickname");
+const logoutBtn = document.getElementById("logoutBtn");
+const charCount = document.getElementById("charCount");
+let replyTo = null;
+const messageElements = new Map();
+
+// 글자 수 카운터
+msgInput.addEventListener("input", () => charCount.textContent = msgInput.value.length);
+
+logoutBtn.onclick = () => {
+  localStorage.removeItem("chatNickname");
+  localStorage.removeItem("jungbin777_verified");
+  location.reload();
+};
+
+imgUploadBtn.onclick = () => imgInput.click();
+imgInput.onchange = () => imgUploadBtn.textContent = imgInput.files.length > 0 ? "선택됨" : "이미지 업로드";
+
+cancelReply.onclick = () => { replyTo = null; replyBox.classList.remove("active"); };
+
+let nickname = "";
+let verificationCode = "";
+let isVerifying = false;
+
+function isVerifiedJungbin() {
+  return nickname === "정빈777" && localStorage.getItem("jungbin777_verified") === "true";
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("chatNickname");
+  if (saved) {
+    nickname = saved;
+    nicknameModal.style.display = "none";
+    userNickname.textContent = nickname;
+    userInfo.classList.add("active");
+    
+    if (saved.includes("정빈777") && saved !== "정빈777") {
+      showPermanentError("이 닉네임은 사용할 수 없습니다. 로그아웃 후 다시 닉네임을 바꿔주세요.");
+    }
+    else if (saved === "정빈777" && !localStorage.getItem("jungbin777_verified")) {
+      showPermanentError("제작자 인증이 불가합니다. 로그아웃 후 다시 시도해주세요.");
+    }
+  }
+});
+
+function showPermanentError(message) {
+  const errorDiv = document.createElement("div");
+  errorDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 0, 0, 0.95);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 10000;
+    box-shadow: 0 4px 20px rgba(255, 0, 0, 0.5);
+    text-align: center;
+  `;
+  errorDiv.textContent = message;
+  document.body.appendChild(errorDiv);
+  
+  msgInput.disabled = true;
+  sendBtn.disabled = true;
+  imgUploadBtn.disabled = true;
+}
+
+async function sendVerificationEmail(code) {
+  try {
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        access_key: 'ee27178a-2f7b-4153-a2b4-01d5905a1280',
+        subject: '🔐 정빈777 닉네임 인증 코드',
+        from_name: '정빈777 채팅',
+        to_email: 'alexeom97@outlook.com',
+        message: `
+━━━━━━━━━━━━━━━━━━━━
+  정빈777 닉네임 인증
+━━━━━━━━━━━━━━━━━━━━
+요청하신 인증 코드입니다:
+    ${code}
+이 코드를 채팅 사이트에 입력해주세요.
+━━━━━━━━━━━━━━━━━━━━
+본인이 요청하지 않았다면 이 메일을 무시하세요.
+        `
+      })
+    });
+   
+    const result = await response.json();
+    console.log("Email send result:", result);
+   
+    if (result.success) {
+      console.log("✅ 인증 코드 이메일 발송 성공!");
+      return true;
+    } else {
+      throw new Error(result.message || "발송 실패");
+    }
+  } catch (err) {
+    console.error("Email send error:", err);
+    console.log("⚠️ Verification Code (email failed):", code);
+    alert(`이메일 발송 실패. 콘솔(F12)에서 인증번호를 확인하세요: ${code}`);
+    return true;
+  }
+}
+
+nicknameBtn.onclick = async () => {
+  const val = nicknameInput.value.trim();
+  const errorMsg = document.getElementById("errorMessage");
+ 
+  if (!val) {
+    errorMsg.textContent = "닉네임을 입력하세요!";
+    return;
+  }
+  if (val.length > 10) {
+    errorMsg.textContent = "닉네임은 10자 이하로 입력하세요!";
+    return;
+  }
+ 
+  if (val.includes("정빈777") && val !== "정빈777") {
+    errorMsg.textContent = "이 닉네임은 사용할 수 없습니다.";
+    return;
+  }
+ 
+  if (val === "정빈777" && !isVerifying) {
+    isVerifying = true;
+    verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+   
+    nicknameInput.placeholder = "인증 코드 6자리";
+    nicknameInput.value = "";
+    errorMsg.textContent = "";
+   
+    const h2 = document.querySelector("#nicknameModal h2");
+    h2.textContent = "제작자 이메일로 메일 보냈습니다. 인증번호를 적어주세요";
+   
+    await sendVerificationEmail(verificationCode);
+    console.log("Generated code for 정빈777:", verificationCode);
+    return;
+  }
+ 
+  if (isVerifying) {
+    if (val === verificationCode) {
+      nickname = "정빈777";
+      localStorage.setItem("chatNickname", nickname);
+      localStorage.setItem("jungbin777_verified", "true");
+      nicknameModal.style.display = "none";
+      userNickname.textContent = nickname;
+      userInfo.classList.add("active");
+      isVerifying = false;
+      errorMsg.textContent = "";
+    } else {
+      errorMsg.textContent = "인증번호가 맞지 않습니다.";
+    }
+    return;
+  }
+ 
+  nickname = val;
+  localStorage.setItem("chatNickname", nickname);
+  nicknameModal.style.display = "none";
+  userNickname.textContent = nickname;
+  userInfo.classList.add("active");
+  errorMsg.textContent = "";
+};
+
+msgInput.addEventListener("keypress", e => { if (e.key === "Enter") sendBtn.click(); });
+
+function escapeHTML(str) {
+  return str.replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[m]));
+}
+
+function linkify(text){
+  text = escapeHTML(text);
+  const urlRegex=/((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
+  return text.replace(urlRegex,url=>{
+    let href=url.startsWith('http')?url:'https://'+url;
+    return `<a href="${href}" target="_blank">${url}</a>`;
+  });
+}
+
+async function uploadToCloudinary(file){
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", "unsigned_preset");
+  try {
+    const res = await fetch("https://api.cloudinary.com/v1_1/dretlhsrk/image/upload", {
+      method: "POST",
+      body: fd
+    });
+    if (!res.ok) {
+      let txt;
+      try { txt = await res.text(); } catch(e){ txt = res.statusText; }
+      throw new Error("Cloudinary 업로드 실패: " + res.status + " " + txt);
+    }
+    const data = await res.json();
+    if (data && data.secure_url) return data.secure_url;
+    const errMsg = data && data.error && data.error.message ? data.error.message : "업로드 실패(응답에 secure_url 없음)";
+    throw new Error(errMsg);
+  } catch (err) {
+    console.error("uploadToCloudinary error:", err);
+    throw err;
+  }
+}
+
+sendBtn.onclick=async()=>{
+  const text=msgInput.value.trim();
+  const file=imgInput.files[0];
+  if(!nickname) return alert("닉네임을 먼저 설정하세요!");
+ 
+  if (nickname === "정빈777" && !localStorage.getItem("jungbin777_verified")) {
+    alert("제작자 인증이 불가합니다. 로그아웃 후 다시 시도해주세요.");
+    return;
+  }
+ 
+  if (nickname.includes("정빈777") && nickname !== "정빈777") {
+    alert("이 닉네임은 사용할 수 없습니다. 로그아웃 후 다시 닉네임을 바꿔주세요.");
+    return;
+  }
+ 
+  if(!text && !file) return;
+  if(text.length>500) return alert("메시지는 500자 이하로 입력하세요!");
+  sendBtn.disabled = true;
+  document.body.style.cursor = "wait";
+  let messageText=text;
+  if(file){
+    try{
+      const imageUrl=await uploadToCloudinary(file);
+      messageText+=(messageText?"\n":"")+imageUrl;
+    }catch(err){
+      alert("이미지 업로드 실패: " + (err.message || ""));
+      console.error(err);
+      sendBtn.disabled = false;
+      document.body.style.cursor = "default";
+      return;
+    }
+    imgInput.value=""; imgUploadBtn.textContent="이미지 업로드";
+  }
+  const data={text:messageText,nickname,time:Date.now()};
+  if(replyTo){data.replyTo=replyTo.nickname;data.replyText=replyTo.text;}
+ 
+  try {
+    await db.ref("messages").push(data);
+    msgInput.value=""; charCount.textContent="0"; replyTo=null; replyBox.classList.remove("active");
+  } catch(err) {
+    alert("메시지 전송 실패: " + (err.message || ""));
+    console.error(err);
+  } finally {
+    sendBtn.disabled = false;
+    document.body.style.cursor = "default";
+  }
+};
+
+db.ref("messages").on("value",snap=>{
+  chat.innerHTML="";
+  messageElements.clear();
+  const data=snap.val(); if(!data) return;
+  const arr=Object.entries(data).sort((a,b)=>a[1].time-b[1].time);
+  for(const [key,m] of arr){
+    const div=document.createElement("div"); div.className="msg";
+    div.dataset.messageKey = key;
+    div.dataset.nickname = m.nickname;
+    div.dataset.time = m.time;
+   
+    if(m.replyTo&&m.replyText){
+      div.classList.add("replyMessage");
+      div.dataset.replyTo = m.replyTo;
+     
+      div.onclick = () => {
+        for(const [otherKey, otherMsg] of messageElements){
+          const otherElem = otherMsg;
+          const otherData = data[otherKey];
+          if(otherElem.dataset.nickname === m.replyTo &&
+             otherData.text === m.replyText &&
+             parseInt(otherElem.dataset.time) < m.time){
+            otherElem.scrollIntoView({behavior:'smooth', block:'center'});
+            otherElem.classList.add('highlight');
+            setTimeout(() => otherElem.classList.remove('highlight'), 1000);
+            break;
+          }
+        }
+      };
+     
+      const replyInfo=document.createElement("div");
+      replyInfo.className="replyInfo";
+      replyInfo.textContent=`${m.replyTo}에 답장`;
+      div.appendChild(replyInfo);
+      const arrow=document.createElement("div");
+      arrow.className="replyArrow";
+      arrow.textContent="↩️";
+      div.appendChild(arrow);
+    }
+    const nick=document.createElement("div");
+    nick.className="nickname";
+    nick.textContent=m.nickname;
+   
+    if(m.nickname === "정빈777") {
+      const badge = document.createElement("span");
+      badge.className = "verification-badge";
+      nick.appendChild(badge);
+    }
+   
+    div.appendChild(nick);
+    const content=document.createElement("div");
+    for(const line of m.text.split("\n")){
+      if(line.trim()){
+        if(line.match(/https?:\/\/.*\.(jpg|jpeg|png|gif|webp)/i)||line.match(/res\.cloudinary\.com/i)){
+          const img=document.createElement("img"); img.src=line; content.appendChild(img);
+        }else{
+          const p=document.createElement("div"); p.innerHTML=linkify(line); content.appendChild(p);
+        }
+      }
+    }
+    div.appendChild(content);
+    const time=document.createElement("div");
+    time.className="time";
+    time.textContent=new Date(m.time).toLocaleTimeString();
+    div.appendChild(time);
+    
+    if(isVerifiedJungbin()) {
+      const deleteBtn=document.createElement("button");
+      deleteBtn.className="deleteBtn";
+      deleteBtn.textContent="🗑️ 삭제";
+      deleteBtn.onclick=async(e)=>{
+        e.stopPropagation();
+        if(confirm("이 메시지를 삭제하시겠습니까?")) {
+          try {
+            await db.ref("messages/" + key).remove();
+          } catch(err) {
+            alert("삭제 실패: " + (err.message || ""));
+            console.error(err);
+          }
+        }
+      };
+      div.appendChild(deleteBtn);
+    }
+    const replyBtn=document.createElement("button");
+    replyBtn.className="replyBtn";
+    replyBtn.textContent="↩️ 답장";
+    replyBtn.onclick=(e)=>{
+      e.stopPropagation();
+      replyTo={nickname:m.nickname,text:m.text};
+      const previewText=m.text.replace(/\n/g," ").substring(0,10);
+      replyPreview.textContent=previewText+(m.text.length>10?"...":"");
+      replyBox.classList.add("active");
+      msgInput.focus();
+    };
+    div.appendChild(replyBtn);
+    chat.appendChild(div);
+    messageElements.set(key, div);
+  }
+  chat.scrollTop=chat.scrollHeight;
+});
+</script>
+
+<!-- 사이드바에 현재 페이지가 채팅임을 알려 active 강조 -->
+<script>
   window.addEventListener('load', () => {
     const iframe = document.getElementById('sidebarFrame');
     if (iframe && iframe.contentWindow) {
       iframe.contentWindow.postMessage({ type: 'activateChat' }, '*');
     }
   });
-
-  // 기존처럼 좁은 화면 모드 처리 (필요하면)
-  function updateSidebarMode() {
-    const iframe = document.getElementById('sidebarFrame');
-    const narrow = window.innerWidth <= 768;
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-    }
-  }
-  window.addEventListener('resize', updateSidebarMode);
-  updateSidebarMode();
 </script>
 </body>
 </html>
