@@ -21,21 +21,42 @@
   <meta name="twitter:title" content="Sharer | 커뮤니티 · SNS">
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; animation: fadeIn 0.4s ease-out forwards; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .sidebar-container { width: 250px; min-width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
-    .sidebar-container iframe { width: 250px !important; height: 100%; border: none; }
-    .main-wrapper { margin-left: 250px; width: calc(100% - 250px); display: flex; flex-direction: column; min-height: 100vh; }
+    .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
+    .main-wrapper { margin-left: 72px; width: calc(100% - 72px); display: flex; flex-direction: column; min-height: 100vh; }
     .main-content { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 20px; overflow-y: auto; opacity: 0; transform: translateY(30px); animation: slideUp 0.6s ease-out 0.2s forwards; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     .feed-container { max-width: 600px; width: 100%; }
-    .recommend-container { width: 250px; margin-left: 20px; position: sticky; top: 20px; background: #1e1e1e; border: 1px solid #333; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); opacity: 0; animation: fadeInText 0.5s ease-out 0.6s forwards; }
+    .recommend-container { 
+      width: 220px; 
+      margin-left: 20px; 
+      position: sticky; 
+      top: 20px; 
+      background: #1e1e1e; 
+      border: 1px solid #333; 
+      border-radius: 16px; 
+      padding: 16px; 
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); 
+      opacity: 0; 
+      animation: fadeInText 0.5s ease-out 0.6s forwards; 
+    }
     @keyframes fadeInText { to { opacity: 1; } }
     .recommend-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #fff; }
-    .profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; transition: background 0.3s; opacity: 0; transform: translateX(20px); animation: slideInLeft 0.5s ease-out forwards; }
+    .profile-item { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      padding: 6px 0; 
+      cursor: pointer; 
+      transition: background 0.3s; 
+      opacity: 0; 
+      transform: translateX(20px); 
+      animation: slideInLeft 0.5s ease-out forwards; 
+    }
     .profile-item:nth-child(1) { animation-delay: 0.7s; }
     .profile-item:nth-child(2) { animation-delay: 0.75s; }
     .profile-item:nth-child(3) { animation-delay: 0.8s; }
@@ -45,8 +66,27 @@
     .profile-item:nth-child(7) { animation-delay: 1s; }
     @keyframes slideInLeft { to { opacity: 1; transform: translateX(0); } }
     .profile-item:hover { background: #2c2c2c; border-radius: 8px; }
-    .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; background-size: cover; background-position: center; }
-    .profile-nickname { font-size: 14px; color: #fff; }
+    .profile-avatar { 
+      width: 32px; 
+      height: 32px; 
+      border-radius: 50%; 
+      background: linear-gradient(135deg, #3478f6, #53b6f9); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 15px; 
+      font-weight: bold; 
+      flex-shrink: 0; 
+      background-size: cover; 
+      background-position: center; 
+    }
+    .profile-nickname { 
+      font-size: 13.5px; 
+      color: #fff; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
     .skeleton { background: linear-gradient(90deg, #1e1e1e 25%, #2a2a2a 50%, #1e1e1e 75%); background-size: 200% 100%; animation: loading 1.5s ease-in-out infinite; border-radius: 6px; }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     .skeleton-post { padding: 20px 0; border-bottom: 1px solid #2a2a2a; }
@@ -58,13 +98,13 @@
     .text-short { width: 60%; }
     .text-medium { width: 85%; }
     .text-long { width: 100%; }
-    .skeleton-profile-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
-    .skeleton-profile-avatar { width: 40px; height: 40px; border-radius: 50%; }
-    .skeleton-profile-nickname { width: 110px; height: 16px; }
+    .skeleton-profile-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+    .skeleton-profile-avatar { width: 32px; height: 32px; border-radius: 50%; }
+    .skeleton-profile-nickname { width: 100px; height: 14px; }
     @media (max-width: 768px) {
       .recommend-container { display: none; }
-      .sidebar-container { width: 80px; min-width: 80px; position: fixed; left: 0; top: 0; height: 100vh; z-index: 1000; }
-      .sidebar-container iframe { width: 80px !important; height: 100vh !important; }
+      .sidebar-container { width: 80px; min-width: 80px; }
+      .sidebar-container iframe { width: 80px !important; }
       .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
     }
     .verification-badge {
@@ -325,7 +365,7 @@
 </head>
 <body>
 <div class="sidebar-container">
-  <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
+  <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
 </div>
 <div class="main-wrapper">
   <div class="auth-modal" id="loginModal">
@@ -431,6 +471,7 @@
   </div>
 </div>
 <script>
+// (이하 스크립트 부분은 원본과 동일하게 유지 - 변경 없음)
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 async function api(endpoint, options = {}) {
   const url = API_BASE + endpoint;
@@ -478,7 +519,7 @@ window.addEventListener('message', (event) => {
   if (type === 'navigate') {
     if (page === 'home') location.href = 'index.html';
     if (page === 'explore') location.href = 'explore.html';
-    if (page === 'chat') location.href = 'chat.html'; // ← 여기 추가! 채팅 클릭 시 이동
+    if (page === 'chat') location.href = 'chat.html';
   }
   if (type === 'logout') {
     localStorage.removeItem('snsUser');
