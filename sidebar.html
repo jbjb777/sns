@@ -4,138 +4,107 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      width: 100%;
+      background: transparent !important;
       height: 100vh;
       overflow: hidden;
-      background: transparent;
     }
+
     .sidebar {
-      width: 100%;
+      width: 72px !important;              /* ← 여기서 폭 강제 고정 (원하는 대로 60~80px 조정) */
+      max-width: 72px !important;
+      min-width: 72px !important;
       height: 100vh;
-      min-height: 100vh;
-      max-height: 100vh;
-      background: transparent;           /* 배경 제거 */
-      border-right: none;                /* 오른쪽 선 제거 */
-      padding: 20px 12px;                /* 좌우 여백 줄임 */
+      background: transparent;
+      border-right: none;
+      padding: 16px 0;                     /* 좌우 패딩 완전 제거 → 상하만 여유 */
       display: flex;
       flex-direction: column;
+      align-items: center;                 /* 모든 아이템 수평 중앙 */
       overflow-y: auto;
+      overflow-x: hidden;
       box-sizing: border-box;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
+      position: relative;
+      scrollbar-width: thin;
+      scrollbar-color: #444 transparent;
     }
+
     .logo-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;           /* 중앙 정렬 */
-      margin-bottom: 40px;
+      margin: 0 auto 32px;
       cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: transform 0.2s;
     }
-    .logo-container:hover {
-      transform: translateY(-4px) scale(1.02);
-    }
+    .logo-container:hover { transform: scale(1.1); }
     .logo-svg {
       width: 40px;
       height: 40px;
-      flex-shrink: 0;
     }
-    .logo-text {
-      display: none;                     /* 텍스트 완전 숨김 */
-    }
+    .logo-text { display: none; }
+
     .nav-item {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      padding: 0;
       display: flex;
       align-items: center;
-      justify-content: center;           /* 아이콘 중앙 */
-      padding: 12px;
-      margin-bottom: 12px;
+      justify-content: center;
       border-radius: 12px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: all 0.25s;
       background: transparent;
     }
     .nav-item:hover {
-      background: rgba(54, 99, 255, 0.12);
-      transform: translateY(-2px) scale(1.02);
+      background: rgba(54, 99, 255, 0.15);
+      transform: scale(1.08);
     }
     .nav-item.active {
-      font-weight: bold;
-      background: linear-gradient(135deg, rgba(54,99,255,0.25), rgba(87,34,179,0.18));
-      box-shadow: 0 4px 15px rgba(54,99,255,0.2);
+      background: linear-gradient(135deg, rgba(54,99,255,0.3), rgba(87,34,179,0.2));
+      box-shadow: 0 4px 12px rgba(54,99,255,0.25);
     }
-    .nav-item .nav-icon-img,
-    .nav-item .nav-icon-img-home,
-    .nav-item .nav-icon-img-explore {
-      width: 28px;                       /* 조금 더 크게 */
-      height: 28px;
-      margin-right: 0;
-      flex-shrink: 0;
-      object-fit: contain;
+    .nav-icon-img, .nav-icon-img-home, .nav-icon-img-explore {
+      width: 32px;
+      height: 32px;
+      margin: 0;
     }
-    .nav-text {
-      display: none;                     /* 모든 텍스트 숨김 */
-    }
+    .nav-text { display: none; }
+
     .create-btn {
-      position: relative;
-      background: linear-gradient(135deg, #5269FF, #5722B3, #FF00EC);
-      color: white;
+      width: 56px;
+      height: 56px;
+      margin: 24px auto;
+      padding: 0;
       border: none;
-      padding: 14px;
-      border-radius: 50%;                /* 완전 원형으로 */
-      font-size: 16px;
-      font-weight: bold;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5269FF, #5722B3, #FF00EC);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 20px;
-      transition: all 0.3s;
-      width: 56px;
-      height: 56px;
-      overflow: hidden;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
-      align-self: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      transition: all 0.25s;
     }
     .create-btn:hover {
-      transform: scale(1.12);
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+      transform: scale(1.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    .create-btn:active {
-      transform: scale(0.92);
+    .btn-icon-img {
+      width: 32px;
+      height: 32px;
+      margin: 0;
     }
-    .create-btn .btn-icon-img {
-      width: 28px;
-      height: 28px;
-      margin-right: 0;
-      flex-shrink: 0;
-    }
-    .btn-text {
-      display: none;
-    }
+    .btn-text { display: none; }
+
     .user-info {
       margin-top: auto;
-      padding: 12px 0;
+      padding: 16px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      border-top: none;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      border-radius: 12px;
-      flex-shrink: 0;
-    }
-    .user-info:hover {
-      background: rgba(44,44,44,0.4);
-      transform: scale(1.05);
-    }
-    .user-avatar-wrapper {
-      position: relative;
-      flex-shrink: 0;
+      width: 100%;
     }
     .user-avatar {
       width: 48px;
@@ -146,8 +115,7 @@
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      font-weight: bold;
-      color: #fff;
+      color: white;
       overflow: hidden;
     }
     .user-avatar img {
@@ -155,43 +123,29 @@
       height: 100%;
       object-fit: cover;
     }
-    .user-details {
-      display: none;                     /* 닉네임 등 텍스트 영역 완전 숨김 */
-    }
-    .logout-icon-btn {
-      display: none;                     /* 데스크톱 로그아웃 버튼 숨김 */
+    .user-details, .logout-icon-btn, .verification-badge, .user-page-label {
+      display: none;
     }
     .logout-icon-btn-mobile {
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: rgba(54, 99, 255, 0.85);
+      background: rgba(54, 99, 255, 0.8);
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.25s;
-      padding: 0;
-      margin: 8px auto 0;
+      margin: 12px auto 0;
+      transition: all 0.2s;
     }
-    .logout-icon-btn-mobile img {
-      width: 22px;
-      height: 22px;
-      filter: brightness(0) invert(1);
-    }
-    .logout-icon-btn-mobile:hover {
-      background: #2952CC;
-      transform: scale(1.1);
-    }
-    .verification-badge {
-      display: none;                     /* 뱃지도 텍스트와 함께 숨김 */
-    }
+    .logout-icon-btn-mobile:hover { transform: scale(1.1); }
+
     .sidebar::-webkit-scrollbar {
-      width: 5px;
+      width: 3px;
     }
     .sidebar::-webkit-scrollbar-thumb {
-      background: #444;
+      background: #555;
       border-radius: 10px;
     }
   </style>
@@ -200,28 +154,25 @@
   <div class="sidebar">
     <div class="logo-container" id="logoContainer">
       <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
-      <span class="logo-text">Sharer</span>
     </div>
+
     <div class="nav-item active" id="homeNav">
       <img src="home.png" alt="홈" class="nav-icon-img-home">
-      <span class="nav-text">홈</span>
     </div>
     <div class="nav-item" id="exploreNav">
       <img src="explore.png" alt="탐색" class="nav-icon-img-explore">
-      <span class="nav-text">탐색</span>
     </div>
     <div class="nav-item" id="chatNav">
       <img src="chat.png" alt="채팅" class="nav-icon-img">
-      <span class="nav-text">채팅</span>
     </div>
     <div class="nav-item" id="discordNav">
       <img src="discord.png" alt="Discord" class="nav-icon-img">
-      <span class="nav-text">Discord</span>
     </div>
+
     <button class="create-btn" id="createBtn">
       <img src="new.png" alt="만들기" class="btn-icon-img">
-      <span class="btn-text">만들기</span>
     </button>
+
     <div class="user-info" id="userInfo" style="display: none;">
       <div class="user-avatar-wrapper">
         <div class="user-avatar" id="userAvatar"></div>
@@ -229,16 +180,10 @@
       <button class="logout-icon-btn-mobile" id="logoutBtnMobile" onclick="handleLogout(event)">
         <img src="logout.png" alt="로그아웃">
       </button>
-      <div class="user-details">
-        <div class="user-nickname" id="userNickname"></div>
-      </div>
     </div>
   </div>
 
   <script>
-    // ──────────────────────────────────────────────
-    // 기존 스크립트 로직 그대로 유지 (텍스트만 안 보이게 했을 뿐)
-    // ──────────────────────────────────────────────
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
     const chatNav = document.getElementById('chatNav');
