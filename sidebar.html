@@ -54,7 +54,6 @@
       background: transparent;
     }
     .nav-item:hover {
-      /* 배경 제거 → 크기 변화만 유지 */
       transform: scale(1.08);
     }
     .nav-item.active {
@@ -63,10 +62,17 @@
       /* background: linear-gradient(135deg, rgba(54,99,255,0.3), rgba(87,34,179,0.2)); */
       /* box-shadow: 0 4px 12px rgba(54,99,255,0.25); */
     }
+    /* 비활성 상태일 때 아이콘 밝기 낮춤 */
+    .nav-item:not(.active) .nav-icon-img,
+    .nav-item:not(.active) .nav-icon-img-home,
+    .nav-item:not(.active) .nav-icon-img-explore {
+      filter: brightness(70%);
+    }
     .nav-icon-img, .nav-icon-img-home, .nav-icon-img-explore {
       width: 32px;
       height: 32px;
       margin: 0;
+      transition: filter 0.2s ease;
     }
     .nav-text { display: none; }
     .create-btn {
@@ -180,7 +186,6 @@
       </button>
     </div>
   </div>
-
   <script>
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
@@ -189,17 +194,14 @@
     const createBtn = document.getElementById('createBtn');
     const logoContainer = document.getElementById('logoContainer');
     const userInfo = document.getElementById('userInfo');
-
     // 아이콘 요소들
     const homeIcon = document.getElementById('homeIcon');
     const exploreIcon = document.getElementById('exploreIcon');
     const chatIcon = document.getElementById('chatIcon');
-
     let isLoggedIn = false;
     let currentUserId = null;
     let currentUserNickname = null;
     let currentUserProfileImage = null;
-
     // 활성화 상태에 따라 아이콘 변경 함수
     function updateIcons() {
       // 홈
@@ -208,14 +210,12 @@
       } else {
         homeIcon.src = 'homeX.png';
       }
-
       // 탐색
       if (exploreNav.classList.contains('active')) {
         exploreIcon.src = 'explore.png';
       } else {
         exploreIcon.src = 'exploreX.png';
       }
-
       // 채팅
       if (chatNav.classList.contains('active')) {
         chatIcon.src = 'chat.png';
@@ -223,27 +223,21 @@
         chatIcon.src = 'chatX.png';
       }
     }
-
     logoContainer.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
     };
-
     homeNav.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
     };
-
     exploreNav.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/explore.html';
     };
-
     chatNav.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/chat.html';
     };
-
     discordNav.onclick = () => {
       window.open('https://discord.gg/8s6XuWkfQb', '_blank');
     };
-
     createBtn.onclick = () => {
       if (isLoggedIn) {
         window.top.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
@@ -251,50 +245,42 @@
         window.top.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
       }
     };
-
     userInfo.onclick = () => {
       if (isLoggedIn && currentUserId && currentUserNickname) {
         window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
       }
     };
-
     window.handleLogout = (event) => {
       event.stopPropagation();
       parent.postMessage({ type: 'logout' }, '*');
     };
-
     window.addEventListener('message', (event) => {
       const data = event.data;
       if (!data?.type) return;
-
       if (data.type === 'activateHome' || data.type === 'default') {
         homeNav.classList.add('active');
         exploreNav.classList.remove('active');
         chatNav.classList.remove('active');
         updateIcons();
       }
-
       if (data.type === 'activateExplore') {
         homeNav.classList.remove('active');
         exploreNav.classList.add('active');
         chatNav.classList.remove('active');
         updateIcons();
       }
-
       if (data.type === 'activateChat') {
         homeNav.classList.remove('active');
         exploreNav.classList.remove('active');
         chatNav.classList.add('active');
         updateIcons();
       }
-
       if (data.type === 'updateUser') {
         if (data.user) {
           isLoggedIn = true;
           currentUserId = data.user.id;
           currentUserNickname = data.user.nickname;
           currentUserProfileImage = data.user.profile_image;
-
           if (currentUserProfileImage && typeof currentUserProfileImage === 'string' && currentUserProfileImage.trim() !== '') {
             const img = document.createElement('img');
             const url = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
@@ -320,7 +306,6 @@
           userInfo.style.display = 'none';
         }
       }
-
       if (data.type === 'setNarrowMode') {
         const sidebar = document.querySelector('.sidebar');
         if (data.narrow) {
@@ -330,10 +315,9 @@
         }
       }
     });
-
     // 초기 상태 설정
     homeNav.classList.add('active');
-    updateIcons();               // 처음 로드 시에도 아이콘 올바르게 표시
+    updateIcons(); // 처음 로드 시에도 아이콘 올바르게 표시
     parent.postMessage({ type: 'requestUserInfo' }, '*');
   </script>
 </body>
