@@ -11,18 +11,17 @@
       height: 100vh;
       overflow: hidden;
     }
-
     .sidebar {
-      width: 72px !important;              /* ← 여기서 폭 강제 고정 (원하는 대로 60~80px 조정) */
+      width: 72px !important; /* ← 여기서 폭 강제 고정 (원하는 대로 60~80px 조정) */
       max-width: 72px !important;
       min-width: 72px !important;
       height: 100vh;
       background: transparent;
       border-right: none;
-      padding: 16px 0;                     /* 좌우 패딩 완전 제거 → 상하만 여유 */
+      padding: 16px 0; /* 좌우 패딩 완전 제거 → 상하만 여유 */
       display: flex;
       flex-direction: column;
-      align-items: center;                 /* 모든 아이템 수평 중앙 */
+      align-items: center; /* 모든 아이템 수평 중앙 */
       overflow-y: auto;
       overflow-x: hidden;
       box-sizing: border-box;
@@ -30,7 +29,6 @@
       scrollbar-width: thin;
       scrollbar-color: #444 transparent;
     }
-
     .logo-container {
       margin: 0 auto 32px;
       cursor: pointer;
@@ -42,7 +40,6 @@
       height: 40px;
     }
     .logo-text { display: none; }
-
     .nav-item {
       width: 48px;
       height: 48px;
@@ -70,7 +67,6 @@
       margin: 0;
     }
     .nav-text { display: none; }
-
     .create-btn {
       width: 56px;
       height: 56px;
@@ -96,15 +92,15 @@
       margin: 0;
     }
     .btn-text { display: none; }
-
     .user-info {
       margin-top: auto;
-      padding: 16px 0;
+      padding: 10px 0 16px; /* ← 위아래 여백 줄임 (기존 16px 0 → 10px 0 16px) */
       display: flex;
       flex-direction: column;
       align-items: center;
       cursor: pointer;
       width: 100%;
+      gap: 4px; /* ← 아바타와 로그아웃 버튼 사이 간격 최소화 */
     }
     .user-avatar {
       width: 48px;
@@ -127,8 +123,8 @@
       display: none;
     }
     .logout-icon-btn-mobile {
-      width: 44px;
-      height: 44px;
+      width: 32px;                    /* ← 44px → 32px (크기 축소 핵심) */
+      height: 32px;
       border-radius: 50%;
       background: rgba(54, 99, 255, 0.8);
       border: none;
@@ -136,11 +132,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 12px auto 0;
+      margin: 8px auto 0;             /* ← 12px → 8px (여백 축소) */
       transition: all 0.2s;
     }
     .logout-icon-btn-mobile:hover { transform: scale(1.1); }
-
+    .logout-icon-btn-mobile img {
+      width: 20px !important;         /* ← 로그아웃 아이콘 자체도 작게 */
+      height: 20px !important;
+    }
     .sidebar::-webkit-scrollbar {
       width: 3px;
     }
@@ -155,7 +154,6 @@
     <div class="logo-container" id="logoContainer">
       <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
     </div>
-
     <div class="nav-item active" id="homeNav">
       <img src="home.png" alt="홈" class="nav-icon-img-home">
     </div>
@@ -168,11 +166,9 @@
     <div class="nav-item" id="discordNav">
       <img src="discord.png" alt="Discord" class="nav-icon-img">
     </div>
-
     <button class="create-btn" id="createBtn">
       <img src="new.png" alt="만들기" class="btn-icon-img">
     </button>
-
     <div class="user-info" id="userInfo" style="display: none;">
       <div class="user-avatar-wrapper">
         <div class="user-avatar" id="userAvatar"></div>
@@ -182,7 +178,6 @@
       </button>
     </div>
   </div>
-
   <script>
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
@@ -193,12 +188,10 @@
     const userInfo = document.getElementById('userInfo');
     const userNickname = document.getElementById('userNickname');
     const userAvatar = document.getElementById('userAvatar');
-
     let isLoggedIn = false;
     let currentUserId = null;
     let currentUserNickname = null;
     let currentUserProfileImage = null;
-
     logoContainer.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
     };
@@ -230,11 +223,9 @@
       event.stopPropagation();
       parent.postMessage({ type: 'logout' }, '*');
     };
-
     window.addEventListener('message', (event) => {
       const data = event.data;
       if (!data?.type) return;
-
       if (data.type === 'activateHome' || data.type === 'default') {
         homeNav.classList.add('active');
         exploreNav.classList.remove('active');
@@ -250,14 +241,12 @@
         exploreNav.classList.remove('active');
         chatNav.classList.add('active');
       }
-
       if (data.type === 'updateUser') {
         if (data.user) {
           isLoggedIn = true;
           currentUserId = data.user.id;
           currentUserNickname = data.user.nickname;
           currentUserProfileImage = data.user.profile_image;
-
           if (currentUserProfileImage && typeof currentUserProfileImage === 'string' && currentUserProfileImage.trim() !== '') {
             const img = document.createElement('img');
             const url = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
@@ -283,7 +272,6 @@
           userInfo.style.display = 'none';
         }
       }
-
       if (data.type === 'setNarrowMode') {
         const sidebar = document.querySelector('.sidebar');
         if (data.narrow) {
@@ -293,7 +281,6 @@
         }
       }
     });
-
     // 초기 홈 활성화
     homeNav.classList.add('active');
     parent.postMessage({ type: 'requestUserInfo' }, '*');
