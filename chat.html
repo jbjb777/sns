@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>채팅테스트</title>
+  <title>㋡꧁정빈777꧂ - 채팅</title>
   <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 2000 2000">
   <defs>
@@ -50,14 +50,16 @@
       min-height: 100vh;
     }
     .chat-wrapper {
-      display:flex; justify-content:center; align-items:center; flex:1; padding:20px;
+      flex:1; display:flex; justify-content:center; align-items:center; padding:20px;
     }
     .container {
       background:#1e1e1e; padding:20px; border-radius:16px;
       box-shadow:0 0 30px rgba(0,0,0,0.6); width:90%; max-width:600px; position:relative;
+      border:1px solid #444;
     }
     #userInfo {
-      position:absolute; top:20px; right:20px; display:none; align-items:center; gap:10px;
+      position:absolute; top:12px; right:12px; display:none; align-items:center; gap:10px;
+      background:rgba(54,99,255,0.3); padding:6px 12px; border-radius:20px;
     }
     #userInfo.active { display:flex; }
     #userNickname { color:#ffffff; font-weight:600; font-size:14px; }
@@ -269,7 +271,7 @@ msgInput.addEventListener("input", () => charCount.textContent = msgInput.value.
 logoutBtn.onclick = () => {
   localStorage.removeItem("chatNickname");
   localStorage.removeItem("jungbin777_verified");
-  location.reload();
+  location.href = "https://sharer.jbjb.r-e.kr/login.html";
 };
 
 imgUploadBtn.onclick = () => imgInput.click();
@@ -285,6 +287,7 @@ function isVerifiedJungbin() {
   return nickname === "정빈777" && localStorage.getItem("jungbin777_verified") === "true";
 }
 
+// 로그인 체크 & 닉네임 처리
 window.addEventListener("DOMContentLoaded", () => {
   const saved = localStorage.getItem("chatNickname");
   if (saved) {
@@ -292,13 +295,16 @@ window.addEventListener("DOMContentLoaded", () => {
     nicknameModal.style.display = "none";
     userNickname.textContent = nickname;
     userInfo.classList.add("active");
-    
+
     if (saved.includes("정빈777") && saved !== "정빈777") {
       showPermanentError("이 닉네임은 사용할 수 없습니다. 로그아웃 후 다시 닉네임을 바꿔주세요.");
     }
     else if (saved === "정빈777" && !localStorage.getItem("jungbin777_verified")) {
       showPermanentError("제작자 인증이 불가합니다. 로그아웃 후 다시 시도해주세요.");
     }
+  } else {
+    // 닉네임이 없으면 로그인 페이지로 강제 이동
+    location.href = "https://sharer.jbjb.r-e.kr/login.html";
   }
 });
 
