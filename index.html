@@ -22,7 +22,7 @@
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
 
-  <!-- Tailwind CSS CDN (UI 깨짐 해결 핵심) -->
+  <!-- Tailwind CDN (UI 깨짐 해결 핵심) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -62,152 +62,101 @@
     }
 
     .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 9999px;
+      width: 44px; height: 44px; border-radius: 9999px;
       background: linear-gradient(135deg, #405DE6, #833AB4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 1.25rem;
-      flex-shrink: 0;
-      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: bold; font-size: 1.25rem; flex-shrink: 0;
     }
 
     .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(12px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px); display: none; align-items: center;
+      justify-content: center; z-index: 1000;
     }
     .modal.active { display: flex; }
 
     .modal-content {
-      background: #111827;
-      border-radius: 20px;
-      border: 1px solid #374151;
-      max-width: 420px;
-      width: 92%;
+      background: #111827; border: 1px solid #374151;
+      border-radius: 20px; max-width: 420px; width: 92%;
       box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
     }
   </style>
 </head>
 <body class="bg-[#0a0a0a] text-gray-100 min-h-screen">
 
-<div class="flex min-h-screen">
-
-  <!-- 사이드바 (원본 그대로) -->
-  <div class="sidebar-container w-[72px] flex-shrink-0">
-    <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
-  </div>
-
-  <div class="flex-1 flex flex-col">
-
-    <!-- DMspace 스타일 헤더 -->
-    <header class="sticky top-0 z-30 bg-[#111827] border-b border-gray-800">
-      <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-gradient-to-br from-[#405DE6] to-[#833AB4] rounded-2xl flex items-center justify-center text-white font-bold text-2xl">S</div>
-          <div>
-            <h1 class="text-2xl font-bold tracking-tight">Sharer</h1>
-            <p class="text-xs text-gray-400 -mt-0.5">정빈777 커뮤니티</p>
-          </div>
-        </div>
-        <button onclick="handleCreatePost()" class="btn-instagram text-sm">새 게시물</button>
-      </div>
-    </header>
-
-    <!-- 메인 콘텐츠 -->
-    <main class="flex-1 p-6">
-      <div class="max-w-5xl mx-auto flex gap-8">
-
-        <!-- 피드 -->
-        <div class="flex-1" id="postsFeed"></div>
-
-        <!-- 추천 프로필 -->
-        <div class="hidden lg:block w-72" id="recommendProfiles">
-          <div class="sticky top-6 bg-[#111827] border border-gray-800 rounded-3xl p-6">
-            <div class="text-lg font-semibold mb-5">프로필 추천</div>
-            <div id="recommendSkeleton" class="space-y-4"></div>
-          </div>
-        </div>
-
-      </div>
-    </main>
-
-    <!-- 푸터 -->
-    <footer class="py-10 text-center text-sm text-gray-500 border-t border-gray-800 mt-auto">
-      © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
-      <div class="mt-3 flex justify-center gap-6 text-[#405DE6]">
-        <a href="/privacy.html">개인정보처리방침</a>
-        <a href="/policy.html">이용약관</a>
-        <a href="mailto:alexeom97@outlook.com">문의하기</a>
-      </div>
-    </footer>
-  </div>
+<div class="sidebar-container">
+  <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
 </div>
 
-<!-- 로그인 모달 (원본 그대로) -->
-<div class="modal" id="loginModal">
-  <div class="modal-content p-8">
-    <button class="float-right text-3xl text-gray-400 hover:text-white" onclick="closeLoginModal()">✕</button>
-    <h2 class="text-2xl font-bold text-center mb-8">로그인</h2>
-    <input type="text" id="loginId" placeholder="아이디" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl mb-3 focus:outline-none focus:border-[#405DE6]">
-    <input type="password" id="loginPassword" placeholder="비밀번호" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl mb-3 focus:outline-none focus:border-[#405DE6]">
-    <div id="loginError" class="text-red-400 text-sm text-center mb-4"></div>
-    <div id="loginSuccess" class="text-green-400 text-sm text-center mb-4"></div>
-    <button onclick="handleLogin()" class="btn-instagram w-full mb-3">로그인</button>
-    <button onclick="showSignup()" class="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-2xl">회원가입</button>
-  </div>
-</div>
-
-<!-- 회원가입 모달 (원본 그대로) -->
-<div class="modal" id="signupModal">
-  <div class="modal-content p-8">
-    <button class="float-right text-3xl text-gray-400 hover:text-white" onclick="closeSignupModal()">✕</button>
-    <h2 class="text-2xl font-bold text-center mb-8">회원가입</h2>
-    <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl mb-1">
-    <div id="nicknameError" class="text-red-400 text-sm text-center mb-3"></div>
-    <input type="text" id="signupId" placeholder="아이디" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl mb-1">
-    <div id="idError" class="text-red-400 text-sm text-center mb-3"></div>
-    <input type="password" id="signupPassword" placeholder="비밀번호" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl mb-1">
-    <div id="signupError" class="text-red-400 text-sm text-center mb-3"></div>
-    <div id="signupSuccess" class="text-green-400 text-sm text-center mb-4"></div>
-    <button onclick="handleSignup()" class="btn-instagram w-full mb-3">가입하기</button>
-    <button onclick="backToLogin()" class="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-2xl">로그인으로 돌아가기</button>
-  </div>
-</div>
-
-<!-- 게시물 작성 모달 (DMspace 스타일) -->
-<div class="modal" id="createModal">
-  <div class="modal-content max-w-lg p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h3 class="text-xl font-bold">새 게시물 만들기</h3>
-      <button onclick="document.getElementById('createModal').classList.add('hidden')" class="text-3xl text-gray-400 hover:text-white">×</button>
+<div class="main-wrapper">
+  <div class="auth-modal" id="loginModal">
+    <div class="modal-content p-8">
+      <button class="auth-close absolute top-4 right-4 text-2xl text-gray-400 hover:text-white" onclick="closeLoginModal()">✕</button>
+      <h2 class="text-2xl font-bold text-center mb-8">로그인</h2>
+      <input type="text" id="loginId" placeholder="아이디" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl focus:outline-none focus:border-[#405DE6]">
+      <input type="password" id="loginPassword" placeholder="비밀번호" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl focus:outline-none focus:border-[#405DE6] mt-3">
+      <div class="error-message" id="loginError"></div>
+      <div class="success-message" id="loginSuccess"></div>
+      <button onclick="handleLogin()" class="btn-instagram w-full mt-6">로그인</button>
+      <button class="secondary w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-2xl mt-2" onclick="showSignup()">회원가입</button>
     </div>
-    <textarea id="postContent" placeholder="문구를 입력하세요..." class="w-full h-40 bg-gray-800 border border-gray-700 rounded-2xl p-5 resize-none focus:outline-none focus:border-[#405DE6]"></textarea>
-    
-    <div class="image-preview-container mt-4">
-      <img id="imagePreview" class="image-preview">
+  </div>
+
+  <div class="auth-modal" id="signupModal">
+    <div class="modal-content p-8">
+      <button class="auth-close absolute top-4 right-4 text-2xl text-gray-400 hover:text-white" onclick="closeSignupModal()">✕</button>
+      <h2 class="text-2xl font-bold text-center mb-8">회원가입</h2>
+      <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl">
+      <div class="error-message" id="nicknameError"></div>
+      <input type="text" id="signupId" placeholder="아이디" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl mt-3">
+      <div class="error-message" id="idError"></div>
+      <input type="password" id="signupPassword" placeholder="비밀번호" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-2xl mt-3">
+      <div class="error-message" id="signupError"></div>
+      <div class="success-message" id="signupSuccess"></div>
+      <button onclick="handleSignup()" class="btn-instagram w-full mt-6">가입하기</button>
+      <button class="secondary w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-2xl mt-2" onclick="backToLogin()">로그인으로 돌아가기</button>
     </div>
-    
-    <input type="file" id="imageInput" accept="image/*" class="hidden">
-    <button id="uploadBtn" class="w-full py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-2xl mt-4 text-white">📷 사진 추가</button>
-    
-    <div id="postMessage" class="mt-4 text-center text-sm"></div>
-    
-    <button id="modalPostBtn" class="btn-instagram w-full mt-6">공유하기</button>
+  </div>
+
+  <div class="create-modal" id="createModal">
+    <div class="modal-content max-w-lg p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold">새 게시물 만들기</h3>
+        <button onclick="document.getElementById('createModal').classList.add('hidden')" class="text-3xl text-gray-400 hover:text-white">×</button>
+      </div>
+      <textarea id="postContent" placeholder="문구를 입력하세요..." class="w-full h-40 bg-gray-800 border border-gray-700 rounded-2xl p-5 resize-none focus:outline-none focus:border-[#405DE6]"></textarea>
+      <div class="image-preview-container mt-4">
+        <img id="imagePreview" class="image-preview">
+      </div>
+      <input type="file" id="imageInput" accept="image/*" style="display: none;">
+      <button id="uploadBtn" class="w-full py-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-2xl mt-4 text-white">📷 사진 추가</button>
+      <div id="postMessage" class="mt-4 text-center text-sm"></div>
+      <button id="modalPostBtn" class="btn-instagram w-full mt-6">공유하기</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="feed-container">
+      <div id="postsFeed"></div>
+    </div>
+    <div class="recommend-container" id="recommendProfiles">
+      <div class="recommend-title">프로필 추천</div>
+      <div id="recommendSkeleton"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="/privacy.html">개인정보처리방침</a>
+      <a href="/policy.html">이용약관</a>
+      <a href="mailto:alexeom97@outlook.com">문의하기</a>
+    </div>
+    <div class="footer-text">© 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.</div>
   </div>
 </div>
 
 <script>
-// ==================== Sharer 원본 스크립트 전체 (한 글자도 생략 없이 그대로) ====================
+// ==================== 원본 Sharer 스크립트 전체 (한 글자도 생략 없이) ====================
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 async function api(endpoint, options = {}) {
   const url = API_BASE + endpoint;
@@ -434,17 +383,17 @@ async function loadPosts() {
         ? `<img src="${authorAvatar}" class="avatar" alt="${authorNickname}">`
         : `<div class="avatar">${authorNickname[0]?.toUpperCase() || '?'}</div>`;
       const authorDisplay = isVerified
-        ? `${escapeHtml(authorNickname)}<span class="ml-1 text-[#405DE6] text-sm">✔</span>`
+        ? `${escapeHtml(authorNickname)}<span class="ml-1 text-[#405DE6]">✔</span>`
         : escapeHtml(authorNickname);
       const deleteButton = canDelete
-        ? `<button class="ml-auto text-xs bg-red-600 hover:bg-red-700 px-4 py-1.5 rounded-2xl text-white font-medium" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
+        ? `<button class="delete-btn ml-auto text-xs bg-red-600 hover:bg-red-700 px-4 py-1.5 rounded-2xl text-white font-medium" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
         : '';
       let contentHTML = '';
       if (post.content) {
         const lines = escapeHtml(post.content).split('\n');
         const title = lines.shift() || '';
         const body = lines.filter(l => l.trim()).join('<br>');
-        contentHTML = `<div class="mt-3"><div class="font-bold text-lg">${title}</div><div class="text-gray-300 mt-2 leading-relaxed">${body}</div></div>`;
+        contentHTML = `<div class="post-content mt-3"><div class="font-bold text-lg">${title}</div><div class="text-gray-300 mt-2 leading-relaxed">${body}</div></div>`;
       }
       let likeCount = 0;
       let liked = false;
@@ -468,15 +417,15 @@ async function loadPosts() {
           </div>
           ${deleteButton}
         </div>
-        ${post.image_url ? `<img src="${post.image_url}" class="mt-4 w-full rounded-2xl">` : ''}
+        ${post.image_url ? `<img src="${post.image_url}" class="post-image mt-4">` : ''}
         ${contentHTML}
-        <div class="flex items-center gap-6 mt-6">
-          <button class="like-button flex items-center gap-2 ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
-            <span class="text-2xl">❤️</span>
-            <span class="like-count font-bold">${likeCount}</span>
+        <div class="post-actions mt-6">
+          <button class="like-button ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
+            <svg class="like-heart w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3 9.24 3 10.91 3.81 12 5.08 13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span class="like-count">${likeCount}</span>
           </button>
         </div>
-        <div class="text-xs text-gray-500 mt-4">${timeStr}</div>
+        <div class="post-time text-xs text-gray-500 mt-4">${timeStr}</div>
       `;
       postCard.onclick = (e) => {
         if (!e.target.closest('.like-button')) {
@@ -492,23 +441,38 @@ async function loadPosts() {
 }
 async function loadRecommendedProfiles() {
   const container = document.getElementById('recommendProfiles');
+  const skeleton = document.getElementById('recommendSkeleton');
   try {
     let users = await api("/users?select=id,nickname,profile_image");
-    if (!users?.length) return;
-    users.sort(() => Math.random() - 0.5).slice(0,7).forEach(user => {
-      const div = document.createElement('div');
-      div.className = 'flex items-center gap-3 cursor-pointer hover:bg-gray-800 p-2 rounded-2xl';
-      div.innerHTML = `
-        ${user.profile_image ? `<img src="${user.profile_image}" class="w-9 h-9 rounded-full object-cover">` : `<div class="avatar w-9 h-9 text-sm">${user.nickname[0]}</div>`}
-        <span class="font-medium">${user.nickname}</span>
-      `;
-      div.onclick = () => window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`;
-      container.appendChild(div);
+    if (!users?.length) {
+      skeleton?.remove();
+      container.innerHTML += '<div style="text-align:center; color:#aaa; padding:12px 0;">사용자 없음</div>';
+      return;
+    }
+    for (let i = users.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [users[i], users[j]] = [users[j], users[i]];
+    }
+    users = users.slice(0, 7);
+    skeleton?.remove();
+    users.forEach(user => {
+      const avatarHTML = user.profile_image
+        ? `<img src="${user.profile_image}" class="avatar" alt="${user.nickname}">`
+        : `<div class="avatar">${user.nickname?.[0]?.toUpperCase() || '?'}</div>`;
+      const item = document.createElement('div');
+      item.className = 'profile-item flex items-center gap-3 p-2 hover:bg-gray-800 rounded-xl cursor-pointer';
+      item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}</span>`;
+      item.onclick = () => window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`;
+      container.appendChild(item);
     });
-  } catch (e) {}
+  } catch (err) {
+    if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:#aaa; padding:12px 0;">로드 실패</div>';
+  }
 }
 window.goToProfile = (userId, nickname) => {
-  if (userId && nickname) window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
+  if (userId && nickname) {
+    window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
+  }
 };
 window.deletePost = async (postId) => {
   if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
@@ -519,8 +483,6 @@ window.deletePost = async (postId) => {
     alert('삭제에 실패했습니다.');
   }
 };
-
-// 초기 로드
 loadPosts();
 loadRecommendedProfiles();
 </script>
