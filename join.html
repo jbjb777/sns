@@ -142,7 +142,6 @@
       color: #666;
       font-size: 12px;
     }
-
     /* 우측 서비스 소개 영역 */
     .intro-section {
       max-width: 500px;
@@ -204,7 +203,6 @@
       line-height: 1.7;
       color: #e0e6ff;
     }
-
     /* 반응형 */
     @media (max-width: 1024px) {
       .main-content {
@@ -239,28 +237,26 @@
       <span class="logo-text">Sharer</span>
     </div>
   </div>
-
   <div class="main-content">
     <!-- 좌측: 회원가입 폼 -->
     <div class="auth-container">
       <h2>회원정보 입력</h2>
-     
+    
       <div id="signupForm">
         <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
         <div class="error-message" id="nicknameError"></div>
-       
+      
         <input type="text" id="signupId" placeholder="아이디">
         <div class="error-message" id="idError"></div>
-       
+      
         <input type="password" id="signupPassword" placeholder="비밀번호">
         <div class="error-message" id="signupError"></div>
-       
+      
         <div class="success-message" id="signupSuccess"></div>
-       
+      
         <button id="signupBtn" onclick="handleSignup()">가입 완료</button>
       </div>
     </div>
-
     <!-- 우측: 서비스 소개 (개인정보처리방침) -->
     <div class="intro-section">
       <h1 class="intro-title">서비스 소개</h1>
@@ -268,7 +264,6 @@
         Sharer 서비스는 사용자의 개인정보를 중요하게 생각하며,<br>
         관련 법령을 준수하고 최소한의 정보만을 수집·이용합니다.
       </p>
-
       <div class="card-wrap">
         <div class="privacy-card">
           <div class="icon">📋</div>
@@ -278,7 +273,6 @@
             (Google 로그인 시 이름·이메일)
           </p>
         </div>
-
         <div class="privacy-card">
           <div class="icon">🎯</div>
           <h3>개인정보 이용 목적</h3>
@@ -287,7 +281,6 @@
             게시물 관리에만 사용됩니다.
           </p>
         </div>
-
         <div class="privacy-card">
           <div class="icon">🔐</div>
           <h3>개인정보 보관 및 보호</h3>
@@ -296,7 +289,6 @@
             외부에 제공되지 않습니다.
           </p>
         </div>
-
         <div class="privacy-card">
           <div class="icon">🗑️</div>
           <h3>개인정보 삭제</h3>
@@ -306,7 +298,6 @@
           </p>
         </div>
       </div>
-
       <div class="info-box">
         <h3>🔒 보안 및 신뢰</h3>
         <p>
@@ -317,25 +308,42 @@
       </div>
     </div>
   </div>
-
   <div class="footer">
     © 2025 ㋡꧁정빈777꧂ SNS. All rights reserved.
   </div>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-   
-    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_vxGxR4uBuYldz-0l_tQXGw_Cz0V6Mj6";
-   
-    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  <script>
+    // Cloudflare Worker API 프록시 주소 (키 노출 완전 제거)
+    const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
+    async function api(endpoint, options = {}) {
+      const url = API_BASE + endpoint;
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        },
+      });
+      if (!res.ok) {
+        let errorText;
+        try {
+          errorText = await res.text();
+        } catch {
+          errorText = "Unknown error";
+        }
+        throw new Error(`API 오류 (${res.status}): ${errorText}`);
+      }
+      if (res.status === 204) return null; // DELETE 등 빈 응답
+      return res.json();
+    }
 
     window.goHome = function() {
       window.location.href = 'index.html';
     }
 
-    function setButtonLoading(buttonId, isLoading, loadingText = '처리 중...') {
-      const button = document.getElementById(buttonId);
+    function setButtonLoading(isLoading, loadingText = '가입 중...') {
+      const button = document.getElementById('signupBtn');
       if (isLoading) {
         button.disabled = true;
         button.innerHTML = `<span class="spinner"></span>${loadingText}`;
@@ -349,11 +357,11 @@
       const nickname = document.getElementById('signupNickname').value.trim();
       const id = document.getElementById('signupId').value.trim();
       const password = document.getElementById('signupPassword').value.trim();
-     
-      const idErrorDiv = document.getElementById('idError');
+
+      const idErrorDiv     = document.getElementById('idError');
       const nicknameErrorDiv = document.getElementById('nicknameError');
-      const errorDiv = document.getElementById('signupError');
-      const successDiv = document.getElementById('signupSuccess');
+      const errorDiv       = document.getElementById('signupError');
+      const successDiv     = document.getElementById('signupSuccess');
 
       idErrorDiv.textContent = '';
       nicknameErrorDiv.textContent = '';
@@ -373,53 +381,47 @@
         return;
       }
 
-      setButtonLoading('signupBtn', true, '가입 중...');
+      setButtonLoading(true);
 
       try {
-        const { data: idCheck } = await supabase
-          .from('users')
-          .select('id')
-          .eq('id', id)
-          .maybeSingle();
-        if (idCheck) {
+        // 1. 아이디 중복 체크
+        const idCheck = await api(`/users?id=eq.${encodeURIComponent(id)}&select=id`);
+        if (idCheck?.length > 0) {
           idErrorDiv.textContent = '이미 사용 중인 아이디입니다.';
-          setButtonLoading('signupBtn', false);
+          setButtonLoading(false);
           return;
         }
 
-        const { data: nicknameCheck } = await supabase
-          .from('users')
-          .select('nickname')
-          .eq('nickname', nickname)
-          .maybeSingle();
-        if (nicknameCheck) {
+        // 2. 닉네임 중복 체크
+        const nicknameCheck = await api(`/users?nickname=eq.${encodeURIComponent(nickname)}&select=nickname`);
+        if (nicknameCheck?.length > 0) {
           nicknameErrorDiv.textContent = '이미 사용 중인 닉네임입니다.';
-          setButtonLoading('signupBtn', false);
+          setButtonLoading(false);
           return;
         }
 
-        const { error } = await supabase
-          .from('users')
-          .insert([
-            {
-              id: id,
-              nickname: nickname,
-              password: password,
-              created_at: new Date().toISOString()
-            }
-          ]);
-
-        if (error) throw error;
+        // 3. 회원가입 요청
+        await api("/users", {
+          method: "POST",
+          body: JSON.stringify({
+            id: id,
+            nickname: nickname,
+            password: password,
+            created_at: new Date().toISOString()
+          })
+        });
 
         successDiv.textContent = '회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.';
-       
+      
         setTimeout(() => {
           window.location.href = 'login.html';
         }, 1500);
+
       } catch (error) {
-        console.error('회원가입 오류 원인:', error);
+        console.error('회원가입 오류:', error);
         errorDiv.textContent = error.message || '회원가입에 실패했습니다. 다시 시도해주세요.';
-        setButtonLoading('signupBtn', false);
+      } finally {
+        setButtonLoading(false);
       }
     }
 
