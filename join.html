@@ -325,17 +325,33 @@
           ...(options.headers || {}),
         },
       });
+
+      // 상태 코드가 204(No Content)인 경우 → 빈 응답 허용 (insert 성공 시 자주 발생)
+      if (res.status === 204) {
+        return null;
+      }
+
       if (!res.ok) {
-        let errorText;
+        let errorText = "";
         try {
           errorText = await res.text();
-        } catch {
-          errorText = "Unknown error";
-        }
-        throw new Error(`API 오류 (${res.status}): ${errorText}`);
+        } catch {}
+        throw new Error(`API 오류 (${res.status}): ${errorText || '응답 본문 없음'}`);
       }
-      if (res.status === 204) return null; // DELETE 등 빈 응답
-      return res.json();
+
+      // JSON 파싱 전에 본문이 있는지 확인
+      const text = await res.text();
+      if (!text.trim()) {
+        // 본문이 완전히 비어있으면 null 반환 (204와 유사하게 처리)
+        return null;
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (parseError) {
+        console.error("JSON 파싱 실패:", parseError, "원본 응답:", text);
+        throw new Error("서버 응답이 유효한 JSON 형식이 아닙니다.");
+      }
     }
 
     window.goHome = function() {
@@ -401,7 +417,7 @@
         }
 
         // 3. 회원가입 요청
-        await api("/users", {
+        const result = await api("/users", {
           method: "POST",
           body: JSON.stringify({
             id: id,
@@ -411,6 +427,7 @@
           })
         });
 
+        // result가 null이어도 성공으로 간주 (204 No Content 허용)
         successDiv.textContent = '회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.';
       
         setTimeout(() => {
@@ -419,6 +436,7 @@
 
       } catch (error) {
         console.error('회원가입 오류:', error);
+        console.log('전체 에러 객체:', error);
         errorDiv.textContent = error.message || '회원가입에 실패했습니다. 다시 시도해주세요.';
       } finally {
         setButtonLoading(false);
