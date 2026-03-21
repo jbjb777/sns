@@ -204,8 +204,18 @@
       throw new Error(`API 오류 (${res.status}): ${errorText}`);
     }
 
+    // 204 No Content이거나 응답 본문이 비어있는 경우 처리
     if (res.status === 204) return null;
-    return res.json();
+    
+    const text = await res.text();
+    if (!text) return null; // 본문이 비어있으면 null 반환
+
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.error("JSON 파싱 오류:", e);
+      return null;
+    }
   }
 
   let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
