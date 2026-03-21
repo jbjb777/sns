@@ -508,7 +508,7 @@
   <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
 
 <script>
-  // Cloudflare Worker API 프록시 주소 (키 노출 완전 제거)
+  // Cloudflare Worker API 프록시 주소
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
   async function api(endpoint, options = {}) {
@@ -531,8 +531,18 @@
       throw new Error(`API 오류 (${res.status}): ${errorText}`);
     }
 
-    if (res.status === 204) return null; // DELETE 등 빈 응답
-    return res.json();
+    // 204 No Content 또는 빈 응답 안전 처리
+    if (res.status === 204) return null;
+    
+    const text = await res.text();
+    if (!text) return null;
+
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.error("JSON 파싱 오류:", e);
+      return null;
+    }
   }
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -583,7 +593,7 @@
   updateSidebarMode();
   window.addEventListener('resize', updateSidebarMode);
 
-  // 프로필 사진 업로드 이벤트 (Worker 경유)
+  // 프로필 사진 업로드 이벤트
   document.getElementById('profileFileInput').addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (!file || !currentUser || !currentUser.id) return;
@@ -593,12 +603,12 @@
     const fileName = `profiles/${userIdForPath}/profile.${fileExt}`;
 
     try {
-      // 1. 파일을 base64로 변환해서 Worker로 전송
       const reader = new FileReader();
       reader.onload = async function () {
-        const base64Data = reader.result.split(',')[1]; // base64만 추출
+        const base64Data = reader.result.split(',')[1];
 
-        await api("/upload-profile", {
+        // 업로드 요청
+        const uploadResult = await api("/upload-profile", {
           method: "POST",
           body: JSON.stringify({
             fileName: fileName,
@@ -607,24 +617,35 @@
           })
         });
 
-        // 2. 업로드 완료 후 DB 업데이트
+        if (!uploadResult && !uploadResult?.success) {
+          throw new Error("업로드 응답이 비정상입니다");
+        }
+
+        // DB 업데이트
         const imageUrl = `${API_BASE}/storage/images/${fileName}?v=${Date.now()}`;
 
         await api("/users", {
           method: "PATCH",
           body: JSON.stringify({ profile_image: imageUrl }),
-          headers: { "Prefer": "return=minimal" } // 필요 시
+          headers: { "Prefer": "return=minimal" }
         });
 
-        // 3. 화면 갱신
+        // UI 갱신
         viewingUser.profile_image = imageUrl;
         await displayProfile(viewingUser);
-        e.target.value = ''; // 재업로드 가능하게 초기화
+        e.target.value = '';
+        alert('프로필 사진이 변경되었습니다.');
       };
       reader.readAsDataURL(file);
     } catch (err) {
       console.error('프로필 사진 업로드 실패:', err);
-      alert('프로필 사진 변경 실패\n' + (err.message || '알 수 없는 오류'));
+      let msg = '프로필 사진 변경에 실패했습니다.';
+      if (err.message.includes('CORS')) {
+        msg += '\n(CORS 정책 문제 → 서버 설정이 필요합니다)';
+      } else if (err.message.includes('404') || err.message.includes('Not Found')) {
+        msg += '\n업로드 엔드포인트가 존재하지 않습니다.';
+      }
+      alert(msg + '\n\n' + (err.message || '자세한 오류는 콘솔을 확인해주세요'));
     }
   });
 
@@ -640,7 +661,6 @@
       let users = await api(`/users?nickname=eq.${encodeURIComponent(userNickname)}&select=*`);
 
       if (users?.length === 0) {
-        // 특수 계정 처리 (JB777 등)
         if (userNickname === "JB777" || userNickname === "진정오") {
           users = [{
             nickname: userNickname,
@@ -667,11 +687,9 @@
     const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
     const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
-    // 게시물 수
     const posts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id`);
     const postCount = posts?.length ?? 0;
 
-    // 총 좋아요 수
     let totalLikes = 0;
     const userPosts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id`);
     if (userPosts?.length) {
