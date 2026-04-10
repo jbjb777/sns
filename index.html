@@ -21,55 +21,41 @@
   <meta name="twitter:title" content="Sharer | 커뮤니티 · SNS">
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #0d0d12;
-      --bg2: #13131a;
-      --bg3: #1a1a24;
-      --bg4: #22222f;
-      --glass: rgba(255,255,255,0.035);
-      --glass2: rgba(255,255,255,0.06);
-      --border: rgba(255,255,255,0.07);
-      --border2: rgba(255,255,255,0.13);
-      --blue: #4f7eff;
-      --blue2: #2d5df0;
-      --blue3: #7aa3ff;
-      --blue-glow: rgba(79,126,255,0.25);
-      --blue-glow2: rgba(79,126,255,0.45);
+      --bg: #000;
+      --bg2: #111;
+      --bg3: #1a1a1a;
+      --bg4: #222;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --border3: #333;
+      --text1: #fff;
+      --text2: #888;
+      --text3: #555;
+      --text4: #333;
+      --accent: #fff;
       --pink: #ff4d7e;
-      --pink-glow: rgba(255,77,126,0.25);
-      --green: #00e5a0;
-      --t1: #eeeef8;
-      --t2: #9090b0;
-      --t3: #55556a;
+      --pink-dim: rgba(255,77,126,0.12);
+      --green: #4ade80;
       --r1: 10px;
-      --r2: 16px;
-      --r3: 24px;
-      --r4: 32px;
+      --r2: 14px;
+      --r3: 20px;
+      --r4: 28px;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Noto Sans KR', 'Segoe UI', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
-      color: var(--t1);
+      color: var(--text1);
       min-height: 100vh;
       display: flex;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      opacity: 0;
-      animation: bodyReveal 0.5s ease forwards;
-    }
-
-    @keyframes bodyReveal {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      overflow-x: hidden;
     }
 
     /* ─── SIDEBAR ─── */
@@ -102,11 +88,10 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 36px 28px;
-      overflow-y: auto;
+      padding: 40px 28px;
       opacity: 0;
-      transform: translateY(28px);
-      animation: contentReveal 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s forwards;
+      transform: translateY(16px);
+      animation: contentReveal 0.4s cubic-bezier(0.4,0,0.2,1) 0.1s forwards;
     }
 
     @keyframes contentReveal {
@@ -115,90 +100,79 @@
 
     /* ─── FEED ─── */
     .feed-container {
-      max-width: 590px;
+      max-width: 580px;
       width: 100%;
     }
 
     /* ─── RECOMMEND ─── */
     .recommend-container {
-      width: 248px;
-      margin-left: 32px;
+      width: 240px;
+      margin-left: 36px;
       position: sticky;
-      top: 36px;
+      top: 40px;
       background: var(--bg2);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border2);
       border-radius: var(--r4);
-      padding: 22px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+      padding: 20px;
       opacity: 0;
-      animation: sidebarReveal 0.6s cubic-bezier(0.22,1,0.36,1) 0.4s forwards;
+      animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1) 0.2s forwards;
     }
 
-    @keyframes sidebarReveal {
-      from { opacity: 0; transform: translateX(20px); }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(12px); }
       to { opacity: 1; transform: translateX(0); }
     }
 
     .recommend-title {
       font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
+      font-weight: 600;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--t3);
-      margin-bottom: 18px;
-      padding-left: 2px;
+      color: var(--text3);
+      margin-bottom: 14px;
     }
 
     .profile-item {
       display: flex;
       align-items: center;
-      gap: 11px;
+      gap: 10px;
       padding: 8px 10px;
       border-radius: var(--r2);
       cursor: pointer;
-      transition: background 0.18s ease, transform 0.18s ease;
-      opacity: 0;
-      transform: translateX(14px);
-      animation: profileItemIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .profile-item:nth-child(1) { animation-delay: 0.55s; }
-    .profile-item:nth-child(2) { animation-delay: 0.62s; }
-    .profile-item:nth-child(3) { animation-delay: 0.69s; }
-    .profile-item:nth-child(4) { animation-delay: 0.76s; }
-    .profile-item:nth-child(5) { animation-delay: 0.83s; }
-    .profile-item:nth-child(6) { animation-delay: 0.90s; }
-    .profile-item:nth-child(7) { animation-delay: 0.97s; }
-
-    @keyframes profileItemIn {
-      to { opacity: 1; transform: translateX(0); }
-    }
-
     .profile-item:hover {
-      background: var(--glass2);
-      transform: translateX(4px);
+      background: rgba(255,255,255,0.06);
+    }
+    .profile-item:active {
+      transform: scale(0.96);
     }
 
     .profile-avatar {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--blue), var(--blue3));
+      background: var(--bg3);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       flex-shrink: 0;
       background-size: cover;
       background-position: center;
-      border: 1.5px solid var(--border2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      overflow: hidden;
+    }
+    .profile-avatar img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
     }
 
     .profile-nickname {
       font-size: 13px;
       font-weight: 500;
-      color: var(--t1);
+      color: var(--text1);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -206,9 +180,9 @@
 
     /* ─── SKELETON ─── */
     .skeleton {
-      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 40%, var(--bg2) 80%);
+      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
       background-size: 300% 100%;
-      animation: shimmer 1.8s ease-in-out infinite;
+      animation: shimmer 1.6s ease-in-out infinite;
       border-radius: var(--r1);
     }
     @keyframes shimmer {
@@ -216,53 +190,44 @@
       100% { background-position: -100% 0; }
     }
 
-    .skeleton-post { padding: 26px 0; border-bottom: 1px solid var(--border); }
-    .skeleton-post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .skeleton-avatar { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; }
-    .skeleton-username { width: 130px; height: 13px; }
-    .skeleton-post-image { width: 100%; height: 370px; border-radius: var(--r3); margin: 14px 0; }
-    .skeleton-text { height: 11px; margin: 9px 0; }
-    .text-short { width: 52%; }
-    .text-medium { width: 78%; }
+    .skeleton-post { padding: 24px 0; border-bottom: 1px solid var(--border); }
+    .skeleton-post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .skeleton-avatar { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; }
+    .skeleton-username { width: 120px; height: 12px; }
+    .skeleton-post-image { width: 100%; height: 340px; border-radius: var(--r3); margin: 12px 0; }
+    .skeleton-text { height: 10px; margin: 8px 0; }
+    .text-short { width: 45%; }
+    .text-medium { width: 72%; }
     .text-long { width: 100%; }
-    .skeleton-profile-item { display: flex; align-items: center; gap: 11px; padding: 8px 10px; }
-    .skeleton-profile-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; }
-    .skeleton-profile-nickname { width: 96px; height: 11px; }
+    .skeleton-profile-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
+    .skeleton-profile-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; }
+    .skeleton-profile-nickname { width: 90px; height: 10px; }
 
     /* ─── POST CARD ─── */
     .post-card {
       background: transparent;
       border: none;
       border-bottom: 1px solid var(--border);
-      padding: 26px 0;
+      padding: 24px 0;
       cursor: pointer;
-      transition: background 0.2s ease;
       opacity: 0;
-      transform: translateY(20px);
-      animation: postIn 0.55s cubic-bezier(0.22,1,0.36,1) forwards;
+      transform: translateY(12px);
+      animation: postIn 0.35s cubic-bezier(0.4,0,0.2,1) forwards;
       position: relative;
+      transition: background 0.15s;
     }
-    .post-card:nth-child(1) { animation-delay: 0.25s; }
-    .post-card:nth-child(2) { animation-delay: 0.35s; }
-    .post-card:nth-child(3) { animation-delay: 0.45s; }
-    .post-card:nth-child(4) { animation-delay: 0.55s; }
-    .post-card:nth-child(5) { animation-delay: 0.65s; }
-    .post-card:nth-child(6) { animation-delay: 0.75s; }
-    .post-card:nth-child(7) { animation-delay: 0.85s; }
+    .post-card:hover { background: rgba(255,255,255,0.02); }
+    .post-card:last-child { border-bottom: none; }
 
     @keyframes postIn {
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .post-card:hover { background: var(--glass); }
-    .post-card:last-child { border-bottom: none; }
-
     .post-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
-      padding: 0 2px;
+      margin-bottom: 12px;
     }
 
     .post-author-info {
@@ -273,25 +238,29 @@
     }
 
     .post-author-avatar {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--blue), var(--blue3));
+      background: var(--bg3);
       background-size: cover;
       background-position: center;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 600;
       flex-shrink: 0;
-      border: 1.5px solid var(--border2);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
-      transition: border-color 0.2s, box-shadow 0.2s;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .post-author-avatar img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
     }
     .post-author-info:hover .post-author-avatar {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px var(--blue-glow);
+      border-color: var(--border3);
+      transform: scale(1.05);
     }
 
     .post-author-name {
@@ -300,85 +269,81 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      color: var(--t1);
+      color: var(--text1);
     }
 
     .post-image {
       width: 100%;
-      max-height: 580px;
+      max-height: 560px;
       object-fit: cover;
       border-radius: var(--r3);
-      margin: 14px 0;
+      margin: 12px 0;
       border: 1px solid var(--border);
       display: block;
-      transition: opacity 0.3s;
+      transition: opacity 0.2s;
     }
-    .post-image:hover { opacity: 0.95; }
+    .post-image:hover { opacity: 0.92; }
 
     .post-content {
       font-size: 14px;
       line-height: 1.75;
-      color: var(--t1);
+      color: var(--text1);
       white-space: pre-wrap;
-      padding: 0 2px;
     }
 
     .post-time {
-      padding: 8px 2px 12px;
-      font-size: 11.5px;
-      color: var(--t3);
-      font-weight: 400;
+      padding: 6px 0 10px;
+      font-size: 11px;
+      color: var(--text3);
       letter-spacing: 0.02em;
     }
 
     .post-actions {
-      margin: 8px 0 4px;
+      margin: 6px 0 2px;
       display: flex;
       align-items: center;
-      gap: 18px;
-      padding: 0 2px;
+      gap: 16px;
     }
 
     /* ─── LIKE BUTTON ─── */
     .like-button {
       background: none;
       border: none;
-      padding: 5px 0;
+      padding: 4px 0;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 7px;
-      color: var(--t3);
-      transition: color 0.2s ease;
-      font-size: 14px;
+      gap: 6px;
+      color: var(--text3);
+      transition: color 0.15s;
+      font-size: 13px;
       font-family: inherit;
     }
     .like-button:hover { color: var(--pink); }
     .like-button.liked { color: var(--pink); }
 
     .like-heart {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       fill: currentColor;
-      transition: transform 0.3s cubic-bezier(0.34,1.7,0.64,1);
+      transition: transform 0.25s cubic-bezier(0.34,1.7,0.64,1);
+      flex-shrink: 0;
     }
-    .like-button:hover .like-heart { transform: scale(1.25); }
-    .like-button.liked .like-heart { transform: scale(1.1); }
-    .like-button.liked:hover .like-heart { transform: scale(1.3); }
+    .like-button:hover .like-heart { transform: scale(1.22); }
+    .like-button.liked .like-heart { transform: scale(1.08); }
 
     .like-count {
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1;
-      min-width: 14px;
       color: currentColor;
     }
 
     /* ─── NO POSTS ─── */
     .no-posts {
       text-align: center;
-      padding: 90px 20px;
-      color: var(--t2);
+      padding: 80px 20px;
+      color: var(--text2);
       font-size: 15px;
       line-height: 1.9;
     }
@@ -386,29 +351,24 @@
     /* ─── DELETE BTN ─── */
     .delete-btn {
       background: transparent;
-      border: 1px solid rgba(255,77,126,0.22);
+      border: 1px solid rgba(255,77,126,0.2);
       color: var(--pink);
       cursor: pointer;
       font-size: 11px;
       font-weight: 600;
-      padding: 5px 13px;
+      padding: 5px 12px;
       border-radius: 20px;
-      transition: background 0.18s, border-color 0.18s, transform 0.18s;
+      transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       font-family: inherit;
-      letter-spacing: 0.02em;
     }
-    .delete-btn:hover {
-      background: rgba(255,77,126,0.12);
-      border-color: var(--pink);
-      transform: translateY(-2px);
-    }
-    .delete-btn:active { transform: translateY(0); }
+    .delete-btn:hover { background: var(--pink-dim); border-color: var(--pink); }
+    .delete-btn:active { transform: scale(0.92); }
 
     /* ─── VERIFICATION BADGE ─── */
     .verification-badge {
       display: inline-block;
-      width: 15px;
-      height: 15px;
+      width: 14px;
+      height: 14px;
       vertical-align: middle;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
       background-size: contain;
@@ -417,42 +377,35 @@
 
     /* ─── FOOTER ─── */
     .footer {
-      background: var(--bg2);
       border-top: 1px solid var(--border);
-      padding: 28px 24px;
+      padding: 24px;
       text-align: center;
-      color: var(--t2);
-      font-size: 13px;
+      color: var(--text3);
+      font-size: 12px;
       margin-top: auto;
-      opacity: 0;
-      animation: fadeUp 0.5s ease 1s forwards;
     }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .footer-links { margin-bottom: 10px; }
+    .footer-links { margin-bottom: 8px; }
     .footer-links a {
-      color: var(--blue);
+      color: var(--text2);
       text-decoration: none;
-      margin: 0 13px;
+      margin: 0 12px;
       font-weight: 500;
-      transition: color 0.18s;
+      transition: color 0.15s;
     }
-    .footer-links a:hover { color: var(--blue3); }
-    .footer-text { color: var(--t3); font-size: 12px; }
+    .footer-links a:hover { color: var(--text1); }
+    .footer-text { color: var(--text4); font-size: 11px; }
 
     /* ─── MODALS ─── */
     .auth-modal, .create-modal {
       position: fixed;
       inset: 0;
-      background: rgba(5,5,10,0.8);
+      background: rgba(0,0,0,0.75);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
     .auth-modal.active, .create-modal.active { display: flex; }
 
@@ -460,113 +413,108 @@
       background: var(--bg2);
       border: 1px solid var(--border2);
       border-radius: var(--r4);
-      padding: 42px;
+      padding: 40px;
       width: 90%;
-      max-width: 400px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06);
+      max-width: 380px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.8);
       position: relative;
-      animation: modalPop 0.35s cubic-bezier(0.34,1.4,0.64,1);
+      animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
     }
     @keyframes modalPop {
-      from { opacity: 0; transform: scale(0.88) translateY(20px); }
+      from { opacity: 0; transform: scale(0.9) translateY(16px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .create-modal-content {
-      max-width: 560px;
+      max-width: 520px;
       max-height: 90vh;
       overflow-y: auto;
       padding: 0;
     }
 
     .auth-close, .close-btn {
-      background: var(--glass2);
-      border: 1px solid var(--border);
-      color: var(--t2);
-      font-size: 17px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      font-size: 16px;
       cursor: pointer;
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.18s, color 0.18s;
+      transition: background 0.15s, color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       line-height: 1;
     }
-    .auth-close { position: absolute; top: 18px; right: 18px; }
+    .auth-close { position: absolute; top: 16px; right: 16px; }
     .auth-close:hover, .close-btn:hover {
       background: rgba(255,255,255,0.1);
-      color: var(--t1);
+      color: var(--text1);
     }
+    .auth-close:active, .close-btn:active { transform: scale(0.82); }
 
     .auth-box h2, .create-modal-header h3 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--t1);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text1);
     }
     .auth-box h2 {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       letter-spacing: -0.02em;
     }
 
     .auth-box input {
       width: 100%;
-      padding: 13px 18px;
+      padding: 12px 16px;
       border-radius: var(--r2);
-      border: 1.5px solid var(--border);
+      border: 1px solid var(--border2);
       font-size: 15px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       outline: none;
       background: var(--bg3);
-      color: var(--t1);
+      color: var(--text1);
       font-family: inherit;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      transition: border-color 0.2s, background 0.2s;
     }
     .auth-box input:focus {
-      border-color: var(--blue);
+      border-color: var(--border3);
       background: var(--bg4);
-      box-shadow: 0 0 0 3px var(--blue-glow);
     }
-    .auth-box input::placeholder { color: var(--t3); }
+    .auth-box input::placeholder { color: var(--text3); }
 
     .auth-box button {
       width: 100%;
-      padding: 13px 24px;
+      padding: 12px 20px;
       border-radius: var(--r2);
       border: none;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      background: linear-gradient(135deg, var(--blue) 0%, var(--blue2) 100%);
-      color: #fff;
-      margin-bottom: 10px;
+      background: var(--text1);
+      color: #000;
+      margin-bottom: 8px;
       font-family: inherit;
-      transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
-      box-shadow: 0 4px 20px var(--blue-glow), 0 1px 0 rgba(255,255,255,0.15) inset;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .auth-box button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px var(--blue-glow2);
-    }
-    .auth-box button:active { transform: translateY(0); }
+    .auth-box button:hover { background: #ddd; }
+    .auth-box button:active { transform: scale(0.96); }
     .auth-box button.secondary {
-      background: var(--glass);
-      border: 1.5px solid var(--border);
-      color: var(--t2);
-      box-shadow: none;
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text2);
     }
     .auth-box button.secondary:hover {
-      border-color: var(--border2);
-      color: var(--t1);
-      background: var(--glass2);
+      border-color: var(--border3);
+      color: var(--text1);
+      background: rgba(255,255,255,0.04);
     }
 
     .error-message, .success-message {
       font-size: 13px;
-      margin-top: -8px;
-      margin-bottom: 10px;
+      margin-top: -6px;
+      margin-bottom: 8px;
       text-align: center;
       font-weight: 500;
     }
@@ -575,7 +523,7 @@
 
     /* ─── CREATE MODAL ─── */
     .create-modal-header {
-      padding: 20px 24px;
+      padding: 18px 22px;
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
@@ -583,51 +531,49 @@
     }
 
     .post-btn {
-      background: linear-gradient(135deg, var(--blue) 0%, var(--blue2) 100%);
+      background: var(--text1);
       border: none;
-      color: #fff;
+      color: #000;
       cursor: pointer;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
-      padding: 8px 22px;
+      padding: 7px 20px;
       border-radius: 22px;
       font-family: inherit;
-      transition: transform 0.18s, box-shadow 0.18s;
-      box-shadow: 0 4px 14px var(--blue-glow);
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .post-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px var(--blue-glow2); }
-    .post-btn:active { transform: translateY(0); }
-    .post-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+    .post-btn:hover { background: #ddd; }
+    .post-btn:active { transform: scale(0.92); }
+    .post-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
-    .create-modal-body { padding: 22px 24px 26px; }
+    .create-modal-body { padding: 20px 22px 24px; }
 
     .create-modal textarea {
       width: 100%;
-      min-height: 120px;
-      padding: 14px 16px;
+      min-height: 110px;
+      padding: 12px 14px;
       border-radius: var(--r2);
-      border: 1.5px solid var(--border);
+      border: 1px solid var(--border2);
       font-size: 15px;
       outline: none;
       background: var(--bg3);
-      color: var(--t1);
+      color: var(--text1);
       resize: vertical;
       font-family: inherit;
       line-height: 1.65;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      transition: border-color 0.2s, background 0.2s;
     }
     .create-modal textarea:focus {
-      border-color: var(--blue);
+      border-color: var(--border3);
       background: var(--bg4);
-      box-shadow: 0 0 0 3px var(--blue-glow);
     }
-    .create-modal textarea::placeholder { color: var(--t3); }
+    .create-modal textarea::placeholder { color: var(--text3); }
 
-    .image-preview-container { margin-top: 14px; }
+    .image-preview-container { margin-top: 12px; }
 
     .image-preview {
       width: 100%;
-      max-height: 360px;
+      max-height: 320px;
       object-fit: cover;
       border-radius: var(--r2);
       display: none;
@@ -636,30 +582,27 @@
     .image-preview.show { display: block; }
 
     .upload-btn {
-      background: var(--glass);
-      border: 1.5px dashed var(--border2);
-      padding: 11px 20px;
+      background: transparent;
+      border: 1px dashed var(--border2);
+      padding: 10px 18px;
       border-radius: var(--r2);
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      margin-top: 12px;
-      color: var(--t2);
+      margin-top: 10px;
+      color: var(--text2);
       font-family: inherit;
-      transition: border-color 0.18s, color 0.18s, background 0.18s;
+      transition: border-color 0.15s, color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       width: 100%;
     }
-    .upload-btn:hover {
-      border-color: var(--blue);
-      color: var(--blue);
-      background: rgba(79,126,255,0.06);
-    }
+    .upload-btn:hover { border-color: var(--border3); color: var(--text1); }
+    .upload-btn:active { transform: scale(0.97); }
 
     /* ─── SCROLLBAR ─── */
-    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border3); }
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
@@ -712,7 +655,7 @@
   <div class="create-modal" id="createModal">
     <div class="create-modal-content">
       <div class="create-modal-header">
-        <h3>새 게시물 만들기</h3>
+        <h3>새 게시물</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
           <button class="post-btn" id="modalPostBtn">공유하기</button>
           <button class="close-btn" id="closeModal">×</button>
@@ -725,7 +668,7 @@
         </div>
         <input type="file" id="imageInput" accept="image/*" style="display: none;">
         <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
-        <div id="postMessage" style="margin-top: 12px; font-size: 13px; font-weight: 500;"></div>
+        <div id="postMessage" style="margin-top: 10px; font-size: 13px; font-weight: 500;"></div>
       </div>
     </div>
   </div>
@@ -734,6 +677,7 @@
   <div class="main-content">
     <div class="feed-container">
       <div id="postsFeed">
+        <!-- Skeleton -->
         <div class="skeleton-post">
           <div class="skeleton-post-header">
             <div class="skeleton skeleton-avatar"></div>
@@ -773,8 +717,6 @@
         <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
         <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
         <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
       </div>
     </div>
   </div>
@@ -791,6 +733,7 @@
 
 <script>
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
 async function api(endpoint, options = {}) {
   const url = API_BASE + endpoint;
   const res = await fetch(url, {
@@ -808,10 +751,12 @@ async function api(endpoint, options = {}) {
   if (res.status === 204) return null;
   return res.json();
 }
+
 let currentUser = null;
 let selectedImage = null;
 const cloudName = 'dretlhsrk';
 const uploadPreset = 'unsigned_preset';
+
 function initCurrentUser() {
   const savedUser = localStorage.getItem('snsUser');
   if (savedUser) {
@@ -819,12 +764,14 @@ function initCurrentUser() {
     updateSidebar();
   }
 }
+
 function updateSidebar() {
   const iframe = document.getElementById('sidebarFrame');
   if (iframe?.contentWindow) {
     iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
   }
 }
+
 function updateSidebarMode() {
   const iframe = document.getElementById('sidebarFrame');
   const narrow = window.innerWidth <= 768;
@@ -832,6 +779,7 @@ function updateSidebarMode() {
     iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
   }
 }
+
 window.addEventListener('message', (event) => {
   const { type, page } = event.data || {};
   if (type === 'navigate') {
@@ -846,13 +794,16 @@ window.addEventListener('message', (event) => {
   }
   if (type === 'requestUserInfo') updateSidebar();
 });
+
 initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
+
 window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
 window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
 window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
 window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
+
 function handleCreatePost() {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
@@ -863,6 +814,7 @@ function handleCreatePost() {
   document.getElementById('imagePreview').classList.remove('show');
   selectedImage = null;
 }
+
 document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
 document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
 document.getElementById('imageInput').onchange = (e) => {
@@ -877,6 +829,7 @@ document.getElementById('imageInput').onchange = (e) => {
   };
   reader.readAsDataURL(file);
 };
+
 async function uploadImageToCloudinary(file) {
   const formData = new FormData();
   formData.append('file', file);
@@ -889,6 +842,7 @@ async function uploadImageToCloudinary(file) {
   const data = await response.json();
   return data.secure_url;
 }
+
 document.getElementById('modalPostBtn').onclick = async () => {
   const content = document.getElementById('postContent').value.trim();
   const messageDiv = document.getElementById('postMessage');
@@ -898,11 +852,11 @@ document.getElementById('modalPostBtn').onclick = async () => {
     return;
   }
   postButton.disabled = true;
-  messageDiv.innerHTML = '<span style="color:var(--t2);">게시 중...</span>';
+  messageDiv.innerHTML = '<span style="color:var(--text2);">게시 중...</span>';
   try {
     let imageUrl = null;
     if (selectedImage) {
-      messageDiv.innerHTML = '<span style="color:var(--t2);">이미지 업로드 중...</span>';
+      messageDiv.innerHTML = '<span style="color:var(--text2);">이미지 업로드 중...</span>';
       imageUrl = await uploadImageToCloudinary(selectedImage);
     }
     await api("/posts", {
@@ -928,6 +882,7 @@ document.getElementById('modalPostBtn').onclick = async () => {
     postButton.disabled = false;
   }
 };
+
 function formatPostTime(dateString) {
   const now = new Date();
   const date = new Date(dateString);
@@ -942,138 +897,108 @@ function formatPostTime(dateString) {
   }
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replaceAll('.', '.');
 }
+
 function escapeHtml(text) {
   if (!text) return '';
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return text.replace(/[&<>"']/g, m => map[m]);
 }
-async function toggleLike(postId, button) {
-  if (!currentUser) {
-    document.getElementById('loginModal').classList.add('active');
-    return;
-  }
-  const countEl = button.querySelector('.like-count');
-  try {
-    const [likeRecords, likeCountResult] = await Promise.all([
-      api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
-      api(`/likes?post_id=eq.${postId}&select=count`)
-    ]);
-    const currentlyLiked = likeRecords?.length > 0;
-    const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
-    const uiLiked = button.classList.contains('liked');
-    const uiCount = parseInt(countEl.textContent, 10) || 0;
-    if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
-      button.classList.toggle('liked', currentlyLiked);
-      countEl.textContent = currentServerCount;
-      console.log('UI와 서버 상태 불일치 → 자동 동기화');
-    }
-    if (currentlyLiked) {
-      if (likeRecords?.[0]?.id) {
-        await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
-      }
-      button.classList.remove('liked');
-      countEl.textContent = currentServerCount - 1;
-    } else {
-      await api("/likes", {
-        method: "POST",
-        body: JSON.stringify({
-          post_id: postId,
-          user_id: currentUser.id
-        })
-      });
-      button.classList.add('liked');
-      countEl.textContent = currentServerCount + 1;
-    }
-    const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`)
-      .then(r => Math.max(0, r?.[0]?.count || 0));
-    countEl.textContent = finalCount;
-  } catch (err) {
-    console.error("좋아요 처리 중 오류:", err);
-    try {
-      const [records, countRes] = await Promise.all([
-        api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
-        api(`/likes?post_id=eq.${postId}&select=count`)
-      ]);
-      button.classList.toggle('liked', records?.length > 0);
-      countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
-    } catch (recoveryErr) {
-      console.error("복구 실패:", recoveryErr);
-    }
-  }
-}
+
+// ─────────────────────────────────────────────
+// 최적화된 로딩: 게시물 + 유저 + 좋아요 병렬 배치
+// ─────────────────────────────────────────────
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
   try {
+    // 1) 게시물 목록 먼저
     const posts = await api("/posts?select=*,author_id&order=created_at.desc");
     if (!posts?.length) {
       feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
       return;
     }
-    feedDiv.innerHTML = '';
-    for (const post of posts) {
-      let authorNickname = post.author || '알 수 없음';
-      let authorAvatar = null;
+
+    // 2) 유니크한 author_id 모아서 한 번에 유저 조회
+    const authorIds = [...new Set(posts.map(p => p.author_id).filter(Boolean))];
+    const usersMap = {};
+    if (authorIds.length) {
       try {
-        const users = await api(`/users?id=eq.${post.author_id}&select=nickname,profile_image`);
-        if (users?.length > 0) {
-          authorNickname = users[0].nickname || authorNickname;
-          authorAvatar = users[0].profile_image;
-        }
+        const users = await api(`/users?id=in.(${authorIds.join(',')})&select=id,nickname,profile_image`);
+        users?.forEach(u => { usersMap[u.id] = u; });
       } catch (e) {
-        console.warn("작성자 정보 로드 실패:", e);
+        console.warn("유저 일괄 로드 실패:", e);
       }
+    }
+
+    // 3) 게시물의 좋아요 수 & 내 좋아요 여부 — 한 번에 병렬로
+    const postIds = posts.map(p => p.id);
+
+    // 전체 좋아요 레코드 한 번에 가져오기
+    let allLikes = [];
+    try {
+      allLikes = await api(`/likes?post_id=in.(${postIds.join(',')})&select=post_id,user_id`);
+    } catch (e) {
+      console.warn("좋아요 일괄 로드 실패:", e);
+    }
+
+    // post_id별 카운트 / 내 좋아요 여부 맵 구성
+    const likeCountMap = {};
+    const likedByMeMap = {};
+    postIds.forEach(id => { likeCountMap[id] = 0; likedByMeMap[id] = false; });
+    allLikes?.forEach(l => {
+      if (likeCountMap[l.post_id] !== undefined) likeCountMap[l.post_id]++;
+      if (currentUser && l.user_id === currentUser.id) likedByMeMap[l.post_id] = true;
+    });
+
+    // 4) DOM 일괄 생성
+    feedDiv.innerHTML = '';
+    posts.forEach((post, idx) => {
+      const user = usersMap[post.author_id];
+      const authorNickname = user?.nickname || post.author || '알 수 없음';
+      const authorAvatar = user?.profile_image || null;
       const isVerified = authorNickname === "JB777";
       const timeStr = formatPostTime(post.created_at);
       const canDelete = currentUser?.nickname === "JB777";
-      const avatarHTML = authorAvatar
-        ? `<img src="${authorAvatar}" class="post-author-avatar" alt="${authorNickname}" onerror="this.style.display='flex';this.textContent='${authorNickname[0]?.toUpperCase()||'?'}'">`
-        : `<div class="post-author-avatar">${authorNickname[0]?.toUpperCase() || '?'}</div>`;
+      const likeCount = likeCountMap[post.id] || 0;
+      const liked = likedByMeMap[post.id] || false;
+
+      const avatarInner = authorAvatar
+        ? `<img src="${escapeHtml(authorAvatar)}" alt="${escapeHtml(authorNickname)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : escapeHtml(authorNickname[0]?.toUpperCase() || '?');
+
       const authorDisplay = isVerified
         ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
         : escapeHtml(authorNickname);
+
       const deleteButton = canDelete
         ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
         : '';
+
       let contentHTML = '';
       if (post.content) {
         const lines = escapeHtml(post.content).split('\n');
         const title = lines.shift() || '';
         const body = lines.filter(l => l.trim()).join('<br>');
         contentHTML = `<div class="post-content">
-            <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${title}</div>
-            ${body ? `<div style="color:#a0a0c0; font-size:14px; line-height:1.75;">${body}</div>` : ''}
-          </div>`;
+          <div style="font-weight:600; font-size:14px; margin-bottom:5px;">${title}</div>
+          ${body ? `<div style="color:var(--text2); font-size:13px; line-height:1.7;">${body}</div>` : ''}
+        </div>`;
       }
-      let likeCount = 0;
-      try {
-        const countRes = await api(`/likes?post_id=eq.${post.id}&select=count`);
-        likeCount = Math.max(0, countRes?.[0]?.count || 0);
-      } catch (e) {
-        console.warn(`좋아요 수 로드 실패 (${post.id}):`, e);
-      }
-      let liked = false;
-      if (currentUser) {
-        try {
-          const likedRes = await api(`/likes?post_id=eq.${post.id}&user_id=eq.${currentUser.id}&select=id`);
-          liked = likedRes?.length > 0;
-        } catch (e) {
-          console.warn(`좋아요 여부 로드 실패 (${post.id}):`, e);
-        }
-      }
+
       const postCard = document.createElement('div');
       postCard.className = 'post-card';
+      postCard.style.animationDelay = `${idx * 0.05}s`;
       postCard.innerHTML = `
         <div class="post-header">
           <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(authorNickname)}')">
-            ${avatarHTML}
+            <div class="post-author-avatar">${avatarInner}</div>
             <div class="post-author-name">${authorDisplay}</div>
           </div>
           ${deleteButton}
         </div>
-        ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지">` : ''}
+        ${post.image_url ? `<img src="${post.image_url}" class="post-image" alt="게시글 이미지" loading="lazy">` : ''}
         ${contentHTML}
         <div class="post-actions">
-          <button class="like-button ${liked ? 'liked' : ''}" onclick="toggleLike('${post.id}', this)">
+          <button class="like-button ${liked ? 'liked' : ''}" data-post-id="${post.id}">
             <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
               <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
             </svg>
@@ -1082,18 +1007,65 @@ async function loadPosts() {
         </div>
         <div class="post-time">${timeStr}</div>
       `;
-      postCard.onclick = (e) => {
-        if (!e.target.closest('.like-button')) {
-          window.location.href = `view.html?id=${post.id}`;
-        }
+
+      postCard.querySelector('.like-button').addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleLike(post.id, this);
+      });
+
+      postCard.onclick = () => {
+        window.location.href = `view.html?id=${post.id}`;
       };
+
       feedDiv.appendChild(postCard);
-    }
+    });
+
   } catch (err) {
     console.error('게시물 로드 오류:', err);
     feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
   }
 }
+
+// 좋아요 토글 (낙관적 업데이트)
+async function toggleLike(postId, button) {
+  if (!currentUser) {
+    document.getElementById('loginModal').classList.add('active');
+    return;
+  }
+
+  const countEl = button.querySelector('.like-count');
+  const wasLiked = button.classList.contains('liked');
+  const prevCount = parseInt(countEl.textContent, 10) || 0;
+
+  // 낙관적 UI 업데이트
+  button.classList.toggle('liked', !wasLiked);
+  countEl.textContent = wasLiked ? prevCount - 1 : prevCount + 1;
+
+  try {
+    if (wasLiked) {
+      // 좋아요 취소: 레코드 ID 조회 후 삭제
+      const records = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
+      if (records?.[0]?.id) {
+        await api(`/likes?id=eq.${records[0].id}`, { method: "DELETE" });
+      }
+    } else {
+      // 좋아요 추가
+      await api("/likes", {
+        method: "POST",
+        body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
+      });
+    }
+    // 서버 실제 카운트로 동기화
+    const countRes = await api(`/likes?post_id=eq.${postId}&select=count`);
+    countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
+  } catch (err) {
+    // 실패 시 롤백
+    console.error("좋아요 처리 오류:", err);
+    button.classList.toggle('liked', wasLiked);
+    countEl.textContent = prevCount;
+  }
+}
+
 async function loadRecommendedProfiles() {
   const container = document.getElementById('recommendProfiles');
   const skeleton = document.getElementById('recommendSkeleton');
@@ -1101,7 +1073,7 @@ async function loadRecommendedProfiles() {
     let users = await api("/users?select=id,nickname,profile_image");
     if (!users?.length) {
       skeleton?.remove();
-      container.innerHTML += '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">사용자 없음</div>';
+      container.innerHTML += '<div style="text-align:center; color:var(--text3); padding:12px 0; font-size:13px;">사용자 없음</div>';
       return;
     }
     for (let i = users.length - 1; i > 0; i--) {
@@ -1111,12 +1083,12 @@ async function loadRecommendedProfiles() {
     users = users.slice(0, 7);
     skeleton?.remove();
     users.forEach(user => {
-      const avatarHTML = user.profile_image
-        ? `<img src="${user.profile_image}" class="profile-avatar" alt="${user.nickname}" onerror="this.style.display='flex';this.textContent='${user.nickname?.[0]?.toUpperCase()||'?'}'">`
-        : `<div class="profile-avatar">${user.nickname?.[0]?.toUpperCase() || '?'}</div>`;
+      const avatarInner = user.profile_image
+        ? `<img src="${escapeHtml(user.profile_image)}" alt="${escapeHtml(user.nickname)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : escapeHtml(user.nickname?.[0]?.toUpperCase() || '?');
       const item = document.createElement('div');
       item.className = 'profile-item';
-      item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}</span>`;
+      item.innerHTML = `<div class="profile-avatar">${avatarInner}</div><span class="profile-nickname">${escapeHtml(user.nickname)}</span>`;
       item.onclick = () => {
         window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`;
       };
@@ -1124,14 +1096,16 @@ async function loadRecommendedProfiles() {
     });
   } catch (err) {
     console.error('추천 프로필 로드 오류:', err);
-    if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">로드 실패</div>';
+    if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:var(--text3); padding:12px 0; font-size:13px;">로드 실패</div>';
   }
 }
+
 window.goToProfile = (userId, nickname) => {
   if (userId && nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   }
 };
+
 window.deletePost = async (postId) => {
   if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
   try {
@@ -1142,6 +1116,7 @@ window.deletePost = async (postId) => {
     alert('삭제에 실패했습니다.');
   }
 };
+
 loadPosts();
 loadRecommendedProfiles();
 </script>
