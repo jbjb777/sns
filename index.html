@@ -997,4 +997,13 @@ window.deletePost = async (postId) => {
     await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
     loadPosts();
   } catch (err) {
-    cons
+    console.error('삭제 오류:', err);
+    alert('삭제에 실패했습니다.');
+  }
+};
+
+loadPosts();
+loadRecommendedProfiles();
+</script>
+</body>
+</html>
