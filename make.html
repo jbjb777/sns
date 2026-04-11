@@ -6,307 +6,347 @@
   <title>새 게시물 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #000;
+      --bg2: #111;
+      --bg3: #1a1a1a;
+      --bg4: #222;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --border3: #333;
+      --t1: #fff;
+      --t2: #888;
+      --t3: #444;
+      --pink: #ff6b6b;
+      --green: #4ade80;
+      --r1: 10px;
+      --r2: 14px;
+      --r3: 20px;
+      --r4: 28px;
+    }
+
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--t1);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      animation: fadeIn 0.4s ease-out forwards;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* ─── HEADER ─── */
     .header {
-      background: #1e1e1e;
-      border-bottom: 1px solid #333;
-      padding: 16px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
       opacity: 0;
-      transform: translateY(-20px);
-      animation: slideDown 0.5s ease-out 0.15s forwards;
+      transform: translateY(-10px);
+      animation: slideDown 0.4s ease 0.08s forwards;
     }
-    @keyframes slideDown {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
+
     .header-left {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 14px;
     }
+
     .back-btn {
-      background: none;
+      width: 36px; height: 36px;
+      border-radius: 10px;
       border: none;
-      color: #fff;
-      font-size: 24px;
+      background: none;
+      color: var(--t2);
       cursor: pointer;
-      padding: 8px;
       display: flex;
       align-items: center;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      justify-content: center;
+      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .back-btn:hover {
-      transform: translateX(-4px) scale(1.1);
-    }
-    .logo-container {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    .logo-container:hover {
-      transform: scale(1.05);
-    }
+    .back-btn:hover { color: var(--t1); background: var(--bg3); }
+    .back-btn:active { transform: scale(0.82); }
+
     .header-title {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
-      color: #fff;
+      color: var(--t1);
       display: flex;
       align-items: center;
       gap: 10px;
     }
+
+    /* ─── 헤더/타이틀 아바타 ─── */
     .header-profile-avatar {
-      width: 32px;
-      height: 32px;
+      width: 30px; height: 30px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      background: var(--bg3);
+      border: 1px solid var(--border2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      font-weight: bold;
+      font-size: 13px;
+      font-weight: 700;
       flex-shrink: 0;
+      overflow: hidden;
+      color: #666;
     }
-    /* 공유하기 버튼 */
+    .header-profile-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    /* ─── POST BUTTON ─── */
     .post-btn {
-      background: #3663FF;
-      color: white;
+      background: #fff;
+      color: #000;
       border: none;
-      padding: 10px 24px;
-      border-radius: 30px;
+      padding: 9px 22px;
+      border-radius: 22px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 14px;
-      transition: all 0.3s ease;
+      font-size: 13px;
+      font-family: inherit;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 100px;
-      position: relative;
-      transform: scale(1);
+      gap: 6px;
+      min-width: 90px;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .post-btn:hover:not(:disabled) {
-      transform: scale(1.1);
-    }
-    .post-btn:active:not(:disabled) {
-      transform: scale(0.95);
-      transition: transform 0.1s ease;
-    }
-    .post-btn:disabled {
-      opacity: 0.8;
-      cursor: not-allowed;
-    }
+    .post-btn:hover:not(:disabled) { background: #e8e8e8; transform: scale(1.04); }
+    .post-btn:active:not(:disabled) { transform: scale(0.94); }
+    .post-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
     .spinner {
       display: none;
-      width: 18px;
-      height: 18px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
+      width: 15px; height: 15px;
+      border: 2px solid rgba(0,0,0,0.2);
       border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
+      border-top-color: #000;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .loading .spinner {
-      display: block;
-    }
-    .loading .btn-text {
-      display: none;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading .spinner { display: block; }
+    .loading .btn-text { display: none; }
+
+    /* ─── MAIN CONTENT ─── */
     .main-content {
       flex: 1;
       display: flex;
       justify-content: center;
-      padding: 40px 20px;
+      padding: 36px 20px;
     }
+
     .create-container {
-      max-width: 600px;
+      max-width: 580px;
       width: 100%;
-      background: #1e1e1e;
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
       opacity: 0;
-      transform: translateY(30px);
-      animation: slideUp 0.6s ease-out 0.3s forwards;
+      transform: translateY(12px);
+      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.18s forwards;
     }
-    @keyframes slideUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .create-container h2 {
-      margin: 0 0 20px 0;
-      font-size: 24px;
-      font-weight: 600;
-      color: #fff;
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 0.55s forwards;
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── AUTHOR ROW ─── */
+    .author-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeInEl 0.4s ease 0.32s forwards;
     }
+    @keyframes fadeInEl { to { opacity: 1; } }
+
     .create-profile-avatar {
-      width: 32px;
-      height: 32px;
+      width: 42px; height: 42px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      background: var(--bg3);
+      border: 1px solid var(--border2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      font-weight: bold;
+      font-size: 17px;
+      font-weight: 700;
       flex-shrink: 0;
+      overflow: hidden;
+      color: #666;
+      transition: border-color 0.2s;
     }
-    textarea {
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 0.7s forwards;
+    .create-profile-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
     }
-    .image-preview-container, .upload-btn, #postMessage {
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 0.85s forwards;
-    }
-    @keyframes fadeInText {
-      to { opacity: 1; }
-    }
-    .create-container textarea {
+
+    .author-info { display: flex; flex-direction: column; gap: 2px; }
+    .author-name { font-size: 14px; font-weight: 600; color: var(--t1); }
+    .author-sub { font-size: 12px; color: var(--t3); }
+
+    /* ─── TEXTAREA ─── */
+    .create-textarea {
       width: 100%;
-      border: 2px solid #333;
+      border: 1px solid var(--border2);
       resize: vertical;
-      min-height: 200px;
-      font-size: 16px;
+      min-height: 180px;
+      font-size: 15px;
       font-family: inherit;
       outline: none;
-      background: #2c2c2c;
-      color: #fff;
+      background: var(--bg2);
+      color: var(--t1);
       padding: 16px;
-      border-radius: 12px;
-      box-sizing: border-box;
-      margin-bottom: 20px;
+      border-radius: var(--r3);
+      line-height: 1.65;
+      transition: border-color 0.2s, background 0.2s;
+      opacity: 0;
+      animation: fadeInEl 0.4s ease 0.4s forwards;
     }
-    .create-container textarea:focus {
-      border-color: #3663FF;
-    }
+    .create-textarea:focus { border-color: var(--border3); background: var(--bg3); }
+    .create-textarea::placeholder { color: var(--t3); }
+
+    /* ─── IMAGE PREVIEW ─── */
     .image-preview-container {
-      margin-bottom: 20px;
+      margin-top: 14px;
+      opacity: 0;
+      animation: fadeInEl 0.4s ease 0.48s forwards;
     }
+
     .image-preview {
       width: 100%;
       max-height: 400px;
       object-fit: cover;
-      border-radius: 12px;
+      border-radius: var(--r3);
       display: none;
+      border: 1px solid var(--border);
     }
-    .image-preview.show {
-      display: block;
-      margin-bottom: 15px;
-    }
-    /* 사진 추가 버튼 */
+    .image-preview.show { display: block; margin-bottom: 12px; }
+
+    /* ─── UPLOAD BTN ─── */
     .upload-btn {
-      background: #2c2c2c;
-      border: 2px solid #333;
-      padding: 12px 24px;
-      border-radius: 30px;
+      background: var(--bg3);
+      border: 1px dashed var(--border2);
+      padding: 10px 20px;
+      border-radius: var(--r2);
       cursor: pointer;
-      font-size: 14px;
-      color: #fff;
-      transition: all 0.3s ease;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--t2);
+      margin-top: 14px;
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       display: inline-block;
-      transform: scale(1);
+      opacity: 0;
+      animation: fadeInEl 0.4s ease 0.52s forwards;
     }
-    .upload-btn:hover {
-      background: #3663FF;
-      border-color: #3663FF;
-      transform: scale(1.1);
-    }
-    .upload-btn:active {
-      transform: scale(0.95);
-      transition: transform 0.1s ease;
-    }
-    .message {
-      margin-top: 15px;
-      font-size: 14px;
+    .upload-btn:hover { border-color: var(--border3); color: var(--t1); background: var(--bg4); transform: scale(1.02); }
+    .upload-btn:active { transform: scale(0.97); }
+
+    /* ─── MESSAGE ─── */
+    #postMessage {
+      margin-top: 14px;
+      font-size: 13px;
       text-align: center;
-      min-height: 20px;
+      min-height: 18px;
+      font-weight: 500;
+      opacity: 0;
+      animation: fadeInEl 0.4s ease 0.56s forwards;
     }
-    .message.error { color: #ff6b6b; }
-    .message.success { color: #00ff00; }
-    .message.info { color: #aaa; }
+    #postMessage.error { color: var(--pink); }
+    #postMessage.success { color: var(--green); }
+    #postMessage.info { color: var(--t2); }
+
+    /* ─── DIVIDER ─── */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+      opacity: 0;
+      animation: fadeInEl 0.4s ease 0.44s forwards;
+    }
+
+    /* ─── FOOTER ─── */
     .footer {
-      background: #1e1e1e;
-      border-top: 1px solid #333;
+      border-top: 1px solid var(--border);
       padding: 20px;
       text-align: center;
-      color: #666;
-      font-size: 12px;
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 1s forwards;
+      color: var(--t3);
+      font-size: 11px;
     }
+
     @media (max-width: 768px) {
-      .header-title { font-size: 16px; }
-      .create-container { padding: 20px; }
-      .create-container h2 { font-size: 20px; }
+      .main-content { padding: 24px 16px; }
+      .create-textarea { min-height: 140px; }
     }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="header-left">
-      <button class="back-btn" onclick="goBack()">←</button>
-      <div class="logo-container" onclick="goHome()">
-      </div>
-      <span class="header-title">새 게시물 만들기 <div class="header-profile-avatar" id="headerAvatar"></div></span>
+      <button class="back-btn" onclick="goBack()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span class="header-title">
+        새 게시물 만들기
+        <div class="header-profile-avatar" id="headerAvatar"></div>
+      </span>
     </div>
     <button class="post-btn" id="postBtn">
       <span class="btn-text">공유하기</span>
       <div class="spinner"></div>
     </button>
   </div>
+
   <div class="main-content">
     <div class="create-container">
-      <h2><div class="create-profile-avatar" id="createAvatar"></div>무엇을 공유하시겠어요?</h2>
-      <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
-   
+
+      <!-- 작성자 행 -->
+      <div class="author-row">
+        <div class="create-profile-avatar" id="createAvatar"></div>
+        <div class="author-info">
+          <div class="author-name" id="authorName">불러오는 중...</div>
+          <div class="author-sub">무엇을 공유하시겠어요?</div>
+        </div>
+      </div>
+
+      <!-- 텍스트 입력 -->
+      <textarea class="create-textarea" id="postContent" placeholder="문구를 입력하세요..."></textarea>
+
+      <div class="section-divider"></div>
+
+      <!-- 이미지 미리보기 -->
       <div class="image-preview-container">
         <img id="imagePreview" class="image-preview">
       </div>
-   
+
       <input type="file" id="imageInput" accept="image/*" style="display: none;">
       <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
-   
-      <div id="postMessage" class="message"></div>
+
+      <div id="postMessage"></div>
     </div>
   </div>
+
   <div class="footer">
     본 서비스는 대한민국의 중1 개발자 1인이 만든 프로젝트입니다 모든 소스 코드및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.
   </div>
 
 <script>
-  // Cloudflare Worker API 프록시 주소
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
-  // 안전한 api 헬퍼 함수 (204 처리 강화 + body 유무 확인)
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
     const res = await fetch(url, {
@@ -316,26 +356,15 @@
         ...(options.headers || {}),
       },
     });
-
     if (!res.ok) {
       let errorText = "";
-      try {
-        errorText = await res.text();
-      } catch {}
+      try { errorText = await res.text(); } catch {}
       throw new Error(`API 오류 (${res.status}): ${errorText || "알 수 없는 오류"}`);
     }
-
-    // 204거나 Content-Length가 0이면 성공으로 간주 (본문 없음)
-    if (res.status === 204 || res.headers.get("content-length") === "0") {
-      return null;
-    }
-
-    // 그 외에는 안전하게 json() 시도
-    try {
-      return await res.json();
-    } catch (e) {
+    if (res.status === 204 || res.headers.get("content-length") === "0") return null;
+    try { return await res.json(); } catch (e) {
       console.warn("JSON 파싱 실패했지만 2xx 성공으로 간주:", e);
-      return null; // 파싱 실패해도 성공으로 처리 (INSERT 성공 시 흔함)
+      return null;
     }
   }
 
@@ -344,7 +373,16 @@
   let currentUser = null;
   let selectedImage = null;
 
-  function initPage() {
+  // 아바타 엘리먼트에 실제 프로필 사진 or 이니셜 세팅
+  function setAvatar(el, profileImage, nickname) {
+    if (profileImage) {
+      el.innerHTML = `<img src="${profileImage}" alt="${nickname || ''}">`;
+    } else {
+      el.textContent = (nickname?.[0] || '?').toUpperCase();
+    }
+  }
+
+  async function initPage() {
     const savedUser = localStorage.getItem('snsUser');
     if (!savedUser) {
       alert('로그인이 필요합니다.');
@@ -352,18 +390,39 @@
       return;
     }
     currentUser = JSON.parse(savedUser);
-    const avatarLetter = currentUser.nickname ? currentUser.nickname[0].toUpperCase() : '?';
-    document.getElementById('headerAvatar').innerHTML = avatarLetter;
-    document.getElementById('createAvatar').innerHTML = avatarLetter;
+
+    // 이니셜로 먼저 세팅 (빠른 표시)
+    const headerAvatar = document.getElementById('headerAvatar');
+    const createAvatar = document.getElementById('createAvatar');
+    const authorName = document.getElementById('authorName');
+
+    setAvatar(headerAvatar, currentUser.profile_image || null, currentUser.nickname);
+    setAvatar(createAvatar, currentUser.profile_image || null, currentUser.nickname);
+    if (authorName) authorName.textContent = currentUser.nickname || '';
+
+    // API에서 최신 프로필 사진 불러오기
+    if (currentUser.id) {
+      try {
+        const users = await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}&select=nickname,profile_image`);
+        if (users?.[0]) {
+          const latest = users[0];
+          // localStorage 업데이트
+          currentUser.profile_image = latest.profile_image || currentUser.profile_image;
+          currentUser.nickname = latest.nickname || currentUser.nickname;
+          localStorage.setItem('snsUser', JSON.stringify(currentUser));
+
+          setAvatar(headerAvatar, currentUser.profile_image, currentUser.nickname);
+          setAvatar(createAvatar, currentUser.profile_image, currentUser.nickname);
+          if (authorName) authorName.textContent = currentUser.nickname || '';
+        }
+      } catch (e) {
+        console.warn('프로필 최신 정보 로드 실패:', e);
+      }
+    }
   }
 
-  window.goBack = function() {
-    window.history.back();
-  }
-
-  window.goHome = function() {
-    window.location.href = 'index.html';
-  }
+  window.goBack = function() { window.history.back(); };
+  window.goHome = function() { window.location.href = 'index.html'; };
 
   document.getElementById('uploadBtn').onclick = () => {
     document.getElementById('imageInput').click();
@@ -378,7 +437,7 @@
         const preview = document.getElementById('imagePreview');
         preview.src = e.target.result;
         preview.classList.add('show');
-      }
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -407,7 +466,7 @@
     const postButton = document.getElementById('postBtn');
 
     if (!content && !selectedImage) {
-      messageDiv.className = 'message error';
+      messageDiv.className = 'error';
       messageDiv.textContent = '내용 또는 이미지를 추가해주세요.';
       return;
     }
@@ -415,15 +474,19 @@
     postButton.disabled = true;
     postButton.classList.add('loading');
     messageDiv.textContent = '';
-    messageDiv.className = 'message';
+    messageDiv.className = '';
 
     try {
       let imageUrl = null;
       if (selectedImage) {
+        messageDiv.className = 'info';
+        messageDiv.textContent = '이미지 업로드 중...';
         imageUrl = await uploadImageToCloudinary(selectedImage);
       }
 
-      console.log('게시 요청 시작...');
+      messageDiv.className = 'info';
+      messageDiv.textContent = '게시 중...';
+
       await api("/posts", {
         method: "POST",
         body: JSON.stringify({
@@ -435,22 +498,16 @@
         })
       });
 
-      console.log('게시 성공! 리다이렉트 시도');
-
-      messageDiv.className = 'message success';
+      messageDiv.className = 'success';
       messageDiv.textContent = '게시물이 성공적으로 업로드되었습니다!';
 
-      // 0.1초만 기다리고 바로 이동 (거의 즉시)
       setTimeout(() => {
-        console.log('location.href 실행');
         window.location.href = 'index.html';
-        // 혹시 모르니 replace도 같이
-        // window.location.replace('index.html');
       }, 100);
 
     } catch (error) {
       console.error('게시 오류:', error);
-      messageDiv.className = 'message error';
+      messageDiv.className = 'error';
       messageDiv.textContent = '게시에 실패했습니다. 다시 시도해주세요.';
     } finally {
       postButton.disabled = false;
