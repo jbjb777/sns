@@ -6,460 +6,465 @@
   <title>프로필 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg" />
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #000;
+      --bg2: #111;
+      --bg3: #1a1a1a;
+      --bg4: #222;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --border3: #333;
+      --t1: #fff;
+      --t2: #888;
+      --t3: #444;
+      --pink: #ff6b6b;
+      --green: #4ade80;
+      --r1: 10px;
+      --r2: 14px;
+      --r3: 20px;
+      --r4: 28px;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--t1);
       min-height: 100vh;
       display: flex;
-      animation: fadeIn 0.4s ease-out forwards;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .sidebar-container {
-      width: 250px;
-      min-width: 250px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      z-index: 100;
-    }
-    .sidebar-container iframe {
-      width: 250px !important;
-      height: 100%;
-      border: none;
-    }
-    .main-wrapper {
-      margin-left: 250px;
-      width: calc(100% - 250px);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar-container { width: 250px; min-width: 250px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 250px !important; height: 100%; border: none; }
+
+    /* ─── MAIN WRAPPER ─── */
+    .main-wrapper { margin-left: 250px; width: calc(100% - 250px); display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ─── HEADER ─── */
     .header {
-      background: #1e1e1e;
-      border-bottom: 1px solid #333;
-      padding: 16px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
       position: sticky;
       top: 0;
       z-index: 50;
       opacity: 0;
-      transform: translateY(-20px);
-      animation: slideDown 0.5s ease-out 0.15s forwards;
+      transform: translateY(-10px);
+      animation: slideDown 0.4s ease 0.1s forwards;
     }
     @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
+
     .back-btn {
-      background: none;
+      width: 36px; height: 36px;
+      border-radius: 10px;
       border: none;
-      color: #fff;
-      font-size: 24px;
+      background: none;
+      color: var(--t2);
+      font-size: 20px;
       cursor: pointer;
-      padding: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.3s ease;
+      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .back-btn:hover {
-      transform: translateX(-4px);
-      color: #3663FF;
-    }
-    .header-title {
-      font-size: 20px;
-      font-weight: 600;
-    }
+    .back-btn:hover { color: var(--t1); background: var(--bg3); }
+    .back-btn:active { transform: scale(0.82); }
+
+    .header-title { font-size: 16px; font-weight: 600; }
+
+    /* ─── CONTAINER ─── */
     .container {
-      max-width: 800px;
+      max-width: 720px;
       width: 100%;
       margin: 0 auto;
-      padding: 20px;
+      padding: 32px 24px;
       flex: 1;
       opacity: 0;
-      transform: translateY(30px);
-      animation: slideUp 0.6s ease-out 0.3s forwards;
+      transform: translateY(12px);
+      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.2s forwards;
     }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── PROFILE CARD ─── */
     .profile-card {
-      background: transparent;
-      border: none;
-      padding: 30px 0;
-      margin-bottom: 30px;
-      box-shadow: none;
+      padding: 28px 0;
+      margin-bottom: 28px;
       opacity: 0;
-      animation: fadeInText 0.5s ease-out 0.55s forwards;
+      animation: fadeInEl 0.5s ease 0.35s forwards;
     }
-    @keyframes fadeInText { to { opacity: 1; } }
+    @keyframes fadeInEl { to { opacity: 1; } }
+
     .profile-header {
       display: flex;
       align-items: center;
-      gap: 30px;
-      margin-bottom: 30px;
+      gap: 28px;
+      margin-bottom: 24px;
     }
+
     .profile-avatar {
-      width: 100px;
-      height: 100px;
+      width: 88px; height: 88px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      background: var(--bg3);
+      border: 1px solid var(--border2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 48px;
-      font-weight: bold;
-      flex-shrink: 0;
-      transition: transform 0.3s ease;
-    }
-    .profile-avatar.editable {
-      cursor: pointer;
-    }
-    .profile-avatar.editable:hover {
-      transform: scale(1.15);
-    }
-    img.profile-avatar-img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      flex-shrink: 0;
-      transition: transform 0.3s ease;
-    }
-    img.profile-avatar-img.editable:hover {
-      transform: scale(1.15);
-    }
-    .profile-info { flex: 1; }
-    .profile-name {
-      font-size: 32px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-      letter-spacing: -0.5px;
-    }
-    .profile-stats {
-      display: flex;
-      gap: 50px;
-      color: #aaa;
-      font-size: 16px;
-      align-items: center;
-    }
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-    }
-    .stat-number {
-      font-size: 28px;
+      font-size: 36px;
       font-weight: 700;
-      color: #fff;
+      flex-shrink: 0;
+      color: #666;
+      transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      overflow: hidden;
     }
-    .stat-label {
-      font-size: 14px;
-      margin-top: 6px;
-      font-weight: 500;
+    .profile-avatar.editable { cursor: pointer; }
+    .profile-avatar.editable:hover { border-color: var(--border3); transform: scale(1.05); }
+    .profile-avatar.editable:active { transform: scale(0.96); }
+
+    .profile-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
     }
-    .share-btn {
-      background: #3663FF;
-      border: none;
-      color: #fff;
-      width: 50px;
-      height: 50px;
-      border-radius: 14px;
-      cursor: pointer;
-      display: flex;
+
+    /* 편집 오버레이 */
+    .avatar-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50%;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
-      margin-left: auto;
-      flex-shrink: 0;
-      font-size: 20px;
     }
-    .share-btn:hover {
-      background: #2952CC;
-      transform: translateY(-2px);
+    .profile-avatar.editable:hover .avatar-overlay { display: flex; }
+
+    .profile-info { flex: 1; min-width: 0; }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
     }
-    .share-btn.success {
-      background: rgb(0, 204, 136) !important;
-    }
+
     .verification-badge {
       display: inline-block;
-      width: 28px;
-      height: 28px;
+      width: 18px; height: 18px;
+      vertical-align: middle;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
       background-size: contain;
       background-repeat: no-repeat;
     }
-    .status-message-container {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #333;
+
+    .profile-stats {
       display: flex;
-      align-items: flex-start;
-      gap: 15px;
+      gap: 36px;
+      align-items: center;
     }
-    .status-message-text {
-      color: #ddd;
-      font-size: 16px;
-      line-height: 1.6;
-      flex: 1;
-      font-weight: 400;
-    }
-    .status-message-empty {
-      color: #777;
-      font-style: italic;
-      font-weight: 500;
-    }
-    .edit-status-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #2a2a2a;
-      border: 1px solid #444;
+
+    .stat-item { display: flex; flex-direction: column; gap: 3px; }
+
+    .stat-number { font-size: 22px; font-weight: 700; color: var(--t1); }
+
+    .stat-label { font-size: 12px; color: var(--t3); font-weight: 500; }
+
+    /* ─── SHARE BTN ─── */
+    .share-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      width: 38px; height: 38px;
+      border-radius: var(--r2);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
+      margin-left: auto;
       flex-shrink: 0;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .edit-status-btn:hover {
-      background: #333;
-      border-color: #3663FF;
+    .share-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--border3); }
+    .share-btn:active { transform: scale(0.88); }
+    .share-btn.success { background: rgba(74,222,128,0.12); border-color: var(--green); color: var(--green); }
+
+    /* ─── STATUS MESSAGE ─── */
+    .status-message-container {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
     }
-    .edit-status-btn img {
-      width: 20px;
-      height: 20px;
-      opacity: 0.8;
+
+    .status-message-text {
+      color: var(--t2);
+      font-size: 14px;
+      line-height: 1.65;
+      flex: 1;
     }
-    .edit-status-btn:hover img {
-      opacity: 1;
+
+    .status-message-empty { color: var(--t3); font-style: italic; }
+
+    .edit-status-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      color: var(--t2);
     }
+    .edit-status-btn:hover { background: var(--bg4); border-color: var(--border3); color: var(--t1); transform: scale(1.08); }
+    .edit-status-btn:active { transform: scale(0.9); }
+
+    /* ─── POSTS SECTION ─── */
+    .posts-section {
+      padding: 20px 0;
+      opacity: 0;
+      animation: fadeInEl 0.5s ease 0.5s forwards;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--t3);
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .post-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r3);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
+    }
+    .post-item:hover { border-color: var(--border3); transform: translateY(-4px); background: var(--bg3); }
+    .post-item:active { transform: translateY(-1px) scale(0.99); }
+
+    .post-item-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background: #000;
+      display: block;
+    }
+
+    .post-item-content { padding: 14px 16px 6px; }
+
+    .post-item-text {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--t2);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-wrap;
+    }
+
+    .post-item-footer {
+      padding: 10px 16px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .post-item-date { font-size: 11px; color: var(--t3); }
+
+    .post-item-likes {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--pink);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ─── SKELETON ─── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
+      background-size: 300% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+      border-radius: var(--r1);
+    }
+    @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+    .skeleton-avatar { width: 88px; height: 88px; border-radius: 50%; }
+    .skeleton-text { height: 22px; border-radius: 8px; margin-bottom: 12px; }
+    .skeleton-stat { width: 70px; height: 44px; border-radius: var(--r1); }
+    .skeleton-post-image { width: 100%; height: 220px; border-radius: var(--r3) var(--r3) 0 0; }
+    .skeleton-post-text { height: 12px; border-radius: 6px; margin-bottom: 8px; }
+
+    /* ─── NO POSTS ─── */
+    .no-posts { text-align: center; padding: 64px 20px; color: var(--t3); font-size: 14px; }
+
+    /* ─── MODAL ─── */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(5px);
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 1000;
     }
-    .modal-overlay.active {
-      display: flex;
-    }
+    .modal-overlay.active { display: flex; }
+
     .modal-content {
-      background: #1e1e1e;
-      border: 1px solid #444;
-      border-radius: 16px;
-      padding: 30px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r4);
+      padding: 32px;
       width: 90%;
-      max-width: 500px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      max-width: 440px;
+      animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
     }
-    .modal-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #fff;
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.90) translateY(14px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
+
+    .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 18px; color: var(--t1); }
+
     .modal-input {
       width: 100%;
-      padding: 12px 15px;
-      background: #252525;
-      border: 1px solid #444;
-      border-radius: 8px;
-      color: #fff;
+      padding: 12px 14px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      color: var(--t1);
       font-size: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       resize: vertical;
       min-height: 80px;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: inherit;
+      line-height: 1.5;
+      transition: border-color 0.2s, background 0.2s;
     }
-    .modal-input:focus {
-      outline: none;
-      border-color: #3663FF;
-    }
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
+    .modal-input:focus { outline: none; border-color: var(--border3); background: var(--bg4); }
+    .modal-input::placeholder { color: var(--t3); }
+
+    .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+
     .modal-btn {
-      padding: 10px 24px;
-      border-radius: 8px;
+      padding: 10px 22px;
+      border-radius: var(--r2);
       border: none;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .modal-btn-cancel {
-      background: #2a2a2a;
-      color: #aaa;
-    }
-    .modal-btn-cancel:hover {
-      background: #333;
-      color: #fff;
-    }
-    .modal-btn-confirm {
-      background: #3663FF;
-      color: #fff;
-    }
-    .modal-btn-confirm:hover {
-      background: #2952CC;
-    }
-    .posts-section {
-      background: transparent;
-      border: none;
-      padding: 20px 0;
-      box-shadow: none;
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 0.7s forwards;
-    }
-    .section-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 30px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #333;
-    }
-    .post-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 30px;
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 0.85s forwards;
-    }
-    .post-item {
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 16px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .post-item:hover {
-      transform: translateY(-8px);
-      border-color: #3663FF;
-      box-shadow: 0 8px 20px rgba(54,99,255,0.2);
-    }
-    .post-item-image {
-      width: 100%;
-      height: 250px;
-      object-fit: cover;
-      background: #000;
-    }
-    .post-item-content {
-      padding: 16px;
-    }
-    .post-item-text {
-      font-size: 15px;
-      line-height: 1.6;
-      color: #eee;
-      display: -webkit-box;
-      -webkit-line-clamp: 4;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: pre-wrap;
-      font-weight: 400;
-    }
-    .post-item-footer {
-      padding: 0 16px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       font-size: 13px;
-      color: #888;
-    }
-    .post-item-date {
-      font-size: 12px;
-    }
-    .post-item-likes {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #3663FF;
       font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .skeleton {
-      background: linear-gradient(90deg, #252525 25%, #2a2a2a 50%, #252525 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-    }
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .skeleton-avatar { width:100px; height:100px; border-radius:50%; }
-    .skeleton-text { height:32px; border-radius:8px; margin-bottom:12px; }
-    .skeleton-stat { width:80px; height:50px; border-radius:10px; }
-    .skeleton-post-image { width:100%; height:250px; border-radius:16px 16px 0 0; }
-    .skeleton-post-text { height:16px; border-radius:6px; margin-bottom:8px; }
-    .no-posts {
-      text-align: center;
-      padding: 80px 20px;
-      color: #aaa;
-      font-size: 18px;
+    .modal-btn:active { transform: scale(0.94); }
+    .modal-btn-cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
+    .modal-btn-cancel:hover { background: var(--bg4); color: var(--t1); }
+    .modal-btn-confirm { background: #fff; color: #000; }
+    .modal-btn-confirm:hover { background: #e8e8e8; }
+
+    /* 업로드 진행 표시 */
+    .upload-toast {
+      position: fixed;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--t1);
+      padding: 10px 22px;
+      border-radius: 22px;
+      font-size: 13px;
       font-weight: 500;
+      z-index: 9999;
+      transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
+      white-space: nowrap;
     }
+    .upload-toast.show { bottom: 28px; }
+
+    /* ─── FOOTER ─── */
     .footer {
-      background: #1e1e1e;
-      border-top: 1px solid #333;
-      padding: 30px 20px;
+      border-top: 1px solid var(--border);
+      padding: 24px;
       text-align: center;
-      color: #aaa;
-      font-size: 14px;
-      margin-top: 40px;
-      opacity: 0;
-      animation: fadeInText 0.5s ease-out 1s forwards;
-    }
-    .footer-links a {
-      color: #3663FF;
-      text-decoration: none;
-      margin: 0 15px;
-    }
-    .footer-text {
-      color: #666;
       font-size: 12px;
+      margin-top: auto;
     }
+    .footer-links { margin-bottom: 8px; }
+    .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--t1); }
+    .footer-text { color: var(--t3); font-size: 11px; }
+
+    /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
-      .sidebar-container { width:80px; min-width:80px; }
-      .sidebar-container iframe { width:80px !important; }
-      .main-wrapper { margin-left:80px; width:calc(100% - 80px); }
-      .post-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:15px; }
-      .post-item-image { height:180px; }
-      .profile-header { flex-direction:column; text-align:center; gap:20px; }
-      .profile-stats { justify-content:center; gap:40px; }
-      .profile-avatar, img.profile-avatar-img { width:90px; height:90px; font-size:42px; }
-      .profile-name { font-size:28px; }
-      .stat-number { font-size:24px; }
-      .modal-content { width:95%; padding:20px; }
+      .sidebar-container { width: 80px; min-width: 80px; }
+      .sidebar-container iframe { width: 80px !important; }
+      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
+      .container { padding: 20px 16px; }
+      .post-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+      .post-item-image { height: 160px; }
+      .profile-header { flex-direction: column; text-align: center; gap: 18px; }
+      .profile-stats { justify-content: center; }
+      .profile-name { font-size: 20px; justify-content: center; }
     }
   </style>
 </head>
 <body>
+  <!-- 업로드 토스트 -->
+  <div class="upload-toast" id="uploadToast">⏳ 업로드 중...</div>
+
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" width="250" height="100%" frameborder="0"></iframe>
   </div>
+
   <div class="main-wrapper">
     <div class="header">
-      <button class="back-btn" onclick="goBack()">←</button>
+      <button class="back-btn" onclick="goBack()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <div class="header-title">프로필</div>
     </div>
+
     <div class="container">
       <div id="profileContent">
-        <!-- 초기 스켈레톤 UI -->
+        <!-- 스켈레톤 -->
         <div class="profile-card">
           <div class="profile-header">
             <div class="skeleton skeleton-avatar"></div>
             <div class="profile-info" style="flex:1;">
-              <div class="skeleton skeleton-text" style="width:250px;"></div>
+              <div class="skeleton skeleton-text" style="width:200px;"></div>
               <div class="profile-stats">
                 <div class="skeleton skeleton-stat"></div>
                 <div class="skeleton skeleton-stat"></div>
@@ -468,6 +473,7 @@
           </div>
         </div>
       </div>
+
       <div class="posts-section">
         <div class="section-title">게시물</div>
         <div id="userPosts">
@@ -476,14 +482,15 @@
               <div class="skeleton skeleton-post-image"></div>
               <div class="post-item-content">
                 <div class="skeleton skeleton-post-text"></div>
-                <div class="skeleton skeleton-post-text" style="width:80%;"></div>
-                <div class="skeleton skeleton-post-text" style="width:60%;"></div>
+                <div class="skeleton skeleton-post-text" style="width:75%;"></div>
+                <div class="skeleton skeleton-post-text" style="width:55%;"></div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
     <div class="footer">
       <div class="footer-links">
         <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
@@ -493,6 +500,7 @@
       <div class="footer-text">본 서비스는 대한민국의 중1 개발자 1인이 만든 프로젝트입니다 모든 소스 코드및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
     </div>
   </div>
+
   <!-- 상태메시지 수정 모달 -->
   <div class="modal-overlay" id="statusModal">
     <div class="modal-content">
@@ -504,12 +512,16 @@
       </div>
     </div>
   </div>
+
   <!-- 프로필 사진 업로드용 숨김 input -->
   <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
 
 <script>
-  // Cloudflare Worker API 프록시 주소
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
+  // Cloudinary 설정 (index.html과 동일)
+  const CLOUDINARY_CLOUD = 'dretlhsrk';
+  const CLOUDINARY_PRESET = 'unsigned_preset';
 
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
@@ -520,56 +532,60 @@
         ...(options.headers || {}),
       },
     });
-
     if (!res.ok) {
       let errorText;
-      try {
-        errorText = await res.text();
-      } catch {
-        errorText = "Unknown error";
-      }
+      try { errorText = await res.text(); } catch { errorText = "Unknown error"; }
       throw new Error(`API 오류 (${res.status}): ${errorText}`);
     }
-
     if (res.status === 204) return null;
-    
     const text = await res.text();
     if (!text) return null;
+    try { return JSON.parse(text); } catch (e) { console.error("JSON 파싱 오류:", e); return null; }
+  }
 
-    try {
-      return JSON.parse(text);
-    } catch (e) {
-      console.error("JSON 파싱 오류:", e);
-      return null;
-    }
+  // Cloudinary로 직접 이미지 업로드 (CORS·413 오류 해결)
+  async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+      { method: 'POST', body: formData }
+    );
+    if (!response.ok) throw new Error('이미지 업로드 실패');
+    const data = await response.json();
+    return data.secure_url;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('uploadToast');
+    t.textContent = msg;
+    t.classList.add('show');
+  }
+  function hideToast() {
+    document.getElementById('uploadToast').classList.remove('show');
   }
 
   const urlParams = new URLSearchParams(window.location.search);
   const userNickname = urlParams.get('nickname');
+  const userId = urlParams.get('id');
   let currentUser = null;
   let viewingUser = null;
 
   function initCurrentUser() {
     const savedUser = localStorage.getItem('snsUser');
-    if (savedUser) {
-      currentUser = JSON.parse(savedUser);
-      updateSidebar();
-    }
+    if (savedUser) { currentUser = JSON.parse(savedUser); updateSidebar(); }
   }
 
   function updateSidebar() {
     const iframe = document.getElementById('sidebarFrame');
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
-    }
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
   }
 
   function updateSidebarMode() {
     const iframe = document.getElementById('sidebarFrame');
     const narrow = window.innerWidth <= 768;
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-    }
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
   }
 
   window.addEventListener('message', (event) => {
@@ -578,59 +594,47 @@
       if (page === 'home') location.href = 'index.html';
       if (page === 'explore') location.href = 'explore.html';
     }
-    if (type === 'logout') {
-      localStorage.removeItem('snsUser');
-      currentUser = null;
-      location.href = 'index.html';
-    }
-    if (type === 'requestUserInfo') {
-      updateSidebar();
-    }
+    if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; location.href = 'index.html'; }
+    if (type === 'requestUserInfo') updateSidebar();
   });
 
   initCurrentUser();
   updateSidebarMode();
   window.addEventListener('resize', updateSidebarMode);
 
-  // 프로필 사진 업로드 이벤트 (현재 상태 그대로 유지)
+  // ─── 프로필 사진 변경: Cloudinary 직접 업로드 ───
   document.getElementById('profileFileInput').addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
-    if (!file || !currentUser || !currentUser.id) return;
+    if (!file || !currentUser?.id) return;
 
-    const fileExt = file.name.split('.').pop() || 'png';
-    const userIdForPath = currentUser.id;
-    const fileName = `profiles/${userIdForPath}/profile.${fileExt}`;
-
+    showToast('⏳ 업로드 중...');
     try {
-      const reader = new FileReader();
-      reader.onload = async function () {
-        const base64Data = reader.result.split(',')[1];
+      // 1) Cloudinary에 직접 업로드 (CORS 없음, 크기 제한 없음)
+      const imageUrl = await uploadImageToCloudinary(file);
 
-        await api("/upload-profile", {
-          method: "POST",
-          body: JSON.stringify({
-            fileName: fileName,
-            fileContent: base64Data,
-            contentType: file.type || 'image/png'
-          })
-        });
+      // 2) API로 프로필 이미지 URL 업데이트 (id 필터 필수!)
+      await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ profile_image: imageUrl }),
+        headers: { "Prefer": "return=minimal" }
+      });
 
-        const imageUrl = `${API_BASE}/storage/images/${fileName}?v=${Date.now()}`;
+      // 3) localStorage의 currentUser도 업데이트
+      currentUser.profile_image = imageUrl;
+      localStorage.setItem('snsUser', JSON.stringify(currentUser));
 
-        await api("/users", {
-          method: "PATCH",
-          body: JSON.stringify({ profile_image: imageUrl }),
-          headers: { "Prefer": "return=minimal" }
-        });
-
-        viewingUser.profile_image = imageUrl;
-        await displayProfile(viewingUser);
-        e.target.value = '';
-      };
-      reader.readAsDataURL(file);
+      viewingUser.profile_image = imageUrl;
+      await displayProfile(viewingUser);
+      hideToast();
+      showToast('✅ 프로필 사진이 변경되었습니다!');
+      setTimeout(hideToast, 2200);
     } catch (err) {
       console.error('프로필 사진 업로드 실패:', err);
-      alert('프로필 사진 변경 실패\n' + (err.message || '알 수 없는 오류'));
+      hideToast();
+      showToast('❌ 업로드 실패: ' + (err.message || '알 수 없는 오류'));
+      setTimeout(hideToast, 3000);
+    } finally {
+      e.target.value = '';
     }
   });
 
@@ -647,12 +651,7 @@
 
       if (users?.length === 0) {
         if (userNickname === "JB777" || userNickname === "진정오") {
-          users = [{
-            nickname: userNickname,
-            isVerified: true,
-            message: null,
-            profile_image: null
-          }];
+          users = [{ nickname: userNickname, isVerified: true, message: null, profile_image: null }];
         } else {
           showError('사용자를 찾을 수 없습니다.');
           return;
@@ -672,16 +671,17 @@
     const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
     const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
-    const posts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id`);
-    const postCount = posts?.length ?? 0;
+    // 게시물 수 + 총 좋아요 수를 병렬로 로드
+    const userPosts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id`);
+    const postCount = userPosts?.length ?? 0;
 
     let totalLikes = 0;
-    const userPosts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id`);
     if (userPosts?.length) {
-      for (const post of userPosts) {
-        const likes = await api(`/likes?post_id=eq.${post.id}&select=count`);
-        totalLikes += likes?.[0]?.count ?? 0;
-      }
+      const postIds = userPosts.map(p => p.id).join(',');
+      try {
+        const allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`);
+        totalLikes = allLikes?.length ?? 0;
+      } catch (e) { totalLikes = 0; }
     }
 
     const statusMessage = user.message || '';
@@ -691,13 +691,31 @@
 
     const editButton = isOwnProfile
       ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
-           <img src="pencil.png" alt="수정">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>
          </button>`
       : '';
 
-    let avatarHtml = user.profile_image
-      ? `<img src="${user.profile_image}" class="profile-avatar-img${isOwnProfile ? ' editable' : ''}" alt="프로필 사진">`
-      : `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">${user.nickname?.[0]?.toUpperCase() ?? '?'}</div>`;
+    const avatarOverlay = isOwnProfile
+      ? `<div class="avatar-overlay">
+           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="#fff" stroke-width="1.8" fill="none"/>
+             <circle cx="12" cy="13" r="4" stroke="#fff" stroke-width="1.8"/>
+           </svg>
+         </div>`
+      : '';
+
+    const avatarHtml = user.profile_image
+      ? `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">
+           <img src="${escapeHtml(user.profile_image)}" alt="프로필 사진">
+           ${avatarOverlay}
+         </div>`
+      : `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">
+           ${(user.nickname?.[0] || '?').toUpperCase()}
+           ${avatarOverlay}
+         </div>`;
 
     contentDiv.innerHTML = `
       <div class="profile-card">
@@ -718,8 +736,8 @@
                 <div class="stat-label">좋아요</div>
               </div>
               <button class="share-btn" id="shareBtn" onclick="copyProfileLink()" title="프로필 링크 복사">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"></rect>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
               </button>
@@ -734,11 +752,9 @@
     `;
 
     if (isOwnProfile) {
-      const avatarElement = contentDiv.querySelector('.profile-avatar, .profile-avatar-img.editable');
+      const avatarElement = contentDiv.querySelector('.profile-avatar.editable');
       if (avatarElement) {
-        avatarElement.onclick = () => {
-          document.getElementById('profileFileInput').click();
-        };
+        avatarElement.onclick = () => document.getElementById('profileFileInput').click();
       }
     }
   }
@@ -753,13 +769,17 @@
         return;
       }
 
-      const postsWithLikes = await Promise.all(
-        posts.map(async (post) => {
-          const likes = await api(`/likes?post_id=eq.${post.id}&select=count`);
-          return { ...post, likeCount: likes?.[0]?.count ?? 0 };
-        })
-      );
+      // 좋아요 수를 배치로 로드
+      const postIds = posts.map(p => p.id).join(',');
+      let allLikes = [];
+      try {
+        allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`) || [];
+      } catch (e) {}
 
+      const likeCountMap = {};
+      allLikes.forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
+
+      const postsWithLikes = posts.map(post => ({ ...post, likeCount: likeCountMap[post.id] || 0 }));
       displayPosts(postsWithLikes);
     } catch (e) {
       console.error('게시물 로드 오류:', e);
@@ -771,26 +791,28 @@
     const postsDiv = document.getElementById('userPosts');
     const gridDiv = document.createElement('div');
     gridDiv.className = 'post-grid';
-    posts.forEach(post => {
+    posts.forEach((post, idx) => {
       const postItem = document.createElement('div');
       postItem.className = 'post-item';
-      postItem.onclick = () => {
-        window.location.href = `view.html?id=${post.id}`;
-      };
+      postItem.style.cssText = `opacity:0; transform:translateY(10px); transition: opacity 0.35s ease ${idx * 0.06}s, transform 0.35s cubic-bezier(0.22,1,0.36,1) ${idx * 0.06}s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;`;
+      postItem.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
       const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
       postItem.innerHTML = `
-        ${post.image_url ? `<img src="${post.image_url}" class="post-item-image" alt="게시글 이미지">` : ''}
-        ${post.content ? `
-          <div class="post-item-content">
-            <div class="post-item-text">${escapeHtml(post.content)}</div>
-          </div>
-        ` : ''}
+        ${post.image_url ? `<img src="${escapeHtml(post.image_url)}" class="post-item-image" alt="게시글 이미지" loading="lazy">` : ''}
+        ${post.content ? `<div class="post-item-content"><div class="post-item-text">${escapeHtml(post.content)}</div></div>` : ''}
         <div class="post-item-footer">
           <div class="post-item-date">${timeStr}</div>
-          <div class="post-item-likes">👍 ${post.likeCount}</div>
+          <div class="post-item-likes">
+            <svg width="12" height="12" viewBox="0 0 2300 2300" fill="currentColor"><path d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/></svg>
+            ${post.likeCount}
+          </div>
         </div>
       `;
       gridDiv.appendChild(postItem);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        postItem.style.opacity = '1';
+        postItem.style.transform = 'translateY(0)';
+      }));
     });
     postsDiv.innerHTML = '';
     postsDiv.appendChild(gridDiv);
@@ -798,21 +820,15 @@
 
   function escapeHtml(t) {
     if (!t) return '';
-    return t.replace(/[&<>"']/g, m => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    }[m]));
+    return t.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
   }
 
   function showError(msg) {
     document.getElementById('profileContent').innerHTML = `
       <div class="profile-card">
-        <div style="text-align:center; padding:40px 20px;">
-          <div style="color:#ff6b6b; font-size:16px; margin-bottom:20px;">${msg}</div>
-          <button onclick="window.history.back()" style="background:#3663FF; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">돌아가기</button>
+        <div style="text-align:center; padding:48px 20px;">
+          <div style="color:var(--pink); font-size:14px; margin-bottom:20px;">${msg}</div>
+          <button onclick="window.history.back()" style="background:#fff; color:#000; border:none; padding:10px 24px; border-radius:var(--r2); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">돌아가기</button>
         </div>
       </div>
     `;
@@ -830,13 +846,16 @@
     document.getElementById('statusModal').classList.remove('active');
   };
 
+  // ─── 상태메시지 저장: id 필터 추가로 오류 수정 ───
   window.saveStatusMessage = async function() {
     const input = document.getElementById('statusInput');
     const newMessage = input.value.trim();
+    if (!currentUser?.id) { alert('로그인이 필요합니다.'); return; }
     try {
-      await api("/users", {
+      await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
         method: "PATCH",
-        body: JSON.stringify({ message: newMessage })
+        body: JSON.stringify({ message: newMessage }),
+        headers: { "Prefer": "return=minimal" }
       });
       viewingUser.message = newMessage;
       await displayProfile(viewingUser);
@@ -852,18 +871,17 @@
   });
 
   window.goBack = () => window.history.back();
-
   window.showPrivacyPolicy = () => window.location.href = "privacy.html";
   window.showTerms = () => window.location.href = "policy.html";
 
   window.copyProfileLink = function() {
     navigator.clipboard.writeText(window.location.href).then(() => {
       const btn = document.getElementById('shareBtn');
+      if (!btn) return;
       btn.classList.add('success');
       setTimeout(() => btn.classList.remove('success'), 1500);
     }).catch(err => {
       console.error('링크 복사 실패:', err);
-      alert('링크 복사에 실패했습니다.');
     });
   };
 </script>
