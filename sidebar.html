@@ -182,14 +182,9 @@
         min-height: 100% !important;
         overflow: hidden;
       }
-      body {
-        pointer-events: none;
-      }
       .sidebar-root {
-        min-height: 100vh;
-        min-height: 100dvh;
-        height: 100%;
-        pointer-events: none;
+        min-height: 0;
+        height: auto;
       }
       .sidebar {
         width: 100% !important;
@@ -273,109 +268,10 @@
         box-sizing: border-box;
       }
 
-      .mobile-sheet-backdrop {
-        display: block;
-        position: fixed;
-        inset: 0;
-        z-index: 10000;
-        background: rgba(0, 0, 0, 0.45);
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        pointer-events: none;
-      }
-      .mobile-sheet-backdrop.open {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-      }
+      /* 프로필 시트는 부모 페이지에서 표시 (iframe은 하단만이라 시트가 가려지지 않음) */
+      .mobile-sheet-backdrop,
       .mobile-profile-sheet {
-        display: block;
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 10001;
-        transform: translateY(100%);
-        transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
-        pointer-events: none;
-      }
-      .mobile-profile-sheet.open {
-        transform: translateY(0);
-        pointer-events: auto;
-      }
-      .mobile-profile-sheet-inner {
-        background: #141414;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-bottom: none;
-        border-radius: 20px 20px 0 0;
-        padding: 10px 16px calc(20px + env(safe-area-inset-bottom, 0px));
-        max-height: 70vh;
-        box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
-      }
-      .sheet-grab {
-        width: 40px;
-        height: 4px;
-        border-radius: 4px;
-        background: rgba(255, 255, 255, 0.2);
-        margin: 0 auto 16px;
-      }
-      .sheet-profile-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 14px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.05);
-        cursor: pointer;
-        margin-bottom: 12px;
-        transition: background 0.2s;
-      }
-      .sheet-profile-row:active {
-        background: rgba(255, 255, 255, 0.1);
-      }
-      .sheet-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #3478f6, #53b6f9);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        color: #fff;
-        overflow: hidden;
-        flex-shrink: 0;
-      }
-      .sheet-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      .sheet-nickname {
-        font-size: 16px;
-        font-weight: 600;
-        color: #fff;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .sheet-logout {
-        width: 100%;
-        padding: 14px 16px;
-        border: none;
-        border-radius: 14px;
-        background: rgba(255, 80, 80, 0.15);
-        color: #ff8a8a;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        transition: background 0.2s, transform 0.15s;
-      }
-      .sheet-logout:active {
-        transform: scale(0.98);
+        display: none !important;
       }
     }
   </style>
@@ -453,13 +349,25 @@
 
     function openProfileSheet() {
       if (!isMobileBottomLayout()) return;
-      profileSheetBackdrop.classList.add('open');
-      profileSheet.classList.add('open');
-      profileSheet.setAttribute('aria-hidden', 'false');
-      profileSheetBackdrop.setAttribute('aria-hidden', 'false');
+      try {
+        parent.postMessage({
+          type: 'sharerProfileSheet',
+          open: true,
+          user: {
+            id: currentUserId,
+            nickname: currentUserNickname,
+            profile_image: currentUserProfileImage
+          }
+        }, '*');
+      } catch (err) {}
     }
 
     function closeProfileSheet() {
+      try {
+        if (isMobileBottomLayout()) {
+          parent.postMessage({ type: 'sharerProfileSheet', open: false }, '*');
+        }
+      } catch (err) {}
       profileSheetBackdrop.classList.remove('open');
       profileSheet.classList.remove('open');
       profileSheet.setAttribute('aria-hidden', 'true');
@@ -546,9 +454,12 @@
       }
     };
 
-    profileSheetBackdrop.onclick = () => closeProfileSheet();
+    profileSheetBackdrop.onclick = () => {
+      if (!isMobileBottomLayout()) closeProfileSheet();
+    };
     sheetProfileRow.onclick = (e) => {
       e.stopPropagation();
+      if (isMobileBottomLayout()) return;
       if (isLoggedIn && currentUserId && currentUserNickname) {
         closeProfileSheet();
         window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
@@ -556,14 +467,13 @@
     };
     sheetLogoutBtn.onclick = (e) => {
       e.stopPropagation();
+      if (isMobileBottomLayout()) return;
       closeProfileSheet();
       parent.postMessage({ type: 'logout' }, '*');
     };
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && profileSheet.classList.contains('open')) {
-        closeProfileSheet();
-      }
+      if (e.key === 'Escape') closeProfileSheet();
     });
 
     window.handleLogout = (event) => {

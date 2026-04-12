@@ -453,23 +453,100 @@
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
 
+    /* ─── 모바일 프로필 시트(부모) ─── */
+    .sharer-profile-sheet-host[hidden] { display: none !important; }
+    .sharer-profile-sheet-host {
+      position: fixed;
+      inset: 0;
+      z-index: 960;
+    }
+    .sharer-profile-sheet-host .sps-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+    .sharer-profile-sheet-host .sps-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 10px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+    }
+    .sharer-profile-sheet-host .sps-grab {
+      width: 40px;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      margin: 0 auto 16px;
+    }
+    .sharer-profile-sheet-host .sps-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .sharer-profile-sheet-host .sps-av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-av img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sharer-profile-sheet-host .sps-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sharer-profile-sheet-host .sps-logout {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .sidebar-container {
         left: 0;
         right: 0;
-        top: 0;
+        top: auto;
         bottom: 0;
         width: 100%;
         min-width: 0;
-        height: 100%;
-        min-height: 100vh;
-        min-height: 100dvh;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
       }
       .sidebar-container iframe {
         width: 100% !important;
         height: 100% !important;
-        min-height: 100%;
       }
       .main-wrapper {
         margin-left: 0;
@@ -498,6 +575,7 @@
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
   </div>
+  <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
 
   <div class="main-wrapper">
     <div class="header">
@@ -687,6 +765,88 @@
     if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; NProgress.start(); location.href = 'index.html'; }
     if (type === 'requestUserInfo') updateSidebar();
   });
+
+  (function setupSharerProfileSheetHost() {
+    const HID = 'sharerProfileSheetHost';
+    let escHandler = null;
+    function q(id) { return document.getElementById(id); }
+    function closeHost() {
+      const host = q(HID);
+      if (!host) return;
+      host.hidden = true;
+      host.innerHTML = '';
+      if (escHandler) {
+        document.removeEventListener('keydown', escHandler);
+        escHandler = null;
+      }
+    }
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (!d || d.type !== 'sharerProfileSheet') return;
+      const host = q(HID);
+      if (!host) return;
+      if (!d.open) {
+        closeHost();
+        return;
+      }
+      const u = d.user || {};
+      const id = u.id;
+      const nick = (u.nickname || '').toString();
+      const pimg = (u.profile_image || '').toString();
+      if (!id || !nick) return;
+      closeHost();
+      host.hidden = false;
+      const bd = document.createElement('div');
+      bd.className = 'sps-backdrop';
+      bd.onclick = closeHost;
+      const panel = document.createElement('div');
+      panel.className = 'sps-panel';
+      const grab = document.createElement('div');
+      grab.className = 'sps-grab';
+      const prof = document.createElement('div');
+      prof.className = 'sps-profile';
+      prof.setAttribute('role', 'button');
+      prof.tabIndex = 0;
+      const av = document.createElement('div');
+      av.className = 'sps-av';
+      if (pimg.trim()) {
+        const im = document.createElement('img');
+        im.src = pimg + (pimg.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        im.alt = nick;
+        im.onerror = () => { av.textContent = (nick.charAt(0) || '?').toUpperCase(); };
+        av.appendChild(im);
+      } else {
+        av.textContent = (nick.charAt(0) || '?').toUpperCase();
+      }
+      const nm = document.createElement('span');
+      nm.className = 'sps-name';
+      nm.textContent = nick;
+      prof.appendChild(av);
+      prof.appendChild(nm);
+      prof.onclick = () => {
+        closeHost();
+        location.href = 'https://sharer.jbjb.r-e.kr/user.html?id=' + encodeURIComponent(id) + '&nickname=' + encodeURIComponent(nick);
+      };
+      const lo = document.createElement('button');
+      lo.type = 'button';
+      lo.className = 'sps-logout';
+      lo.textContent = '로그아웃';
+      lo.onclick = () => {
+        closeHost();
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        NProgress.start();
+        location.href = 'index.html';
+      };
+      panel.appendChild(grab);
+      panel.appendChild(prof);
+      panel.appendChild(lo);
+      host.appendChild(bd);
+      host.appendChild(panel);
+      escHandler = (e) => { if (e.key === 'Escape') closeHost(); };
+      document.addEventListener('keydown', escHandler);
+    });
+  })();
 
   initCurrentUser();
   updateSidebarMode();
