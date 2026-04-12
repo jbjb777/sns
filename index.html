@@ -569,9 +569,24 @@
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .recommend-container { display: none; }
-      .sidebar-container { width: 80px; min-width: 80px; }
-      .sidebar-container iframe { width: 80px !important; }
-      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
+      .sidebar-container {
+        left: 0;
+        right: 0;
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        min-width: 0;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .sidebar-container iframe {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .main-wrapper {
+        margin-left: 0;
+        width: 100%;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
       .main-content { padding: 20px 16px; }
     }
   </style>
