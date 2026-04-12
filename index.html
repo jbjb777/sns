@@ -726,12 +726,17 @@ document.addEventListener('click', function(e) {
       setTimeout(() => { splash.style.display = 'none'; }, 460);
     }
 
+    const splashStart = Date.now();
+    const MIN_SPLASH = 2000;
+
     window.addEventListener('load', () => {
       NProgress.done();
-      finishSplash();
+      const elapsed = Date.now() - splashStart;
+      const remaining = Math.max(0, MIN_SPLASH - elapsed);
+      setTimeout(finishSplash, remaining);
     });
-    // 안전망: 최대 3.5초 후 강제 종료
-    setTimeout(finishSplash, 3500);
+    // 안전망: 최대 5초 후 강제 종료
+    setTimeout(finishSplash, 5000);
   }
 })();
 
