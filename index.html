@@ -715,17 +715,24 @@ document.addEventListener('click', function(e) {
 (function () {
   const splash = document.getElementById('splash');
 
-  function finishSplash() {
-    splash.classList.add('fade-out');
-    setTimeout(() => { splash.style.display = 'none'; }, 460);
-  }
+  // 이미 방문한 경우 스플래시 즉시 숨김
+  if (sessionStorage.getItem('splashShown')) {
+    splash.style.display = 'none';
+  } else {
+    sessionStorage.setItem('splashShown', 'true');
 
-  window.addEventListener('load', () => {
-    NProgress.done();
-    finishSplash();
-  });
-  // 안전망: 최대 3.5초 후 강제 종료
-  setTimeout(finishSplash, 3500);
+    function finishSplash() {
+      splash.classList.add('fade-out');
+      setTimeout(() => { splash.style.display = 'none'; }, 460);
+    }
+
+    window.addEventListener('load', () => {
+      NProgress.done();
+      finishSplash();
+    });
+    // 안전망: 최대 3.5초 후 강제 종료
+    setTimeout(finishSplash, 3500);
+  }
 })();
 
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
