@@ -10,8 +10,8 @@
     body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; min-height: 100vh; display: flex; overflow: hidden; }
   
     .sidebar-container {
-      width: 250px;
-      min-width: 250px;
+      width: 72px;
+      min-width: 72px;
       height: 100vh;
       position: fixed;
       left: 0;
@@ -19,13 +19,13 @@
       z-index: 100;
     }
     .sidebar-container iframe {
-      width: 250px !important;
+      width: 72px !important;
       height: 100%;
       border: none;
     }
     .main-wrapper {
-      margin-left: 250px;
-      width: calc(100% - 250px);
+      margin-left: 72px;
+      width: calc(100% - 72px);
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -538,15 +538,25 @@
     }
     @media (max-width: 768px) {
       .sidebar-container {
-        width: 80px;
-        min-width: 80px;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
       }
       .sidebar-container iframe {
-        width: 80px !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 100%;
       }
       .main-wrapper {
-        margin-left: 80px;
-        width: calc(100% - 80px);
+        margin-left: 0;
+        width: 100%;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
       }
       .shorts-container {
         height: auto;
@@ -641,7 +651,7 @@
     <iframe
       src="sidebar.html"
       id="sidebarFrame"
-      width="250"
+      width="72"
       height="100%"
       frameborder="0"
     ></iframe>
