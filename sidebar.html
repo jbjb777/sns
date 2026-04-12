@@ -197,12 +197,12 @@
         min-width: 100% !important;
         height: auto;
         min-height: 0;
-        flex-direction: row;
-        flex-wrap: nowrap;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: 12px;
         align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        padding: 4px 12px calc(4px + env(safe-area-inset-bottom, 0px));
+        justify-items: center;
+        padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
         box-sizing: border-box;
         overflow: visible;
         border-right: none;
@@ -218,48 +218,42 @@
         z-index: 2;
         pointer-events: auto;
       }
+      .sidebar.has-profile {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
       .logo-container { display: none; }
       #chatNav,
       #discordNav {
         display: none !important;
       }
-      .mob-nav-left {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 8px;
-        flex: 1 1 0;
-        min-width: 0;
-      }
+      .mob-nav-left,
       .mob-nav-right {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-end;
-        flex: 1 1 0;
-        min-width: 0;
+        display: contents;
       }
       .nav-item {
-        flex: 0 0 auto;
-        width: 44px;
-        height: 44px;
+        width: 48px;
+        height: 48px;
+        max-width: 48px;
         margin: 0;
-        max-width: 44px;
+        box-sizing: border-box;
       }
       .create-btn {
-        flex: 0 0 auto;
         width: 48px;
         height: 48px;
         margin: 0;
+        box-sizing: border-box;
       }
       .user-info {
         margin-top: 0;
         padding: 0;
-        width: auto;
+        width: 48px;
+        height: 48px;
+        min-width: 0;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
         gap: 0;
+        box-sizing: border-box;
       }
       .logout-icon-btn-mobile {
         display: none !important;
@@ -276,6 +270,7 @@
         width: 40px;
         height: 40px;
         font-size: 18px;
+        box-sizing: border-box;
       }
 
       .mobile-sheet-backdrop {
@@ -324,23 +319,6 @@
         border-radius: 4px;
         background: rgba(255, 255, 255, 0.2);
         margin: 0 auto 16px;
-      }
-      .sheet-direct-create {
-        width: 100%;
-        padding: 14px 16px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.06);
-        color: #fff;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        margin-bottom: 12px;
-        transition: background 0.2s, transform 0.15s;
-      }
-      .sheet-direct-create:active {
-        transform: scale(0.98);
       }
       .sheet-profile-row {
         display: flex;
@@ -441,7 +419,6 @@
     <div class="mobile-profile-sheet" id="profileSheet" role="dialog" aria-modal="true" aria-hidden="true">
       <div class="mobile-profile-sheet-inner">
         <div class="sheet-grab"></div>
-        <button type="button" class="sheet-direct-create" id="sheetDirectCreate">직접 만들기</button>
         <div class="sheet-profile-row" id="sheetProfileRow">
           <div class="sheet-avatar" id="sheetMenuAvatar"></div>
           <span class="sheet-nickname" id="sheetMenuNickname"></span>
@@ -463,12 +440,12 @@
     const chatIcon = document.getElementById('chatIcon');
     const profileSheetBackdrop = document.getElementById('profileSheetBackdrop');
     const profileSheet = document.getElementById('profileSheet');
-    const sheetDirectCreate = document.getElementById('sheetDirectCreate');
     const sheetProfileRow = document.getElementById('sheetProfileRow');
     const sheetMenuAvatar = document.getElementById('sheetMenuAvatar');
     const sheetMenuNickname = document.getElementById('sheetMenuNickname');
     const sheetLogoutBtn = document.getElementById('sheetLogoutBtn');
     const userAvatar = document.getElementById('userAvatar');
+    const sidebarBar = document.querySelector('.sidebar');
 
     function isMobileBottomLayout() {
       return window.matchMedia('(min-width: 200px)').matches;
@@ -570,11 +547,6 @@
     };
 
     profileSheetBackdrop.onclick = () => closeProfileSheet();
-    sheetDirectCreate.onclick = (e) => {
-      e.stopPropagation();
-      closeProfileSheet();
-      goCreate();
-    };
     sheetProfileRow.onclick = (e) => {
       e.stopPropagation();
       if (isLoggedIn && currentUserId && currentUserNickname) {
@@ -642,6 +614,7 @@
             userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
           }
           userInfo.style.display = 'flex';
+          sidebarBar.classList.add('has-profile');
           syncSheetProfileFromUser();
         } else {
           isLoggedIn = false;
@@ -649,6 +622,7 @@
           currentUserNickname = null;
           currentUserProfileImage = null;
           userInfo.style.display = 'none';
+          sidebarBar.classList.remove('has-profile');
           closeProfileSheet();
         }
       }
