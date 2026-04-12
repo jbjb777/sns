@@ -166,6 +166,44 @@
       border-radius: 10px;
     }
 
+    .mobile-profile-sheet-inner .sheet-logout {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .mobile-profile-sheet-inner .sheet-discord-join {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
+      padding: 14px 16px;
+      border: 1px solid rgba(88, 101, 242, 0.9);
+      border-radius: 14px;
+      background: transparent;
+      color: #aeb7ff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .mobile-profile-sheet-inner .sheet-discord-join img {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
     /* 데스크톱 iframe(좁음): 시트 숨김 — 뷰포트 min-width는 iframe 너비 기준이라 72px에서는 아래 블록 미적용 */
     .mobile-sheet-backdrop,
     .mobile-profile-sheet {
@@ -320,6 +358,10 @@
           <span class="sheet-nickname" id="sheetMenuNickname"></span>
         </div>
         <button type="button" class="sheet-logout" id="sheetLogoutBtn">로그아웃</button>
+        <button type="button" class="sheet-discord-join" id="sheetDiscordJoinBtn">
+          <img src="discord.png" alt="">
+          <span>디스코드 참여</span>
+        </button>
       </div>
     </div>
   </div>
@@ -340,6 +382,7 @@
     const sheetMenuAvatar = document.getElementById('sheetMenuAvatar');
     const sheetMenuNickname = document.getElementById('sheetMenuNickname');
     const sheetLogoutBtn = document.getElementById('sheetLogoutBtn');
+    const sheetDiscordJoinBtn = document.getElementById('sheetDiscordJoinBtn');
     const userAvatar = document.getElementById('userAvatar');
     const sidebarBar = document.querySelector('.sidebar');
 
@@ -470,6 +513,12 @@
       if (isMobileBottomLayout()) return;
       closeProfileSheet();
       parent.postMessage({ type: 'logout' }, '*');
+    };
+    sheetDiscordJoinBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (isMobileBottomLayout()) return;
+      closeProfileSheet();
+      window.open('https://discord.gg/8s6XuWkfQb', '_blank');
     };
 
     document.addEventListener('keydown', (e) => {
