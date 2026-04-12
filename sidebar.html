@@ -155,6 +155,72 @@
       background: #555;
       border-radius: 10px;
     }
+
+    /* ─── MOBILE: BOTTOM BAR ─── */
+    @media (max-width: 768px) {
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+      .sidebar {
+        width: 100vw !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        height: 72px;
+        padding: 10px 12px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        overflow: hidden;
+      }
+      .logo-container {
+        display: none;
+      }
+      .nav-item {
+        margin: 0;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+      }
+      .create-btn {
+        margin: 0;
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+      }
+      .user-info {
+        margin-top: 0;
+        padding: 0;
+        width: auto;
+        gap: 0;
+      }
+      .user-avatar-wrapper {
+        position: relative;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .user-avatar {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      .logout-icon-btn-mobile {
+        position: absolute;
+        right: -8px;
+        bottom: -8px;
+        margin: 0;
+        width: 26px;
+        height: 26px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+      }
+      .logout-icon-btn-mobile img {
+        width: 16px !important;
+        height: 16px !important;
+      }
+    }
   </style>
 </head>
 <body>
