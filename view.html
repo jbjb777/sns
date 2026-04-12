@@ -536,6 +536,13 @@
       position: absolute;
       inset: 0;
       background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
+      opacity: 1;
+      pointer-events: auto;
     }
     .sharer-profile-sheet-host .sps-panel {
       position: absolute;
@@ -546,15 +553,47 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-bottom: none;
       border-radius: 20px 20px 0 0;
-      padding: 10px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
       box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+      max-height: 44vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      will-change: transform;
+      transform: translateY(100%);
+      transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-panel {
+      transform: translateY(0);
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
+      max-height: 88vh;
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
+      transition: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area {
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 6px 16px 14px;
+      margin: -2px -16px 0 -16px;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area:active {
+      cursor: grabbing;
     }
     .sharer-profile-sheet-host .sps-grab {
       width: 40px;
-      height: 4px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.2);
-      margin: 0 auto 16px;
+      height: 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.28);
+      flex-shrink: 0;
     }
     .sharer-profile-sheet-host .sps-profile {
       display: flex;
@@ -824,86 +863,11 @@
     if (type === 'requestUserInfo') updateSidebar();
   });
 
-  (function setupSharerProfileSheetHost() {
-    const HID = 'sharerProfileSheetHost';
-    let escHandler = null;
-    function q(id) { return document.getElementById(id); }
-    function closeHost() {
-      const host = q(HID);
-      if (!host) return;
-      host.hidden = true;
-      host.innerHTML = '';
-      if (escHandler) {
-        document.removeEventListener('keydown', escHandler);
-        escHandler = null;
-      }
-    }
-    window.addEventListener('message', (ev) => {
-      const d = ev.data;
-      if (!d || d.type !== 'sharerProfileSheet') return;
-      const host = q(HID);
-      if (!host) return;
-      if (!d.open) {
-        closeHost();
-        return;
-      }
-      const u = d.user || {};
-      const id = u.id;
-      const nick = (u.nickname || '').toString();
-      const pimg = (u.profile_image || '').toString();
-      if (!id || !nick) return;
-      closeHost();
-      host.hidden = false;
-      const bd = document.createElement('div');
-      bd.className = 'sps-backdrop';
-      bd.onclick = closeHost;
-      const panel = document.createElement('div');
-      panel.className = 'sps-panel';
-      const grab = document.createElement('div');
-      grab.className = 'sps-grab';
-      const prof = document.createElement('div');
-      prof.className = 'sps-profile';
-      prof.setAttribute('role', 'button');
-      prof.tabIndex = 0;
-      const av = document.createElement('div');
-      av.className = 'sps-av';
-      if (pimg.trim()) {
-        const im = document.createElement('img');
-        im.src = pimg + (pimg.includes('?') ? '&' : '?') + 'v=' + Date.now();
-        im.alt = nick;
-        im.onerror = () => { av.textContent = (nick.charAt(0) || '?').toUpperCase(); };
-        av.appendChild(im);
-      } else {
-        av.textContent = (nick.charAt(0) || '?').toUpperCase();
-      }
-      const nm = document.createElement('span');
-      nm.className = 'sps-name';
-      nm.textContent = nick;
-      prof.appendChild(av);
-      prof.appendChild(nm);
-      prof.onclick = () => {
-        closeHost();
-        location.href = 'https://sharer.jbjb.r-e.kr/user.html?id=' + encodeURIComponent(id) + '&nickname=' + encodeURIComponent(nick);
-      };
-      const lo = document.createElement('button');
-      lo.type = 'button';
-      lo.className = 'sps-logout';
-      lo.textContent = '로그아웃';
-      lo.onclick = () => {
-        closeHost();
-        localStorage.removeItem('snsUser');
-        currentUser = null;
-        location.href = 'index.html';
-      };
-      panel.appendChild(grab);
-      panel.appendChild(prof);
-      panel.appendChild(lo);
-      host.appendChild(bd);
-      host.appendChild(panel);
-      escHandler = (e) => { if (e.key === 'Escape') closeHost(); };
-      document.addEventListener('keydown', escHandler);
-    });
-  })();
+  window.onSharerProfileLogout = function () {
+    localStorage.removeItem('snsUser');
+    currentUser = null;
+    location.href = 'index.html';
+  };
 
   document.getElementById('commentInput')?.addEventListener('focus', function() {
     if (!currentUser) { this.blur(); showLoginAlert(); }
@@ -1222,5 +1186,6 @@
     } catch (e) { alert('게시물 삭제 실패'); }
   };
 </script>
+<script src="sharer-profile-sheet-host.js"></script>
 </body>
 </html>
