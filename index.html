@@ -569,10 +569,9 @@
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .recommend-container { display: none; }
-      /* 모바일: 사이드바 iframe 숨기고, 하단바 여백 확보 */
       .sidebar-container { display: none; }
       .main-wrapper { margin-left: 0; width: 100%; }
-      .main-content { padding: 20px 16px 80px; /* 하단바 높이(60px) + 여유 */ }
+      .main-content { padding: 20px 16px 80px; }
       .footer { padding-bottom: 80px; }
     }
   </style>
@@ -590,7 +589,7 @@
   <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
 </div>
 
-<!-- 모바일 하단바용 iframe (모바일에서만 표시) -->
+<!-- 모바일 하단바용 iframe -->
 <iframe
   src="sidebar.html"
   id="bottomBarFrame"
@@ -787,18 +786,23 @@ function initCurrentUser() {
 }
 
 function updateSidebar() {
-  // 데스크탑 사이드바
   const iframe = document.getElementById('sidebarFrame');
   if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
-  // 모바일 하단바
   const btmFrame = document.getElementById('bottomBarFrame');
   if (btmFrame?.contentWindow) btmFrame.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
 }
 
+// ★★★ 수정된 부분 ★★★
 function updateSidebarMode() {
   const narrow = window.innerWidth <= 768;
   const iframe = document.getElementById('sidebarFrame');
-  if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+  if (iframe?.contentWindow) {
+    iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+  }
+  const btmFrame = document.getElementById('bottomBarFrame');
+  if (btmFrame?.contentWindow) {
+    btmFrame.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+  }
 }
 
 window.addEventListener('message', (event) => {
