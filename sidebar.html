@@ -11,6 +11,8 @@
       height: 100vh;
       overflow: hidden;
     }
+
+    /* ─── 데스크탑: 기존 사이드바 ─── */
     .sidebar {
       width: 72px !important;
       max-width: 72px !important;
@@ -56,13 +58,6 @@
     .nav-item:hover {
       transform: scale(1.08);
     }
-    .nav-item.active {
-      /* 배경 그라데이션 및 그림자 제거 (필요시 다시 추가 가능) */
-      /* background와 box-shadow 주석 처리 또는 삭제 */
-      /* background: linear-gradient(135deg, rgba(54,99,255,0.3), rgba(87,34,179,0.2)); */
-      /* box-shadow: 0 4px 12px rgba(54,99,255,0.25); */
-    }
-    /* 비활성 상태일 때 아이콘 밝기 낮춤 */
     .nav-item:not(.active) .nav-icon-img,
     .nav-item:not(.active) .nav-icon-img-home,
     .nav-item:not(.active) .nav-icon-img-explore {
@@ -155,9 +150,129 @@
       background: #555;
       border-radius: 10px;
     }
+
+    /* ─── 모바일: 하단 탭바 ─── */
+    .bottom-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 60px;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      z-index: 9999;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 4px;
+      box-sizing: border-box;
+    }
+
+    .bottom-bar-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 6px 0;
+      border-radius: 10px;
+      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      gap: 3px;
+    }
+    .bottom-bar-item:active { transform: scale(0.88); }
+
+    .bottom-bar-item img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      transition: filter 0.2s ease;
+    }
+    .bottom-bar-item:not(.active) img {
+      filter: brightness(55%);
+    }
+    .bottom-bar-item.active img {
+      filter: brightness(100%);
+    }
+
+    .bottom-bar-label {
+      font-size: 10px;
+      font-weight: 500;
+      color: #555;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      letter-spacing: 0.01em;
+      transition: color 0.2s;
+    }
+    .bottom-bar-item.active .bottom-bar-label {
+      color: #fff;
+    }
+
+    /* 가운데 만들기 버튼 */
+    .bottom-bar-create {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .bottom-bar-create-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5269FF, #5722B3, #FF00EC);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(82,105,255,0.4);
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .bottom-bar-create-btn:active { transform: scale(0.88); }
+    .bottom-bar-create-btn img {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* 프로필 아바타 (하단바) */
+    .bottom-bar-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .bottom-bar-avatar img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+      filter: none !important;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none !important; }
+      .bottom-bar { display: flex !important; }
+      html, body { height: 100%; overflow: visible; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- 데스크탑 사이드바 -->
   <div class="sidebar">
     <div class="logo-container" id="logoContainer">
       <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
@@ -186,138 +301,203 @@
       </button>
     </div>
   </div>
+
+  <!-- 모바일 하단 탭바 -->
+  <div class="bottom-bar" id="bottomBar">
+    <!-- 홈 -->
+    <div class="bottom-bar-item active" id="btmHome">
+      <img src="home.png" alt="홈" id="btmHomeIcon">
+      <span class="bottom-bar-label">홈</span>
+    </div>
+    <!-- 탐색 -->
+    <div class="bottom-bar-item" id="btmExplore">
+      <img src="exploreX.png" alt="탐색" id="btmExploreIcon">
+      <span class="bottom-bar-label">탐색</span>
+    </div>
+    <!-- 만들기 (중앙) -->
+    <div class="bottom-bar-create" id="btmCreate">
+      <button class="bottom-bar-create-btn">
+        <img src="new.png" alt="만들기">
+      </button>
+    </div>
+    <!-- 채팅 -->
+    <div class="bottom-bar-item" id="btmChat">
+      <img src="chatX.png" alt="채팅" id="btmChatIcon">
+      <span class="bottom-bar-label">채팅</span>
+    </div>
+    <!-- 프로필 / 로그인 -->
+    <div class="bottom-bar-item" id="btmProfile">
+      <div class="bottom-bar-avatar" id="btmAvatar">?</div>
+      <span class="bottom-bar-label" id="btmProfileLabel">프로필</span>
+    </div>
+  </div>
+
   <script>
-    const homeNav = document.getElementById('homeNav');
-    const exploreNav = document.getElementById('exploreNav');
-    const chatNav = document.getElementById('chatNav');
-    const discordNav = document.getElementById('discordNav');
-    const createBtn = document.getElementById('createBtn');
-    const logoContainer = document.getElementById('logoContainer');
-    const userInfo = document.getElementById('userInfo');
-    // 아이콘 요소들
-    const homeIcon = document.getElementById('homeIcon');
-    const exploreIcon = document.getElementById('exploreIcon');
-    const chatIcon = document.getElementById('chatIcon');
+    /* ─── 공통 상태 ─── */
     let isLoggedIn = false;
     let currentUserId = null;
     let currentUserNickname = null;
     let currentUserProfileImage = null;
-    // 활성화 상태에 따라 아이콘 변경 함수
+
+    const homeNav    = document.getElementById('homeNav');
+    const exploreNav = document.getElementById('exploreNav');
+    const chatNav    = document.getElementById('chatNav');
+    const discordNav = document.getElementById('discordNav');
+    const createBtn  = document.getElementById('createBtn');
+    const logoContainer = document.getElementById('logoContainer');
+    const userInfo   = document.getElementById('userInfo');
+    const userAvatar = document.getElementById('userAvatar');
+    const homeIcon   = document.getElementById('homeIcon');
+    const exploreIcon= document.getElementById('exploreIcon');
+    const chatIcon   = document.getElementById('chatIcon');
+
+    /* 데스크탑 아이콘 업데이트 */
     function updateIcons() {
-      // 홈
-      if (homeNav.classList.contains('active')) {
-        homeIcon.src = 'home.png';
-      } else {
-        homeIcon.src = 'homeX.png';
-      }
-      // 탐색
-      if (exploreNav.classList.contains('active')) {
-        exploreIcon.src = 'explore.png';
-      } else {
-        exploreIcon.src = 'exploreX.png';
-      }
-      // 채팅
-      if (chatNav.classList.contains('active')) {
-        chatIcon.src = 'chat.png';
-      } else {
-        chatIcon.src = 'chatX.png';
-      }
+      homeIcon.src    = homeNav.classList.contains('active')    ? 'home.png'    : 'homeX.png';
+      exploreIcon.src = exploreNav.classList.contains('active') ? 'explore.png' : 'exploreX.png';
+      chatIcon.src    = chatNav.classList.contains('active')    ? 'chat.png'    : 'chatX.png';
     }
-    logoContainer.onclick = () => {
-      window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
-    };
-    homeNav.onclick = () => {
-      window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
-    };
-    exploreNav.onclick = () => {
-      window.top.location.href = 'https://sharer.jbjb.r-e.kr/explore.html';
-    };
-    chatNav.onclick = () => {
-      window.top.location.href = 'https://sharer.jbjb.r-e.kr/chat.html';
-    };
-    discordNav.onclick = () => {
-      window.open('https://discord.gg/8s6XuWkfQb', '_blank');
-    };
+
+    /* 모바일 하단바 아이콘 업데이트 */
+    const btmHome    = document.getElementById('btmHome');
+    const btmExplore = document.getElementById('btmExplore');
+    const btmChat    = document.getElementById('btmChat');
+    const btmProfile = document.getElementById('btmProfile');
+    const btmHomeIcon    = document.getElementById('btmHomeIcon');
+    const btmExploreIcon = document.getElementById('btmExploreIcon');
+    const btmChatIcon    = document.getElementById('btmChatIcon');
+    const btmProfileLabel= document.getElementById('btmProfileLabel');
+    const btmAvatar  = document.getElementById('btmAvatar');
+
+    function updateBottomIcons() {
+      btmHomeIcon.src    = btmHome.classList.contains('active')    ? 'home.png'    : 'homeX.png';
+      btmExploreIcon.src = btmExplore.classList.contains('active') ? 'explore.png' : 'exploreX.png';
+      btmChatIcon.src    = btmChat.classList.contains('active')    ? 'chat.png'    : 'chatX.png';
+    }
+
+    function setActiveTab(tab) {
+      [homeNav, exploreNav, chatNav].forEach(n => n.classList.remove('active'));
+      [btmHome, btmExplore, btmChat, btmProfile].forEach(n => n.classList.remove('active'));
+
+      if (tab === 'home')    { homeNav.classList.add('active');    btmHome.classList.add('active'); }
+      if (tab === 'explore') { exploreNav.classList.add('active'); btmExplore.classList.add('active'); }
+      if (tab === 'chat')    { chatNav.classList.add('active');    btmChat.classList.add('active'); }
+      if (tab === 'profile') { btmProfile.classList.add('active'); }
+
+      updateIcons();
+      updateBottomIcons();
+    }
+
+    /* ─── 데스크탑 네비게이션 ─── */
+    logoContainer.onclick = () => { window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html'; };
+    homeNav.onclick    = () => { window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html'; };
+    exploreNav.onclick = () => { window.top.location.href = 'https://sharer.jbjb.r-e.kr/explore.html'; };
+    chatNav.onclick    = () => { window.top.location.href = 'https://sharer.jbjb.r-e.kr/chat.html'; };
+    discordNav.onclick = () => { window.open('https://discord.gg/8s6XuWkfQb', '_blank'); };
+
     createBtn.onclick = () => {
-      if (isLoggedIn) {
-        window.top.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
-      } else {
-        window.top.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
-      }
+      window.top.location.href = isLoggedIn
+        ? 'https://sharer.jbjb.r-e.kr/make.html'
+        : 'https://sharer.jbjb.r-e.kr/login.html';
     };
+
     userInfo.onclick = () => {
       if (isLoggedIn && currentUserId && currentUserNickname) {
         window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
       }
     };
+
+    /* ─── 모바일 하단바 네비게이션 ─── */
+    btmHome.onclick = () => { window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html'; };
+    btmExplore.onclick = () => { window.top.location.href = 'https://sharer.jbjb.r-e.kr/explore.html'; };
+    btmChat.onclick = () => { window.top.location.href = 'https://sharer.jbjb.r-e.kr/chat.html'; };
+
+    document.getElementById('btmCreate').onclick = () => {
+      window.top.location.href = isLoggedIn
+        ? 'https://sharer.jbjb.r-e.kr/make.html'
+        : 'https://sharer.jbjb.r-e.kr/login.html';
+    };
+
+    btmProfile.onclick = () => {
+      if (isLoggedIn && currentUserId && currentUserNickname) {
+        window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
+      } else {
+        window.top.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
+      }
+    };
+
+    /* ─── 로그아웃 ─── */
     window.handleLogout = (event) => {
       event.stopPropagation();
       parent.postMessage({ type: 'logout' }, '*');
     };
+
+    /* ─── 프로필 아바타 업데이트 (데스크탑 + 모바일 공통) ─── */
+    function applyUserToUI(user) {
+      if (!user) {
+        isLoggedIn = false;
+        currentUserId = null;
+        currentUserNickname = null;
+        currentUserProfileImage = null;
+        userInfo.style.display = 'none';
+        // 하단바 프로필 초기화
+        btmAvatar.innerHTML = '?';
+        btmAvatar.style.background = 'linear-gradient(135deg, #3478f6, #53b6f9)';
+        btmProfileLabel.textContent = '프로필';
+        return;
+      }
+
+      isLoggedIn = true;
+      currentUserId = user.id;
+      currentUserNickname = user.nickname;
+      currentUserProfileImage = user.profile_image;
+
+      /* 데스크탑 아바타 */
+      if (user.profile_image && user.profile_image.trim()) {
+        const img = document.createElement('img');
+        img.src = user.profile_image + (user.profile_image.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        img.alt = user.nickname || '프로필';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        img.onerror = () => { userAvatar.innerHTML = user.nickname ? user.nickname[0].toUpperCase() : '?'; };
+        userAvatar.innerHTML = '';
+        userAvatar.appendChild(img);
+      } else {
+        userAvatar.textContent = user.nickname ? user.nickname[0].toUpperCase() : '?';
+      }
+      userInfo.style.display = 'flex';
+
+      /* 모바일 아바타 */
+      if (user.profile_image && user.profile_image.trim()) {
+        const mImg = document.createElement('img');
+        mImg.src = user.profile_image + (user.profile_image.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        mImg.alt = user.nickname || '프로필';
+        mImg.onerror = () => { btmAvatar.innerHTML = user.nickname ? user.nickname[0].toUpperCase() : '?'; };
+        btmAvatar.innerHTML = '';
+        btmAvatar.appendChild(mImg);
+      } else {
+        btmAvatar.innerHTML = user.nickname ? user.nickname[0].toUpperCase() : '?';
+      }
+      btmProfileLabel.textContent = user.nickname ? user.nickname.slice(0, 4) : '프로필';
+    }
+
+    /* ─── 메시지 수신 ─── */
     window.addEventListener('message', (event) => {
       const data = event.data;
       if (!data?.type) return;
-      if (data.type === 'activateHome' || data.type === 'default') {
-        homeNav.classList.add('active');
-        exploreNav.classList.remove('active');
-        chatNav.classList.remove('active');
-        updateIcons();
-      }
-      if (data.type === 'activateExplore') {
-        homeNav.classList.remove('active');
-        exploreNav.classList.add('active');
-        chatNav.classList.remove('active');
-        updateIcons();
-      }
-      if (data.type === 'activateChat') {
-        homeNav.classList.remove('active');
-        exploreNav.classList.remove('active');
-        chatNav.classList.add('active');
-        updateIcons();
-      }
-      if (data.type === 'updateUser') {
-        if (data.user) {
-          isLoggedIn = true;
-          currentUserId = data.user.id;
-          currentUserNickname = data.user.nickname;
-          currentUserProfileImage = data.user.profile_image;
-          if (currentUserProfileImage && typeof currentUserProfileImage === 'string' && currentUserProfileImage.trim() !== '') {
-            const img = document.createElement('img');
-            const url = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
-            img.src = url;
-            img.alt = data.user.nickname || '프로필';
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
-            img.onerror = () => {
-              userAvatar.innerHTML = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
-            };
-            userAvatar.innerHTML = '';
-            userAvatar.appendChild(img);
-          } else {
-            userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
-          }
-          userInfo.style.display = 'flex';
-        } else {
-          isLoggedIn = false;
-          currentUserId = null;
-          currentUserNickname = null;
-          currentUserProfileImage = null;
-          userInfo.style.display = 'none';
-        }
-      }
+
+      if (data.type === 'activateHome' || data.type === 'default') setActiveTab('home');
+      if (data.type === 'activateExplore') setActiveTab('explore');
+      if (data.type === 'activateChat')    setActiveTab('chat');
+
+      if (data.type === 'updateUser') applyUserToUI(data.user || null);
+
       if (data.type === 'setNarrowMode') {
-        const sidebar = document.querySelector('.sidebar');
-        if (data.narrow) {
-          sidebar.classList.add('narrow');
-        } else {
-          sidebar.classList.remove('narrow');
-        }
+        /* narrow 모드 처리 – 모바일에서는 CSS media query가 하단바 제어하므로 별도 처리 없음 */
       }
     });
-    // 초기 상태 설정
-    homeNav.classList.add('active');
-    updateIcons(); // 처음 로드 시에도 아이콘 올바르게 표시
+
+    /* ─── 초기화 ─── */
+    setActiveTab('home');
     parent.postMessage({ type: 'requestUserInfo' }, '*');
   </script>
 </body>

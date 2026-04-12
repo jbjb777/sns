@@ -569,10 +569,11 @@
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .recommend-container { display: none; }
-      .sidebar-container { width: 80px; min-width: 80px; }
-      .sidebar-container iframe { width: 80px !important; }
-      .main-wrapper { margin-left: 80px; width: calc(100% - 80px); }
-      .main-content { padding: 20px 16px; }
+      /* 모바일: 사이드바 iframe 숨기고, 하단바 여백 확보 */
+      .sidebar-container { display: none; }
+      .main-wrapper { margin-left: 0; width: 100%; }
+      .main-content { padding: 20px 16px 80px; /* 하단바 높이(60px) + 여유 */ }
+      .footer { padding-bottom: 80px; }
     }
   </style>
 </head>
@@ -588,6 +589,15 @@
 <div class="sidebar-container">
   <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
 </div>
+
+<!-- 모바일 하단바용 iframe (모바일에서만 표시) -->
+<iframe
+  src="sidebar.html"
+  id="bottomBarFrame"
+  style="display:none; position:fixed; bottom:0; left:0; width:100%; height:60px; border:none; z-index:200; background:transparent;"
+  frameborder="0"
+></iframe>
+
 <div class="main-wrapper">
 
   <!-- Login Modal -->
@@ -715,7 +725,6 @@ document.addEventListener('click', function(e) {
 (function () {
   const splash = document.getElementById('splash');
 
-  // 이미 방문한 경우 스플래시 즉시 숨김
   if (sessionStorage.getItem('splashShown')) {
     splash.style.display = 'none';
   } else {
@@ -735,10 +744,20 @@ document.addEventListener('click', function(e) {
       const remaining = Math.max(0, MIN_SPLASH - elapsed);
       setTimeout(finishSplash, remaining);
     });
-    // 안전망: 최대 5초 후 강제 종료
     setTimeout(finishSplash, 5000);
   }
 })();
+
+// ─── 모바일 하단바 iframe 표시/숨김 ───
+function applyMobileLayout() {
+  const isMobile = window.innerWidth <= 768;
+  const bottomBarFrame = document.getElementById('bottomBarFrame');
+  if (bottomBarFrame) {
+    bottomBarFrame.style.display = isMobile ? 'block' : 'none';
+  }
+}
+applyMobileLayout();
+window.addEventListener('resize', applyMobileLayout);
 
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
@@ -768,13 +787,17 @@ function initCurrentUser() {
 }
 
 function updateSidebar() {
+  // 데스크탑 사이드바
   const iframe = document.getElementById('sidebarFrame');
   if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+  // 모바일 하단바
+  const btmFrame = document.getElementById('bottomBarFrame');
+  if (btmFrame?.contentWindow) btmFrame.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
 }
 
 function updateSidebarMode() {
-  const iframe = document.getElementById('sidebarFrame');
   const narrow = window.innerWidth <= 768;
+  const iframe = document.getElementById('sidebarFrame');
   if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
 }
 
@@ -932,22 +955,15 @@ async function toggleLike(postId, button) {
   }
 }
 
-// ──────────────────────────────────────────────────────────────
-// 최적화된 loadPosts
-// 기존: 게시물 N개 × (유저 1 + 좋아요수 1 + 내좋아요 1) = 3N 요청
-// 개선: 게시물 1 + 유저 1(배치) + 좋아요전체 1 + 내좋아요 1 = 4 요청 고정
-// ──────────────────────────────────────────────────────────────
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
   try {
-    // 1) 게시물 로드
     const posts = await api("/posts?select=*&order=created_at.desc");
     if (!posts?.length) {
       feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
       return;
     }
 
-    // 2) 유니크 author_id 목록 → 유저 정보 배치 로드 (요청 1번)
     const authorIds = [...new Set(posts.map(p => p.author_id).filter(Boolean))];
     const usersMap = {};
     if (authorIds.length) {
@@ -958,7 +974,6 @@ async function loadPosts() {
       } catch (e) { console.warn("유저 일괄 로드 실패:", e); }
     }
 
-    // 3) 모든 게시물의 좋아요 데이터 한 번에 로드 (요청 1~2번)
     const postIds = posts.map(p => p.id);
     const postIdFilter = postIds.join(',');
 
@@ -969,12 +984,10 @@ async function loadPosts() {
         : Promise.resolve([])
     ]);
 
-    // 좋아요 수 집계 (클라이언트에서)
     const likeCountMap = {};
     (allLikes || []).forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
     const myLikeSet = new Set((myLikes || []).map(l => l.post_id));
 
-    // 4) 전체 DOM 한 번에 렌더링
     feedDiv.innerHTML = '';
     posts.forEach((post, idx) => {
       const userInfo = usersMap[post.author_id] || null;
