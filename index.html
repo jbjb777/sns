@@ -21,6 +21,8 @@
   <meta name="twitter:title" content="Sharer | 커뮤니티 · SNS">
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.jbjb.r-e.kr/logo.png">
+  <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
+  <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -57,6 +59,53 @@
     }
 
     @keyframes bodyReveal { to { opacity: 1; } }
+
+    /* ─── SPLASH SCREEN ─── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease;
+    }
+
+    #splash.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .splash-logo {
+      width: 72px;
+      height: 72px;
+      animation: splashLogoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes splashLogoPop {
+      from { opacity: 0; transform: scale(0.7); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* NProgress 커스텀 스타일 */
+    #nprogress .bar {
+      background: #fff !important;
+      height: 2px !important;
+    }
+    #nprogress .peg {
+      display: none !important;
+    }
+    #nprogress .spinner {
+      display: none !important;
+    }
 
     /* ─── SIDEBAR ─── */
     .sidebar-container {
@@ -528,6 +577,14 @@
   </style>
 </head>
 <body>
+
+<!-- ─── SPLASH SCREEN ─── -->
+<div id="splash">
+  <div class="splash-inner">
+    <img src="logo.svg" class="splash-logo" alt="Sharer">
+  </div>
+</div>
+
 <div class="sidebar-container">
   <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
 </div>
@@ -644,6 +701,33 @@
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── NPROGRESS 설정 ───
+NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+
+document.addEventListener('click', function(e) {
+  const link = e.target.closest('a');
+  if (link && link.href && !link.target && !link.hasAttribute('download')) {
+    NProgress.start();
+  }
+});
+
+// ─── SPLASH ───
+(function () {
+  const splash = document.getElementById('splash');
+
+  function finishSplash() {
+    splash.classList.add('fade-out');
+    setTimeout(() => { splash.style.display = 'none'; }, 460);
+  }
+
+  window.addEventListener('load', () => {
+    NProgress.done();
+    finishSplash();
+  });
+  // 안전망: 최대 3.5초 후 강제 종료
+  setTimeout(finishSplash, 3500);
+})();
+
 const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
 async function api(endpoint, options = {}) {
