@@ -39,7 +39,7 @@
       position: fixed;
       inset: 0;
       background: var(--bg);
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       z-index: 99999;
@@ -594,15 +594,17 @@
       <div class="footer-links">
         <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
         <a href="#" onclick="showTerms(); return false;">이용약관</a>
-        <a href="mailto:alexeom97@outlook.com">문의하기</a>
+        <a href="/cdn-cgi/l/email-protection#7d1c111805181210444a3d12080911121216531e1210">문의하기</a>
       </div>
       <div class="footer-text">본 서비스는 대한민국의 중1 개발자 1인이 만든 프로젝트입니다 모든 소스 코드및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
     </div>
   </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ─── NPROGRESS 설정 ───
   NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+
+  window.addEventListener('load', () => { NProgress.done(); });
 
   document.addEventListener('click', function(e) {
     const link = e.target.closest('a');
@@ -621,9 +623,10 @@
     }
 
     if (sessionStorage.getItem('splashShown')) {
-      splash.style.display = 'none';
+      // 이미 방문 → display:none 그대로 둠
     } else {
       sessionStorage.setItem('splashShown', 'true');
+      splash.style.display = 'flex';
       const splashStart = Date.now();
       const MIN_SPLASH = 2000;
 
@@ -990,6 +993,7 @@
   };
 
   window.goToProfile = function(userId, nickname) {
+    NProgress.start();
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   };
 
@@ -1031,19 +1035,13 @@
     });
   };
 
-  window.goHome = () => window.location.href = "index.html";
-  window.showPrivacyPolicy = () => window.location.href = "privacy.html";
-  window.showTerms = () => window.location.href = "policy.html";
+  window.goHome = () => { NProgress.start(); window.location.href = "index.html"; };
+  window.showPrivacyPolicy = () => { NProgress.start(); window.location.href = "privacy.html"; };
+  window.showTerms = () => { NProgress.start(); window.location.href = "policy.html"; };
 
   document.getElementById('confirmDeleteBtn').onclick = async () => {
     if (!pendingDeletePostId) return;
     try {
       await api(`/comments?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
       await api(`/likes?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
-      await api(`/posts?id=eq.${pendingDeletePostId}`, { method: "DELETE" });
-      window.location.href = 'index.html';
-    } catch (e) { alert('게시물 삭제 실패'); }
-  };
-</script>
-</body>
-</html>
+      await api(`/posts?id=eq.${pendingDeletePostId}`,
