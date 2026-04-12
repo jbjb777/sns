@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>게시물 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
+  <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -25,6 +27,32 @@
       --r2: 14px;
       --r3: 20px;
       --r4: 28px;
+    }
+
+    /* NProgress 커스텀 */
+    #nprogress .bar { background: #fff !important; height: 2px !important; }
+    #nprogress .peg { display: none !important; }
+    #nprogress .spinner { display: none !important; }
+
+    /* ─── SPLASH ─── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease;
+    }
+    #splash.fade-out { opacity: 0; pointer-events: none; }
+    .splash-logo {
+      width: 72px; height: 72px;
+      animation: splashLogoPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes splashLogoPop {
+      from { opacity: 0; transform: scale(0.7); }
+      to   { opacity: 1; transform: scale(1); }
     }
 
     body {
@@ -512,6 +540,12 @@
   </style>
 </head>
 <body>
+
+  <!-- ─── SPLASH ─── -->
+  <div id="splash">
+    <img src="logo.svg" class="splash-logo" alt="Sharer">
+  </div>
+
   <!-- 로그인 알림 -->
   <div class="login-alert" id="loginAlert">
     <span> </span>
@@ -567,6 +601,43 @@
   </div>
 
 <script>
+  // ─── NPROGRESS 설정 ───
+  NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && link.href && !link.target && !link.hasAttribute('download')) {
+      NProgress.start();
+    }
+  });
+
+  // ─── SPLASH (처음 방문 시에만) ───
+  (function () {
+    const splash = document.getElementById('splash');
+
+    function finishSplash() {
+      splash.classList.add('fade-out');
+      setTimeout(() => { splash.style.display = 'none'; }, 460);
+    }
+
+    if (sessionStorage.getItem('splashShown')) {
+      splash.style.display = 'none';
+    } else {
+      sessionStorage.setItem('splashShown', 'true');
+      const splashStart = Date.now();
+      const MIN_SPLASH = 2000;
+
+      window.addEventListener('load', () => {
+        NProgress.done();
+        const elapsed = Date.now() - splashStart;
+        const remaining = Math.max(0, MIN_SPLASH - elapsed);
+        setTimeout(finishSplash, remaining);
+      });
+      // 안전망: 최대 5초 후 강제 종료
+      setTimeout(finishSplash, 5000);
+    }
+  })();
+
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
   async function api(endpoint, options = {}) {
