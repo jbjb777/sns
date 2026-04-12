@@ -152,11 +152,9 @@
       color: #666;
       position: relative;
       overflow: hidden;
-      transition: all 0.2s;
     }
     .profile-avatar.editable { cursor: pointer; }
     .profile-avatar.editable:hover { border-color: var(--border3); transform: scale(1.05); }
-    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
     .avatar-overlay {
       display: none;
@@ -182,38 +180,27 @@
     .verification-badge {
       display: inline-block;
       width: 18px; height: 18px;
-      vertical-align: middle;
       background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1" /></linearGradient></defs><path fill="url(%23grad)" d="M512 0 L1024 295 L1024 729 L512 1024 L0 729 L0 295 Z"/><path fill="white" d="M256 512 L384 640 L768 256 L832 320 L384 768 L192 576 Z"/></svg>');
       background-size: contain;
       background-repeat: no-repeat;
     }
+
     .profile-stats { display: flex; gap: 36px; align-items: center; }
     .stat-number { font-size: 22px; font-weight: 700; color: var(--t1); }
     .stat-label { font-size: 12px; color: var(--t3); font-weight: 500; }
 
     .share-btn {
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      color: var(--t2);
-      width: 38px; height: 38px;
-      border-radius: var(--r2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-left: auto;
-      transition: all 0.15s;
+      background: var(--bg3); border: 1px solid var(--border2); color: var(--t2);
+      width: 38px; height: 38px; border-radius: var(--r2); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: auto; transition: all 0.15s;
     }
     .share-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--border3); }
     .share-btn.success { background: rgba(74,222,128,0.12); border-color: var(--green); color: var(--green); }
 
     .status-message-container {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
+      margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 12px;
     }
     .status-message-text { color: var(--t2); font-size: 14px; line-height: 1.65; flex: 1; }
     .status-message-empty { color: var(--t3); font-style: italic; }
@@ -223,56 +210,39 @@
       border-radius: 50%;
       background: var(--bg3);
       border: 1px solid var(--border2);
+      color: var(--t2);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.15s;
     }
-    .edit-status-btn:hover { background: var(--bg4); border-color: var(--border3); color: var(--t1); transform: scale(1.08); }
+    .edit-status-btn:hover {
+      background: var(--bg4);
+      border-color: var(--border3);
+      color: var(--t1);
+      transform: scale(1.08);
+    }
 
     .posts-section { padding: 20px 0; }
     .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--t3);
-      margin-bottom: 20px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border);
+      font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--t3); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
     }
-    .post-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
+
+    .post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
     .post-item {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r3);
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r3);
+      overflow: hidden; cursor: pointer; transition: all 0.2s;
     }
     .post-item:hover { border-color: var(--border3); transform: translateY(-4px); background: var(--bg3); }
     .post-item-image { width: 100%; height: 220px; object-fit: cover; }
     .post-item-content { padding: 14px 16px 6px; }
     .post-item-text {
-      font-size: 14px;
-      line-height: 1.65;
-      color: var(--t2);
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 14px; line-height: 1.65; color: var(--t2);
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .post-item-footer {
-      padding: 10px 16px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .post-item-footer { padding: 10px 16px 14px; display: flex; justify-content: space-between; align-items: center; }
     .post-item-date { font-size: 11px; color: var(--t3); }
     .post-item-likes { display: flex; align-items: center; gap: 5px; color: var(--pink); font-size: 12px; font-weight: 600; }
 
@@ -286,17 +256,13 @@
 
     .no-posts { text-align: center; padding: 64px 20px; color: var(--t3); font-size: 14px; }
 
+    /* ─── MODAL ─── */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(16px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(16px);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
     }
     .modal-overlay.active { display: flex; }
+
     .modal-content {
       background: var(--bg2);
       border: 1px solid var(--border2);
@@ -304,49 +270,33 @@
       padding: 32px;
       width: 90%;
       max-width: 440px;
+      animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
     }
-    .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 18px; }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.90) translateY(14px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 18px; color: var(--t1); }
     .modal-input {
-      width: 100%;
-      padding: 12px 14px;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      border-radius: var(--r2);
-      color: var(--t1);
-      font-size: 14px;
-      margin-bottom: 18px;
-      resize: vertical;
-      min-height: 80px;
-      font-family: inherit;
+      width: 100%; padding: 12px 14px; background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: var(--r2); color: var(--t1); font-size: 14px; margin-bottom: 18px;
+      resize: vertical; min-height: 80px; font-family: inherit;
     }
     .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
     .modal-btn {
-      padding: 10px 22px;
-      border-radius: var(--r2);
-      border: none;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
+      padding: 10px 22px; border-radius: var(--r2); border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
     }
     .modal-btn-cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
     .modal-btn-cancel:hover { background: var(--bg4); color: var(--t1); }
     .modal-btn-confirm { background: #fff; color: #000; }
 
     .upload-toast {
-      position: fixed;
-      bottom: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      color: var(--t1);
-      padding: 10px 22px;
-      border-radius: 22px;
-      font-size: 13px;
-      font-weight: 500;
-      z-index: 9999;
-      transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
+      position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%);
+      background: var(--bg2); border: 1px solid var(--border2); color: var(--t1);
+      padding: 10px 22px; border-radius: 22px; font-size: 13px; font-weight: 500;
+      z-index: 9999; transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
     }
     .upload-toast.show { bottom: 28px; }
 
@@ -494,11 +444,7 @@ async function api(endpoint, options = {}) {
     ...options,
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
   });
-  if (!res.ok) {
-    let errorText = "";
-    try { errorText = await res.text(); } catch {}
-    throw new Error(`API 오류 (${res.status}): ${errorText}`);
-  }
+  if (!res.ok) throw new Error(`API 오류 (${res.status})`);
   if (res.status === 204) return null;
   const text = await res.text();
   return text ? JSON.parse(text) : null;
@@ -552,7 +498,6 @@ window.addEventListener('message', (event) => {
   }
   if (type === 'logout') {
     localStorage.removeItem('snsUser');
-    currentUser = null;
     location.href = 'index.html';
   }
 });
@@ -562,7 +507,7 @@ updateSidebar();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
 
-// 프로필 사진 변경
+// 프로필 사진 업로드
 document.getElementById('profileFileInput').addEventListener('change', async (e) => {
   const file = e.target.files?.[0];
   if (!file || !currentUser?.id) return;
@@ -582,7 +527,6 @@ document.getElementById('profileFileInput').addEventListener('change', async (e)
     showToast('✅ 프로필 사진이 변경되었습니다!');
     setTimeout(hideToast, 2200);
   } catch (err) {
-    console.error(err);
     hideToast();
     showToast('❌ 업로드 실패');
     setTimeout(hideToast, 3000);
@@ -611,7 +555,7 @@ async function loadUserProfile() {
     viewingUser = users[0];
     await displayProfile(viewingUser);
   } catch (e) {
-    console.error('프로필 로드 오류:', e);
+    console.error(e);
     showError('프로필을 불러오는 중 오류가 발생했습니다.');
   }
 }
@@ -623,14 +567,11 @@ async function displayProfile(user) {
 
   const userPostsData = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id`);
   const postCount = userPostsData?.length ?? 0;
-
   let totalLikes = 0;
   if (userPostsData?.length) {
     const postIds = userPostsData.map(p => p.id).join(',');
-    try {
-      const allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`);
-      totalLikes = allLikes?.length ?? 0;
-    } catch (e) {}
+    const allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`).catch(() => []);
+    totalLikes = allLikes?.length ?? 0;
   }
 
   const statusMessage = user.message || '';
@@ -714,20 +655,14 @@ async function loadUserPosts() {
       postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
       return;
     }
-
     const postIds = posts.map(p => p.id).join(',');
     let allLikes = [];
-    try {
-      allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`) || [];
-    } catch (e) {}
-
+    try { allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`) || []; } catch {}
     const likeCountMap = {};
     allLikes.forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
-
     const postsWithLikes = posts.map(post => ({ ...post, likeCount: likeCountMap[post.id] || 0 }));
     displayPosts(postsWithLikes);
   } catch (e) {
-    console.error('게시물 로드 오류:', e);
     postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
   }
 }
@@ -740,7 +675,7 @@ function displayPosts(posts) {
     const postItem = document.createElement('div');
     postItem.className = 'post-item';
     postItem.style.cssText = `opacity:0; transform:translateY(10px); transition: all 0.35s ease ${idx * 0.06}s;`;
-    postItem.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
+    postItem.onclick = () => window.location.href = `view.html?id=${post.id}`;
     const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
     postItem.innerHTML = `
       ${post.image_url ? `<img src="${escapeHtml(post.image_url)}" class="post-item-image" alt="게시글 이미지" loading="lazy">` : ''}
@@ -748,7 +683,7 @@ function displayPosts(posts) {
       <div class="post-item-footer">
         <div class="post-item-date">${timeStr}</div>
         <div class="post-item-likes">
-          <svg width="12" height="12" viewBox="0 0 2300 2300" fill="currentColor"><path d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/></svg>
+          <svg width="12" height="12" viewBox="0 0 2300 2300" fill="currentColor"><path d="M 2169.75708 1273.707397 C ... Z"/></svg>
           ${post.likeCount}
         </div>
       </div>
@@ -765,7 +700,7 @@ function displayPosts(posts) {
 
 function escapeHtml(t) {
   if (!t) return '';
-  return t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'} [m]));
+  return t.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
 
 function showError(msg) {
@@ -782,8 +717,7 @@ function showError(msg) {
 
 window.openStatusModal = function() {
   const modal = document.getElementById('statusModal');
-  const input = document.getElementById('statusInput');
-  input.value = viewingUser?.message || '';
+  document.getElementById('statusInput').value = viewingUser?.message || '';
   modal.classList.add('active');
 };
 
@@ -792,9 +726,8 @@ window.closeStatusModal = function() {
 };
 
 window.saveStatusMessage = async function() {
-  const input = document.getElementById('statusInput');
-  const newMessage = input.value.trim();
-  if (!currentUser?.id) { alert('로그인이 필요합니다.'); return; }
+  const newMessage = document.getElementById('statusInput').value.trim();
+  if (!currentUser?.id) return alert('로그인이 필요합니다.');
   try {
     await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
       method: "PATCH",
@@ -805,8 +738,7 @@ window.saveStatusMessage = async function() {
     await displayProfile(viewingUser);
     closeStatusModal();
   } catch (e) {
-    console.error(e);
-    alert('상태메시지 저장에 실패했습니다.');
+    alert('저장에 실패했습니다.');
   }
 };
 
