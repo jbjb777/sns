@@ -572,9 +572,7 @@
       .sidebar-container {
         width: 100%;
         min-width: 100%;
-        height: 72px;
-        padding-bottom: 0;
-        padding-bottom: env(safe-area-inset-bottom);
+        height: calc(72px + env(safe-area-inset-bottom));
         left: 0;
         right: 0;
         top: auto;
@@ -582,7 +580,7 @@
       }
       .sidebar-container iframe {
         width: 100% !important;
-        height: 72px !important;
+        height: calc(72px + env(safe-area-inset-bottom)) !important;
         display: block;
       }
       .main-wrapper {
@@ -590,7 +588,6 @@
         width: 100%;
       }
       .main-content {
-        padding: 20px 16px 92px 16px;
         padding: 20px 16px calc(20px + 72px + env(safe-area-inset-bottom)) 16px;
       }
     }
