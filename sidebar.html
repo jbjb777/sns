@@ -155,155 +155,6 @@
       background: #555;
       border-radius: 10px;
     }
-
-    /* ─── MOBILE: BOTTOM BAR (enabled via setNarrowMode) ─── */
-    body.is-mobile {
-      height: 100%;
-      overflow: hidden;
-    }
-    body.is-mobile .sidebar {
-      width: 100vw !important;
-      max-width: none !important;
-      min-width: 0 !important;
-      height: 72px;
-      padding: 10px 12px;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 10px;
-      overflow: hidden;
-    }
-    body.is-mobile .logo-container { display: none; }
-    body.is-mobile .nav-item {
-      margin: 0;
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-    }
-    body.is-mobile #chatNav,
-    body.is-mobile #discordNav {
-      display: none;
-    }
-    body.is-mobile .create-btn {
-      margin: 0 auto;
-      width: 52px;
-      height: 52px;
-      border-radius: 18px;
-    }
-    body.is-mobile .user-info {
-      margin-top: 0;
-      padding: 0;
-      width: auto;
-      gap: 0;
-    }
-    body.is-mobile .logout-icon-btn-mobile {
-      display: none;
-    }
-    body.is-mobile .user-avatar-wrapper {
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    body.is-mobile .user-avatar {
-      width: 44px;
-      height: 44px;
-      font-size: 18px;
-    }
-
-    /* ─── MOBILE: PROFILE SHEET ─── */
-    .mobile-sheet-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 220ms ease;
-    }
-    .mobile-sheet {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
-      background: rgba(12,12,12,0.92);
-      border-top: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      transform: translateY(110%);
-      transition: transform 280ms cubic-bezier(0.22,1,0.36,1);
-      pointer-events: none;
-    }
-    .mobile-sheet-handle {
-      width: 44px;
-      height: 5px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.18);
-      margin: 0 auto 12px;
-    }
-    .mobile-sheet-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 12px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      transition: transform 160ms ease, background 160ms ease;
-    }
-    .mobile-sheet-profile:active { transform: scale(0.98); }
-    .mobile-sheet-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-weight: 700;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-    .mobile-sheet-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .mobile-sheet-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: -0.01em;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .mobile-sheet-sub {
-      font-size: 12px;
-      color: rgba(255,255,255,0.55);
-      margin-top: 2px;
-    }
-    .mobile-sheet-actions { margin-top: 12px; }
-    .mobile-sheet-logout {
-      width: 100%;
-      border: 1px solid rgba(255,107,107,0.35);
-      background: rgba(255,107,107,0.08);
-      color: #ff6b6b;
-      padding: 12px 14px;
-      border-radius: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: transform 160ms ease, background 160ms ease;
-    }
-    .mobile-sheet-logout:active { transform: scale(0.99); }
-    .mobile-sheet-open .mobile-sheet-backdrop {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .mobile-sheet-open .mobile-sheet {
-      transform: translateY(0);
-      pointer-events: auto;
-    }
   </style>
 </head>
 <body>
@@ -335,21 +186,6 @@
       </button>
     </div>
   </div>
-
-  <div class="mobile-sheet-backdrop" id="mobileSheetBackdrop"></div>
-  <div class="mobile-sheet" id="mobileSheet" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="mobile-sheet-handle"></div>
-    <div class="mobile-sheet-profile" id="mobileSheetProfile">
-      <div class="mobile-sheet-avatar" id="mobileSheetAvatar"></div>
-      <div style="min-width: 0;">
-        <div class="mobile-sheet-name" id="mobileSheetName">로그인 필요</div>
-        <div class="mobile-sheet-sub">프로필 보기</div>
-      </div>
-    </div>
-    <div class="mobile-sheet-actions">
-      <button class="mobile-sheet-logout" id="mobileSheetLogout">로그아웃</button>
-    </div>
-  </div>
   <script>
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
@@ -358,12 +194,6 @@
     const createBtn = document.getElementById('createBtn');
     const logoContainer = document.getElementById('logoContainer');
     const userInfo = document.getElementById('userInfo');
-    const mobileSheetBackdrop = document.getElementById('mobileSheetBackdrop');
-    const mobileSheet = document.getElementById('mobileSheet');
-    const mobileSheetProfile = document.getElementById('mobileSheetProfile');
-    const mobileSheetAvatar = document.getElementById('mobileSheetAvatar');
-    const mobileSheetName = document.getElementById('mobileSheetName');
-    const mobileSheetLogout = document.getElementById('mobileSheetLogout');
     // 아이콘 요소들
     const homeIcon = document.getElementById('homeIcon');
     const exploreIcon = document.getElementById('exploreIcon');
@@ -372,46 +202,6 @@
     let currentUserId = null;
     let currentUserNickname = null;
     let currentUserProfileImage = null;
-    let isMobile = false;
-
-    function setMobileMode(narrow) {
-      isMobile = !!narrow;
-      document.body.classList.toggle('is-mobile', isMobile);
-      if (!isMobile) closeMobileSheet();
-    }
-
-    function openMobileSheet() {
-      if (!isMobile) return;
-      document.body.classList.add('mobile-sheet-open');
-      mobileSheet?.setAttribute('aria-hidden', 'false');
-    }
-    function closeMobileSheet() {
-      document.body.classList.remove('mobile-sheet-open');
-      mobileSheet?.setAttribute('aria-hidden', 'true');
-    }
-    function toggleMobileSheet() {
-      if (document.body.classList.contains('mobile-sheet-open')) closeMobileSheet();
-      else openMobileSheet();
-    }
-
-    function renderMobileSheetUser() {
-      if (!mobileSheetAvatar || !mobileSheetName) return;
-      mobileSheetAvatar.innerHTML = '';
-      if (currentUserProfileImage && typeof currentUserProfileImage === 'string' && currentUserProfileImage.trim() !== '') {
-        const img = document.createElement('img');
-        const url = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
-        img.src = url;
-        img.alt = currentUserNickname || '프로필';
-        img.onerror = () => {
-          mobileSheetAvatar.textContent = currentUserNickname ? currentUserNickname[0].toUpperCase() : '?';
-        };
-        mobileSheetAvatar.appendChild(img);
-      } else {
-        mobileSheetAvatar.textContent = currentUserNickname ? currentUserNickname[0].toUpperCase() : '?';
-      }
-      mobileSheetName.textContent = currentUserNickname || '로그인 필요';
-      mobileSheetLogout.style.display = isLoggedIn ? 'block' : 'none';
-    }
     // 활성화 상태에 따라 아이콘 변경 함수
     function updateIcons() {
       // 홈
@@ -456,27 +246,12 @@
       }
     };
     userInfo.onclick = () => {
-      if (!isLoggedIn || !currentUserId || !currentUserNickname) return;
-      if (isMobile) {
-        toggleMobileSheet();
-        return;
-      }
-      window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
-    };
-    window.handleLogout = (event) => {
-      event.stopPropagation();
-      parent.postMessage({ type: 'logout' }, '*');
-    };
-    mobileSheetBackdrop.onclick = () => closeMobileSheet();
-    mobileSheetProfile.onclick = () => {
       if (isLoggedIn && currentUserId && currentUserNickname) {
-        closeMobileSheet();
         window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
       }
     };
-    mobileSheetLogout.onclick = (e) => {
-      e.stopPropagation();
-      closeMobileSheet();
+    window.handleLogout = (event) => {
+      event.stopPropagation();
       parent.postMessage({ type: 'logout' }, '*');
     };
     window.addEventListener('message', (event) => {
@@ -523,18 +298,21 @@
             userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
           }
           userInfo.style.display = 'flex';
-          renderMobileSheetUser();
         } else {
           isLoggedIn = false;
           currentUserId = null;
           currentUserNickname = null;
           currentUserProfileImage = null;
           userInfo.style.display = 'none';
-          renderMobileSheetUser();
         }
       }
       if (data.type === 'setNarrowMode') {
-        setMobileMode(!!data.narrow);
+        const sidebar = document.querySelector('.sidebar');
+        if (data.narrow) {
+          sidebar.classList.add('narrow');
+        } else {
+          sidebar.classList.remove('narrow');
+        }
       }
     });
     // 초기 상태 설정
