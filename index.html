@@ -569,18 +569,22 @@
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .recommend-container { display: none; }
+      /* iframe 전체 높이: 사이드바 시트(프로필 메뉴)가 본문 위에 올라올 수 있게 함. 빈 영역 클릭은 sidebar.html에서 pointer-events로 통과 */
       .sidebar-container {
         left: 0;
         right: 0;
-        top: auto;
+        top: 0;
         bottom: 0;
         width: 100%;
         min-width: 0;
-        height: calc(64px + env(safe-area-inset-bottom, 0px));
+        height: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
       }
       .sidebar-container iframe {
         width: 100% !important;
         height: 100% !important;
+        min-height: 100%;
       }
       .main-wrapper {
         margin-left: 0;

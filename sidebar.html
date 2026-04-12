@@ -11,6 +11,12 @@
       height: 100vh;
       overflow: hidden;
     }
+    .sidebar-root {
+      min-height: 100vh;
+      height: 100%;
+      box-sizing: border-box;
+      position: relative;
+    }
     .sidebar {
       width: 72px !important;
       max-width: 72px !important;
@@ -40,6 +46,10 @@
       height: 40px;
     }
     .logo-text { display: none; }
+    .mob-nav-left,
+    .mob-nav-right {
+      display: contents;
+    }
     .nav-item {
       width: 48px;
       height: 48px;
@@ -156,51 +166,86 @@
       border-radius: 10px;
     }
 
-    /* ─── 모바일: 하단 탭 바 ─── */
-    @media (max-width: 768px) {
+    /* 데스크톱 iframe(좁음): 시트 숨김 — 뷰포트 min-width는 iframe 너비 기준이라 72px에서는 아래 블록 미적용 */
+    .mobile-sheet-backdrop,
+    .mobile-profile-sheet {
+      display: none;
+    }
+
+    /*
+      모바일: 부모가 iframe을 화면 너비로 둠 → 뷰포트가 넓어짐(200px 이상).
+      max-width:768px는 iframe 안에서도 참이 되어 데스크톱 사이드바가 깨지므로 쓰지 않음.
+    */
+    @media (min-width: 200px) {
       html, body {
-        height: auto !important;
-        min-height: 0 !important;
+        height: 100% !important;
+        min-height: 100% !important;
         overflow: hidden;
+      }
+      body {
+        pointer-events: none;
+      }
+      .sidebar-root {
+        min-height: 100vh;
+        min-height: 100dvh;
+        height: 100%;
+        pointer-events: none;
       }
       .sidebar {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 100% !important;
-        height: 100%;
+        height: auto;
         min-height: 0;
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: center;
-        justify-content: space-around;
-        gap: 2px;
-        padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+        justify-content: space-between;
+        gap: 8px;
+        padding: 4px 12px calc(4px + env(safe-area-inset-bottom, 0px));
         box-sizing: border-box;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        overflow: visible;
         border-right: none;
         background: rgba(10, 10, 10, 0.92);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-top: 1px solid rgba(255, 255, 255, 0.08);
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        z-index: 2;
+        pointer-events: auto;
       }
-      .sidebar::-webkit-scrollbar { display: none; }
       .logo-container { display: none; }
-      #homeNav { order: 1; }
-      #exploreNav { order: 2; }
-      #createBtn { order: 3; }
-      #chatNav { order: 4; }
-      #discordNav { order: 5; }
-      #userInfo { order: 6; }
-      .nav-item {
+      #chatNav,
+      #discordNav {
+        display: none !important;
+      }
+      .mob-nav-left {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
         flex: 1 1 0;
         min-width: 0;
-        max-width: 56px;
-        width: auto;
+      }
+      .mob-nav-right {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        flex: 1 1 0;
+        min-width: 0;
+      }
+      .nav-item {
+        flex: 0 0 auto;
+        width: 44px;
         height: 44px;
         margin: 0;
+        max-width: 44px;
       }
       .create-btn {
         flex: 0 0 auto;
@@ -211,17 +256,10 @@
       .user-info {
         margin-top: 0;
         padding: 0;
-        flex: 1 1 0;
-        min-width: 0;
-        max-width: 56px;
+        width: auto;
         flex-direction: column;
         justify-content: center;
         gap: 0;
-      }
-      .user-avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
       }
       .logout-icon-btn-mobile {
         display: none !important;
@@ -234,36 +272,182 @@
         width: 28px;
         height: 28px;
       }
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+
+      .mobile-sheet-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        pointer-events: none;
+      }
+      .mobile-sheet-backdrop.open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+      .mobile-profile-sheet {
+        display: block;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10001;
+        transform: translateY(100%);
+        transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+        pointer-events: none;
+      }
+      .mobile-profile-sheet.open {
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+      .mobile-profile-sheet-inner {
+        background: #141414;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: none;
+        border-radius: 20px 20px 0 0;
+        padding: 10px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+        max-height: 70vh;
+        box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+      }
+      .sheet-grab {
+        width: 40px;
+        height: 4px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        margin: 0 auto 16px;
+      }
+      .sheet-direct-create {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin-bottom: 12px;
+        transition: background 0.2s, transform 0.15s;
+      }
+      .sheet-direct-create:active {
+        transform: scale(0.98);
+      }
+      .sheet-profile-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        margin-bottom: 12px;
+        transition: background 0.2s;
+      }
+      .sheet-profile-row:active {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .sheet-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3478f6, #53b6f9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .sheet-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .sheet-nickname {
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .sheet-logout {
+        width: 100%;
+        padding: 14px 16px;
+        border: none;
+        border-radius: 14px;
+        background: rgba(255, 80, 80, 0.15);
+        color: #ff8a8a;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        transition: background 0.2s, transform 0.15s;
+      }
+      .sheet-logout:active {
+        transform: scale(0.98);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="logo-container" id="logoContainer">
-      <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
-    </div>
-    <div class="nav-item active" id="homeNav">
-      <img src="home.png" alt="홈" class="nav-icon-img-home" id="homeIcon">
-    </div>
-    <div class="nav-item" id="exploreNav">
-      <img src="exploreX.png" alt="탐색" class="nav-icon-img-explore" id="exploreIcon">
-    </div>
-    <div class="nav-item" id="chatNav">
-      <img src="chatX.png" alt="채팅" class="nav-icon-img" id="chatIcon">
-    </div>
-    <div class="nav-item" id="discordNav">
-      <img src="discord.png" alt="Discord" class="nav-icon-img">
-    </div>
-    <button class="create-btn" id="createBtn">
-      <img src="new.png" alt="만들기" class="btn-icon-img">
-    </button>
-    <div class="user-info" id="userInfo" style="display: none;">
-      <div class="user-avatar-wrapper">
-        <div class="user-avatar" id="userAvatar"></div>
+  <div class="sidebar-root">
+    <div class="sidebar">
+      <div class="logo-container" id="logoContainer">
+        <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
       </div>
-      <button class="logout-icon-btn-mobile" id="logoutBtnMobile" onclick="handleLogout(event)">
-        <img src="logout.png" alt="로그아웃">
+      <div class="mob-nav-left">
+        <div class="nav-item active" id="homeNav">
+          <img src="home.png" alt="홈" class="nav-icon-img-home" id="homeIcon">
+        </div>
+        <div class="nav-item" id="exploreNav">
+          <img src="exploreX.png" alt="탐색" class="nav-icon-img-explore" id="exploreIcon">
+        </div>
+      </div>
+      <div class="nav-item" id="chatNav">
+        <img src="chatX.png" alt="채팅" class="nav-icon-img" id="chatIcon">
+      </div>
+      <div class="nav-item" id="discordNav">
+        <img src="discord.png" alt="Discord" class="nav-icon-img">
+      </div>
+      <button class="create-btn" id="createBtn" type="button">
+        <img src="new.png" alt="만들기" class="btn-icon-img">
       </button>
+      <div class="mob-nav-right">
+        <div class="user-info" id="userInfo" style="display: none;">
+          <div class="user-avatar-wrapper">
+            <div class="user-avatar" id="userAvatar"></div>
+          </div>
+          <button class="logout-icon-btn-mobile" id="logoutBtnMobile" type="button" onclick="handleLogout(event)">
+            <img src="logout.png" alt="로그아웃">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-sheet-backdrop" id="profileSheetBackdrop" aria-hidden="true"></div>
+    <div class="mobile-profile-sheet" id="profileSheet" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="mobile-profile-sheet-inner">
+        <div class="sheet-grab"></div>
+        <button type="button" class="sheet-direct-create" id="sheetDirectCreate">직접 만들기</button>
+        <div class="sheet-profile-row" id="sheetProfileRow">
+          <div class="sheet-avatar" id="sheetMenuAvatar"></div>
+          <span class="sheet-nickname" id="sheetMenuNickname"></span>
+        </div>
+        <button type="button" class="sheet-logout" id="sheetLogoutBtn">로그아웃</button>
+      </div>
     </div>
   </div>
   <script>
@@ -274,35 +458,85 @@
     const createBtn = document.getElementById('createBtn');
     const logoContainer = document.getElementById('logoContainer');
     const userInfo = document.getElementById('userInfo');
-    // 아이콘 요소들
     const homeIcon = document.getElementById('homeIcon');
     const exploreIcon = document.getElementById('exploreIcon');
     const chatIcon = document.getElementById('chatIcon');
+    const profileSheetBackdrop = document.getElementById('profileSheetBackdrop');
+    const profileSheet = document.getElementById('profileSheet');
+    const sheetDirectCreate = document.getElementById('sheetDirectCreate');
+    const sheetProfileRow = document.getElementById('sheetProfileRow');
+    const sheetMenuAvatar = document.getElementById('sheetMenuAvatar');
+    const sheetMenuNickname = document.getElementById('sheetMenuNickname');
+    const sheetLogoutBtn = document.getElementById('sheetLogoutBtn');
+    const userAvatar = document.getElementById('userAvatar');
+
+    function isMobileBottomLayout() {
+      return window.matchMedia('(min-width: 200px)').matches;
+    }
+
+    function openProfileSheet() {
+      if (!isMobileBottomLayout()) return;
+      profileSheetBackdrop.classList.add('open');
+      profileSheet.classList.add('open');
+      profileSheet.setAttribute('aria-hidden', 'false');
+      profileSheetBackdrop.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeProfileSheet() {
+      profileSheetBackdrop.classList.remove('open');
+      profileSheet.classList.remove('open');
+      profileSheet.setAttribute('aria-hidden', 'true');
+      profileSheetBackdrop.setAttribute('aria-hidden', 'true');
+    }
+
+    function goCreate() {
+      if (isLoggedIn) {
+        window.top.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
+      } else {
+        window.top.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
+      }
+    }
+
     let isLoggedIn = false;
     let currentUserId = null;
     let currentUserNickname = null;
     let currentUserProfileImage = null;
-    // 활성화 상태에 따라 아이콘 변경 함수
+
     function updateIcons() {
-      // 홈
       if (homeNav.classList.contains('active')) {
         homeIcon.src = 'home.png';
       } else {
         homeIcon.src = 'homeX.png';
       }
-      // 탐색
       if (exploreNav.classList.contains('active')) {
         exploreIcon.src = 'explore.png';
       } else {
         exploreIcon.src = 'exploreX.png';
       }
-      // 채팅
       if (chatNav.classList.contains('active')) {
         chatIcon.src = 'chat.png';
       } else {
         chatIcon.src = 'chatX.png';
       }
     }
+
+    function syncSheetProfileFromUser() {
+      sheetMenuNickname.textContent = currentUserNickname || '';
+      sheetMenuAvatar.innerHTML = '';
+      if (currentUserProfileImage && typeof currentUserProfileImage === 'string' && currentUserProfileImage.trim() !== '') {
+        const img = document.createElement('img');
+        const url = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        img.src = url;
+        img.alt = currentUserNickname || '프로필';
+        img.onerror = () => {
+          sheetMenuAvatar.textContent = currentUserNickname ? currentUserNickname[0].toUpperCase() : '?';
+        };
+        sheetMenuAvatar.appendChild(img);
+      } else {
+        sheetMenuAvatar.textContent = currentUserNickname ? currentUserNickname[0].toUpperCase() : '?';
+      }
+    }
+
     logoContainer.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
     };
@@ -318,18 +552,48 @@
     discordNav.onclick = () => {
       window.open('https://discord.gg/8s6XuWkfQb', '_blank');
     };
-    createBtn.onclick = () => {
-      if (isLoggedIn) {
-        window.top.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
-      } else {
-        window.top.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
-      }
+    createBtn.onclick = (e) => {
+      e.stopPropagation();
+      goCreate();
     };
-    userInfo.onclick = () => {
+    userInfo.onclick = (e) => {
+      if (isMobileBottomLayout() && isLoggedIn) {
+        e.preventDefault();
+        e.stopPropagation();
+        syncSheetProfileFromUser();
+        openProfileSheet();
+        return;
+      }
       if (isLoggedIn && currentUserId && currentUserNickname) {
         window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
       }
     };
+
+    profileSheetBackdrop.onclick = () => closeProfileSheet();
+    sheetDirectCreate.onclick = (e) => {
+      e.stopPropagation();
+      closeProfileSheet();
+      goCreate();
+    };
+    sheetProfileRow.onclick = (e) => {
+      e.stopPropagation();
+      if (isLoggedIn && currentUserId && currentUserNickname) {
+        closeProfileSheet();
+        window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
+      }
+    };
+    sheetLogoutBtn.onclick = (e) => {
+      e.stopPropagation();
+      closeProfileSheet();
+      parent.postMessage({ type: 'logout' }, '*');
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && profileSheet.classList.contains('open')) {
+        closeProfileSheet();
+      }
+    });
+
     window.handleLogout = (event) => {
       event.stopPropagation();
       parent.postMessage({ type: 'logout' }, '*');
@@ -378,12 +642,14 @@
             userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
           }
           userInfo.style.display = 'flex';
+          syncSheetProfileFromUser();
         } else {
           isLoggedIn = false;
           currentUserId = null;
           currentUserNickname = null;
           currentUserProfileImage = null;
           userInfo.style.display = 'none';
+          closeProfileSheet();
         }
       }
       if (data.type === 'setNarrowMode') {
@@ -395,9 +661,8 @@
         }
       }
     });
-    // 초기 상태 설정
     homeNav.classList.add('active');
-    updateIcons(); // 처음 로드 시에도 아이콘 올바르게 표시
+    updateIcons();
     parent.postMessage({ type: 'requestUserInfo' }, '*');
   </script>
 </body>
