@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>프로필 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg" />
+  <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
+  <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -25,6 +27,32 @@
       --r2: 14px;
       --r3: 20px;
       --r4: 28px;
+    }
+
+    /* NProgress 커스텀 */
+    #nprogress .bar { background: #fff !important; height: 2px !important; }
+    #nprogress .peg { display: none !important; }
+    #nprogress .spinner { display: none !important; }
+
+    /* ─── SPLASH ─── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease;
+    }
+    #splash.fade-out { opacity: 0; pointer-events: none; }
+    .splash-logo {
+      width: 72px; height: 72px;
+      animation: splashLogoPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes splashLogoPop {
+      from { opacity: 0; transform: scale(0.7); }
+      to   { opacity: 1; transform: scale(1); }
     }
 
     body {
@@ -440,6 +468,12 @@
   </style>
 </head>
 <body>
+
+  <!-- ─── SPLASH ─── -->
+  <div id="splash">
+    <img src="logo.svg" class="splash-logo" alt="Sharer">
+  </div>
+
   <!-- 업로드 토스트 -->
   <div class="upload-toast" id="uploadToast">⏳ 업로드 중...</div>
 
@@ -517,6 +551,44 @@
   <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
 
 <script>
+  // ─── NPROGRESS 설정 ───
+  NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+
+  window.addEventListener('load', () => { NProgress.done(); });
+
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && link.href && !link.target && !link.hasAttribute('download')) {
+      NProgress.start();
+    }
+  });
+
+  // ─── SPLASH (처음 방문 시에만) ───
+  (function () {
+    const splash = document.getElementById('splash');
+
+    if (!sessionStorage.getItem('splashShown')) {
+      sessionStorage.setItem('splashShown', 'true');
+      splash.style.display = 'flex';
+
+      function finishSplash() {
+        splash.classList.add('fade-out');
+        setTimeout(() => { splash.style.display = 'none'; }, 460);
+      }
+
+      const splashStart = Date.now();
+      const MIN_SPLASH = 2000;
+
+      window.addEventListener('load', () => {
+        const elapsed = Date.now() - splashStart;
+        const remaining = Math.max(0, MIN_SPLASH - elapsed);
+        setTimeout(finishSplash, remaining);
+      });
+      // 안전망: 최대 5초 후 강제 종료
+      setTimeout(finishSplash, 5000);
+    }
+  })();
+
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
   // Cloudinary 설정 (index.html과 동일)
@@ -591,10 +663,10 @@
   window.addEventListener('message', (event) => {
     const { type, page } = event.data || {};
     if (type === 'navigate') {
-      if (page === 'home') location.href = 'index.html';
-      if (page === 'explore') location.href = 'explore.html';
+      if (page === 'home') { NProgress.start(); location.href = 'index.html'; }
+      if (page === 'explore') { NProgress.start(); location.href = 'explore.html'; }
     }
-    if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; location.href = 'index.html'; }
+    if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; NProgress.start(); location.href = 'index.html'; }
     if (type === 'requestUserInfo') updateSidebar();
   });
 
@@ -795,7 +867,7 @@
       const postItem = document.createElement('div');
       postItem.className = 'post-item';
       postItem.style.cssText = `opacity:0; transform:translateY(10px); transition: opacity 0.35s ease ${idx * 0.06}s, transform 0.35s cubic-bezier(0.22,1,0.36,1) ${idx * 0.06}s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;`;
-      postItem.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
+      postItem.onclick = () => { NProgress.start(); window.location.href = `view.html?id=${post.id}`; };
       const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
       postItem.innerHTML = `
         ${post.image_url ? `<img src="${escapeHtml(post.image_url)}" class="post-item-image" alt="게시글 이미지" loading="lazy">` : ''}
@@ -870,9 +942,9 @@
     if (e.target === this) closeStatusModal();
   });
 
-  window.goBack = () => window.history.back();
-  window.showPrivacyPolicy = () => window.location.href = "privacy.html";
-  window.showTerms = () => window.location.href = "policy.html";
+  window.goBack = () => { NProgress.start(); window.history.back(); };
+  window.showPrivacyPolicy = () => { NProgress.start(); window.location.href = "privacy.html"; };
+  window.showTerms = () => { NProgress.start(); window.location.href = "policy.html"; };
 
   window.copyProfileLink = function() {
     navigator.clipboard.writeText(window.location.href).then(() => {
