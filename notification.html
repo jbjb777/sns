@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>알림</title>
+  <style>
+    :root{
+      --bg0:#0b0b0f; --bg1:#101018; --bg2:#151522; --bg3:#1c1c2d; --bg4:#23233a;
+      --t1:#ffffff; --t2:#d8d8e3; --t3:#a7a7bd;
+      --border1:rgba(255,255,255,.08); --border2:rgba(255,255,255,.12); --border3:rgba(255,255,255,.18);
+      --r1:12px; --r2:16px;
+      --pink:#ff4f9a; --green:#66ffb8;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; height:100%; background:var(--bg0); color:var(--t1); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", Arial, sans-serif; }
+
+    .sidebar-container{
+      position: fixed;
+      top: 0; left: 0;
+      width: 72px;
+      height: 100vh;
+      z-index: 10;
+    }
+    .sidebar-container iframe{ width:72px; height:100%; border:none; }
+
+    .main-wrapper{
+      margin-left: 72px;
+      min-height: 100vh;
+      width: calc(100% - 72px);
+    }
+
+    .header{
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 18px 18px 14px;
+      background: linear-gradient(180deg, rgba(11,11,15,.98), rgba(11,11,15,.74));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border1);
+    }
+    .header-left{ display:flex; align-items:center; gap: 12px; }
+    .back-btn{
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border1);
+      background: rgba(255,255,255,.04);
+      color: var(--t1);
+      cursor: pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+    }
+    .back-btn:hover{ background: rgba(255,255,255,.06); border-color: var(--border2); transform: translateY(-1px); }
+    .back-btn:active{ transform: translateY(0) scale(.98); }
+    .header-title{ font-weight: 800; letter-spacing: -0.2px; font-size: 18px; }
+    .header-actions{ display:flex; align-items:center; gap: 8px; }
+    .action-btn{
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border1);
+      background: rgba(255,255,255,.04);
+      color: var(--t2);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      transition: transform .12s ease, background .15s ease, border-color .15s ease, color .15s ease;
+    }
+    .action-btn:hover{ background: rgba(255,255,255,.06); border-color: var(--border2); color: var(--t1); transform: translateY(-1px); }
+    .action-btn:active{ transform: translateY(0) scale(.99); }
+    .action-btn.primary{ border-color: rgba(255,79,154,.28); background: rgba(255,79,154,.12); color: #ffd4e8; }
+    .action-btn.primary:hover{ border-color: rgba(255,79,154,.42); background: rgba(255,79,154,.16); }
+
+    .container{ padding: 16px 18px 30px; }
+
+    .noti-list{ display:flex; flex-direction:column; gap: 10px; }
+    .noti-item{
+      border: 1px solid var(--border1);
+      background: radial-gradient(1200px 500px at 0% 0%, rgba(255,255,255,.05), transparent 60%), rgba(255,255,255,.03);
+      border-radius: var(--r2);
+      padding: 14px 14px 12px;
+      cursor: pointer;
+      overflow: hidden;
+      transform: translateY(6px);
+      opacity: 0;
+      transition: transform .32s cubic-bezier(.22,1,.36,1), opacity .32s ease, border-color .15s ease, background .15s ease;
+    }
+    .noti-item.show{ transform: translateY(0); opacity: 1; }
+    .noti-item:hover{ border-color: var(--border2); background: radial-gradient(1200px 500px at 0% 0%, rgba(255,255,255,.07), transparent 60%), rgba(255,255,255,.04); }
+    .noti-item:active{ transform: translateY(0) scale(.995); }
+    .noti-item.read{
+      opacity: .62;
+      filter: saturate(.86) brightness(.92);
+      background: rgba(255,255,255,.02);
+    }
+    .noti-detail{ font-size: 14px; font-weight: 700; line-height: 1.4; color: var(--t1); }
+    .noti-meta{ margin-top: 10px; display:flex; align-items:center; justify-content:space-between; gap: 10px; }
+    .noti-time{ font-size: 12px; color: var(--t3); }
+    .noti-pill{
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(102,255,184,.25);
+      color: rgba(102,255,184,.95);
+      background: rgba(102,255,184,.08);
+    }
+
+    .state{
+      border: 1px solid var(--border1);
+      background: rgba(255,255,255,.03);
+      border-radius: var(--r2);
+      padding: 20px 16px;
+      text-align: center;
+      color: var(--t3);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(12px);
+      opacity: 0;
+      background: rgba(0,0,0,.72);
+      border: 1px solid rgba(255,255,255,.1);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      z-index: 50;
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events: none;
+      backdrop-filter: blur(10px);
+    }
+    .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 768px){
+      .sidebar-container{
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .sidebar-container iframe{ width: 100%; height: 100%; }
+      .main-wrapper{
+        margin-left: 0;
+        width: 100%;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .header{ padding: 16px 16px 12px; }
+      .container{ padding: 14px 16px 26px; }
+      .action-btn{ padding: 0 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-container">
+    <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
+  </div>
+
+  <div class="main-wrapper">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-btn" id="backBtn" aria-label="뒤로가기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="header-title">알림</div>
+      </div>
+      <div class="header-actions">
+        <button class="action-btn primary" id="readAllBtn">모두 읽기</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="state" class="state" style="display:none;"></div>
+      <div id="notiList" class="noti-list"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
+    async function api(endpoint, options = {}) {
+      const url = API_BASE + endpoint;
+      const res = await fetch(url, {
+        ...options,
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      });
+      if (!res.ok) {
+        let errorText;
+        try { errorText = await res.text(); } catch { errorText = ""; }
+        throw new Error(`API 오류 (${res.status}): ${errorText}`);
+      }
+      if (res.status === 204) return null;
+      const text = await res.text();
+      if (!text) return null;
+      try { return JSON.parse(text); } catch { return null; }
+    }
+
+    let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
+    const notiListEl = document.getElementById('notiList');
+    const stateEl = document.getElementById('state');
+    const toastEl = document.getElementById('toast');
+
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 1600);
+    }
+
+    function initCurrentUser() {
+      const saved = localStorage.getItem('snsUser');
+      if (saved) currentUser = JSON.parse(saved);
+    }
+
+    function updateSidebar() {
+      const iframe = document.getElementById('sidebarFrame');
+      if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+    }
+
+    function updateSidebarMode() {
+      const iframe = document.getElementById('sidebarFrame');
+      const narrow = window.innerWidth <= 768;
+      if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+    }
+
+    window.addEventListener('message', (event) => {
+      const { type, page } = event.data || {};
+      if (type === 'navigate') {
+        if (page === 'home') location.href = 'index.html';
+        if (page === 'explore') location.href = 'explore.html';
+        if (page === 'chat') location.href = 'chat.html';
+      }
+      if (type === 'logout') {
+        localStorage.removeItem('snsUser');
+        currentUser = null;
+        location.href = 'login.html';
+      }
+      if (type === 'requestUserInfo') updateSidebar();
+    });
+
+    window.onSharerProfileLogout = function () {
+      localStorage.removeItem('snsUser');
+      currentUser = null;
+      location.href = 'login.html';
+    };
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(text).replace(/[&<>"']/g, (m) => map[m]);
+    }
+
+    function formatTime(ts) {
+      try {
+        const d = new Date(ts);
+        return d.toLocaleString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+      } catch (e) { return ''; }
+    }
+
+    function setState(message, show) {
+      if (!show) {
+        stateEl.style.display = 'none';
+        stateEl.textContent = '';
+        return;
+      }
+      stateEl.textContent = message;
+      stateEl.style.display = 'block';
+    }
+
+    async function fetchNotifications() {
+      const endpoint = `/notification?user=eq.${currentUser.id}&select=user,detail,created_at,link,isread&order=created_at.desc`;
+      return await api(endpoint);
+    }
+
+    function normalizeIsRead(v) {
+      if (v === true) return 1;
+      if (v === false) return 0;
+      const n = Number(v);
+      if (Number.isNaN(n)) return 0;
+      return n;
+    }
+
+    async function markAsRead(n) {
+      if (!n) return;
+      if (normalizeIsRead(n.isread) === 1) return;
+      const createdAt = n.created_at || '';
+      const detail = n.detail || '';
+      const link = n.link || '';
+
+      const base = `/notification?user=eq.${currentUser.id}`;
+      const byAll = `${base}&created_at=eq.${encodeURIComponent(createdAt)}&detail=eq.${encodeURIComponent(detail)}&link=eq.${encodeURIComponent(link)}`;
+      try {
+        await api(byAll, { method: "PATCH", body: JSON.stringify({ isread: 1 }) });
+        return;
+      } catch (e) {}
+
+      const bySafe = `${base}&created_at=eq.${encodeURIComponent(createdAt)}&link=eq.${encodeURIComponent(link)}`;
+      try {
+        await api(bySafe, { method: "PATCH", body: JSON.stringify({ isread: 1 }) });
+      } catch (e) {}
+    }
+
+    async function markAllRead() {
+      const or = encodeURIComponent('(isread.eq.0,isread.is.null)');
+      const endpoint = `/notification?user=eq.${currentUser.id}&or=${or}`;
+      await api(endpoint, { method: "PATCH", body: JSON.stringify({ isread: 1 }) });
+    }
+
+    function renderNotifications(items) {
+      notiListEl.innerHTML = '';
+      if (!items || items.length === 0) {
+        setState('아직 알림이 없습니다.\n댓글/좋아요가 달리면 여기에 표시됩니다.', true);
+        return;
+      }
+      setState('', false);
+
+      items.forEach((n, idx) => {
+        const isRead = normalizeIsRead(n.isread) === 1;
+        const el = document.createElement('div');
+        el.className = 'noti-item' + (isRead ? ' read' : '');
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        el.style.transitionDelay = `${Math.min(idx, 10) * 0.03}s`;
+        el.innerHTML = `
+          <div class="noti-detail">${escapeHtml(n.detail || '알림')}</div>
+          <div class="noti-meta">
+            <div class="noti-time">${escapeHtml(formatTime(n.created_at))}</div>
+            ${isRead ? '' : '<div class="noti-pill">NEW</div>'}
+          </div>
+        `;
+        const open = async () => {
+          try {
+            await markAsRead(n);
+          } catch (e) {}
+          const link = (n.link || '').trim();
+          window.location.href = link ? link : 'index.html';
+        };
+        el.onclick = open;
+        el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') open(); };
+        notiListEl.appendChild(el);
+        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+      });
+    }
+
+    async function loadAndRender() {
+      setState('알림 불러오는 중...', true);
+      try {
+        const items = await fetchNotifications();
+        renderNotifications(items || []);
+      } catch (e) {
+        console.error(e);
+        setState('알림을 불러오지 못했습니다.\n잠시 후 다시 시도해주세요.', true);
+      }
+    }
+
+    document.getElementById('backBtn').onclick = () => history.length > 1 ? history.back() : (location.href = 'index.html');
+
+    document.getElementById('readAllBtn').onclick = async () => {
+      try {
+        await markAllRead();
+        toast('모두 읽음 처리했습니다');
+        await loadAndRender();
+      } catch (e) {
+        console.error(e);
+        toast('처리에 실패했습니다');
+      }
+    };
+
+    initCurrentUser();
+    if (!currentUser) {
+      location.href = 'login.html';
+    } else {
+      updateSidebar();
+      updateSidebarMode();
+      window.addEventListener('resize', updateSidebarMode);
+      loadAndRender();
+    }
+  </script>
+</body>
+</html>
+

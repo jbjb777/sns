@@ -876,6 +876,26 @@
   let loadedPostIndices = new Set();
   const INITIAL_LOAD = 2;
 
+  async function createNotification(targetUserId, detail, link) {
+    if (!targetUserId || targetUserId === currentUser?.id) return;
+    try {
+      await api("/notification", {
+        method: "POST",
+        body: JSON.stringify({
+          user: targetUserId,
+          detail,
+          link,
+          isread: 0,
+          created_at: new Date().toISOString()
+        })
+      });
+    } catch (e) {}
+  }
+
+  function getPostById(postId) {
+    return allPosts.find(p => p.id === postId) || displayedPosts.find(p => p.id === postId) || null;
+  }
+
   // 프로필 이미지 캐시 (user_id → url)
   const profileImageCache = new Map();
 
@@ -1218,6 +1238,8 @@
             user_id: currentUser.id
           })
         });
+        const post = getPostById(postId);
+        createNotification(post?.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
       }
 
       // 업데이트된 좋아요 목록 가져오기
@@ -1326,6 +1348,9 @@
           created_at: new Date().toISOString()
         })
       });
+
+      const post = getPostById(currentCommentPostId);
+      createNotification(post?.author_id, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${currentCommentPostId}`);
 
       input.value = '';
       await loadComments(currentCommentPostId);

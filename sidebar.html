@@ -75,13 +75,20 @@
     /* 비활성 상태일 때 아이콘 밝기 낮춤 */
     .nav-item:not(.active) .nav-icon-img,
     .nav-item:not(.active) .nav-icon-img-home,
-    .nav-item:not(.active) .nav-icon-img-explore {
+    .nav-item:not(.active) .nav-icon-img-explore,
+    .nav-item:not(.active) .nav-icon-svg {
       filter: brightness(70%);
     }
     .nav-icon-img, .nav-icon-img-home, .nav-icon-img-explore {
       width: 32px;
       height: 32px;
       margin: 0;
+      transition: filter 0.2s ease;
+    }
+    .nav-icon-svg {
+      width: 32px;
+      height: 32px;
+      color: #fff;
       transition: filter 0.2s ease;
     }
     .nav-text { display: none; }
@@ -331,6 +338,12 @@
       <div class="nav-item" id="chatNav">
         <img src="chatX.png" alt="채팅" class="nav-icon-img" id="chatIcon">
       </div>
+      <div class="nav-item" id="notiNav" title="알림">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <div class="nav-item" id="discordNav">
         <img src="discord.png" alt="Discord" class="nav-icon-img">
       </div>
@@ -369,6 +382,7 @@
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
     const chatNav = document.getElementById('chatNav');
+    const notiNav = document.getElementById('notiNav');
     const discordNav = document.getElementById('discordNav');
     const createBtn = document.getElementById('createBtn');
     const logoContainer = document.getElementById('logoContainer');
@@ -476,6 +490,9 @@
     };
     chatNav.onclick = () => {
       window.top.location.href = 'https://sharer.jbjb.r-e.kr/chat.html';
+    };
+    notiNav.onclick = () => {
+      window.top.location.href = 'https://sharer.jbjb.r-e.kr/notification.html';
     };
     discordNav.onclick = () => {
       window.open('https://discord.gg/8s6XuWkfQb', '_blank');

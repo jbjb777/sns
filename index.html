@@ -894,8 +894,25 @@ async function api(endpoint, options = {}) {
 
 let currentUser = null;
 let selectedImage = null;
+const postAuthorIdMap = Object.create(null);
 const cloudName = 'dretlhsrk';
 const uploadPreset = 'unsigned_preset';
+
+async function createNotification(targetUserId, detail, link) {
+  if (!targetUserId || targetUserId === currentUser?.id) return;
+  try {
+    await api("/notification", {
+      method: "POST",
+      body: JSON.stringify({
+        user: targetUserId,
+        detail,
+        link,
+        isread: 0,
+        created_at: new Date().toISOString()
+      })
+    });
+  } catch (e) {}
+}
 
 function initCurrentUser() {
   const savedUser = localStorage.getItem('snsUser');
@@ -1054,6 +1071,7 @@ async function toggleLike(postId, button) {
       });
       button.classList.add('liked');
       countEl.textContent = currentServerCount + 1;
+      createNotification(postAuthorIdMap[postId], `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
     }
     const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`)
       .then(r => Math.max(0, r?.[0]?.count || 0));
@@ -1087,6 +1105,7 @@ async function loadPosts() {
       feedDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div>';
       return;
     }
+    posts.forEach(p => { postAuthorIdMap[p.id] = p.author_id; });
 
     // 2) 유니크 author_id 목록 → 유저 정보 배치 로드 (요청 1번)
     const authorIds = [...new Set(posts.map(p => p.author_id).filter(Boolean))];

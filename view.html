@@ -902,11 +902,21 @@
           user: targetUserId,
           detail,
           link,
-          isread: 1,
+          isread: 0,
           created_at: new Date().toISOString()
         })
       });
     } catch (e) {}
+  }
+
+  async function getCommentById(commentId) {
+    if (!commentId) return null;
+    try {
+      const rows = await api(`/comments?id=eq.${commentId}&select=user_id,user_name`);
+      return rows?.[0] || null;
+    } catch (e) {
+      return null;
+    }
   }
 
   function linkify(text) {
@@ -1365,7 +1375,9 @@
           created_at: new Date().toISOString()
         })
       });
-      createNotification(currentPost.author_id, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${postId}`);
+      const parentComment = await getCommentById(parentId);
+      const targetUserId = parentComment?.user_id || currentPost.author_id;
+      createNotification(targetUserId, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${postId}`);
       if (input) input.value = '';
       const compose = document.getElementById(`replyCompose-${parentId}`);
       if (compose) compose.style.display = 'none';
