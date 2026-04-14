@@ -979,7 +979,8 @@
     showError('게시물 ID가 없습니다.');
   } else {
     loadPost(postId);
-    setInterval(() => listenComments(postId), 8000);
+    // ─── 자동 새로고침 제거 ───
+    // 댓글/답글 작성·삭제 시에만 listenComments() 를 직접 호출합니다.
     listenComments(postId);
   }
 
