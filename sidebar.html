@@ -1,274 +1,602 @@
-/**
- * 모바일 사이드바 프로필 시트 — 부모 페이지에서 실행.
- * 각 페이지에 #sharerProfileSheetHost 가 있어야 하며,
- * 로그아웃 시 window.onSharerProfileLogout = function () { ... } 를 먼저 할당하세요.
- */
-(function setupSharerProfileSheetHost() {
-  const HID = 'sharerProfileSheetHost';
-  let escHandler = null;
-  let discordJoinStylesInjected = false;
-
-  function ensureDiscordJoinStyles() {
-    if (discordJoinStylesInjected) return;
-    discordJoinStylesInjected = true;
-    const st = document.createElement('style');
-    st.setAttribute('data-sps-discord-join', '');
-    st.textContent =
-      '.sharer-profile-sheet-host .sps-discord-join{' +
-      'width:100%;box-sizing:border-box;margin-top:10px;padding:14px 16px;' +
-      'border:1px solid rgba(88,101,242,0.9);border-radius:14px;background:transparent;' +
-      'color:#aeb7ff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;' +
-      'display:flex;align-items:center;justify-content:center;gap:10px;' +
-      '}' +
-      '.sharer-profile-sheet-host .sps-discord-join img{' +
-      'width:22px;height:22px;flex-shrink:0;object-fit:contain;' +
-      '}';
-    document.head.appendChild(st);
-  }
-
-  function q(id) {
-    return document.getElementById(id);
-  }
-
-  function finalizeClose(host) {
-    if (escHandler) {
-      document.removeEventListener('keydown', escHandler);
-      escHandler = null;
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent !important;
+      height: 100vh;
+      overflow: hidden;
     }
-    if (!host) return;
-    host.hidden = true;
-    host.setAttribute('hidden', '');
-    host.innerHTML = '';
-    host.className = 'sharer-profile-sheet-host';
-  }
-
-  function animateClose(host, afterDone) {
-    if (!host || host.hidden) {
-      if (afterDone) afterDone();
-      return;
+    .sidebar-root {
+      min-height: 100vh;
+      height: 100%;
+      box-sizing: border-box;
+      position: relative;
     }
-    if (escHandler) {
-      document.removeEventListener('keydown', escHandler);
-      escHandler = null;
+    .sidebar {
+      width: 72px !important;
+      max-width: 72px !important;
+      min-width: 72px !important;
+      height: 100vh;
+      background: transparent;
+      border-right: none;
+      padding: 16px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+      overflow-x: hidden;
+      box-sizing: border-box;
+      position: relative;
+      scrollbar-width: thin;
+      scrollbar-color: #444 transparent;
     }
-    const panel = host.querySelector('.sps-panel');
-    host.classList.remove('sps-host-open');
-    if (!panel) {
-      finalizeClose(host);
-      if (afterDone) afterDone();
-      return;
+    .logo-container {
+      margin: 0 auto 32px;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
-    panel.classList.remove('sps-panel-expanded');
-    panel.classList.remove('sps-panel-dragging');
-    panel.style.transform = '';
-    delete panel.dataset.pull;
-    let settled = false;
-    const cleanup = () => {
-      if (settled) return;
-      settled = true;
-      panel.removeEventListener('transitionend', onEnd);
-      clearTimeout(tid);
-      finalizeClose(host);
-      if (afterDone) afterDone();
-    };
-    const onEnd = (e) => {
-      if (e.target === panel && e.propertyName === 'transform') cleanup();
-    };
-    panel.addEventListener('transitionend', onEnd);
-    const tid = setTimeout(cleanup, 520);
-  }
-
-  function wireDragAndActions(host, panel, dragArea, prof, lo, discordJoin, id, nick) {
-    const profileUrl =
-      'https://sharer.jbjb.r-e.kr/user.html?id=' +
-      encodeURIComponent(id) +
-      '&nickname=' +
-      encodeURIComponent(nick);
-
-    let expanded = false;
-    let dragActive = false;
-    let startY = 0;
-
-    const dismissPx = () => Math.min(window.innerHeight * 0.24, 150);
-    const expandPx = () => -56;
-    const collapsePx = () => 92;
-
-    function setExpanded(v) {
-      expanded = !!v;
-      panel.classList.toggle('sps-panel-expanded', expanded);
+    .logo-container:hover { transform: scale(1.1); }
+    .logo-svg {
+      width: 40px;
+      height: 40px;
+    }
+    .logo-text { display: none; }
+    .mob-nav-left,
+    .mob-nav-right {
+      display: contents;
+    }
+    .nav-item {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: transparent;
+    }
+    .nav-item:hover {
+      transform: scale(1.08);
+    }
+    .nav-item.active {
+      /* 배경 그라데이션 및 그림자 제거 (필요시 다시 추가 가능) */
+      /* background와 box-shadow 주석 처리 또는 삭제 */
+      /* background: linear-gradient(135deg, rgba(54,99,255,0.3), rgba(87,34,179,0.2)); */
+      /* box-shadow: 0 4px 12px rgba(54,99,255,0.25); */
+    }
+    /* 비활성 상태일 때 아이콘 밝기 낮춤 */
+    .nav-item:not(.active) .nav-icon-img,
+    .nav-item:not(.active) .nav-icon-img-home,
+    .nav-item:not(.active) .nav-icon-img-explore {
+      filter: brightness(70%);
+    }
+    .nav-icon-img, .nav-icon-img-home, .nav-icon-img-explore {
+      width: 32px;
+      height: 32px;
+      margin: 0;
+      transition: filter 0.2s ease;
+    }
+    .nav-text { display: none; }
+    .create-btn {
+      width: 56px;
+      height: 56px;
+      margin: 24px auto;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #5269FF, #5722B3, #FF00EC);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      transition: all 0.25s;
+    }
+    .create-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .btn-icon-img {
+      width: 32px;
+      height: 32px;
+      margin: 0;
+    }
+    .btn-text { display: none; }
+    .user-info {
+      margin-top: auto;
+      padding: 10px 0 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      width: 100%;
+      gap: 4px;
+    }
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: white;
+      overflow: hidden;
+    }
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .user-details, .logout-icon-btn, .verification-badge, .user-page-label {
+      display: none;
+    }
+    .logout-icon-btn-mobile {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(54, 99, 255, 0.8);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px auto 0;
+      transition: all 0.2s;
+    }
+    .logout-icon-btn-mobile:hover { transform: scale(1.1); }
+    .logout-icon-btn-mobile img {
+      width: 20px !important;
+      height: 20px !important;
+    }
+    .sidebar::-webkit-scrollbar {
+      width: 3px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
     }
 
-    function endDrag(e) {
-      if (!dragActive) return;
-      dragActive = false;
+    .mobile-profile-sheet-inner .sheet-logout {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .mobile-profile-sheet-inner .sheet-discord-join {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
+      padding: 14px 16px;
+      border: 1px solid rgba(88, 101, 242, 0.9);
+      border-radius: 14px;
+      background: transparent;
+      color: #aeb7ff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .mobile-profile-sheet-inner .sheet-discord-join img {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
+    /* 데스크톱 iframe(좁음): 시트 숨김 — 뷰포트 min-width는 iframe 너비 기준이라 72px에서는 아래 블록 미적용 */
+    .mobile-sheet-backdrop,
+    .mobile-profile-sheet {
+      display: none;
+    }
+
+    /*
+      모바일: 부모가 iframe을 화면 너비로 둠 → 뷰포트가 넓어짐(200px 이상).
+      max-width:768px는 iframe 안에서도 참이 되어 데스크톱 사이드바가 깨지므로 쓰지 않음.
+    */
+    @media (min-width: 200px) {
+      html, body {
+        height: 100% !important;
+        min-height: 100% !important;
+        overflow: hidden;
+      }
+      .sidebar-root {
+        min-height: 0;
+        height: auto;
+      }
+      .sidebar {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        height: auto;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: 12px;
+        align-items: center;
+        justify-items: center;
+        padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
+        box-sizing: border-box;
+        overflow: visible;
+        border-right: none;
+        background: rgba(10, 10, 10, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        z-index: 2;
+        pointer-events: auto;
+      }
+      .sidebar.has-profile {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .logo-container { display: none; }
+      #chatNav,
+      #discordNav {
+        display: none !important;
+      }
+      .mob-nav-left,
+      .mob-nav-right {
+        display: contents;
+      }
+      .nav-item {
+        width: 48px;
+        height: 48px;
+        max-width: 48px;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      .create-btn {
+        width: 48px;
+        height: 48px;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      .user-info {
+        margin-top: 0;
+        padding: 0;
+        width: 48px;
+        height: 48px;
+        min-width: 0;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        box-sizing: border-box;
+      }
+      .logout-icon-btn-mobile {
+        display: none !important;
+      }
+      .nav-icon-img, .nav-icon-img-home, .nav-icon-img-explore {
+        width: 26px;
+        height: 26px;
+      }
+      .btn-icon-img {
+        width: 28px;
+        height: 28px;
+      }
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        box-sizing: border-box;
+      }
+
+      /* 프로필 시트는 부모 페이지에서 표시 (iframe은 하단만이라 시트가 가려지지 않음) */
+      .mobile-sheet-backdrop,
+      .mobile-profile-sheet {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-root">
+    <div class="sidebar">
+      <div class="logo-container" id="logoContainer">
+        <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
+      </div>
+      <div class="mob-nav-left">
+        <div class="nav-item active" id="homeNav">
+          <img src="home.png" alt="홈" class="nav-icon-img-home" id="homeIcon">
+        </div>
+        <div class="nav-item" id="exploreNav">
+          <img src="exploreX.png" alt="탐색" class="nav-icon-img-explore" id="exploreIcon">
+        </div>
+      </div>
+      <div class="nav-item" id="chatNav">
+        <img src="chatX.png" alt="채팅" class="nav-icon-img" id="chatIcon">
+      </div>
+      <div class="nav-item" id="discordNav">
+        <img src="discord.png" alt="Discord" class="nav-icon-img">
+      </div>
+      <button class="create-btn" id="createBtn" type="button">
+        <img src="new.png" alt="만들기" class="btn-icon-img">
+      </button>
+      <div class="mob-nav-right">
+        <div class="user-info" id="userInfo" style="display: none;">
+          <div class="user-avatar-wrapper">
+            <div class="user-avatar" id="userAvatar"></div>
+          </div>
+          <button class="logout-icon-btn-mobile" id="logoutBtnMobile" type="button" onclick="handleLogout(event)">
+            <img src="logout.png" alt="로그아웃">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-sheet-backdrop" id="profileSheetBackdrop" aria-hidden="true"></div>
+    <div class="mobile-profile-sheet" id="profileSheet" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="mobile-profile-sheet-inner">
+        <div class="sheet-grab"></div>
+        <div class="sheet-profile-row" id="sheetProfileRow">
+          <div class="sheet-avatar" id="sheetMenuAvatar"></div>
+          <span class="sheet-nickname" id="sheetMenuNickname"></span>
+        </div>
+        <button type="button" class="sheet-logout" id="sheetLogoutBtn">로그아웃</button>
+        <button type="button" class="sheet-discord-join" id="sheetDiscordJoinBtn">
+          <img src="discord.png" alt="">
+          <span>디스코드 참여</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const homeNav = document.getElementById('homeNav');
+    const exploreNav = document.getElementById('exploreNav');
+    const chatNav = document.getElementById('chatNav');
+    const discordNav = document.getElementById('discordNav');
+    const createBtn = document.getElementById('createBtn');
+    const logoContainer = document.getElementById('logoContainer');
+    const userInfo = document.getElementById('userInfo');
+    const homeIcon = document.getElementById('homeIcon');
+    const exploreIcon = document.getElementById('exploreIcon');
+    const chatIcon = document.getElementById('chatIcon');
+    const profileSheetBackdrop = document.getElementById('profileSheetBackdrop');
+    const profileSheet = document.getElementById('profileSheet');
+    const sheetProfileRow = document.getElementById('sheetProfileRow');
+    const sheetMenuAvatar = document.getElementById('sheetMenuAvatar');
+    const sheetMenuNickname = document.getElementById('sheetMenuNickname');
+    const sheetLogoutBtn = document.getElementById('sheetLogoutBtn');
+    const sheetDiscordJoinBtn = document.getElementById('sheetDiscordJoinBtn');
+    const userAvatar = document.getElementById('userAvatar');
+    const sidebarBar = document.querySelector('.sidebar');
+
+    function isMobileBottomLayout() {
+      return window.matchMedia('(min-width: 200px)').matches;
+    }
+
+    function openProfileSheet() {
+      if (!isMobileBottomLayout()) return;
       try {
-        if (e && e.pointerId != null) dragArea.releasePointerCapture(e.pointerId);
-      } catch (_) {}
-      panel.classList.remove('sps-panel-dragging');
-      const ty = parseFloat(panel.dataset.pull || '0') || 0;
-      panel.style.transform = '';
-      delete panel.dataset.pull;
-
-      const dPx = dismissPx();
-      const exPx = expandPx();
-      const colPx = collapsePx();
-
-      if (ty > dPx) {
-        animateClose(host, null);
-        return;
-      }
-      if (!expanded && ty < exPx) {
-        setExpanded(true);
-        host.classList.add('sps-host-open');
-        return;
-      }
-      if (expanded && ty > colPx && ty <= dPx) {
-        setExpanded(false);
-        host.classList.add('sps-host-open');
-        return;
-      }
-      host.classList.add('sps-host-open');
+        parent.postMessage({
+          type: 'sharerProfileSheet',
+          open: true,
+          user: {
+            id: currentUserId,
+            nickname: currentUserNickname,
+            profile_image: currentUserProfileImage
+          }
+        }, '*');
+      } catch (err) {}
     }
 
-    dragArea.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0) return;
-      dragActive = true;
-      startY = e.clientY;
-      panel.classList.add('sps-panel-dragging');
+    function closeProfileSheet() {
       try {
-        dragArea.setPointerCapture(e.pointerId);
-      } catch (_) {}
-    });
-    dragArea.addEventListener('pointermove', (e) => {
-      if (!dragActive) return;
-      e.preventDefault();
-      const dy = e.clientY - startY;
-      const minTy = expanded
-        ? -Math.min(140, window.innerHeight * 0.14)
-        : -Math.min(110, window.innerHeight * 0.12);
-      const maxTy = window.innerHeight * 0.55;
-      const ty = Math.max(minTy, Math.min(maxTy, dy));
-      panel.dataset.pull = String(ty);
-      panel.style.transform = 'translateY(' + ty + 'px)';
-    });
-    dragArea.addEventListener('pointerup', endDrag);
-    dragArea.addEventListener('pointercancel', endDrag);
-    dragArea.addEventListener('lostpointercapture', endDrag);
-
-    prof.onclick = () => {
-      animateClose(host, () => {
-        location.href = profileUrl;
-      });
-    };
-    lo.onclick = () => {
-      animateClose(host, () => {
-        if (typeof window.onSharerProfileLogout === 'function') {
-          window.onSharerProfileLogout();
+        if (isMobileBottomLayout()) {
+          parent.postMessage({ type: 'sharerProfileSheet', open: false }, '*');
         }
-      });
-    };
-    discordJoin.onclick = () => {
-      animateClose(host, () => {
-        window.open('https://discord.gg/8s6XuWkfQb', '_blank');
-      });
-    };
-  }
-
-  window.addEventListener('message', (ev) => {
-    const d = ev.data;
-    if (!d || d.type !== 'sharerProfileSheet') return;
-    const host = q(HID);
-    if (!host) return;
-
-    if (!d.open) {
-      if (!host.hidden && host.querySelector('.sps-panel')) animateClose(host, null);
-      else finalizeClose(host);
-      return;
+      } catch (err) {}
+      profileSheetBackdrop.classList.remove('open');
+      profileSheet.classList.remove('open');
+      profileSheet.setAttribute('aria-hidden', 'true');
+      profileSheetBackdrop.setAttribute('aria-hidden', 'true');
     }
 
-    const u = d.user || {};
-    const id = u.id;
-    const nick = (u.nickname || '').toString();
-    const pimg = (u.profile_image || '').toString();
-    if (!id || !nick) return;
-
-    ensureDiscordJoinStyles();
-
-    finalizeClose(host);
-    host.removeAttribute('hidden');
-    host.hidden = false;
-    host.className = 'sharer-profile-sheet-host';
-
-    const bd = document.createElement('div');
-    bd.className = 'sps-backdrop';
-    bd.onclick = () => animateClose(host, null);
-
-    const panel = document.createElement('div');
-    panel.className = 'sps-panel';
-
-    const dragArea = document.createElement('div');
-    dragArea.className = 'sps-drag-area';
-    const grab = document.createElement('div');
-    grab.className = 'sps-grab';
-    dragArea.appendChild(grab);
-
-    const prof = document.createElement('div');
-    prof.className = 'sps-profile';
-    prof.setAttribute('role', 'button');
-    prof.tabIndex = 0;
-    const av = document.createElement('div');
-    av.className = 'sps-av';
-    if (pimg.trim()) {
-      const im = document.createElement('img');
-      im.src = pimg + (pimg.includes('?') ? '&' : '?') + 'v=' + Date.now();
-      im.alt = nick;
-      im.onerror = () => {
-        av.textContent = (nick.charAt(0) || '?').toUpperCase();
-      };
-      av.appendChild(im);
-    } else {
-      av.textContent = (nick.charAt(0) || '?').toUpperCase();
+    function goCreate() {
+      if (isLoggedIn) {
+        window.top.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
+      } else {
+        window.top.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
+      }
     }
-    const nm = document.createElement('span');
-    nm.className = 'sps-name';
-    nm.textContent = nick;
-    prof.appendChild(av);
-    prof.appendChild(nm);
 
-    const lo = document.createElement('button');
-    lo.type = 'button';
-    lo.className = 'sps-logout';
-    lo.textContent = '로그아웃';
+    let isLoggedIn = false;
+    let currentUserId = null;
+    let currentUserNickname = null;
+    let currentUserProfileImage = null;
 
-    const discordJoin = document.createElement('button');
-    discordJoin.type = 'button';
-    discordJoin.className = 'sps-discord-join';
-    const dIcon = document.createElement('img');
-    dIcon.src = 'discord.png';
-    dIcon.alt = '';
-    const dLabel = document.createElement('span');
-    dLabel.textContent = '디스코드 참여';
-    discordJoin.appendChild(dIcon);
-    discordJoin.appendChild(dLabel);
+    function updateIcons() {
+      if (homeNav.classList.contains('active')) {
+        homeIcon.src = 'home.png';
+      } else {
+        homeIcon.src = 'homeX.png';
+      }
+      if (exploreNav.classList.contains('active')) {
+        exploreIcon.src = 'explore.png';
+      } else {
+        exploreIcon.src = 'exploreX.png';
+      }
+      if (chatNav.classList.contains('active')) {
+        chatIcon.src = 'chat.png';
+      } else {
+        chatIcon.src = 'chatX.png';
+      }
+    }
 
-    panel.appendChild(dragArea);
-    panel.appendChild(prof);
-    panel.appendChild(lo);
-    panel.appendChild(discordJoin);
-    host.appendChild(bd);
-    host.appendChild(panel);
+    function syncSheetProfileFromUser() {
+      sheetMenuNickname.textContent = currentUserNickname || '';
+      sheetMenuAvatar.innerHTML = '';
+      if (currentUserProfileImage && typeof currentUserProfileImage === 'string' && currentUserProfileImage.trim() !== '') {
+        const img = document.createElement('img');
+        const url = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        img.src = url;
+        img.alt = currentUserNickname || '프로필';
+        img.onerror = () => {
+          sheetMenuAvatar.textContent = currentUserNickname ? currentUserNickname[0].toUpperCase() : '?';
+        };
+        sheetMenuAvatar.appendChild(img);
+      } else {
+        sheetMenuAvatar.textContent = currentUserNickname ? currentUserNickname[0].toUpperCase() : '?';
+      }
+    }
 
-    wireDragAndActions(host, panel, dragArea, prof, lo, discordJoin, id, nick);
-
-    escHandler = (e) => {
-      if (e.key === 'Escape') animateClose(host, null);
+    logoContainer.onclick = () => {
+      window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
     };
-    document.addEventListener('keydown', escHandler);
+    homeNav.onclick = () => {
+      window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
+    };
+    exploreNav.onclick = () => {
+      window.top.location.href = 'https://sharer.jbjb.r-e.kr/explore.html';
+    };
+    chatNav.onclick = () => {
+      window.top.location.href = 'https://sharer.jbjb.r-e.kr/chat.html';
+    };
+    discordNav.onclick = () => {
+      window.open('https://discord.gg/8s6XuWkfQb', '_blank');
+    };
+    createBtn.onclick = (e) => {
+      e.stopPropagation();
+      goCreate();
+    };
+    userInfo.onclick = (e) => {
+      if (isMobileBottomLayout() && isLoggedIn) {
+        e.preventDefault();
+        e.stopPropagation();
+        syncSheetProfileFromUser();
+        openProfileSheet();
+        return;
+      }
+      if (isLoggedIn && currentUserId && currentUserNickname) {
+        window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
+      }
+    };
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        host.classList.add('sps-host-open');
-      });
+    profileSheetBackdrop.onclick = () => {
+      if (!isMobileBottomLayout()) closeProfileSheet();
+    };
+    sheetProfileRow.onclick = (e) => {
+      e.stopPropagation();
+      if (isMobileBottomLayout()) return;
+      if (isLoggedIn && currentUserId && currentUserNickname) {
+        closeProfileSheet();
+        window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
+      }
+    };
+    sheetLogoutBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (isMobileBottomLayout()) return;
+      closeProfileSheet();
+      parent.postMessage({ type: 'logout' }, '*');
+    };
+    sheetDiscordJoinBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (isMobileBottomLayout()) return;
+      closeProfileSheet();
+      window.open('https://discord.gg/8s6XuWkfQb', '_blank');
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeProfileSheet();
     });
-  });
-})();
+
+    window.handleLogout = (event) => {
+      event.stopPropagation();
+      parent.postMessage({ type: 'logout' }, '*');
+    };
+    window.addEventListener('message', (event) => {
+      const data = event.data;
+      if (!data?.type) return;
+      if (data.type === 'activateHome' || data.type === 'default') {
+        homeNav.classList.add('active');
+        exploreNav.classList.remove('active');
+        chatNav.classList.remove('active');
+        updateIcons();
+      }
+      if (data.type === 'activateExplore') {
+        homeNav.classList.remove('active');
+        exploreNav.classList.add('active');
+        chatNav.classList.remove('active');
+        updateIcons();
+      }
+      if (data.type === 'activateChat') {
+        homeNav.classList.remove('active');
+        exploreNav.classList.remove('active');
+        chatNav.classList.add('active');
+        updateIcons();
+      }
+      if (data.type === 'updateUser') {
+        if (data.user) {
+          isLoggedIn = true;
+          currentUserId = data.user.id;
+          currentUserNickname = data.user.nickname;
+          currentUserProfileImage = data.user.profile_image;
+          if (currentUserProfileImage && typeof currentUserProfileImage === 'string' && currentUserProfileImage.trim() !== '') {
+            const img = document.createElement('img');
+            const url = currentUserProfileImage + (currentUserProfileImage.includes('?') ? '&' : '?') + 'v=' + Date.now();
+            img.src = url;
+            img.alt = data.user.nickname || '프로필';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.onerror = () => {
+              userAvatar.innerHTML = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
+            };
+            userAvatar.innerHTML = '';
+            userAvatar.appendChild(img);
+          } else {
+            userAvatar.textContent = data.user.nickname ? data.user.nickname[0].toUpperCase() : '?';
+          }
+          userInfo.style.display = 'flex';
+          sidebarBar.classList.add('has-profile');
+          syncSheetProfileFromUser();
+        } else {
+          isLoggedIn = false;
+          currentUserId = null;
+          currentUserNickname = null;
+          currentUserProfileImage = null;
+          userInfo.style.display = 'none';
+          sidebarBar.classList.remove('has-profile');
+          closeProfileSheet();
+        }
+      }
+      if (data.type === 'setNarrowMode') {
+        const sidebar = document.querySelector('.sidebar');
+        if (data.narrow) {
+          sidebar.classList.add('narrow');
+        } else {
+          sidebar.classList.remove('narrow');
+        }
+      }
+    });
+    homeNav.classList.add('active');
+    updateIcons();
+    parent.postMessage({ type: 'requestUserInfo' }, '*');
+  </script>
+</body>
+</html>
