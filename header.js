@@ -10,7 +10,7 @@ function loadHeader() {
         window.location.href = 'index.html';
       });
 
-      // 버튼 이벤트 리스너 추가
+      // 버튼 이벤트 리스너 추가d
       document.getElementById('openLinkBtn1').addEventListener('click', () => {
         window.open('https://naver.me/xAWjFEtu', '_blank');
       });

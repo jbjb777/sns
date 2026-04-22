@@ -1,8 +1,4 @@
-/**
- * 모바일 사이드바 프로필 시트 — 부모 페이지에서 실행.
- * 각 페이지에 #sharerProfileSheetHost 가 있어야 하며,
- * 로그아웃 시 window.onSharerProfileLogout = function () { ... } 를 먼저 할당하세요.
- */
+//아
 (function setupSharerProfileSheetHost() {
   const HID = 'sharerProfileSheetHost';
   let escHandler = null;
