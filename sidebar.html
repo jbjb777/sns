@@ -166,6 +166,57 @@
       border-radius: 10px;
     }
 
+    /* TOOLTIP (Desktop only) */
+    .nav-item[data-tooltip], .create-btn[data-tooltip], .user-info[data-tooltip] {
+      position: relative;
+    }
+    .nav-item[data-tooltip]::after, .create-btn[data-tooltip]::after, .user-info[data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%) translateX(8px);
+      background: rgba(15, 15, 15, 0.95);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      letter-spacing: 0.02em;
+    }
+    .nav-item[data-tooltip]:hover::after, .create-btn[data-tooltip]:hover::after, .user-info[data-tooltip]:hover::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-50%) translateX(16px);
+    }
+    .nav-item[data-tooltip]::before, .create-btn[data-tooltip]::before, .user-info[data-tooltip]::before {
+      content: '';
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%) translateX(2px);
+      border: 6px solid transparent;
+      border-right-color: rgba(15, 15, 15, 0.95);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .nav-item[data-tooltip]:hover::before, .create-btn[data-tooltip]:hover::before, .user-info[data-tooltip]:hover::before {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-50%) translateX(10px);
+    }
+
     .mobile-profile-sheet-inner .sheet-logout {
       width: 100%;
       box-sizing: border-box;
@@ -311,6 +362,11 @@
       .mobile-profile-sheet {
         display: none !important;
       }
+      
+      .nav-item[data-tooltip]::after, .create-btn[data-tooltip]::after, .user-info[data-tooltip]::after,
+      .nav-item[data-tooltip]::before, .create-btn[data-tooltip]::before, .user-info[data-tooltip]::before {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -321,24 +377,24 @@
         <img src="logo.svg" alt="Sharer 로고" class="logo-svg">
       </div>
       <div class="mob-nav-left">
-        <div class="nav-item active" id="homeNav">
+        <div class="nav-item active" id="homeNav" data-tooltip="홈">
           <img src="home.png" alt="홈" class="nav-icon-img-home" id="homeIcon">
         </div>
-        <div class="nav-item" id="exploreNav">
+        <div class="nav-item" id="exploreNav" data-tooltip="탐색">
           <img src="exploreX.png" alt="탐색" class="nav-icon-img-explore" id="exploreIcon">
         </div>
       </div>
-      <div class="nav-item" id="chatNav">
+      <div class="nav-item" id="chatNav" data-tooltip="채팅">
         <img src="chatX.png" alt="채팅" class="nav-icon-img" id="chatIcon">
       </div>
-      <div class="nav-item" id="discordNav">
+      <div class="nav-item" id="discordNav" data-tooltip="Discord 커뮤니티">
         <img src="discord.png" alt="Discord" class="nav-icon-img">
       </div>
-      <button class="create-btn" id="createBtn" type="button">
+      <button class="create-btn" id="createBtn" type="button" data-tooltip="새 게시물 만들기">
         <img src="new.png" alt="만들기" class="btn-icon-img">
       </button>
       <div class="mob-nav-right">
-        <div class="user-info" id="userInfo" style="display: none;">
+        <div class="user-info" id="userInfo" style="display: none;" data-tooltip="내 프로필">
           <div class="user-avatar-wrapper">
             <div class="user-avatar" id="userAvatar"></div>
           </div>

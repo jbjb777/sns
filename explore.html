@@ -222,9 +222,22 @@
       font-size: 24px;
     }
     .action-btn:hover {
-      transform: scale(1.1);
+      transform: scale(1.15);
       background: rgba(54, 99, 255, 0.8);
       border-color: #3663FF;
+    }
+    .action-btn:active {
+      transform: scale(0.85);
+      transition: transform 0.1s;
+    }
+    @keyframes springBounce {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.3); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    .action-btn.animate-bounce {
+      animation: springBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .action-btn.liked {
       background: rgba(54, 99, 255, 0.8);
@@ -563,6 +576,31 @@
       color: #aaa;
       line-height: 1.6;
     }
+    
+    .end-of-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #888;
+      font-size: 16px;
+      gap: 16px;
+    }
+    .end-btn {
+      background: rgba(54, 99, 255, 0.9);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .end-btn:hover { transform: scale(1.05); background: #3663FF; }
+    .end-btn:active { transform: scale(0.95); }
 
     /* ─── 모바일 프로필 시트(부모) ─── */
     .sharer-profile-sheet-host[hidden] { display: none !important; }
@@ -1133,15 +1171,15 @@
 
   function getNextPost() {
     if (currentPostIndex >= displayedPosts.length) {
-      const newShuffled = [...allPosts].sort(() => Math.random() - 0.5);
-      displayedPosts = [...displayedPosts, ...newShuffled];
+      return null;
     }
     return displayedPosts[currentPostIndex++];
   }
 
   function preloadNextPost() {
     const container = document.getElementById('shortsContainer');
-    const nextIndex = container.children.length;
+    const items = container.querySelectorAll('.short-item');
+    const nextIndex = items.length;
     if (!loadedPostIndices.has(nextIndex)) {
       const post = getNextPost();
       if (post) {
@@ -1151,9 +1189,29 @@
           loadLikesAndComments();
           updateNavButtons();
         });
+      } else {
+        if (!document.getElementById('endIndicator')) {
+          const endDiv = document.createElement('div');
+          endDiv.id = 'endIndicator';
+          endDiv.className = 'short-item';
+          endDiv.innerHTML = `
+            <div class="end-of-content">
+              <div>모든 콘텐츠를 다 보셨네요!<br>더 이상 콘텐츠가 없습니다. 🎉</div>
+              <button class="end-btn" onclick="scrollToTop()">처음으로 돌아가기</button>
+            </div>
+          `;
+          container.appendChild(endDiv);
+        }
       }
     }
   }
+
+  window.scrollToTop = function() {
+    const container = document.getElementById('shortsContainer');
+    container.scrollTo({ top: 0, behavior: 'smooth' });
+    currentScrollIndex = 0;
+    updateNavButtons();
+  };
 
   function setupScrollTracking() {
     const container = document.getElementById('shortsContainer');
@@ -1287,6 +1345,15 @@
       }
       return;
     }
+    
+    // Play bounce animation
+    const btn = document.querySelector(`[data-like-btn="${postId}"]`);
+    if (btn) {
+      btn.classList.remove('animate-bounce');
+      void btn.offsetWidth; // trigger reflow
+      btn.classList.add('animate-bounce');
+    }
+
     try {
       const likes = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
 
@@ -1315,6 +1382,14 @@
   };
 
   window.openComments = async function(postId) {
+    // Play bounce animation
+    const btn = document.querySelector(`[data-like-btn="${postId}"]`).nextElementSibling;
+    if (btn) {
+      btn.classList.remove('animate-bounce');
+      void btn.offsetWidth; // trigger reflow
+      btn.classList.add('animate-bounce');
+    }
+
     currentCommentPostId = postId;
     document.getElementById('commentOverlay').classList.add('active');
     document.getElementById('commentModal').classList.add('active');

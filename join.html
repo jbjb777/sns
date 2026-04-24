@@ -230,6 +230,44 @@
       font-size: 11px;
     }
 
+    /* ─── PROGRESS BAR ─── */
+    .progress-container {
+      margin-bottom: 24px;
+    }
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--t3);
+    }
+    .progress-steps .active { color: var(--t1); }
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      background: var(--bg3);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--t1);
+      transition: width 0.3s ease;
+    }
+
+    /* ─── ERROR ANIMATION ─── */
+    .input-error {
+      border-color: var(--pink) !important;
+      animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translateX(-1px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-3px); }
+      40%, 60% { transform: translateX(3px); }
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 1024px) {
       .main-content { flex-direction: column; align-items: center; gap: 32px; }
@@ -255,6 +293,14 @@
     <!-- 좌측: 회원가입 폼 -->
     <div class="auth-container">
       <h2>회원정보 입력</h2>
+
+      <div class="progress-container">
+        <div class="progress-steps">
+          <div class="step">Step 1: 약관 동의</div>
+          <div class="step active">Step 2: 정보 입력</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width: 100%;"></div></div>
+      </div>
 
       <div id="signupForm">
         <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
@@ -362,9 +408,13 @@
   }
 
   window.handleSignup = async function() {
-    const nickname = document.getElementById('signupNickname').value.trim();
-    const id = document.getElementById('signupId').value.trim();
-    const password = document.getElementById('signupPassword').value.trim();
+    const nicknameInput = document.getElementById('signupNickname');
+    const idInput = document.getElementById('signupId');
+    const passwordInput = document.getElementById('signupPassword');
+
+    const nickname = nicknameInput.value.trim();
+    const id = idInput.value.trim();
+    const password = passwordInput.value.trim();
 
     const idErrorDiv = document.getElementById('idError');
     const nicknameErrorDiv = document.getElementById('nicknameError');
@@ -375,19 +425,50 @@
     nicknameErrorDiv.textContent = '';
     errorDiv.textContent = '';
     successDiv.textContent = '';
+    
+    nicknameInput.classList.remove('input-error');
+    idInput.classList.remove('input-error');
+    passwordInput.classList.remove('input-error');
 
-    if (!nickname || !id || !password) { errorDiv.textContent = '모든 필드를 입력하세요.'; return; }
-    if (nickname.length > 20) { nicknameErrorDiv.textContent = '닉네임은 20자 이하로 입력하세요.'; return; }
-    if (nickname.includes("정빈777")) { nicknameErrorDiv.textContent = '이 닉네임은 사용할 수 없습니다.'; return; }
+    let hasError = false;
+    if (!nickname || !id || !password) { 
+      errorDiv.textContent = '모든 필드를 입력하세요.'; 
+      if (!nickname) nicknameInput.classList.add('input-error');
+      if (!id) idInput.classList.add('input-error');
+      if (!password) passwordInput.classList.add('input-error');
+      return; 
+    }
+    if (nickname.length > 20) { 
+      nicknameErrorDiv.textContent = '닉네임은 20자 이하로 입력하세요.'; 
+      nicknameInput.classList.add('input-error');
+      hasError = true;
+    }
+    if (nickname.includes("정빈777")) { 
+      nicknameErrorDiv.textContent = '이 닉네임은 사용할 수 없습니다.'; 
+      nicknameInput.classList.add('input-error');
+      hasError = true;
+    }
+    
+    if (hasError) return;
 
     setButtonLoading(true);
 
     try {
       const idCheck = await api(`/users?id=eq.${encodeURIComponent(id)}&select=id`);
-      if (idCheck?.length > 0) { idErrorDiv.textContent = '이미 사용 중인 아이디입니다.'; setButtonLoading(false); return; }
+      if (idCheck?.length > 0) { 
+        idErrorDiv.textContent = '이미 사용 중인 아이디입니다.'; 
+        idInput.classList.add('input-error');
+        setButtonLoading(false); 
+        return; 
+      }
 
       const nicknameCheck = await api(`/users?nickname=eq.${encodeURIComponent(nickname)}&select=nickname`);
-      if (nicknameCheck?.length > 0) { nicknameErrorDiv.textContent = '이미 사용 중인 닉네임입니다.'; setButtonLoading(false); return; }
+      if (nicknameCheck?.length > 0) { 
+        nicknameErrorDiv.textContent = '이미 사용 중인 닉네임입니다.'; 
+        nicknameInput.classList.add('input-error');
+        setButtonLoading(false); 
+        return; 
+      }
 
       await api("/users", {
         method: "POST",
@@ -404,6 +485,31 @@
       setButtonLoading(false);
     }
   }
+
+  document.getElementById('signupNickname').addEventListener('input', function() {
+    this.classList.remove('input-error');
+    const err = document.getElementById('nicknameError');
+    const val = this.value.trim();
+    if (val.length > 20) {
+      err.textContent = '닉네임은 20자 이하로 입력하세요.';
+      this.classList.add('input-error');
+    } else if (val.includes("정빈777")) {
+      err.textContent = '이 닉네임은 사용할 수 없습니다.';
+      this.classList.add('input-error');
+    } else {
+      err.textContent = '';
+    }
+  });
+
+  document.getElementById('signupId').addEventListener('input', function() {
+    this.classList.remove('input-error');
+    document.getElementById('idError').textContent = '';
+  });
+
+  document.getElementById('signupPassword').addEventListener('input', function() {
+    this.classList.remove('input-error');
+    document.getElementById('signupError').textContent = '';
+  });
 
   document.getElementById('signupPassword').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSignup();
