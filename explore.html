@@ -335,144 +335,141 @@
     }
     .comment-modal-header {
       padding: 16px 20px;
-      border-bottom: 1px solid #333;
+      border-bottom: 1px solid #1e1e1e;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .comment-modal-title {
-      font-size: 16px;
-      font-weight: 600;
-    }
-    .comment-close-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 24px;
-      cursor: pointer;
-    }
-    .comment-modal-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
+    .comment-modal-title { font-size: 16px; font-weight: 600; }
+    .comment-close-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+    .comment-modal-list { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; gap: 0; }
+    
     .comment-item {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      padding-bottom: 16px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid #333;
+      padding: 20px;
+      border-bottom: 1px solid #1e1e1e;
     }
-    .comment-item:last-child {
-      border-bottom: none;
-    }
-    .comment-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .comment-author-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-    }
-    .comment-author-wrapper:hover {
-      opacity: 0.8;
-    }
+    .comment-item:last-child { border-bottom: none; }
+    .comment-header { display: flex; justify-content: space-between; align-items: center; }
+    .comment-author-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; transition: opacity 0.15s; }
+    .comment-author-wrapper:hover { opacity: 0.75; }
     .comment-avatar {
-      width: 32px;
-      height: 32px;
+      width: 36px; height: 36px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      font-weight: bold;
-      flex-shrink: 0;
+      font-size: 14px;
+      font-weight: 600;
       overflow: hidden;
+      flex-shrink: 0;
+      color: #666;
+      transition: border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .comment-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .comment-author-wrapper:hover .comment-avatar { border-color: #333; transform: scale(1.06); }
+    .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .comment-author {
       font-size: 14px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      color: #fff;
     }
     .comment-content {
       font-size: 14px;
-      color: #ddd;
-      line-height: 1.5;
+      color: #ccc;
+      line-height: 1.7;
       white-space: pre-wrap;
+      padding-left: 2px;
     }
-    .comment-content a {
-      color: #00bfff;
-      text-decoration: underline;
-    }
-    .comment-content a:hover {
-      color: #53b6f9;
-    }
-    .comment-date {
-      font-size: 12px;
-      color: #666;
-    }
+    .comment-content a { color: #888; text-decoration: underline; text-underline-offset: 3px; }
+    .comment-content a:hover { color: #fff; }
+    .comment-date { font-size: 11px; color: #444; padding-left: 2px; }
     .comment-del-btn {
       background: none;
       border: none;
-      color: #ff4444;
+      color: #444;
       font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
       padding: 4px 8px;
+      border-radius: 8px;
+      font-family: inherit;
+      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
+    .comment-del-btn:hover { color: #ff6b6b; background: rgba(255,107,107,0.08); }
+    .comment-del-btn:active { transform: scale(0.88); }
+    
+    /* REPLIES */
+    .comment-actions { display: flex; align-items: center; gap: 10px; padding-left: 2px; margin-top: 2px; }
+    .reply-btn, .replies-toggle-btn {
+      background: none; border: none; color: #888; font-size: 12px; font-weight: 600; cursor: pointer;
+      padding: 6px 10px; border-radius: 10px; font-family: inherit; transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .reply-btn:hover, .replies-toggle-btn:hover { color: #fff; background: #1a1a1a; }
+    .reply-btn:active, .replies-toggle-btn:active { transform: scale(0.92); }
+    .reply-compose { margin-top: 10px; padding-left: 44px; display: flex; flex-direction: column; gap: 8px; }
+    .reply-input {
+      background: #111; border: 1px solid #2a2a2a; border-radius: 14px; padding: 10px 14px; color: #fff;
+      font-size: 13px; font-family: inherit; resize: none; min-height: 42px; max-height: 160px;
+      transition: border-color 0.2s, background 0.2s; line-height: 1.5;
+    }
+    .reply-input:focus { outline: none; border-color: #333; background: #1a1a1a; }
+    .reply-input::placeholder { color: #444; }
+    .reply-compose-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .reply-submit-btn, .reply-cancel-btn {
+      border: 1px solid #2a2a2a; background: #1a1a1a; color: #888; padding: 8px 12px; border-radius: 12px;
+      font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .reply-submit-btn { background: #fff; color: #000; border-color: transparent; }
+    .reply-submit-btn:hover { background: #e8e8e8; transform: scale(1.02); }
+    .reply-cancel-btn:hover { background: #222; color: #fff; border-color: #333; }
+    .reply-submit-btn:active, .reply-cancel-btn:active { transform: scale(0.96); }
+    .reply-list { margin-top: 10px; padding-left: 44px; display: flex; flex-direction: column; border-left: 1px solid #1e1e1e; }
+    .reply-item { display: flex; flex-direction: column; gap: 6px; padding: 14px 0 14px 14px; }
+    .reply-item .comment-avatar { width: 28px; height: 28px; font-size: 12px; }
+    .reply-item .comment-author { font-size: 13px; }
+    .reply-item .comment-content { font-size: 13px; color: #cfcfcf; }
+    .reply-item .comment-date { font-size: 10px; }
+
+    /* MODAL INPUT */
     .comment-input-wrapper {
       padding: 16px 20px;
-      border-top: 1px solid #333;
+      border-top: 1px solid #1e1e1e;
       display: flex;
       gap: 10px;
-      background: #1e1e1e;
+      background: #141414;
     }
     .comment-input {
       flex: 1;
-      background: #121212;
-      border: 1px solid #444;
-      border-radius: 20px;
-      padding: 10px 16px;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 14px;
+      padding: 12px 16px;
       color: #fff;
       font-size: 14px;
+      font-family: inherit;
       resize: none;
-      min-height: 40px;
-      max-height: 100px;
+      min-height: 48px;
+      max-height: 180px;
+      transition: border-color 0.2s, background 0.2s;
+      line-height: 1.5;
     }
-    .comment-input:focus {
-      outline: none;
-      border-color: #3663FF;
-    }
+    .comment-input:focus { outline: none; border-color: #333; background: #1a1a1a; }
+    .comment-input::placeholder { color: #444; }
     .comment-submit-btn {
-      background: #3663FF;
-      border: none;
-      color: white;
-      padding: 0 20px;
-      border-radius: 20px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      font-size: 14px;
+      background: #fff; border: none; color: #000; padding: 0 20px; border-radius: 14px;
+      font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; flex-shrink: 0;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap;
     }
-    .comment-submit-btn:hover {
-      background: #2952CC;
-    }
-    .comment-submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .comment-submit-btn:hover { background: #e8e8e8; transform: scale(1.04); }
+    .comment-submit-btn:active { transform: scale(0.94); }
+    .comment-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .loading-spinner {
       width: 100%;
       height: 100vh;
@@ -908,6 +905,7 @@
   let currentScrollIndex = 0;
   let loadedPostIndices = new Set();
   const INITIAL_LOAD = 2;
+  const openReplyThreads = new Set();
 
   // 댓글 창 드래그 기능
   const _commentModal = document.getElementById('commentModal');
@@ -1332,6 +1330,16 @@
     document.getElementById('commentList').innerHTML = '';
   };
 
+  async function getCommentById(commentId) {
+    if (!commentId) return null;
+    try {
+      const rows = await api(`/comments?id=eq.${commentId}&select=user_id,user_name`);
+      return rows?.[0] || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   async function loadComments(postId) {
     const listDiv = document.getElementById('commentList');
     listDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 40px 20px;">댓글을 불러오는 중...</div>';
@@ -1347,7 +1355,6 @@
 
       listDiv.innerHTML = '';
 
-      // 댓글 작성자 프로필 사진 미리 로드
       const uniqueUserIds = [...new Set(comments.map(c => c.user_id))];
       const profileMap = {};
       await Promise.all(
@@ -1357,33 +1364,123 @@
         })
       );
 
-      comments.forEach(comment => {
-        const isMyComment = currentUser && currentUser.id === comment.user_id;
-        const date = new Date(comment.created_at).toLocaleString('ko-KR');
-        const isVerified = ["JB777", "진정오"].includes(comment.user_name);
-        let avatarHTML = comment.user_name ? comment.user_name[0].toUpperCase() : '?';
-        if (profileMap[comment.user_id]) {
-          const url = profileMap[comment.user_id];
-          const cacheBuster = url.includes('?') ? '&' : '?';
-          avatarHTML = `<img src="${url}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(comment.user_name)}">`;
+      const roots = [];
+      const repliesByParent = {};
+
+      comments.forEach(c => {
+        const parentId = c.parent_id || null;
+        if (!parentId) roots.push(c);
+        else {
+          if (!repliesByParent[parentId]) repliesByParent[parentId] = [];
+          repliesByParent[parentId].push(c);
         }
-        const linkedText = linkify(comment.text);
-        const div = document.createElement('div');
-        div.className = 'comment-item';
-        div.innerHTML = `
+      });
+
+      Object.values(repliesByParent).forEach(arr => {
+        arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      });
+
+      function renderAvatar(userName, userId) {
+        let avatar = userName ? userName[0].toUpperCase() : '?';
+        if (profileMap[userId]) {
+          const url = profileMap[userId].includes('?')
+            ? `${profileMap[userId]}&v=${Date.now()}`
+            : `${profileMap[userId]}?v=${Date.now()}`;
+          avatar = `<img src="${url}" alt="${escapeHtml(userName)}">`;
+        }
+        return avatar;
+      }
+
+      function renderOneComment(c, { showReplyButton }) {
+        const isMine = currentUser?.id === c.user_id;
+        const date = new Date(c.created_at).toLocaleString('ko-KR', {
+          year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        const isVerified = ["JB777", "진정오"].includes(c.user_name);
+        const avatarContent = renderAvatar(c.user_name, c.user_id);
+        const linkedText = linkify(c.text);
+
+        const replyCount = (repliesByParent[c.id] || []).length;
+        const hasReplies = replyCount > 0;
+        const isOpen = openReplyThreads.has(c.id);
+
+        const replyBtnHtml = showReplyButton
+          ? `<button class="reply-btn" onclick="openReplyComposer('${c.id}')">답글 달기</button>`
+          : '';
+
+        const toggleBtnHtml = hasReplies
+          ? `<button class="replies-toggle-btn" id="toggleReplies-${c.id}" data-count="${replyCount}" onclick="toggleReplies('${c.id}')">${isOpen ? '답글 접기' : `답글 ${replyCount}개 보기`}</button>`
+          : '';
+
+        const replyComposeHtml = showReplyButton ? `
+          <div class="reply-compose" id="replyCompose-${c.id}" style="display:none;">
+            <textarea id="replyInput-${c.id}" class="reply-input" placeholder="답글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
+            <div class="reply-compose-actions">
+              <button class="reply-cancel-btn" onclick="cancelReply('${c.id}')">취소</button>
+              <button class="reply-submit-btn" onclick="submitReply('${c.id}')">답글</button>
+            </div>
+          </div>
+        ` : '';
+
+        const replies = repliesByParent[c.id] || [];
+        const repliesHtml = replies.length ? `
+          <div class="reply-list" id="replyList-${c.id}" style="display:${isOpen ? 'flex' : 'none'};">
+            ${replies.map(r => {
+              const rIsMine = currentUser?.id === r.user_id;
+              const rDate = new Date(r.created_at).toLocaleString('ko-KR', {
+                year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              });
+              const rIsVerified = ["JB777", "진정오"].includes(r.user_name);
+              const rAvatarContent = renderAvatar(r.user_name, r.user_id);
+              const rLinkedText = linkify(r.text);
+              return `
+                <div class="reply-item">
+                  <div class="comment-header">
+                    <div class="comment-author-wrapper" onclick="goToProfile('${r.user_id}', '${escapeHtml(r.user_name)}')">
+                      <div class="comment-avatar">${rAvatarContent}</div>
+                      <span class="comment-author">
+                        ${escapeHtml(r.user_name)}
+                        ${rIsVerified ? '<span class="verification-badge" style="width:12px;height:12px;"></span>' : ''}
+                      </span>
+                    </div>
+                    ${rIsMine ? `<button class="comment-del-btn" onclick="deleteComment('${r.id}', '${postId}')">삭제</button>` : ''}
+                  </div>
+                  <div class="comment-content">${rLinkedText}</div>
+                  <div class="comment-date">${rDate}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : '';
+
+        return `
           <div class="comment-header">
-            <div class="comment-author-wrapper" onclick="goToProfile('${comment.user_id}', '${escapeHtml(comment.user_name)}')">
-              <div class="comment-avatar">${avatarHTML}</div>
+            <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
+              <div class="comment-avatar">${avatarContent}</div>
               <span class="comment-author">
-                ${escapeHtml(comment.user_name)}
-                ${isVerified ? '<span class="verification-badge" style="width:14px; height:14px;"></span>' : ''}
+                ${escapeHtml(c.user_name)}
+                ${isVerified ? '<span class="verification-badge" style="width:13px;height:13px;"></span>' : ''}
               </span>
             </div>
-            ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${comment.id}', '${postId}')">삭제</button>` : ''}
+            ${isMine ? `<button class="comment-del-btn" onclick="deleteComment('${c.id}', '${postId}')">삭제</button>` : ''}
           </div>
           <div class="comment-content">${linkedText}</div>
           <div class="comment-date">${date}</div>
+          ${showReplyButton ? `
+            <div class="comment-actions">
+              ${replyBtnHtml}
+              ${toggleBtnHtml}
+            </div>
+            ${replyComposeHtml}
+            ${repliesHtml}
+          ` : ''}
         `;
+      }
+
+      roots.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'comment-item';
+        div.innerHTML = renderOneComment(c, { showReplyButton: true });
         listDiv.appendChild(div);
       });
     } catch (e) {
@@ -1391,6 +1488,79 @@
       listDiv.innerHTML = '<div style="text-align: center; color: #ff6b6b; padding: 40px 20px;">댓글을 불러오는데 실패했습니다.</div>';
     }
   }
+
+  window.openReplyComposer = function(commentId) {
+    if (!currentUser) {
+      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) window.location.href = 'index.html';
+      return;
+    }
+    const compose = document.getElementById(`replyCompose-${commentId}`);
+    if (!compose) return;
+    compose.style.display = 'flex';
+    const input = document.getElementById(`replyInput-${commentId}`);
+    if (input) input.focus();
+  };
+
+  window.cancelReply = function(commentId) {
+    const compose = document.getElementById(`replyCompose-${commentId}`);
+    const input = document.getElementById(`replyInput-${commentId}`);
+    if (input) input.value = '';
+    if (compose) compose.style.display = 'none';
+  };
+
+  window.submitReply = async function(parentId) {
+    const input = document.getElementById(`replyInput-${parentId}`);
+    const text = input?.value?.trim() || '';
+    if (!currentUser) {
+      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) window.location.href = 'index.html';
+      return;
+    }
+    if (!text) return;
+    try {
+      await api("/comments", {
+        method: "POST",
+        body: JSON.stringify({
+          post_id: currentCommentPostId,
+          user_id: currentUser.id,
+          user_name: currentUser.nickname,
+          text,
+          parent_id: parentId,
+          created_at: new Date().toISOString()
+        })
+      });
+      const parentComment = await getCommentById(parentId);
+      const post = getPostById(currentCommentPostId);
+      const targetUserId = parentComment?.user_id || post?.author_id;
+      createNotification(targetUserId, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${currentCommentPostId}`);
+      if (input) input.value = '';
+      const compose = document.getElementById(`replyCompose-${parentId}`);
+      if (compose) compose.style.display = 'none';
+      openReplyThreads.add(parentId);
+      await loadComments(currentCommentPostId);
+      const countEl = document.querySelector(`[data-comment-count="${currentCommentPostId}"]`);
+      if (countEl) countEl.textContent = parseInt(countEl.textContent || '0') + 1;
+    } catch (e) {
+      console.error('답글 작성 실패:', e);
+      alert('답글 작성에 실패했습니다.');
+    }
+  };
+
+  window.toggleReplies = function(commentId) {
+    const listEl = document.getElementById(`replyList-${commentId}`);
+    const btn = document.getElementById(`toggleReplies-${commentId}`);
+    if (!listEl || !btn) return;
+    const opening = listEl.style.display === 'none' || !listEl.style.display;
+    if (opening) {
+      listEl.style.display = 'flex';
+      openReplyThreads.add(commentId);
+      btn.textContent = '답글 접기';
+    } else {
+      listEl.style.display = 'none';
+      openReplyThreads.delete(commentId);
+      const count = btn.getAttribute('data-count') || 0;
+      btn.textContent = `답글 ${count}개 보기`;
+    }
+  };
 
   window.submitComment = async function() {
     if (!currentUser) {
@@ -1412,6 +1582,7 @@
           user_id: currentUser.id,
           user_name: currentUser.nickname,
           text,
+          parent_id: null,
           created_at: new Date().toISOString()
         })
       });
