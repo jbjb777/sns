@@ -253,6 +253,75 @@
     .terms-box h4 { margin: 12px 0 4px; color: var(--t1); font-size: 12px; border-bottom: 1px solid var(--border); padding-bottom: 2px; }
     .terms-box strong { color: var(--t1); font-weight: 600; }
 
+    /* ─── CUSTOM CHECKBOX ─── */
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 0 4px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 13px;
+      color: var(--t2);
+      transition: color 0.2s;
+    }
+    .checkbox-item:hover { color: var(--t1); }
+
+    .checkbox-input {
+      display: none;
+    }
+
+    .checkbox-custom {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border2);
+      border-radius: 6px;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+      background: var(--bg3);
+    }
+
+    .checkbox-input:checked + .checkbox-custom {
+      background: var(--t1);
+      border-color: var(--t1);
+    }
+
+    .checkbox-custom::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid #000;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg) scale(0);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .checkbox-input:checked + .checkbox-custom::after {
+      transform: rotate(45deg) scale(1);
+    }
+
+    .checkbox-item span a {
+      color: var(--t1);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    .checkbox-item span a:hover {
+      opacity: 0.7;
+    }
+
     /* ─── SPINNER ─── */
     .spinner {
       display: inline-block;
@@ -358,38 +427,19 @@
 
       <!-- 회원가입 탭 -->
       <div class="form-section" id="signupForm">
-        <div class="terms-label">이용약관</div>
-        <div class="terms-box">
-          <h4>제1조 (목적)</h4>
-          이 약관은 <strong>서비스의 이용조건 및 절차</strong>에 관한 사항을 규정함을 목적으로 합니다.
-          <h4>제2조 (용어의 정의)</h4>
-          1. <strong>"서비스"</strong>란 웹사이트가 제공하는 모든 서비스를 의미합니다.<br>
-          2. <strong>"회원"</strong>란 서비스에 접속하여 이 약관에 따라 서비스를 이용하는 자를 말합니다.
-          <h4>제3조 (서비스의 제공)</h4>
-          1. 서비스는 <strong>연중무휴, 1일 24시간 제공</strong>함을 원칙으로 합니다.<br>
-          2. 서비스는 시스템 점검 등 필요한 경우 일시적으로 중단될 수 있습니다.
-          <h4>제4조 (회원의 의무)</h4>
-          1. 회원은 관계법령, 이 약관의 규정, 이용안내 및 서비스와 관련하여 공지한 주의사항을 준수하여야 합니다.<br>
-          2. 회원은 <strong>타인의 명예를 손상시키거나 불이익을 주는 행위</strong>를 해서는 안 됩니다.
-          <h4>제5조 (서비스 이용의 제한)</h4>
-          운영자는 회원이 이 약관의 의무를 위반하거나 서비스의 정상적인 운영을 방해한 경우, 서비스 이용을 제한할 수 있습니다.<br><br>
-          <strong>문의사항:</strong> alexeom97@outlook.com
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" class="checkbox-input" id="agreePrivacy" onchange="validateSignup()">
+            <span class="checkbox-custom"></span>
+            <span>Sharer의 <a href="privacy.html" target="_blank" onclick="event.stopPropagation()">개인정보 처리방침</a>에 동의합니다</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" class="checkbox-input" id="agreeTerms" onchange="validateSignup()">
+            <span class="checkbox-custom"></span>
+            <span>Sharer의 <a href="policy.html" target="_blank" onclick="event.stopPropagation()">이용약관</a>에 동의합니다</span>
+          </label>
         </div>
-        <div class="terms-label">개인정보 처리방침</div>
-        <div class="terms-box">
-          <h4>수집하는 개인정보 항목</h4>
-          <strong>필수항목:</strong> 아이디, 비밀번호, 닉네임
-          <h4>개인정보의 수집 및 이용목적</h4>
-          회원 관리, 서비스 제공, 게시물 관리
-          <h4>개인정보의 보유 및 이용기간</h4>
-          <strong>회원 탈퇴 시까지</strong>
-          <h4>개인정보 파기절차 및 방법</h4>
-          이용자의 개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 <strong>지체 없이 파기</strong>합니다.
-          <h4>이용자의 권리</h4>
-          이용자는 언제든지 본인의 개인정보를 조회하거나 수정할 수 있습니다.<br><br>
-          <strong>문의사항:</strong> alexeom97@outlook.com
-        </div>
-        <button id="nextBtn" onclick="handleNextStep()">다음으로</button>
+        <button id="nextBtn" onclick="handleNextStep()" disabled>다음으로</button>
 
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleSignupBtn" onclick="showGoogleModal('signup')">
@@ -484,9 +534,23 @@
     } else {
       tabs[1].classList.add('active');
       document.getElementById('signupForm').classList.add('active');
+      // Reset checkboxes when switching to signup tab
+      const p = document.getElementById('agreePrivacy');
+      const t = document.getElementById('agreeTerms');
+      if (p) p.checked = false;
+      if (t) t.checked = false;
+      validateSignup();
     }
     document.querySelectorAll('.error-message, .success-message').forEach(el => el.textContent = '');
     hideGoogleModal();
+  }
+
+  window.validateSignup = function() {
+    const p = document.getElementById('agreePrivacy');
+    const t = document.getElementById('agreeTerms');
+    const btn = document.getElementById('nextBtn');
+    if (!p || !t || !btn) return;
+    btn.disabled = !(p.checked && t.checked);
   }
 
   window.handleNextStep = function() {
