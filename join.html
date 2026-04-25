@@ -343,19 +343,19 @@
       err.textContent = '';
     }
 
-    track.style.transform = \`translateX(-\${stepIndex * 25}%)\`;
+    track.style.transform = `translateX(-${stepIndex * 25}%)`;
   }
 
   function prevStep(stepIndex) {
     const track = document.getElementById('sliderTrack');
-    track.style.transform = \`translateX(-\${stepIndex * 25}%)\`;
+    track.style.transform = `translateX(-${stepIndex * 25}%)`;
   }
 
   function setButtonLoading(isLoading, loadingText = '가입 중...') {
     const button = document.getElementById('signupBtn');
     if (isLoading) {
       button.disabled = true;
-      button.innerHTML = \`<span class="spinner"></span>\${loadingText}\`;
+      button.innerHTML = `<span class="spinner"></span>${loadingText}`;
     } else {
       button.disabled = false;
       button.innerHTML = '가입 완료';
@@ -394,7 +394,7 @@
     setButtonLoading(true);
 
     try {
-      const idCheck = await api(\`/users?id=eq.\${encodeURIComponent(id)}&select=id\`);
+      const idCheck = await api(`/users?id=eq.${encodeURIComponent(id)}&select=id`);
       if (idCheck?.length > 0) { 
         idErrorDiv.textContent = '이미 사용 중인 아이디입니다.'; 
         idInput.classList.add('input-error');
@@ -403,7 +403,7 @@
         return; 
       }
 
-      const nicknameCheck = await api(\`/users?nickname=eq.\${encodeURIComponent(nickname)}&select=nickname\`);
+      const nicknameCheck = await api(`/users?nickname=eq.${encodeURIComponent(nickname)}&select=nickname`);
       if (nicknameCheck?.length > 0) { 
         nicknameErrorDiv.textContent = '이미 사용 중인 닉네임입니다.'; 
         nicknameInput.classList.add('input-error');
@@ -421,7 +421,7 @@
       
       successDiv.textContent = '가입이 완료되었습니다! 마이페이지로 이동합니다.';
       setTimeout(() => { 
-        window.location.href = \`user.html?nickname=\${encodeURIComponent(nickname)}&id=\${encodeURIComponent(id)}&u=new\`; 
+        window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new`; 
       }, 1500);
 
     } catch (error) {
