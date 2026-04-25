@@ -941,6 +941,11 @@
     if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
   }
 
+
+
+
+
+
   function updateSidebarMode() {
     const iframe = document.getElementById('sidebarFrame');
     const narrow = window.innerWidth <= 768;
