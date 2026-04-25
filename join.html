@@ -239,7 +239,7 @@
               Sharer 서비스는 개인정보를 중요하게 생각하며, 관련 법령을 준수합니다.<br><br>최소한의 정보만 수집하며, 탈퇴 시 즉시 삭제됩니다.
             </p>
             <div style="margin-top:auto;">
-              <button onclick="nextStep(1)">동의하고 다음으로</button>
+              <button onclick="nextStep(1, this)">동의하고 다음으로</button>
             </div>
           </div>
 
@@ -252,7 +252,7 @@
             <div class="error-message" id="idError"></div>
             <div style="margin-top:auto;">
               <button class="btn-secondary" onclick="prevStep(0)">이전</button>
-              <button onclick="nextStep(2)">다음으로</button>
+              <button onclick="nextStep(2, this)">다음으로</button>
             </div>
           </div>
 
@@ -265,7 +265,7 @@
             <div class="error-message" id="nicknameError"></div>
             <div style="margin-top:auto;">
               <button class="btn-secondary" onclick="prevStep(1)">이전</button>
-              <button onclick="nextStep(3)">다음으로</button>
+              <button onclick="nextStep(3, this)">다음으로</button>
             </div>
           </div>
 
@@ -326,7 +326,7 @@
 
   window.goHome = function() { window.location.href = 'index.html'; }
 
-  function nextStep(stepIndex) {
+  async function nextStep(stepIndex, btn) {
     const track = document.getElementById('sliderTrack');
     
     if(stepIndex === 2) {
@@ -339,7 +339,25 @@
         idInput.classList.add('input-error');
         return;
       }
-      err.textContent = '';
+      
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="spinner"></span>확인 중...`;
+      btn.disabled = true;
+      try {
+        const idCheck = await api(`/users?id=eq.${encodeURIComponent(id)}&select=id`);
+        if (idCheck?.length > 0) { 
+          err.textContent = '이미 사용 중인 아이디입니다.'; 
+          idInput.classList.add('input-error');
+          return; 
+        }
+        err.textContent = '';
+      } catch (e) {
+        err.textContent = '확인 중 오류가 발생했습니다.';
+        return;
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
     }
     
     if(stepIndex === 3) {
@@ -362,7 +380,25 @@
         nickInput.classList.add('input-error');
         return;
       }
-      err.textContent = '';
+      
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="spinner"></span>확인 중...`;
+      btn.disabled = true;
+      try {
+        const nicknameCheck = await api(`/users?nickname=eq.${encodeURIComponent(nick)}&select=nickname`);
+        if (nicknameCheck?.length > 0) { 
+          err.textContent = '이미 사용 중인 닉네임입니다.'; 
+          nickInput.classList.add('input-error');
+          return; 
+        }
+        err.textContent = '';
+      } catch (e) {
+        err.textContent = '확인 중 오류가 발생했습니다.';
+        return;
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
     }
 
     track.style.transform = `translateX(-${stepIndex * 25}%)`;
@@ -416,24 +452,6 @@
     setButtonLoading(true);
 
     try {
-      const idCheck = await api(`/users?id=eq.${encodeURIComponent(id)}&select=id`);
-      if (idCheck?.length > 0) { 
-        idErrorDiv.textContent = '이미 사용 중인 아이디입니다.'; 
-        idInput.classList.add('input-error');
-        prevStep(1);
-        setButtonLoading(false); 
-        return; 
-      }
-
-      const nicknameCheck = await api(`/users?nickname=eq.${encodeURIComponent(nickname)}&select=nickname`);
-      if (nicknameCheck?.length > 0) { 
-        nicknameErrorDiv.textContent = '이미 사용 중인 닉네임입니다.'; 
-        nicknameInput.classList.add('input-error');
-        prevStep(2);
-        setButtonLoading(false); 
-        return; 
-      }
-
       await api("/users", {
         method: "POST",
         body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
