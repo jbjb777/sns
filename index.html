@@ -1029,7 +1029,20 @@ function applyFadeEffect() {
   const elements = document.querySelectorAll('.post-content');
 
   elements.forEach(el => {
-    if (el.scrollHeight > el.clientHeight) {
+    const style = getComputedStyle(el);
+    const lineHeight = parseFloat(style.lineHeight);
+
+    // 1️⃣ 실제 렌더링 줄 수
+    const visualLines = el.scrollHeight / lineHeight;
+
+    // 2️⃣ <br> 기준 줄 수
+    const html = el.innerHTML || "";
+    const brLines = html.split('<br').length;
+
+    // 👉 둘 중 큰 값 사용
+    const totalLines = Math.max(visualLines, brLines);
+
+    if (totalLines >= 7) {
       el.classList.add('fade');
     } else {
       el.classList.remove('fade');
@@ -1373,12 +1386,6 @@ loadPosts().then(() => {
   applyFadeEffect();
 });
 loadRecommendedProfiles();
-
-
-
-
-
-
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
 </body>
