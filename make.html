@@ -247,6 +247,12 @@
       transition: border-color 0.2s, background 0.2s;
       opacity: 0;
       animation: fadeInEl 0.4s ease 0.4s forwards;
+      overflow-y: auto;
+    }
+    .create-textarea[contenteditable]:empty::before {
+      content: attr(placeholder);
+      color: var(--t3);
+      pointer-events: none;
     }
     .create-textarea:focus { border-color: var(--border3); background: var(--bg3); }
     .create-textarea::placeholder { color: var(--t3); }
@@ -359,22 +365,16 @@
 
       <!-- 마크다운 툴바 -->
       <div class="editor-toolbar" id="editorToolbar">
-        <button type="button" onclick="insertMarkdown('**', '**')"><b>B</b></button>
-        <button type="button" onclick="insertMarkdown('*', '*')"><i>I</i></button>
-        <button type="button" onclick="insertMarkdown('__', '__')"><u>U</u></button>
-        <button type="button" onclick="insertMarkdown('# ', '')">H1</button>
-        <button type="button" onclick="insertMarkdown('## ', '')">H2</button>
-        <button type="button" onclick="insertMarkdown('\\n---', '')">HR</button>
+        <button type="button" onclick="execFormat('bold')"><b>B</b></button>
+        <button type="button" onclick="execFormat('italic')"><i>I</i></button>
+        <button type="button" onclick="execFormat('underline')"><u>U</u></button>
+        <button type="button" onclick="execFormat('formatBlock', 'H1')">H1</button>
+        <button type="button" onclick="execFormat('formatBlock', 'H2')">H2</button>
+        <button type="button" onclick="execFormat('insertHorizontalRule')">HR</button>
       </div>
 
       <!-- 텍스트 입력 -->
-      <textarea class="create-textarea" id="postContent" placeholder="문구를 입력하세요..."></textarea>
-
-      <!-- 실시간 미리보기 -->
-      <div class="preview-container">
-        <div class="preview-title">미리보기</div>
-        <div id="livePreview" style="min-height: 50px; padding: 14px; background: var(--bg2); border-radius: var(--r2); border: 1px solid var(--border2); font-size: 14px; line-height: 1.6; white-space: pre-wrap; display: none;"></div>
-      </div>
+      <div class="create-textarea" id="postContent" contenteditable="true" placeholder="문구를 입력하세요..."></div>
 
       <div class="section-divider"></div>
 
@@ -479,37 +479,11 @@
     document.getElementById('imageInput').click();
   };
 
-  // 실시간 미리보기
-  const postContentTextarea = document.getElementById('postContent');
-  const livePreview = document.getElementById('livePreview');
+  const postContentDiv = document.getElementById('postContent');
 
-  postContentTextarea.addEventListener('input', function() {
-    const text = this.value;
-    if (text.trim().length > 0) {
-      livePreview.style.display = 'block';
-      livePreview.innerHTML = parseMarkdown(text);
-    } else {
-      livePreview.style.display = 'none';
-      livePreview.innerHTML = '';
-    }
-  });
-
-  window.insertMarkdown = function(prefix, suffix) {
-    const start = postContentTextarea.selectionStart;
-    const end = postContentTextarea.selectionEnd;
-    const text = postContentTextarea.value;
-    const before = text.substring(0, start);
-    const selected = text.substring(start, end);
-    const after = text.substring(end);
-
-    postContentTextarea.value = before + prefix + selected + suffix + after;
-    
-    // 이벤트 강제 발생시켜 미리보기 업데이트
-    postContentTextarea.dispatchEvent(new Event('input'));
-    
-    // 커서 위치 조정
-    postContentTextarea.focus();
-    postContentTextarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+  window.execFormat = function(command, value = null) {
+    postContentDiv.focus();
+    document.execCommand(command, false, value);
   };
 
   document.getElementById('imageInput').onchange = (e) => {
@@ -544,8 +518,49 @@
     }
   }
 
+  function htmlToMarkdown(html) {
+    let md = html;
+    
+    // Block elements to newlines
+    md = md.replace(/<div><br><\/div>/gi, '\n');
+    md = md.replace(/<div[^>]*>/gi, '\n');
+    md = md.replace(/<\/div>/gi, '');
+    md = md.replace(/<p[^>]*>/gi, '\n');
+    md = md.replace(/<\/p>/gi, '');
+    md = md.replace(/<br\s*\/?>/gi, '\n');
+    
+    // Inline styles
+    md = md.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+    md = md.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+    md = md.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+    md = md.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+    md = md.replace(/<u[^>]*>(.*?)<\/u>/gi, '__$1__');
+    
+    // Headers
+    md = md.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n');
+    md = md.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n');
+    md = md.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n');
+    
+    // HR
+    md = md.replace(/<hr\s*\/?>/gi, '\n---\n');
+
+    // Remove remaining HTML
+    md = md.replace(/<[^>]+>/g, '');
+    
+    // Decode HTML entities
+    md = md.replace(/&nbsp;/g, ' ')
+           .replace(/&lt;/g, '<')
+           .replace(/&gt;/g, '>')
+           .replace(/&amp;/g, '&');
+           
+    md = md.replace(/\n{3,}/g, '\n\n');
+    
+    return md.trim();
+  }
+
   document.getElementById('postBtn').onclick = async () => {
-    const content = document.getElementById('postContent').value.trim();
+    const rawHtml = document.getElementById('postContent').innerHTML;
+    const content = htmlToMarkdown(rawHtml);
     const messageDiv = document.getElementById('postMessage');
     const postButton = document.getElementById('postBtn');
 
