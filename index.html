@@ -1375,23 +1375,8 @@ loadPosts().then(() => {
 loadRecommendedProfiles();
 
 
-loadPosts().then(() => {
-  applyFadeEffect();
-});
-loadRecommendedProfiles();
 
 
-// ✅ 추가 코드 (여기 넣기)
-window.addEventListener('load', applyFadeEffect);
-window.addEventListener('resize', applyFadeEffect);
-
-document.addEventListener('DOMContentLoaded', () => {
-  applyFadeEffect();
-
-  document.querySelectorAll('.post-image').forEach(img => {
-    img.onload = applyFadeEffect;
-  });
-});
 
 
 </script>
