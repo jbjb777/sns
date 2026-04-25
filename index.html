@@ -893,6 +893,7 @@
   </div>
 </div>
 
+<script src="markdown.js"></script>
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ─── NPROGRESS 설정 ───
 NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
@@ -1087,12 +1088,6 @@ function formatPostTime(dateString) {
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-function escapeHtml(text) {
-  if (!text) return '';
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-  return text.replace(/[&<>"']/g, m => map[m]);
-}
-
 async function toggleLike(postId, button) {
   if (!currentUser) {
     document.getElementById('loginModal').classList.add('active');
@@ -1218,12 +1213,8 @@ async function loadPosts() {
 
       let contentHTML = '';
       if (post.content) {
-        const lines = escapeHtml(post.content).split('\n');
-        const title = lines.shift() || '';
-        const body = lines.filter(l => l.trim()).join('<br>');
-        contentHTML = `<div class="post-content">
-          <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${title}</div>
-          ${body ? `<div style="color:#666; font-size:14px; line-height:1.75;">${body}</div>` : ''}
+        contentHTML = `<div class="post-content" style="display:flex;flex-direction:column;gap:4px;">
+          ${parseMarkdown(post.content)}
         </div>`;
       }
 

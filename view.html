@@ -824,6 +824,7 @@
     </div>
   </div>
 
+<script src="markdown.js"></script>
 <script>
   // ─── NPROGRESS 설정 ───
   NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
@@ -921,14 +922,7 @@
     }
   }
 
-  function linkify(text) {
-    text = escapeHtml(text);
-    const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
-    return text.replace(urlRegex, url => {
-      let href = url.startsWith('http') ? url : 'https://' + url;
-      return `<a href="${href}" target="_blank">${url}</a>`;
-    });
-  }
+
 
   function showLoginAlert() {
     const alert = document.getElementById('loginAlert');
@@ -1030,7 +1024,7 @@
       avatarContent = `<img src="${url}" alt="${escapeHtml(post.author)}">`;
     }
 
-    const linkedContent = linkify(post.content || '');
+    const linkedContent = parseMarkdown(post.content || '');
 
     contentDiv.innerHTML = `
       <div class="post-detail-card">
@@ -1205,7 +1199,7 @@
       });
       const isVerified = ["JB777", "진정오"].includes(c.user_name);
       const avatarContent = renderAvatar(c.user_name, c.user_id);
-      const linkedText = linkify(c.text);
+      const linkedText = parseMarkdown(c.text);
 
       const replyCount = (repliesByParent[c.id] || []).length;
       const hasReplies = replyCount > 0;
@@ -1239,7 +1233,7 @@
             });
             const rIsVerified = ["JB777", "진정오"].includes(r.user_name);
             const rAvatarContent = renderAvatar(r.user_name, r.user_id);
-            const rLinkedText = linkify(r.text);
+            const rLinkedText = parseMarkdown(r.text);
             return `
               <div class="reply-item">
                 <div class="comment-header">
@@ -1301,10 +1295,7 @@
     `;
   }
 
-  function escapeHtml(text) {
-    if (!text) return '';
-    return text.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
-  }
+
 
   window.openDeleteModal = function(id) {
     pendingDeletePostId = id;

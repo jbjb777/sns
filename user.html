@@ -687,6 +687,7 @@
   <!-- 프로필 사진 업로드용 숨김 input -->
   <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
 
+<script src="markdown.js"></script>
 <script>
   // ─── NPROGRESS 설정 ───
   NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
@@ -1015,7 +1016,7 @@
       const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
       postItem.innerHTML = `
         ${post.image_url ? `<img src="${escapeHtml(post.image_url)}" class="post-item-image" alt="게시글 이미지" loading="lazy">` : ''}
-        ${post.content ? `<div class="post-item-content"><div class="post-item-text">${escapeHtml(post.content)}</div></div>` : ''}
+        ${post.content ? `<div class="post-item-content"><div class="post-item-text">${parseMarkdown(post.content)}</div></div>` : ''}
         <div class="post-item-footer">
           <div class="post-item-date">${timeStr}</div>
           <div class="post-item-likes">
@@ -1034,10 +1035,7 @@
     postsDiv.appendChild(gridDiv);
   }
 
-  function escapeHtml(t) {
-    if (!t) return '';
-    return t.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
-  }
+
 
   function showError(msg) {
     document.getElementById('profileContent').innerHTML = `

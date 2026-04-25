@@ -196,6 +196,40 @@
     .author-name { font-size: 14px; font-weight: 600; color: var(--t1); }
     .author-sub { font-size: 12px; color: var(--t3); }
 
+    /* ─── EDITOR TOOLBAR ─── */
+    .editor-toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      opacity: 0;
+      animation: fadeInEl 0.4s ease 0.36s forwards;
+    }
+    .editor-toolbar button {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t1);
+      padding: 6px 12px;
+      border-radius: var(--r1);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .editor-toolbar button:hover {
+      background: var(--bg4);
+      border-color: var(--border3);
+    }
+    
+    .preview-container {
+      opacity: 0;
+      animation: fadeInEl 0.4s ease 0.42s forwards;
+    }
+    .preview-title {
+      font-size: 12px;
+      color: var(--t2);
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
     /* ─── TEXTAREA ─── */
     .create-textarea {
       width: 100%;
@@ -323,8 +357,24 @@
         </div>
       </div>
 
+      <!-- 마크다운 툴바 -->
+      <div class="editor-toolbar" id="editorToolbar">
+        <button type="button" onclick="insertMarkdown('**', '**')"><b>B</b></button>
+        <button type="button" onclick="insertMarkdown('*', '*')"><i>I</i></button>
+        <button type="button" onclick="insertMarkdown('__', '__')"><u>U</u></button>
+        <button type="button" onclick="insertMarkdown('# ', '')">H1</button>
+        <button type="button" onclick="insertMarkdown('## ', '')">H2</button>
+        <button type="button" onclick="insertMarkdown('\\n---', '')">HR</button>
+      </div>
+
       <!-- 텍스트 입력 -->
       <textarea class="create-textarea" id="postContent" placeholder="문구를 입력하세요..."></textarea>
+
+      <!-- 실시간 미리보기 -->
+      <div class="preview-container">
+        <div class="preview-title">미리보기</div>
+        <div id="livePreview" style="min-height: 50px; padding: 14px; background: var(--bg2); border-radius: var(--r2); border: 1px solid var(--border2); font-size: 14px; line-height: 1.6; white-space: pre-wrap; display: none;"></div>
+      </div>
 
       <div class="section-divider"></div>
 
@@ -344,6 +394,7 @@
     본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.
   </div>
 
+<script src="markdown.js"></script>
 <script>
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
@@ -426,6 +477,39 @@
 
   document.getElementById('uploadBtn').onclick = () => {
     document.getElementById('imageInput').click();
+  };
+
+  // 실시간 미리보기
+  const postContentTextarea = document.getElementById('postContent');
+  const livePreview = document.getElementById('livePreview');
+
+  postContentTextarea.addEventListener('input', function() {
+    const text = this.value;
+    if (text.trim().length > 0) {
+      livePreview.style.display = 'block';
+      livePreview.innerHTML = parseMarkdown(text);
+    } else {
+      livePreview.style.display = 'none';
+      livePreview.innerHTML = '';
+    }
+  });
+
+  window.insertMarkdown = function(prefix, suffix) {
+    const start = postContentTextarea.selectionStart;
+    const end = postContentTextarea.selectionEnd;
+    const text = postContentTextarea.value;
+    const before = text.substring(0, start);
+    const selected = text.substring(start, end);
+    const after = text.substring(end);
+
+    postContentTextarea.value = before + prefix + selected + suffix + after;
+    
+    // 이벤트 강제 발생시켜 미리보기 업데이트
+    postContentTextarea.dispatchEvent(new Event('input'));
+    
+    // 커서 위치 조정
+    postContentTextarea.focus();
+    postContentTextarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
   };
 
   document.getElementById('imageInput').onchange = (e) => {

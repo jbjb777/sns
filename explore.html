@@ -899,6 +899,7 @@
     </div>
   </div>
 
+<script src="markdown.js"></script>
 <script>
   // Cloudflare Worker API 프록시 주소 (키 노출 완전 제거)
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
@@ -1017,14 +1018,7 @@
     }
   }
 
-  function linkify(text) {
-    text = escapeHtml(text);
-    const urlRegex = /((https?:\/\/)?[^\s]+\.(com|net|io|kr|org|co|me|us|한국|google|ai|me|cc|shop|dev|info|page|rest|help|wiki|fyi|sale|army|im)(\/[^\s]*)?)/gi;
-    return text.replace(urlRegex, url => {
-      let href = url.startsWith('http') ? url : 'https://' + url;
-      return `<a href="${href}" target="_blank">${url}</a>`;
-    });
-  }
+
 
   function initCurrentUser() {
     const savedUser = localStorage.getItem('snsUser');
@@ -1249,7 +1243,7 @@
 
     let contentHTML = '';
     if (hasImage && hasContent) {
-      const linkedContent = linkify(post.content);
+      const linkedContent = parseMarkdown(post.content);
       contentHTML = `
         <div class="short-content">
           <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
@@ -1265,7 +1259,7 @@
         </div>
       `;
     } else if (!hasImage && hasContent) {
-      const linkedContent = linkify(post.content);
+      const linkedContent = parseMarkdown(post.content);
       contentHTML = `
         <div class="short-content">
           <div class="short-text-only">
@@ -1473,7 +1467,7 @@
         });
         const isVerified = ["JB777", "진정오"].includes(c.user_name);
         const avatarContent = renderAvatar(c.user_name, c.user_id);
-        const linkedText = linkify(c.text);
+        const linkedText = parseMarkdown(c.text);
 
         const replyCount = (repliesByParent[c.id] || []).length;
         const hasReplies = replyCount > 0;
@@ -1507,7 +1501,7 @@
               });
               const rIsVerified = ["JB777", "진정오"].includes(r.user_name);
               const rAvatarContent = renderAvatar(r.user_name, r.user_id);
-              const rLinkedText = linkify(r.text);
+              const rLinkedText = parseMarkdown(r.text);
               return `
                 <div class="reply-item">
                   <div class="comment-header">
@@ -1723,17 +1717,7 @@
     `;
   }
 
-  function escapeHtml(text) {
-    if (!text) return '';
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, m => map[m]);
-  }
+
 
   // 초기 로드
   loadAllPosts();
