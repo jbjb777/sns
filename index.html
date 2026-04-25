@@ -1026,10 +1026,20 @@ function applyFadeEffect() {
   const elements = document.querySelectorAll('.post-content');
 
   elements.forEach(el => {
-    const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
-    const maxHeight = lineHeight * 8; // 8줄 기준
+    const style = getComputedStyle(el);
+    const lineHeight = parseFloat(style.lineHeight);
 
-    if (el.scrollHeight > maxHeight + 2) {
+    // 1️⃣ 실제 렌더링 줄 수 (자동 줄바꿈 포함)
+    const visualLines = el.scrollHeight / lineHeight;
+
+    // 2️⃣ 엔터 기준 줄 수
+    const text = el.innerText || "";
+    const enterLines = text.split('\n').length;
+
+    // 👉 더 정확한 줄 수 (둘 중 큰 값 사용)
+    const totalLines = Math.max(visualLines, enterLines);
+
+    if (totalLines >= 7) {
       el.classList.add('fade');
     } else {
       el.classList.remove('fade');
