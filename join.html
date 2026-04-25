@@ -112,6 +112,14 @@
       letter-spacing: -0.3px;
     }
 
+    .step-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px auto;
+      display: block;
+      opacity: 0.9;
+    }
+
     .intro-desc {
       color: var(--t2);
       margin-bottom: 24px;
@@ -192,6 +200,16 @@
       40%, 60% { transform: translateX(3px); }
     }
 
+    /* ─── FOOTER ─── */
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--t3);
+      font-size: 11px;
+      line-height: 1.5;
+      margin-top: auto;
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .auth-container { padding: 28px 20px; }
@@ -215,6 +233,7 @@
           
           <!-- Step 0: 서비스 소개 -->
           <div class="slider-step">
+            <img src="service.svg" class="step-icon" alt="서비스 소개" onerror="this.style.display='none'">
             <h2>서비스 소개</h2>
             <p class="intro-desc">
               Sharer 서비스는 개인정보를 중요하게 생각하며, 관련 법령을 준수합니다.<br><br>최소한의 정보만 수집하며, 탈퇴 시 즉시 삭제됩니다.
@@ -226,6 +245,7 @@
 
           <!-- Step 1: 아이디 설정 -->
           <div class="slider-step">
+            <img src="id.svg" class="step-icon" alt="아이디 설정" onerror="this.style.display='none'">
             <h2>아이디 설정</h2>
             <p class="intro-desc">로그인에 사용할 아이디를 입력해주세요.</p>
             <input type="text" id="signupId" placeholder="아이디">
@@ -238,6 +258,7 @@
 
           <!-- Step 2: 닉네임 설정 -->
           <div class="slider-step">
+            <img src="name.svg" class="step-icon" alt="닉네임 설정" onerror="this.style.display='none'">
             <h2>닉네임 설정</h2>
             <p class="intro-desc">다른 사용자에게 보여질 닉네임을 입력해주세요.</p>
             <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
@@ -250,6 +271,7 @@
 
           <!-- Step 3: 비밀번호 설정 -->
           <div class="slider-step">
+            <img src="shield.svg" class="step-icon" alt="비밀번호 설정" onerror="this.style.display='none'">
             <h2>비밀번호 설정</h2>
             <p class="intro-desc">안전한 비밀번호를 설정해주세요.</p>
             <input type="password" id="signupPassword" placeholder="비밀번호">
