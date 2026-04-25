@@ -341,32 +341,35 @@
 .post-content {
   font-size: 14px;
   line-height: 1.6;
-  max-height: calc(1.6em * 8); /* 표시 최대 8줄 */
+  max-height: calc(1.6em * 10); /* 10줄까지 보여줌 */
   overflow: hidden;
   position: relative;
 }
 
-/* 기본: 페이드 없음 */
+/* 기본 숨김 */
 .post-content::after {
   display: none;
 }
 
-/* 조건 만족할 때만 페이드 */
+/* 페이드 적용 */
 .post-content.fade::after {
   display: block;
   content: "";
   position: absolute;
-  bottom: 0;
   left: 0;
   right: 0;
-  height: 6em;
+
+  /* ⭐ 핵심: 7줄부터 시작 */
+  top: calc(1.6em * 6);
+
+  /* ⭐ 7~10줄 영역만 덮음 */
+  height: calc(1.6em * 4);
 
   background: linear-gradient(
     to bottom,
     rgba(0,0,0,0) 0%,
-    rgba(0,0,0,0.1) 20%,
     rgba(0,0,0,0.3) 40%,
-    rgba(0,0,0,0.6) 70%,
+    rgba(0,0,0,0.7) 75%,
     var(--bg) 100%
   );
 
@@ -1015,6 +1018,10 @@ function initCurrentUser() {
 }
 
 
+
+
+
+
 function applyFadeEffect() {
   const elements = document.querySelectorAll('.post-content');
 
@@ -1267,7 +1274,7 @@ async function loadPosts() {
 
       let contentHTML = '';
       if (post.content) {
-        contentHTML = `<div class="post-content" style="display:flex;flex-direction:column;gap:4px;">
+        contentHTML = `<div class="post-content">
           ${parseMarkdown(post.content)}
         </div>`;
       }
