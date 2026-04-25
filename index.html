@@ -338,26 +338,28 @@
     }
     .post-image:hover { opacity: 0.9; transform: scale(1.004); }
 
-    .post-content {
-      font-size: 14px; 
-      line-height: 1.6; 
-      color: var(--t1); 
-      white-space: pre-wrap; 
-      padding: 0 2px; 
-      max-height: calc(1.6em * 8);
-      overflow: hidden;
-      position: relative;
-    }
-    .post-content::after {
-      content: "";
-      position: absolute;
-      top: calc(1.6em * 6.5);
-      left: 0;
-      right: 0;
-      height: calc(1.6em * 1.5);
-      background: linear-gradient(to bottom, transparent, var(--bg));
-      pointer-events: none;
-    }
+.post-content {
+  font-size: 14px;
+  line-height: 1.6;
+  max-height: calc(1.6em * 8);
+  overflow: hidden;
+  position: relative;
+}
+
+.post-content::after {
+  content: "";
+  position: absolute;
+  bottom: 0;   /* 👈 중요: top 대신 bottom */
+  left: 0;
+  right: 0;
+  height: 3em; /* 👈 자연스럽게 길게 */
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    var(--bg) 100%
+  );
+  pointer-events: none;
+}
     .post-card:hover .post-content::after {
       background: linear-gradient(to bottom, transparent, #080808);
     }
