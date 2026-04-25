@@ -684,6 +684,20 @@
     </div>
   </div>
 
+  <!-- 프로필 사진 설정 모달 (신규 가입자용) -->
+  <div class="modal-overlay" id="profilePicModal">
+    <div class="modal-content" style="text-align: center;">
+      <div class="modal-title" style="font-size:18px;">가입을 환영합니다! 🎉</div>
+      <p style="color:var(--t2); font-size:14px; margin-bottom:24px; line-height:1.6;">
+        나만의 개성을 표현할<br>프로필 사진을 설정해 보세요.
+      </p>
+      <div class="modal-buttons" style="justify-content: center; gap:12px;">
+        <button class="modal-btn modal-btn-cancel" onclick="closeProfilePicModal()">나중에 하기</button>
+        <button class="modal-btn modal-btn-confirm" onclick="triggerProfilePicUpload()">설정하기</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 프로필 사진 업로드용 숨김 input -->
   <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
 
@@ -877,6 +891,10 @@
 
       viewingUser = users[0];
       await displayProfile(viewingUser);
+      
+      if (urlParams.get('u') === 'new' && currentUser && currentUser.nickname === viewingUser.nickname) {
+        document.getElementById('profilePicModal').classList.add('active');
+      }
     } catch (e) {
       console.error('프로필 로드 오류:', e);
       showError('프로필을 불러오는 중 오류가 발생했습니다.');
@@ -1058,6 +1076,18 @@
 
   window.closeStatusModal = function() {
     document.getElementById('statusModal').classList.remove('active');
+  };
+
+  window.closeProfilePicModal = function() {
+    document.getElementById('profilePicModal').classList.remove('active');
+    const url = new URL(window.location);
+    url.searchParams.delete('u');
+    window.history.replaceState({}, '', url);
+  };
+
+  window.triggerProfilePicUpload = function() {
+    closeProfilePicModal();
+    document.getElementById('profileFileInput').click();
   };
 
   // ─── 상태메시지 저장: id 필터 추가로 오류 수정 ───

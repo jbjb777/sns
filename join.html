@@ -63,42 +63,65 @@
     .logo-svg { width: 32px; height: 32px; }
     .logo-text { font-size: 18px; font-weight: 600; color: var(--t1); letter-spacing: -0.3px; }
 
-    /* ─── MAIN ─── */
     .main-content {
       flex: 1;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       padding: 48px 20px;
-      gap: 48px;
     }
 
-    /* ─── AUTH CONTAINER ─── */
     .auth-container {
       background: var(--bg2);
       border: 1px solid var(--border2);
       border-radius: var(--r4);
       padding: 40px;
-      width: 90%;
-      max-width: 400px;
+      width: 100%;
+      max-width: 440px;
       flex-shrink: 0;
       opacity: 0;
       transform: translateY(12px);
       animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
+      overflow: hidden;
     }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-    .auth-container h2 {
+    .slider-wrap {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .slider-track {
+      display: flex;
+      width: 400%; /* 4 steps */
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .slider-step {
+      width: 25%;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slider-step h2 {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       color: var(--t1);
       font-size: 20px;
       font-weight: 600;
       letter-spacing: -0.3px;
     }
 
+    .intro-desc {
+      color: var(--t2);
+      margin-bottom: 24px;
+      line-height: 1.6;
+      font-size: 13px;
+      text-align: center;
+    }
+
     /* ─── INPUTS ─── */
-    .auth-container input {
+    .slider-step input {
       width: 100%;
       padding: 12px 16px;
       border-radius: var(--r2);
@@ -111,11 +134,11 @@
       font-family: inherit;
       transition: border-color 0.2s, background 0.2s;
     }
-    .auth-container input:focus { border-color: var(--border3); background: var(--bg4); }
-    .auth-container input::placeholder { color: var(--t3); }
+    .slider-step input:focus { border-color: var(--border3); background: var(--bg4); }
+    .slider-step input::placeholder { color: var(--t3); }
 
     /* ─── BUTTON ─── */
-    .auth-container button {
+    .slider-step button {
       width: 100%;
       padding: 12px 20px;
       border-radius: var(--r2);
@@ -129,9 +152,16 @@
       font-family: inherit;
       transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .auth-container button:hover:not(:disabled) { background: #e8e8e8; transform: scale(1.02); }
-    .auth-container button:active:not(:disabled) { transform: scale(0.97); }
-    .auth-container button:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
+    .slider-step button:hover:not(:disabled) { background: #e8e8e8; transform: scale(1.02); }
+    .slider-step button:active:not(:disabled) { transform: scale(0.97); }
+    .slider-step button:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
+
+    .btn-secondary {
+      background: var(--bg3) !important;
+      color: var(--t1) !important;
+      border: 1px solid var(--border2) !important;
+    }
+    .btn-secondary:hover:not(:disabled) { background: var(--bg4) !important; }
 
     /* ─── MESSAGES ─── */
     .error-message { color: var(--pink); font-size: 12px; margin-top: -6px; margin-bottom: 8px; text-align: center; font-weight: 500; }
@@ -150,112 +180,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── INTRO SECTION ─── */
-    .intro-section {
-      max-width: 480px;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(12px);
-      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.2s forwards;
-    }
-
-    .intro-title {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      text-align: center;
-      letter-spacing: -0.3px;
-    }
-
-    .intro-desc {
-      color: var(--t2);
-      margin-bottom: 32px;
-      line-height: 1.7;
-      font-size: 13px;
-      text-align: center;
-    }
-
-    .card-wrap {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .privacy-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r3);
-      padding: 20px;
-      text-align: center;
-      transition: border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .privacy-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-
-    .privacy-card .icon { font-size: 28px; margin-bottom: 12px; }
-
-    .privacy-card h3 {
-      margin-bottom: 8px;
-      color: var(--t1);
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .privacy-card p { font-size: 12px; color: var(--t2); line-height: 1.6; }
-
-    .info-box {
-      padding: 24px;
-      border-radius: var(--r3);
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      text-align: center;
-      margin-top: 12px;
-    }
-
-    .info-box h3 {
-      margin-bottom: 12px;
-      color: var(--t1);
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .info-box p { font-size: 13px; line-height: 1.75; color: var(--t2); }
-
-    /* ─── FOOTER ─── */
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 20px;
-      text-align: center;
-      color: var(--t3);
-      font-size: 11px;
-    }
-
-    /* ─── PROGRESS BAR ─── */
-    .progress-container {
-      margin-bottom: 24px;
-    }
-    .progress-steps {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--t3);
-    }
-    .progress-steps .active { color: var(--t1); }
-    .progress-track {
-      width: 100%;
-      height: 4px;
-      background: var(--bg3);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--t1);
-      transition: width 0.3s ease;
-    }
-
     /* ─── ERROR ANIMATION ─── */
     .input-error {
       border-color: var(--pink) !important;
@@ -269,14 +193,9 @@
     }
 
     /* ─── RESPONSIVE ─── */
-    @media (max-width: 1024px) {
-      .main-content { flex-direction: column; align-items: center; gap: 32px; }
-      .intro-section { max-width: 540px; }
-    }
     @media (max-width: 768px) {
       .auth-container { padding: 28px 20px; }
-      .auth-container h2 { font-size: 18px; }
-      .intro-title { font-size: 18px; }
+      .slider-step h2 { font-size: 18px; }
       .main-content { padding: 28px 16px; }
     }
   </style>
@@ -290,70 +209,59 @@
   </div>
 
   <div class="main-content">
-    <!-- 좌측: 회원가입 폼 -->
     <div class="auth-container">
-      <h2>회원정보 입력</h2>
+      <div class="slider-wrap">
+        <div class="slider-track" id="sliderTrack">
+          
+          <!-- Step 0: 서비스 소개 -->
+          <div class="slider-step">
+            <h2>서비스 소개</h2>
+            <p class="intro-desc">
+              Sharer 서비스는 개인정보를 중요하게 생각하며, 관련 법령을 준수합니다.<br><br>최소한의 정보만 수집하며, 탈퇴 시 즉시 삭제됩니다.
+            </p>
+            <div style="margin-top:auto;">
+              <button onclick="nextStep(1)">동의하고 다음으로</button>
+            </div>
+          </div>
 
-      <div class="progress-container">
-        <div class="progress-steps">
-          <div class="step">Step 1: 약관 동의</div>
-          <div class="step active">Step 2: 정보 입력</div>
+          <!-- Step 1: 아이디 설정 -->
+          <div class="slider-step">
+            <h2>아이디 설정</h2>
+            <p class="intro-desc">로그인에 사용할 아이디를 입력해주세요.</p>
+            <input type="text" id="signupId" placeholder="아이디">
+            <div class="error-message" id="idError"></div>
+            <div style="margin-top:auto;">
+              <button class="btn-secondary" onclick="prevStep(0)">이전</button>
+              <button onclick="nextStep(2)">다음으로</button>
+            </div>
+          </div>
+
+          <!-- Step 2: 닉네임 설정 -->
+          <div class="slider-step">
+            <h2>닉네임 설정</h2>
+            <p class="intro-desc">다른 사용자에게 보여질 닉네임을 입력해주세요.</p>
+            <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
+            <div class="error-message" id="nicknameError"></div>
+            <div style="margin-top:auto;">
+              <button class="btn-secondary" onclick="prevStep(1)">이전</button>
+              <button onclick="nextStep(3)">다음으로</button>
+            </div>
+          </div>
+
+          <!-- Step 3: 비밀번호 설정 -->
+          <div class="slider-step">
+            <h2>비밀번호 설정</h2>
+            <p class="intro-desc">안전한 비밀번호를 설정해주세요.</p>
+            <input type="password" id="signupPassword" placeholder="비밀번호">
+            <div class="error-message" id="signupError"></div>
+            <div class="success-message" id="signupSuccess"></div>
+            <div style="margin-top:auto;">
+              <button class="btn-secondary" onclick="prevStep(2)">이전</button>
+              <button id="signupBtn" onclick="handleSignup()">가입 완료</button>
+            </div>
+          </div>
+
         </div>
-        <div class="progress-track"><div class="progress-fill" style="width: 100%;"></div></div>
-      </div>
-
-      <div id="signupForm">
-        <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
-        <div class="error-message" id="nicknameError"></div>
-
-        <input type="text" id="signupId" placeholder="아이디">
-        <div class="error-message" id="idError"></div>
-
-        <input type="password" id="signupPassword" placeholder="비밀번호">
-        <div class="error-message" id="signupError"></div>
-
-        <div class="success-message" id="signupSuccess"></div>
-
-        <button id="signupBtn" onclick="handleSignup()">가입 완료</button>
-      </div>
-    </div>
-
-    <!-- 우측: 서비스 소개 -->
-    <div class="intro-section">
-      <h1 class="intro-title">서비스 소개</h1>
-      <p class="intro-desc">
-        Sharer 서비스는 사용자의 개인정보를 중요하게 생각하며,<br>
-        관련 법령을 준수하고 최소한의 정보만을 수집·이용합니다.
-      </p>
-      <div class="card-wrap">
-        <div class="privacy-card">
-          <div class="icon">📋</div>
-          <h3>수집하는 개인정보</h3>
-          <p>아이디, 닉네임, 비밀번호<br>(Google 로그인 시 이름·이메일)</p>
-        </div>
-        <div class="privacy-card">
-          <div class="icon">🎯</div>
-          <h3>개인정보 이용 목적</h3>
-          <p>회원 관리, 서비스 제공,<br>게시물 관리에만 사용됩니다.</p>
-        </div>
-        <div class="privacy-card">
-          <div class="icon">🔐</div>
-          <h3>개인정보 보관 및 보호</h3>
-          <p>개인정보는 안전하게 보호되며<br>외부에 제공되지 않습니다.</p>
-        </div>
-        <div class="privacy-card">
-          <div class="icon">🗑️</div>
-          <h3>개인정보 삭제</h3>
-          <p>회원 탈퇴 시<br>모든 정보가 즉시 삭제됩니다.</p>
-        </div>
-      </div>
-      <div class="info-box">
-        <h3>🔒 보안 및 신뢰</h3>
-        <p>
-          Sharer는 Supabase를 사용하여 데이터를 안전하게 저장합니다.<br>
-          모든 개인정보는 암호화되어 보호되며,<br>
-          서비스 운영 외의 목적으로는 절대 사용되지 않습니다.
-        </p>
       </div>
     </div>
   </div>
@@ -396,11 +304,58 @@
 
   window.goHome = function() { window.location.href = 'index.html'; }
 
+  function nextStep(stepIndex) {
+    const track = document.getElementById('sliderTrack');
+    
+    if(stepIndex === 2) {
+      const idInput = document.getElementById('signupId');
+      const id = idInput.value.trim();
+      const err = document.getElementById('idError');
+      idInput.classList.remove('input-error');
+      if(!id) {
+        err.textContent = '아이디를 입력해주세요.';
+        idInput.classList.add('input-error');
+        return;
+      }
+      err.textContent = '';
+    }
+    
+    if(stepIndex === 3) {
+      const nickInput = document.getElementById('signupNickname');
+      const nick = nickInput.value.trim();
+      const err = document.getElementById('nicknameError');
+      nickInput.classList.remove('input-error');
+      if(!nick) {
+        err.textContent = '닉네임을 입력해주세요.';
+        nickInput.classList.add('input-error');
+        return;
+      }
+      if(nick.length > 20) {
+        err.textContent = '닉네임은 20자 이하로 입력하세요.';
+        nickInput.classList.add('input-error');
+        return;
+      }
+      if(nick.includes("정빈777")) {
+        err.textContent = '이 닉네임은 사용할 수 없습니다.';
+        nickInput.classList.add('input-error');
+        return;
+      }
+      err.textContent = '';
+    }
+
+    track.style.transform = \`translateX(-\${stepIndex * 25}%)\`;
+  }
+
+  function prevStep(stepIndex) {
+    const track = document.getElementById('sliderTrack');
+    track.style.transform = \`translateX(-\${stepIndex * 25}%)\`;
+  }
+
   function setButtonLoading(isLoading, loadingText = '가입 중...') {
     const button = document.getElementById('signupBtn');
     if (isLoading) {
       button.disabled = true;
-      button.innerHTML = `<span class="spinner"></span>${loadingText}`;
+      button.innerHTML = \`<span class="spinner"></span>\${loadingText}\`;
     } else {
       button.disabled = false;
       button.innerHTML = '가입 완료';
@@ -430,42 +385,29 @@
     idInput.classList.remove('input-error');
     passwordInput.classList.remove('input-error');
 
-    let hasError = false;
-    if (!nickname || !id || !password) { 
-      errorDiv.textContent = '모든 필드를 입력하세요.'; 
-      if (!nickname) nicknameInput.classList.add('input-error');
-      if (!id) idInput.classList.add('input-error');
-      if (!password) passwordInput.classList.add('input-error');
+    if (!password) { 
+      errorDiv.textContent = '비밀번호를 입력해주세요.'; 
+      passwordInput.classList.add('input-error');
       return; 
     }
-    if (nickname.length > 20) { 
-      nicknameErrorDiv.textContent = '닉네임은 20자 이하로 입력하세요.'; 
-      nicknameInput.classList.add('input-error');
-      hasError = true;
-    }
-    if (nickname.includes("정빈777")) { 
-      nicknameErrorDiv.textContent = '이 닉네임은 사용할 수 없습니다.'; 
-      nicknameInput.classList.add('input-error');
-      hasError = true;
-    }
-    
-    if (hasError) return;
 
     setButtonLoading(true);
 
     try {
-      const idCheck = await api(`/users?id=eq.${encodeURIComponent(id)}&select=id`);
+      const idCheck = await api(\`/users?id=eq.\${encodeURIComponent(id)}&select=id\`);
       if (idCheck?.length > 0) { 
         idErrorDiv.textContent = '이미 사용 중인 아이디입니다.'; 
         idInput.classList.add('input-error');
+        prevStep(1);
         setButtonLoading(false); 
         return; 
       }
 
-      const nicknameCheck = await api(`/users?nickname=eq.${encodeURIComponent(nickname)}&select=nickname`);
+      const nicknameCheck = await api(\`/users?nickname=eq.\${encodeURIComponent(nickname)}&select=nickname\`);
       if (nicknameCheck?.length > 0) { 
         nicknameErrorDiv.textContent = '이미 사용 중인 닉네임입니다.'; 
         nicknameInput.classList.add('input-error');
+        prevStep(2);
         setButtonLoading(false); 
         return; 
       }
@@ -475,8 +417,12 @@
         body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
       });
 
-      successDiv.textContent = '회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.';
-      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+      localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
+      
+      successDiv.textContent = '가입이 완료되었습니다! 마이페이지로 이동합니다.';
+      setTimeout(() => { 
+        window.location.href = \`user.html?nickname=\${encodeURIComponent(nickname)}&id=\${encodeURIComponent(id)}&u=new\`; 
+      }, 1500);
 
     } catch (error) {
       console.error('회원가입 오류:', error);
@@ -488,17 +434,7 @@
 
   document.getElementById('signupNickname').addEventListener('input', function() {
     this.classList.remove('input-error');
-    const err = document.getElementById('nicknameError');
-    const val = this.value.trim();
-    if (val.length > 20) {
-      err.textContent = '닉네임은 20자 이하로 입력하세요.';
-      this.classList.add('input-error');
-    } else if (val.includes("정빈777")) {
-      err.textContent = '이 닉네임은 사용할 수 없습니다.';
-      this.classList.add('input-error');
-    } else {
-      err.textContent = '';
-    }
+    document.getElementById('nicknameError').textContent = '';
   });
 
   document.getElementById('signupId').addEventListener('input', function() {
