@@ -326,60 +326,80 @@
       color: var(--t1);
     }
 
-    .post-image {
+    /* 홈 피드 이미지 영역: 여러 장일 때 가로 스크롤 캐러셀 */
+    .post-image-container {
+      position: relative;
+      margin: 14px 0;
+      border-radius: var(--r3);
+      overflow: hidden;
+      background: #000;
+      border: 1px solid var(--border);
+    }
+    .post-image-carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .post-image-carousel::-webkit-scrollbar { display: none; }
+    .post-image-slide {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+    }
+    .post-image-slide img {
       width: 100%;
       max-height: 560px;
       object-fit: cover;
-      border-radius: var(--r3);
-      margin: 14px 0;
-      border: 1px solid var(--border);
       display: block;
-      transition: opacity 0.2s, transform 0.3s cubic-bezier(0.22,1,0.36,1);
     }
-    .post-image:hover { opacity: 0.9; transform: scale(1.004); }
+    .post-image-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.65);
+      color: white;
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .post-card:hover .post-image-nav { opacity: 1; }
+    .post-image-nav.prev { left: 12px; }
+    .post-image-nav.next { right: 12px; }
 
-.post-content {
-  font-size: 14px;
-  line-height: 1.6;
-  max-height: calc(1.6em * 10); /* 10줄까지 보여줌 */
-  overflow: hidden;
-  position: relative;
+    .post-content {
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: calc(1.6em * 10);
+      overflow: hidden;
+      position: relative;
+    }
 
-}
-
-
-
-/* 기본 숨김 */
-.post-content::after {
-  display: none;
-}
-
-/* 페이드 적용 */
-.post-content.fade::after {
-  display: block;
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-
-  /* ⭐ 핵심: 7줄부터 시작 */
-  top: calc(1.6em * 6);
-
-  /* ⭐ 7~10줄 영역만 덮음 */
-  height: calc(1.6em * 4);
-
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0) 0%,
-    rgba(0,0,0,0.3) 40%,
-    rgba(0,0,0,0.7) 75%,
-    var(--bg) 100%
-  );
-
-  pointer-events: none;
-}
-    .post-card:hover .post-content::after {
-      background: linear-gradient(to bottom, transparent, #080808);
+    .post-content.fade::after {
+      display: block;
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(1.6em * 6);
+      height: calc(1.6em * 4);
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,0.3) 40%,
+        rgba(0,0,0,0.7) 75%,
+        var(--bg) 100%
+      );
+      pointer-events: none;
     }
 
     .post-time { padding: 8px 2px 10px; font-size: 11px; color: var(--t3); letter-spacing: 0.02em; }
@@ -951,7 +971,6 @@ document.addEventListener('click', function(e) {
 (function () {
   const splash = document.getElementById('splash');
 
-  // 이미 방문한 경우 스플래시 즉시 숨김
   if (sessionStorage.getItem('splashShown')) {
     splash.style.display = 'none';
   } else {
@@ -971,7 +990,6 @@ document.addEventListener('click', function(e) {
       const remaining = Math.max(0, MIN_SPLASH - elapsed);
       setTimeout(finishSplash, remaining);
     });
-    // 안전망: 최대 5초 후 강제 종료
     setTimeout(finishSplash, 5000);
   }
 })();
@@ -1020,11 +1038,6 @@ function initCurrentUser() {
   if (savedUser) { currentUser = JSON.parse(savedUser); updateSidebar(); }
 }
 
-
-
-
-
-
 function applyFadeEffect() {
   const elements = document.querySelectorAll('.post-content');
 
@@ -1032,14 +1045,10 @@ function applyFadeEffect() {
     const style = getComputedStyle(el);
     const lineHeight = parseFloat(style.lineHeight);
 
-    // 1️⃣ 실제 렌더링 줄 수
     const visualLines = el.scrollHeight / lineHeight;
-
-    // 2️⃣ <br> 기준 줄 수
     const html = el.innerHTML || "";
     const brLines = html.split('<br').length;
 
-    // 👉 둘 중 큰 값 사용
     const totalLines = Math.max(visualLines, brLines);
 
     if (totalLines >= 7) {
@@ -1049,8 +1058,6 @@ function applyFadeEffect() {
     }
   });
 }
-
-
 
 function updateSidebar() {
   const iframe = document.getElementById('sidebarFrame');
@@ -1180,7 +1187,6 @@ async function toggleLike(postId, button) {
     if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
       button.classList.toggle('liked', currentlyLiked);
       countEl.textContent = currentServerCount;
-      console.log('UI와 서버 상태 불일치 → 자동 동기화');
     }
     if (currentlyLiked) {
       if (likeRecords?.[0]?.id) {
@@ -1218,15 +1224,52 @@ async function toggleLike(postId, button) {
   }
 }
 
+// 여러 이미지 캐러셀 렌더링 (홈 피드용)
+function renderPostImages(imageUrl) {
+  if (!imageUrl) return '';
+  const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
+  if (urls.length === 0) return '';
+
+  let html = `<div class="post-image-container">`;
+  html += `<div class="post-image-carousel">`;
+
+  urls.forEach(url => {
+    html += `
+      <div class="post-image-slide">
+        <img src="${escapeHtml(url)}" alt="게시글 이미지" loading="lazy">
+      </div>`;
+  });
+
+  html += `</div>`;
+
+  if (urls.length > 1) {
+    html += `
+      <button class="post-image-nav prev" onclick="event.stopPropagation(); prevFeedSlide(this)">‹</button>
+      <button class="post-image-nav next" onclick="event.stopPropagation(); nextFeedSlide(this)">›</button>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+window.prevFeedSlide = function(btn) {
+  const carousel = btn.parentElement.querySelector('.post-image-carousel');
+  if (!carousel) return;
+  carousel.scrollBy({ left: -carousel.clientWidth, behavior: 'smooth' });
+};
+
+window.nextFeedSlide = function(btn) {
+  const carousel = btn.parentElement.querySelector('.post-image-carousel');
+  if (!carousel) return;
+  carousel.scrollBy({ left: carousel.clientWidth, behavior: 'smooth' });
+};
+
 // ──────────────────────────────────────────────────────────────
 // 최적화된 loadPosts
-// 기존: 게시물 N개 × (유저 1 + 좋아요수 1 + 내좋아요 1) = 3N 요청
-// 개선: 게시물 1 + 유저 1(배치) + 좋아요전체 1 + 내좋아요 1 = 4 요청 고정
 // ──────────────────────────────────────────────────────────────
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
   try {
-    // 1) 게시물 로드
     const posts = await api("/posts?select=*&order=created_at.desc");
     if (!posts?.length) {
       feedDiv.innerHTML = '<div class="no-posts"><div class="no-posts-icon">🍃</div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div></div>';
@@ -1234,7 +1277,6 @@ async function loadPosts() {
     }
     posts.forEach(p => { postAuthorIdMap[p.id] = p.author_id; });
 
-    // 2) 유니크 author_id 목록 → 유저 정보 배치 로드 (요청 1번)
     const authorIds = [...new Set(posts.map(p => p.author_id).filter(Boolean))];
     const usersMap = {};
     if (authorIds.length) {
@@ -1245,7 +1287,6 @@ async function loadPosts() {
       } catch (e) { console.warn("유저 일괄 로드 실패:", e); }
     }
 
-    // 3) 모든 게시물의 좋아요 데이터 한 번에 로드 (요청 1~2번)
     const postIds = posts.map(p => p.id);
     const postIdFilter = postIds.join(',');
 
@@ -1256,12 +1297,10 @@ async function loadPosts() {
         : Promise.resolve([])
     ]);
 
-    // 좋아요 수 집계 (클라이언트에서)
     const likeCountMap = {};
     (allLikes || []).forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
     const myLikeSet = new Set((myLikes || []).map(l => l.post_id));
 
-    // 4) 전체 DOM 한 번에 렌더링
     feedDiv.innerHTML = '';
     posts.forEach((post, idx) => {
       const userInfo = usersMap[post.author_id] || null;
@@ -1303,7 +1342,7 @@ async function loadPosts() {
           </div>
           ${deleteButton}
         </div>
-        ${post.image_url ? `<img src="${escapeHtml(post.image_url)}" class="post-image" alt="게시글 이미지" loading="lazy">` : ''}
+        ${renderPostImages(post.image_url)}
         ${contentHTML}
         <div class="post-actions">
           <button class="like-button ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
@@ -1316,7 +1355,7 @@ async function loadPosts() {
         <div class="post-time">${timeStr}</div>
       `;
       postCard.onclick = (e) => {
-        if (!e.target.closest('.like-button') && !e.target.closest('.delete-btn') && !e.target.closest('.post-author-info')) {
+        if (!e.target.closest('.like-button') && !e.target.closest('.delete-btn') && !e.target.closest('.post-author-info') && !e.target.closest('.post-image-nav')) {
           window.location.href = `view.html?id=${post.id}`;
         }
       };
@@ -1381,6 +1420,15 @@ window.deletePost = async (postId) => {
   }
 };
 
+// escapeHtml 함수
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 loadPosts().then(() => {
   applyFadeEffect();
