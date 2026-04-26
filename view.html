@@ -27,13 +27,12 @@
       --r3: 20px;
       --r4: 28px;
     }
-
-    /* NProgress */
+    /* NProgress 커스텀 */
     #nprogress .bar { background: #fff !important; height: 2px !important; }
     #nprogress .peg { display: none !important; }
     #nprogress .spinner { display: none !important; }
 
-    /* SPLASH */
+    /* ─── SPLASH ─── */
     #splash {
       position: fixed;
       inset: 0;
@@ -66,20 +65,14 @@
     }
     @keyframes fadeIn { to { opacity: 1; } }
 
-    /* SIDEBAR */
+    /* ─── SIDEBAR ─── */
     .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
     .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
-    /* MAIN WRAPPER - 푸터 깨짐 방지 */
-    .main-wrapper { 
-      margin-left: 72px; 
-      width: calc(100% - 72px); 
-      display: flex; 
-      flex-direction: column; 
-      min-height: 100vh; 
-    }
+    /* ─── MAIN WRAPPER ─── */
+    .main-wrapper { margin-left: 72px; width: calc(100% - 72px); display: flex; flex-direction: column; min-height: 100vh; }
 
-    /* HEADER */
+    /* ─── HEADER ─── */
     .header {
       background: var(--bg);
       border-bottom: 1px solid var(--border);
@@ -112,7 +105,7 @@
     .back-btn:active { transform: scale(0.82); }
     .header-title { font-size: 16px; font-weight: 600; color: var(--t1); }
 
-    /* CONTAINER */
+    /* ─── CONTAINER ─── */
     .container {
       max-width: 720px;
       width: 100%;
@@ -125,7 +118,7 @@
     }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-    /* POST CARD */
+    /* ─── POST DETAIL CARD ─── */
     .post-detail-card { margin-bottom: 48px; }
     .post-detail-header {
       padding: 24px 0;
@@ -156,7 +149,9 @@
       overflow: hidden;
       flex-shrink: 0;
       color: #666;
+      transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
+    .author-info:hover .author-avatar { border-color: var(--border3); transform: scale(1.05); }
     .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .author-details { display: flex; flex-direction: column; gap: 5px; }
     .author-name {
@@ -165,125 +160,21 @@
       display: flex;
       align-items: center;
       gap: 7px;
+      letter-spacing: -0.3px;
     }
     .post-timestamp { font-size: 13px; color: var(--t3); }
     .verification-badge {
       display: inline-block;
       width: 14px;
       height: 14px;
+      vertical-align: middle;
       background-image: url('https://sharer.jbjb.r-e.kr/badge.svg');
       background-repeat: no-repeat;
       background-size: contain;
+      background-position: center;
     }
 
-    /* 이미지 슬라이더 */
-    .post-images-wrapper {
-      position: relative;
-      margin: 28px 0;
-    }
-    .post-images {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      gap: 12px;
-      padding-bottom: 12px;
-      scrollbar-width: none;
-    }
-    .post-images::-webkit-scrollbar { display: none; }
-
-    .post-image-item {
-      flex: 0 0 100%;
-      scroll-snap-align: center;
-      border-radius: var(--r3);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      cursor: pointer;
-    }
-    .post-image-item img {
-      width: 100%;
-      height: auto;
-      max-height: 620px;
-      object-fit: contain;
-      background: #000;
-      display: block;
-    }
-
-    .nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0,0,0,0.65);
-      color: white;
-      border: none;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      font-size: 26px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      transition: all 0.2s;
-    }
-    .nav-btn:hover { background: rgba(0,0,0,0.9); }
-    .nav-btn.left { left: 16px; }
-    .nav-btn.right { right: 16px; }
-
-    /* 이미지 확대 모달 */
-    #imageModal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.97);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 20000;
-    }
-    .modal-content {
-      position: relative;
-      max-width: 96%;
-      max-height: 96vh;
-    }
-    .modal-content img {
-      max-width: 100%;
-      max-height: 96vh;
-      object-fit: contain;
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-    }
-    .modal-close {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      border: none;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      font-size: 32px;
-      cursor: pointer;
-      z-index: 10;
-    }
-    .modal-nav {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      border: none;
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      font-size: 36px;
-      cursor: pointer;
-      z-index: 10;
-    }
-    .modal-nav.prev { left: 30px; }
-    .modal-nav.next { right: 30px; }
-
-    /* LIKE & DELETE */
+    /* ─── LIKE BTN ─── */
     .like-btn {
       display: flex;
       align-items: center;
@@ -297,12 +188,20 @@
       padding: 9px 18px;
       border-radius: 22px;
       font-family: inherit;
-      transition: all 0.15s;
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .like-btn:hover { border-color: var(--pink); color: var(--pink); }
+    .like-btn:hover { border-color: var(--pink); color: var(--pink); background: rgba(255,107,107,0.06); }
+    .like-btn:active { transform: scale(0.92); }
     .like-btn.liked { border-color: var(--pink); color: var(--pink); background: rgba(255,107,107,0.08); }
-    .like-heart { width: 16px; height: 16px; fill: currentColor; }
+    .like-heart {
+      width: 16px; height: 16px;
+      fill: currentColor;
+      transition: transform 0.25s cubic-bezier(0.34,1.7,0.64,1);
+    }
+    .like-btn:hover .like-heart { transform: scale(1.3); }
+    .like-btn.liked .like-heart { transform: scale(1.15); }
 
+    /* ─── DELETE BTN ─── */
     .delete-btn {
       background: transparent;
       border: 1px solid #2a1a1a;
@@ -312,11 +211,40 @@
       font-weight: 600;
       padding: 9px 16px;
       border-radius: 22px;
-      transition: all 0.15s;
+      transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      font-family: inherit;
     }
-    .delete-btn:hover { background: rgba(255,107,107,0.1); border-color: var(--pink); }
+    .delete-btn:hover { background: rgba(255,107,107,0.1); border-color: var(--pink); transform: scale(1.04); }
+    .delete-btn:active { transform: scale(0.94); }
 
-    /* POST CONTENT */
+    /* ─── 여러 이미지 표시 영역 ─── */
+    .post-images {
+      margin: 28px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      border-radius: var(--r3);
+      overflow: hidden;
+    }
+
+    .post-images.single img {
+      width: 100%;
+      max-height: 620px;
+      object-fit: contain;
+      background: #000;
+      border-radius: var(--r3);
+      border: 1px solid var(--border);
+    }
+
+    .post-images.multiple img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--r3);
+      border: 1px solid var(--border);
+    }
+
+    /* ─── POST CONTENT ─── */
     .post-detail-content { padding: 16px 0 32px; }
     .post-text {
       font-size: 15px;
@@ -325,8 +253,10 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
+    .post-text a { color: #888; text-decoration: underline; text-underline-offset: 3px; }
+    .post-text a:hover { color: var(--t1); }
 
-    /* SHARE */
+    /* ─── SHARE ─── */
     .share-container {
       padding: 24px 0;
       border-top: 1px solid var(--border);
@@ -344,6 +274,7 @@
       border-radius: var(--r2);
       font-size: 13px;
       color: var(--t2);
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -357,11 +288,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .copy-btn:hover { background: var(--bg4); color: var(--t1); }
+    .copy-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--border3); }
+    .copy-btn:active { transform: scale(0.88); }
+    .copy-btn.success { background: rgba(74,222,128,0.12); border-color: var(--green); color: var(--green); }
 
-    /* COMMENT */
-    .comment-section { padding: 32px 0; }
+    /* 나머지 스타일은 기존과 동일 (댓글, 모달 등) */
+    .comment-section { padding: 32px 0; opacity: 0; animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.35s forwards; }
     .comment-input-wrapper { display: flex; gap: 10px; margin-bottom: 32px; }
     .comment-input {
       flex: 1;
@@ -371,30 +306,43 @@
       padding: 12px 16px;
       color: var(--t1);
       font-size: 14px;
+      font-family: inherit;
       resize: none;
       min-height: 48px;
       max-height: 180px;
+      transition: border-color 0.2s, background 0.2s;
+      line-height: 1.5;
     }
-    .comment-input:focus { border-color: var(--border3); background: var(--bg3); }
+    .comment-input:focus { outline: none; border-color: var(--border3); background: var(--bg3); }
+    .comment-input::placeholder { color: var(--t3); }
     .comment-submit-btn {
       background: #fff;
       border: none;
       color: #000;
-      padding: 0 24px;
+      padding: 0 20px;
       border-radius: var(--r2);
       font-weight: 600;
       font-size: 13px;
       cursor: pointer;
+      font-family: inherit;
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap;
     }
+    .comment-submit-btn:hover { background: #e8e8e8; transform: scale(1.04); }
+    .comment-submit-btn:active { transform: scale(0.94); }
 
     .comment-list { display: flex; flex-direction: column; gap: 0; }
     .comment-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       padding: 20px 0;
       border-bottom: 1px solid var(--border);
     }
     .comment-item:last-child { border-bottom: none; }
 
-    /* LOGIN ALERT */
+    /* 삭제 모달 등 기존 스타일 유지 (생략 없이 포함) */
     .login-alert {
       position: fixed;
       top: -80px;
@@ -406,24 +354,32 @@
       padding: 12px 24px;
       border-radius: 22px;
       font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
       z-index: 9999;
-      transition: top 0.5s ease;
+      transition: top 0.5s cubic-bezier(0.34,1.4,0.64,1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      white-space: nowrap;
     }
     .login-alert.show { top: 20px; }
 
-    /* DELETE MODAL */
     .delete-modal-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.75);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10000;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
     }
     .delete-modal-overlay.show { opacity: 1; visibility: visible; }
     .delete-modal {
@@ -434,67 +390,64 @@
       text-align: center;
       max-width: 360px;
       width: 90%;
+      transform: scale(0.88) translateY(12px);
+      transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1);
     }
-
-    /* FOOTER */
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 24px;
-      text-align: center;
-      font-size: 12px;
-      margin-top: auto;
+    .delete-modal-overlay.show .delete-modal { transform: scale(1) translateY(0); }
+    .delete-modal img { width: 80px; height: 80px; margin-bottom: 20px; opacity: 0.85; }
+    .delete-modal-title { font-size: 16px; font-weight: 600; margin-bottom: 28px; color: var(--t1); line-height: 1.5; }
+    .delete-modal-buttons { display: flex; gap: 10px; justify-content: center; }
+    .delete-modal-btn {
+      padding: 10px 28px;
+      border-radius: var(--r2);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      border: none;
     }
-    .footer-links a { color: var(--t2); margin: 0 12px; text-decoration: none; }
-    .footer-links a:hover { color: var(--t1); }
-    .footer-text { color: var(--t3); font-size: 11px; }
+    .delete-modal-btn.cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
+    .delete-modal-btn.cancel:hover { background: var(--bg4); color: var(--t1); }
+    .delete-modal-btn.delete { background: rgba(255,107,107,0.15); color: var(--pink); border: 1px solid rgba(255,107,107,0.3); }
+    .delete-modal-btn.delete:hover { background: rgba(255,107,107,0.25); border-color: var(--pink); }
 
     @media (max-width: 768px) {
-      .main-wrapper { margin-left: 0; width: 100%; }
-      .sidebar-container { 
-        left: 0; right: 0; top: auto; bottom: 0; 
-        width: 100%; height: calc(64px + env(safe-area-inset-bottom, 0px)); 
-      }
+      .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .sidebar-container iframe { width: 100% !important; height: 100% !important; }
+      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .container { padding: 20px 16px; }
-      .nav-btn { width: 40px; height: 40px; font-size: 22px; }
+      .post-detail-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .header-actions { align-self: flex-end; }
+      .post-images { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <!-- SPLASH -->
+  <!-- ─── SPLASH ─── -->
   <div id="splash">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
 
   <!-- 로그인 알림 -->
   <div class="login-alert" id="loginAlert">
-    로그인 후 사용 가능합니다
+    <span>로그인 후 사용 가능합니다</span>
   </div>
 
-  <!-- 삭제 모달 -->
+  <!-- 게시물 삭제 확인 모달 -->
   <div class="delete-modal-overlay" id="deleteModal">
     <div class="delete-modal">
-      <img src="careful.png" alt="주의" style="width:80px;height:80px;margin-bottom:20px;">
-      <div class="delete-modal-title" style="font-size:16px;font-weight:600;margin-bottom:28px;">정말로 삭제하시겠습니까?</div>
-      <div style="display:flex;gap:10px;justify-content:center;">
-        <button class="delete-modal-btn cancel" onclick="closeDeleteModal()" 
-          style="padding:10px 28px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);">취소</button>
-        <button class="delete-modal-btn delete" id="confirmDeleteBtn"
-          style="padding:10px 28px;border-radius:10px;background:rgba(255,107,107,0.15);color:var(--pink);border:1px solid rgba(255,107,107,0.3);">삭제</button>
+      <img src="careful.png" alt="주의">
+      <div class="delete-modal-title">정말로 삭제하시겠습니까?</div>
+      <div class="delete-modal-buttons">
+        <button class="delete-modal-btn cancel" onclick="closeDeleteModal()">취소</button>
+        <button class="delete-modal-btn delete" id="confirmDeleteBtn">삭제</button>
       </div>
     </div>
   </div>
 
-  <!-- 이미지 확대 모달 -->
-  <div id="imageModal">
-    <button class="modal-close" onclick="closeImageModal()">×</button>
-    <button class="modal-nav prev" onclick="changeModalImage(-1)">&#10094;</button>
-    <div class="modal-content" id="modalContent"></div>
-    <button class="modal-nav next" onclick="changeModalImage(1)">&#10095;</button>
-  </div>
-
   <div class="sidebar-container">
-    <iframe src="sidebar.html" id="sidebarFrame" frameborder="0"></iframe>
+    <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
   </div>
 
   <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
@@ -511,7 +464,6 @@
 
     <div class="container">
       <div id="postContent"></div>
-
       <div class="comment-section">
         <div class="comment-input-wrapper">
           <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
@@ -527,16 +479,43 @@
         <a href="#" onclick="showTerms(); return false;">이용약관</a>
         <a href="mailto:alexeom97@outlook.com">문의하기</a>
       </div>
-      <div class="footer-text">
-        본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다.<br>
-        모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.
-      </div>
+      <div class="footer-text">본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
     </div>
   </div>
 
 <script src="markdown.js"></script>
 <script>
+  // ─── NPROGRESS 설정 ───
   NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && link.href && !link.target && !link.hasAttribute('download')) {
+      NProgress.start();
+    }
+  });
+
+  // ─── SPLASH ───
+  (function () {
+    const splash = document.getElementById('splash');
+    function finishSplash() {
+      splash.classList.add('fade-out');
+      setTimeout(() => { splash.style.display = 'none'; }, 460);
+    }
+    if (sessionStorage.getItem('splashShown')) {
+      splash.style.display = 'none';
+    } else {
+      sessionStorage.setItem('splashShown', 'true');
+      const splashStart = Date.now();
+      const MIN_SPLASH = 2000;
+      window.addEventListener('load', () => {
+        NProgress.done();
+        const elapsed = Date.now() - splashStart;
+        const remaining = Math.max(0, MIN_SPLASH - elapsed);
+        setTimeout(finishSplash, remaining);
+      });
+      setTimeout(finishSplash, 5000);
+    }
+  })();
 
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
@@ -546,13 +525,18 @@
       ...options,
       headers: {
         "Content-Type": "application/json",
-        ...(options.headers || {})
-      }
+        ...(options.headers || {}),
+      },
     });
-    if (!res.ok) throw new Error(`API 오류 (${res.status})`);
+    if (!res.ok) {
+      let errorText;
+      try { errorText = await res.text(); } catch { errorText = "Unknown error"; }
+      throw new Error(`API 오류 (${res.status}): ${errorText}`);
+    }
     if (res.status === 204) return null;
     const text = await res.text();
-    return text ? JSON.parse(text) : null;
+    if (!text) return null;
+    try { return JSON.parse(text); } catch (e) { console.error("JSON 파싱 오류:", e); return null; }
   }
 
   let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
@@ -562,70 +546,89 @@
   const urlParams = new URLSearchParams(window.location.search);
   const postId = urlParams.get('id');
 
-  let currentModalImages = [];
-  let currentModalIndex = 0;
-
-  // 이미지 모달 함수
-  function openImageModal(images, startIndex = 0) {
-    currentModalImages = images;
-    currentModalIndex = startIndex;
-    showModalImage();
-    document.getElementById('imageModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+  async function createNotification(targetUserId, detail, link) {
+    if (!targetUserId || targetUserId === currentUser?.id) return;
+    try {
+      await api("/notification", {
+        method: "POST",
+        body: JSON.stringify({
+          user: targetUserId,
+          detail,
+          link,
+          isread: 0,
+          created_at: new Date().toISOString()
+        })
+      });
+    } catch (e) {}
   }
 
-  function showModalImage() {
-    const content = document.getElementById('modalContent');
-    content.innerHTML = `<img src="${currentModalImages[currentModalIndex]}" alt="확대 이미지">`;
-  }
-
-  window.changeModalImage = function(direction) {
-    currentModalIndex = (currentModalIndex + direction + currentModalImages.length) % currentModalImages.length;
-    showModalImage();
-  };
-
-  window.closeImageModal = function() {
-    document.getElementById('imageModal').style.display = 'none';
-    document.body.style.overflow = '';
-  };
-
-  // 이미지 슬라이더 렌더링
-  function renderImages(imageUrl) {
-    if (!imageUrl) return '';
-    const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
-    if (urls.length === 0) return '';
-
-    let html = `<div class="post-images-wrapper">`;
-    html += `<div class="post-images" id="postImages">`;
-
-    urls.forEach((url, index) => {
-      html += `
-        <div class="post-image-item" onclick="openImageModal(${JSON.stringify(urls)}, ${index})">
-          <img src="${url}" alt="게시물 이미지" loading="lazy">
-        </div>
-      `;
-    });
-
-    html += `</div>`;
-
-    if (urls.length > 1) {
-      html += `
-        <button class="nav-btn left" onclick="scrollImages(-1)">‹</button>
-        <button class="nav-btn right" onclick="scrollImages(1)">›</button>
-      `;
+  async function getCommentById(commentId) {
+    if (!commentId) return null;
+    try {
+      const rows = await api(`/comments?id=eq.${commentId}&select=user_id,user_name`);
+      return rows?.[0] || null;
+    } catch (e) {
+      return null;
     }
-
-    html += `</div>`;
-    return html;
   }
 
-  window.scrollImages = function(direction) {
-    const container = document.getElementById('postImages');
-    if (container) {
-      const scrollAmount = container.offsetWidth * 0.9;
-      container.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' });
+  function showLoginAlert() {
+    const alert = document.getElementById('loginAlert');
+    alert.classList.add('show');
+    setTimeout(() => alert.classList.remove('show'), 3000);
+    alert.onclick = () => window.location.href = 'login.html';
+  }
+
+  function initCurrentUser() {
+    const saved = localStorage.getItem('snsUser');
+    if (saved) { currentUser = JSON.parse(saved); updateSidebar(); }
+  }
+
+  function updateSidebar() {
+    const iframe = document.getElementById('sidebarFrame');
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+  }
+
+  function updateSidebarMode() {
+    const iframe = document.getElementById('sidebarFrame');
+    const narrow = window.innerWidth <= 768;
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+  }
+
+  window.addEventListener('message', (event) => {
+    const { type, page } = event.data || {};
+    if (type === 'navigate') {
+      if (page === 'home') location.href = 'index.html';
+      if (page === 'explore') location.href = 'explore.html';
     }
+    if (type === 'logout') { 
+      localStorage.removeItem('snsUser'); 
+      currentUser = null; 
+      location.href = 'index.html'; 
+    }
+    if (type === 'requestUserInfo') updateSidebar();
+  });
+
+  window.onSharerProfileLogout = function () {
+    localStorage.removeItem('snsUser');
+    currentUser = null;
+    location.href = 'index.html';
   };
+
+  document.getElementById('commentInput')?.addEventListener('focus', function() {
+    if (!currentUser) { this.blur(); showLoginAlert(); }
+  });
+
+  initCurrentUser();
+  updateSidebarMode();
+  window.addEventListener('resize', updateSidebarMode);
+
+  if (!postId) {
+    showError('게시물 ID가 없습니다.');
+  } else {
+    loadPost(postId);
+    listenComments(postId);
+  }
 
   async function getProfileImage(userId) {
     if (!userId) return null;
@@ -635,15 +638,36 @@
     } catch (e) { return null; }
   }
 
+  // 여러 이미지 처리 함수
+  function renderImages(imageUrl) {
+    if (!imageUrl) return '';
+
+    const urls = imageUrl.split(',').map(url => url.trim()).filter(Boolean);
+    
+    if (urls.length === 0) return '';
+
+    const isSingle = urls.length === 1;
+    
+    let html = `<div class="post-images ${isSingle ? 'single' : 'multiple'}">`;
+    
+    urls.forEach(url => {
+      html += `<img src="${url}" alt="게시물 이미지" loading="lazy">`;
+    });
+    
+    html += `</div>`;
+    return html;
+  }
+
   async function loadPost(postId) {
     try {
       const posts = await api(`/posts?id=eq.${postId}&select=*`);
-      if (!posts?.length) return showError('게시물을 찾을 수 없습니다.');
-      
+      if (!posts?.length) { 
+        showError('게시물을 찾을 수 없습니다.'); 
+        return; 
+      }
       const post = posts[0];
       const authorProfileImage = await getProfileImage(post.author_id);
       currentPost = { ...post, author_profile_image: authorProfileImage };
-      
       displayPost(currentPost, postId);
       loadLikes(postId);
     } catch (e) {
@@ -666,8 +690,8 @@
 
     let avatarContent = post.author ? post.author[0].toUpperCase() : '?';
     if (post.author_profile_image) {
-      const url = post.author_profile_image.includes('?') 
-        ? `${post.author_profile_image}&v=${Date.now()}` 
+      const url = post.author_profile_image.includes('?')
+        ? `${post.author_profile_image}&v=${Date.now()}`
         : `${post.author_profile_image}?v=${Date.now()}`;
       avatarContent = `<img src="${url}" alt="${escapeHtml(post.author)}">`;
     }
@@ -690,7 +714,7 @@
           <div class="header-actions">
             <button class="like-btn" id="likeBtn" onclick="toggleLike()">
               <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
-                <path fill="currentColor" d="M2169.757 1273.707C2082.986 1435.052 1959.815 1592.116 1800.24 1744.903C1640.756 1897.7 1451.882 2043.706 1233.619 2182.921C1220.223 2191.47 1206.115 2198.851 1191.453 2204.979C1165.431 2218.34 1134.569 2218.34 1108.547 2204.979C1093.885 2198.851 1079.777 2191.47 1066.381 2182.921C848.148 2043.694 659.268 1897.688 499.743 1744.903C340.216 1592.116 217.042 1435.052 130.217 1273.707C43.416 1112.371 0 944.233 0 779.518C0 642.959 28.581 527.006 85.715 421.458C139.349 319.654 219.242 234.056 317.106 173.548C414.637 113.418 527.301 82.375 641.86 84.066C755.301 84.066 858.31 112.999 943.982 171.087C1030.091 228.041 1100.847 305.33 1150 396.128C1199.153 305.33 1269.909 228.041 1356.018 171.087C1441.69 112.999 1544.744 84.066 1658.14 84.066C1772.703 82.367 1885.372 113.411 1982.905 173.548C2080.76 234.049 2160.638 319.649 2214.239 421.458C2271.384 527.006 2300 642.959 2300 779.518C2300 944.233 2256.584 1112.371 2169.757 1273.707Z"/>
+                <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
               </svg>
               <span id="likeCount">0</span>
             </button>
@@ -708,28 +732,23 @@
           <div class="share-label">게시물 공유</div>
           <div class="share-box-wrapper">
             <div class="share-url-box">${window.location.href}</div>
-            <button class="copy-btn" id="copyBtn" onclick="copyShareLink()">복사</button>
+            <button class="copy-btn" id="copyBtn" onclick="copyShareLink()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
     `;
   }
 
-  function escapeHtml(unsafe) {
-    return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  // 기존 함수들 (간단히 유지)
   async function loadLikes(postId) {
     try {
       const likes = await api(`/likes?post_id=eq.${postId}&select=user_id`);
       updateLikeUI(likes || []);
-    } catch (e) {}
+    } catch (e) { console.error('loadLikes 오류:', e); }
   }
 
   function updateLikeUI(likes) {
@@ -744,51 +763,311 @@
     }
   }
 
-  window.toggleLike = async function() { /* 기존 toggleLike 로직 그대로 사용 */ 
-    alert("좋아요 기능은 기존 코드와 동일하게 동작합니다.");
+  // 나머지 함수들 (toggleLike, listenComments, displayComments 등)은 기존과 동일하게 유지
+  window.toggleLike = async function() {
+    if (!currentUser) return showLoginAlert();
+    if (!currentPost) return;
+    const btn = document.getElementById('likeBtn');
+    const countEl = document.getElementById('likeCount');
+    try {
+      const [likeRecords, likeCountResult] = await Promise.all([
+        api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+        api(`/likes?post_id=eq.${postId}&select=count`)
+      ]);
+      const currentlyLiked = likeRecords?.length > 0;
+      const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
+      const uiLiked = btn.classList.contains('liked');
+      const uiCount = parseInt(countEl.textContent, 10) || 0;
+
+      if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
+        btn.classList.toggle('liked', currentlyLiked);
+        countEl.textContent = currentServerCount;
+      }
+
+      if (currentlyLiked) {
+        if (likeRecords?.[0]?.id) {
+          await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
+        }
+        btn.classList.remove('liked');
+        countEl.textContent = currentServerCount - 1;
+      } else {
+        await api("/likes", {
+          method: "POST",
+          body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
+        });
+        btn.classList.add('liked');
+        countEl.textContent = currentServerCount + 1;
+        createNotification(currentPost.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
+      }
+
+      const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`);
+      countEl.textContent = Math.max(0, finalCount?.[0]?.count || 0);
+    } catch (err) {
+      console.error("좋아요 처리 오류:", err);
+      try {
+        const [records, countRes] = await Promise.all([
+          api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+          api(`/likes?post_id=eq.${postId}&select=count`)
+        ]);
+        btn.classList.toggle('liked', records?.length > 0);
+        countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
+      } catch (recoveryErr) { console.error("복구 실패:", recoveryErr); }
+    }
   };
 
   async function listenComments(postId) {
     try {
       const comments = await api(`/comments?post_id=eq.${postId}&select=*&order=created_at.desc`);
-      displayComments(comments || []);
-    } catch (e) { console.error(e); }
+      const userIds = [...new Set(comments.map(c => c.user_id))];
+      const profileImages = {};
+      await Promise.all(userIds.map(async (uid) => {
+        const img = await getProfileImage(uid);
+        if (img) profileImages[uid] = img;
+      }));
+      displayComments(comments || [], profileImages);
+    } catch (e) { console.error('댓글 로드 오류:', e); }
   }
 
-  function displayComments(comments) {
+  function displayComments(comments, profileImages = {}) {
     const list = document.getElementById('commentList');
-    list.innerHTML = comments.length === 0 
-      ? '<div style="text-align:center; color:var(--t3); padding:48px 20px;">아직 댓글이 없습니다.</div>'
-      : comments.map(c => `<div class="comment-item"><strong>${escapeHtml(c.user_name)}</strong><p>${escapeHtml(c.text)}</p></div>`).join('');
+    list.innerHTML = '';
+    if (comments.length === 0) {
+      list.innerHTML = '<div style="text-align:center; color:var(--t3); padding:48px 20px; font-size:14px;">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>';
+      return;
+    }
+
+    const roots = [];
+    const repliesByParent = {};
+    comments.forEach(c => {
+      const parentId = c.parent_id || null;
+      if (!parentId) roots.push(c);
+      else {
+        if (!repliesByParent[parentId]) repliesByParent[parentId] = [];
+        repliesByParent[parentId].push(c);
+      }
+    });
+
+    Object.values(repliesByParent).forEach(arr => {
+      arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    });
+
+    function renderAvatar(userName, userId) {
+      let avatar = userName ? userName[0].toUpperCase() : '?';
+      if (profileImages[userId]) {
+        const url = profileImages[userId].includes('?')
+          ? `${profileImages[userId]}&v=${Date.now()}`
+          : `${profileImages[userId]}?v=${Date.now()}`;
+        avatar = `<img src="${url}" alt="${escapeHtml(userName)}">`;
+      }
+      return avatar;
+    }
+
+    function renderOneComment(c, { showReplyButton }) {
+      const isMine = currentUser?.id === c.user_id;
+      const date = new Date(c.created_at).toLocaleString('ko-KR', {
+        year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      const isVerified = ["JB777", "진정오"].includes(c.user_name);
+      const avatarContent = renderAvatar(c.user_name, c.user_id);
+      const linkedText = parseMarkdown(c.text);
+      const replyCount = (repliesByParent[c.id] || []).length;
+      const hasReplies = replyCount > 0;
+      const isOpen = openReplyThreads.has(c.id);
+      const replyBtnHtml = showReplyButton ? `<button class="reply-btn" onclick="openReplyComposer('${c.id}')">답글 달기</button>` : '';
+      const toggleBtnHtml = hasReplies ? `<button class="replies-toggle-btn" id="toggleReplies-${c.id}" data-count="${replyCount}" onclick="toggleReplies('${c.id}')">${isOpen ? '답글 접기' : `답글 ${replyCount}개 보기`}</button>` : '';
+      const replyComposeHtml = showReplyButton ? `
+        <div class="reply-compose" id="replyCompose-${c.id}" style="display:none;">
+          <textarea id="replyInput-${c.id}" class="reply-input" placeholder="답글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
+          <div class="reply-compose-actions">
+            <button class="reply-cancel-btn" onclick="cancelReply('${c.id}')">취소</button>
+            <button class="reply-submit-btn" onclick="submitReply('${c.id}')">답글</button>
+          </div>
+        </div>
+      ` : '';
+      const replies = repliesByParent[c.id] || [];
+      const repliesHtml = replies.length ? `
+        <div class="reply-list" id="replyList-${c.id}" style="display:${isOpen ? 'flex' : 'none'};">
+          ${replies.map(r => {
+            const rIsMine = currentUser?.id === r.user_id;
+            const rDate = new Date(r.created_at).toLocaleString('ko-KR', {
+              year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            const rIsVerified = ["JB777", "진정오"].includes(r.user_name);
+            const rAvatarContent = renderAvatar(r.user_name, r.user_id);
+            const rLinkedText = parseMarkdown(r.text);
+            return `
+              <div class="reply-item">
+                <div class="comment-header">
+                  <div class="comment-author-wrapper" onclick="goToProfile('${r.user_id}', '${escapeHtml(r.user_name)}')">
+                    <div class="comment-avatar">${rAvatarContent}</div>
+                    <span class="comment-author">
+                      ${escapeHtml(r.user_name)}
+                      ${rIsVerified ? '<span class="verification-badge" style="width:12px;height:12px;"></span>' : ''}
+                    </span>
+                  </div>
+                  ${rIsMine ? `<button class="comment-del-btn" onclick="deleteComment('${r.id}')">삭제</button>` : ''}
+                </div>
+                <div class="comment-content">${rLinkedText}</div>
+                <div class="comment-date">${rDate}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      ` : '';
+      return `
+        <div class="comment-header">
+          <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
+            <div class="comment-avatar">${avatarContent}</div>
+            <span class="comment-author">
+              ${escapeHtml(c.user_name)}
+              ${isVerified ? '<span class="verification-badge" style="width:13px;height:13px;"></span>' : ''}
+            </span>
+          </div>
+          ${isMine ? `<button class="comment-del-btn" onclick="deleteComment('${c.id}')">삭제</button>` : ''}
+        </div>
+        <div class="comment-content">${linkedText}</div>
+        <div class="comment-date">${date}</div>
+        ${showReplyButton ? `
+          <div class="comment-actions">
+            ${replyBtnHtml}
+            ${toggleBtnHtml}
+          </div>
+          ${replyComposeHtml}
+          ${repliesHtml}
+        ` : ''}
+      `;
+    }
+
+    roots.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'comment-item';
+      item.innerHTML = renderOneComment(c, { showReplyButton: true });
+      list.appendChild(item);
+    });
   }
 
-  window.addComment = async function() {
-    const input = document.getElementById('commentInput');
-    if (!currentUser || !input.value.trim()) return;
-    alert("댓글 업로드 기능은 기존 코드와 동일합니다.");
-    input.value = '';
-    listenComments(postId);
-  };
+  function showError(msg) {
+    document.getElementById('postContent').innerHTML = `
+      <div style="padding:80px 20px; text-align:center;">
+        <div style="color:var(--pink); font-size:15px; margin-bottom:20px;">${msg}</div>
+        <button onclick="window.history.back()" style="background:#fff; color:#000; border:none; padding:12px 28px; border-radius:var(--r2); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s;" onmouseover="this.style.background='#e8e8e8'" onmouseout="this.style.background='#fff'">돌아가기</button>
+      </div>
+    `;
+  }
 
   window.openDeleteModal = function(id) {
     pendingDeletePostId = id;
     document.getElementById('deleteModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
   };
 
   window.closeDeleteModal = function() {
     document.getElementById('deleteModal').classList.remove('show');
+    document.body.style.overflow = '';
+    pendingDeletePostId = null;
   };
 
   window.goToProfile = function(userId, nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   };
 
+  window.addComment = async function() {
+    const input = document.getElementById('commentInput');
+    const text = input.value.trim();
+    if (!currentUser) return showLoginAlert();
+    if (!text || !currentPost) return;
+    try {
+      await api("/comments", {
+        method: "POST",
+        body: JSON.stringify({
+          post_id: postId,
+          user_id: currentUser.id,
+          user_name: currentUser.nickname,
+          text,
+          parent_id: null,
+          created_at: new Date().toISOString()
+        })
+      });
+      createNotification(currentPost.author_id, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${postId}`);
+      input.value = '';
+      listenComments(postId);
+    } catch (e) { alert('댓글 작성 실패'); }
+  };
+
+  window.openReplyComposer = function(commentId) {
+    if (!currentUser) return showLoginAlert();
+    const compose = document.getElementById(`replyCompose-${commentId}`);
+    if (!compose) return;
+    compose.style.display = 'flex';
+    const input = document.getElementById(`replyInput-${commentId}`);
+    if (input) input.focus();
+  };
+
+  window.cancelReply = function(commentId) {
+    const compose = document.getElementById(`replyCompose-${commentId}`);
+    const input = document.getElementById(`replyInput-${commentId}`);
+    if (input) input.value = '';
+    if (compose) compose.style.display = 'none';
+  };
+
+  window.submitReply = async function(parentId) {
+    const input = document.getElementById(`replyInput-${parentId}`);
+    const text = input?.value?.trim() || '';
+    if (!currentUser) return showLoginAlert();
+    if (!text || !currentPost) return;
+    try {
+      await api("/comments", {
+        method: "POST",
+        body: JSON.stringify({
+          post_id: postId,
+          user_id: currentUser.id,
+          user_name: currentUser.nickname,
+          text,
+          parent_id: parentId,
+          created_at: new Date().toISOString()
+        })
+      });
+      const parentComment = await getCommentById(parentId);
+      const targetUserId = parentComment?.user_id || currentPost.author_id;
+      createNotification(targetUserId, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${postId}`);
+      if (input) input.value = '';
+      const compose = document.getElementById(`replyCompose-${parentId}`);
+      if (compose) compose.style.display = 'none';
+      openReplyThreads.add(parentId);
+      listenComments(postId);
+    } catch (e) { alert('답글 작성 실패'); }
+  };
+
+  window.toggleReplies = function(commentId) {
+    const listEl = document.getElementById(`replyList-${commentId}`);
+    const btn = document.getElementById(`toggleReplies-${commentId}`);
+    if (!listEl || !btn) return;
+    const opening = listEl.style.display === 'none' || !listEl.style.display;
+    if (opening) {
+      listEl.style.display = 'flex';
+      btn.textContent = '답글 접기';
+      openReplyThreads.add(commentId);
+    } else {
+      listEl.style.display = 'none';
+      const count = Number(btn.dataset.count || 0);
+      btn.textContent = `답글 ${count}개 보기`;
+      openReplyThreads.delete(commentId);
+    }
+  };
+
+  window.deleteComment = async function(commentId) {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    try {
+      await api(`/comments?id=eq.${commentId}`, { method: "DELETE" });
+      listenComments(postId);
+    } catch (e) { alert('댓글 삭제 실패'); }
+  };
+
   window.copyShareLink = function() {
     navigator.clipboard.writeText(window.location.href).then(() => {
       const btn = document.getElementById('copyBtn');
-      const original = btn.textContent;
-      btn.textContent = '복사됨';
-      setTimeout(() => btn.textContent = original, 1500);
+      btn.classList.add('success');
+      setTimeout(() => btn.classList.remove('success'), 1500);
     });
   };
 
@@ -799,34 +1078,21 @@
   document.getElementById('confirmDeleteBtn').onclick = async () => {
     if (!pendingDeletePostId) return;
     try {
+      await api(`/comments?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
+      await api(`/likes?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
       await api(`/posts?id=eq.${pendingDeletePostId}`, { method: "DELETE" });
       window.location.href = 'index.html';
-    } catch (e) { alert('삭제 실패'); }
+    } catch (e) { alert('게시물 삭제 실패'); }
   };
 
-  // 키보드 ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === "Escape") {
-      const modal = document.getElementById('imageModal');
-      if (modal.style.display === 'flex') closeImageModal();
-    }
-  });
-
-  // 초기화
-  if (postId) {
-    loadPost(postId);
-    listenComments(postId);
-  } else {
-    showError('게시물 ID가 없습니다.');
-  }
-
-  function showError(msg) {
-    document.getElementById('postContent').innerHTML = `
-      <div style="padding:80px 20px;text-align:center;color:var(--pink);">
-        ${msg}<br><br>
-        <button onclick="window.history.back()" style="background:#fff;color:#000;border:none;padding:12px 28px;border-radius:10px;cursor:pointer;">돌아가기</button>
-      </div>
-    `;
+  // escapeHtml 함수 추가 (없을 경우를 대비)
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
