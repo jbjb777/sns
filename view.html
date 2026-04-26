@@ -237,6 +237,7 @@
       border-radius: var(--r3);
       border: 1px solid var(--border);
       display: block;
+      cursor: pointer;
     }
     .carousel-nav {
       position: absolute;
@@ -332,8 +333,12 @@
     .copy-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--border3); }
     .copy-btn:active { transform: scale(0.88); }
     .copy-btn.success { background: rgba(74,222,80,0.12); border-color: var(--green); color: var(--green); }
-    /* 댓글 스타일 */
-    .comment-section { padding: 32px 0; opacity: 0; animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.35s forwards; }
+    /* ─── COMMENT SECTION ─── */
+    .comment-section {
+      padding: 32px 0;
+      opacity: 0;
+      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.35s forwards;
+    }
     .comment-input-wrapper { display: flex; gap: 10px; margin-bottom: 32px; }
     .comment-input {
       flex: 1;
@@ -377,7 +382,144 @@
       border-bottom: 1px solid var(--border);
     }
     .comment-item:last-child { border-bottom: none; }
-    /* 로그인 알림 */
+    .comment-header { display: flex; justify-content: space-between; align-items: center; }
+    .comment-author-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .comment-author-wrapper:hover { opacity: 0.75; }
+    .comment-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      overflow: hidden;
+      flex-shrink: 0;
+      color: #666;
+      transition: border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .comment-author-wrapper:hover .comment-avatar { border-color: var(--border3); transform: scale(1.06); }
+    .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .comment-author {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--t1);
+    }
+    .comment-content {
+      font-size: 14px;
+      color: #ccc;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      padding-left: 2px;
+    }
+    .comment-content a { color: var(--t2); text-decoration: underline; text-underline-offset: 3px; }
+    .comment-content a:hover { color: var(--t1); }
+    .comment-date { font-size: 11px; color: var(--t3); padding-left: 2px; }
+    .comment-del-btn {
+      background: none;
+      border: none;
+      color: var(--t3);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-family: inherit;
+      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .comment-del-btn:hover { color: var(--pink); background: rgba(255,107,107,0.08); }
+    .comment-del-btn:active { transform: scale(0.88); }
+    /* ─── REPLIES (대댓글) ─── */
+    .comment-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 2px;
+      margin-top: 2px;
+    }
+    .reply-btn, .replies-toggle-btn {
+      background: none;
+      border: none;
+      color: var(--t2);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-family: inherit;
+      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .reply-btn:hover, .replies-toggle-btn:hover { color: var(--t1); background: var(--bg3); }
+    .reply-btn:active, .replies-toggle-btn:active { transform: scale(0.92); }
+    .reply-compose {
+      margin-top: 10px;
+      padding-left: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .reply-input {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 10px 14px;
+      color: var(--t1);
+      font-size: 13px;
+      font-family: inherit;
+      resize: none;
+      min-height: 42px;
+      max-height: 160px;
+      transition: border-color 0.2s, background 0.2s;
+      line-height: 1.5;
+    }
+    .reply-input:focus { outline: none; border-color: var(--border3); background: var(--bg3); }
+    .reply-input::placeholder { color: var(--t3); }
+    .reply-compose-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .reply-submit-btn, .reply-cancel-btn {
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--t2);
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .reply-submit-btn { background: #fff; color: #000; border-color: transparent; }
+    .reply-submit-btn:hover { background: #e8e8e8; transform: scale(1.02); }
+    .reply-cancel-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--border3); }
+    .reply-submit-btn:active, .reply-cancel-btn:active { transform: scale(0.96); }
+    .reply-list {
+      margin-top: 10px;
+      padding-left: 44px;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border);
+    }
+    .reply-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px 0 14px 14px;
+    }
+    .reply-item .comment-avatar { width: 28px; height: 28px; font-size: 12px; }
+    .reply-item .comment-author { font-size: 13px; }
+    .reply-item .comment-content { font-size: 13px; color: #cfcfcf; }
+    .reply-item .comment-date { font-size: 10px; }
+    /* ─── LOGIN ALERT ─── */
     .login-alert {
       position: fixed;
       top: -80px;
@@ -401,7 +543,7 @@
       white-space: nowrap;
     }
     .login-alert.show { top: 20px; }
-    /* 삭제 모달 */
+    /* ─── DELETE MODAL ─── */
     .delete-modal-overlay {
       position: fixed;
       inset: 0;
@@ -446,7 +588,7 @@
     .delete-modal-btn.cancel:hover { background: var(--bg4); color: var(--t1); }
     .delete-modal-btn.delete { background: rgba(255,107,107,0.15); color: var(--pink); border: 1px solid rgba(255,107,107,0.3); }
     .delete-modal-btn.delete:hover { background: rgba(255,107,107,0.25); border-color: var(--pink); }
-    /* 라이트박스 (모달 이미지 뷰어) */
+    /* 라이트박스 (이미지 확대 보기) */
     #imageLightbox {
       position: fixed;
       inset: 0;
@@ -525,39 +667,31 @@
       .header-actions { align-self: flex-end; }
       .carousel-nav { width: 36px; height: 36px; font-size: 18px; }
     }
-    /* 푸터 수정 (깨짐 방지) */
+    /* 푸터 */
     .footer {
       border-top: 1px solid var(--border);
-      padding: 24px 20px 40px;
+      padding: 24px;
       text-align: center;
-      color: var(--t3);
-      font-size: 11px;
-      line-height: 1.5;
-      flex-shrink: 0;
-    }
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 12px;
       font-size: 12px;
+      margin-top: auto;
     }
-    .footer-links a {
-      color: var(--t3);
-      text-decoration: none;
-    }
-    .footer-links a:hover { color: var(--t2); }
+    .footer-links { margin-bottom: 8px; }
+    .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--t1); }
+    .footer-text { color: var(--t3); font-size: 11px; }
   </style>
 </head>
 <body>
-  <!-- ─── SPLASH ─── -->
+  <!-- SPLASH -->
   <div id="splash">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
+
   <!-- 로그인 알림 -->
   <div class="login-alert" id="loginAlert">
     <span>로그인 후 사용 가능합니다</span>
   </div>
+
   <!-- 게시물 삭제 확인 모달 -->
   <div class="delete-modal-overlay" id="deleteModal">
     <div class="delete-modal">
@@ -585,6 +719,7 @@
     <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
   </div>
   <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
+
   <div class="main-wrapper">
     <div class="header">
       <button class="back-btn" onclick="goHome()">
@@ -594,6 +729,7 @@
       </button>
       <div class="header-title">게시물</div>
     </div>
+
     <div class="container">
       <div id="postContent"></div>
       <div class="comment-section">
@@ -604,6 +740,7 @@
         <div id="commentList" class="comment-list"></div>
       </div>
     </div>
+
     <div class="footer">
       <div class="footer-links">
         <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
@@ -624,6 +761,7 @@
       NProgress.start();
     }
   });
+
   // ─── SPLASH ───
   (function () {
     const splash = document.getElementById('splash');
@@ -648,6 +786,7 @@
   })();
 
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
     const res = await fetch(url, {
@@ -713,7 +852,10 @@
 
   function initCurrentUser() {
     const saved = localStorage.getItem('snsUser');
-    if (saved) { currentUser = JSON.parse(saved); updateSidebar(); }
+    if (saved) { 
+      currentUser = JSON.parse(saved); 
+      updateSidebar(); 
+    }
   }
 
   function updateSidebar() {
@@ -733,10 +875,10 @@
       if (page === 'home') location.href = 'index.html';
       if (page === 'explore') location.href = 'explore.html';
     }
-    if (type === 'logout') {
-      localStorage.removeItem('snsUser');
-      currentUser = null;
-      location.href = 'index.html';
+    if (type === 'logout') { 
+      localStorage.removeItem('snsUser'); 
+      currentUser = null; 
+      location.href = 'index.html'; 
     }
     if (type === 'requestUserInfo') updateSidebar();
   });
@@ -770,7 +912,7 @@
     } catch (e) { return null; }
   }
 
-  // 여러 이미지 캐러셀 + 라이트박스 렌더링
+  // 여러 이미지 캐러셀 + 라이트박스
   function renderImages(imageUrl) {
     if (!imageUrl) return '';
     const urls = imageUrl.split(',').map(url => url.trim()).filter(Boolean);
@@ -778,29 +920,26 @@
 
     let html = `<div class="post-images">`;
     html += `<div class="image-carousel" id="carousel-${postId}">`;
-
+    
     urls.forEach((url, index) => {
       html += `
         <div class="carousel-slide">
           <img src="${url}" alt="게시물 이미지 ${index + 1}" loading="lazy" onclick="openLightbox(${index})">
         </div>`;
     });
-
+    
     html += `</div>`;
 
-    // 네비게이션 버튼 (이미지가 2장 이상일 때만)
     if (urls.length > 1) {
       html += `
         <button class="carousel-nav prev" onclick="prevSlide('${postId}')">‹</button>
         <button class="carousel-nav next" onclick="nextSlide('${postId}')">›</button>
         <div class="carousel-indicators" id="indicators-${postId}"></div>`;
     }
-
     html += `</div>`;
     return html;
   }
 
-  // 캐러셀 슬라이드 이동 함수
   window.prevSlide = function(postIdStr) {
     const carousel = document.getElementById(`carousel-${postIdStr}`);
     if (!carousel) return;
@@ -815,18 +954,16 @@
     carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   };
 
-  // 라이트박스 열기
+  // 라이트박스
   window.openLightbox = function(startIndex) {
-    const post = currentPost;
-    if (!post || !post.image_url) return;
-
-    currentLightboxImages = post.image_url.split(',').map(u => u.trim()).filter(Boolean);
+    if (!currentPost || !currentPost.image_url) return;
+    currentLightboxImages = currentPost.image_url.split(',').map(u => u.trim()).filter(Boolean);
     currentLightboxIndex = startIndex;
-
+    
     const lightbox = document.getElementById('imageLightbox');
     const imgEl = document.getElementById('lightboxImage');
     const counter = document.getElementById('lightboxCounter');
-
+    
     imgEl.src = currentLightboxImages[currentLightboxIndex];
     counter.textContent = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
     lightbox.style.display = 'flex';
@@ -857,7 +994,6 @@
     counter.textContent = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
   };
 
-  // ESC 키로 라이트박스 닫기
   document.addEventListener('keydown', function(e) {
     if (e.key === "Escape") {
       const lightbox = document.getElementById('imageLightbox');
@@ -896,6 +1032,7 @@
       currentUser.id === post.author_id ||
       (currentUser.nickname === "JB777" && currentUser.isVerified)
     );
+
     let avatarContent = post.author ? post.author[0].toUpperCase() : '?';
     if (post.author_profile_image) {
       const url = post.author_profile_image.includes('?')
@@ -903,7 +1040,9 @@
         : `${post.author_profile_image}?v=${Date.now()}`;
       avatarContent = `<img src="${url}" alt="${escapeHtml(post.author)}">`;
     }
+
     const linkedContent = parseMarkdown(post.content || '');
+
     contentDiv.innerHTML = `
       <div class="post-detail-card">
         <div class="post-detail-header">
@@ -946,7 +1085,7 @@
       </div>
     `;
 
-    // 캐러셀 인디케이터 초기화 (여러 장일 경우)
+    // 캐러셀 인디케이터 초기화
     if (post.image_url) {
       const urls = post.image_url.split(',').map(u => u.trim()).filter(Boolean);
       if (urls.length > 1) {
@@ -972,7 +1111,6 @@
       container.appendChild(dot);
     }
 
-    // 스크롤 시 인디케이터 업데이트
     const carousel = document.getElementById(`carousel-${postIdStr}`);
     if (carousel) {
       carousel.addEventListener('scroll', () => {
@@ -1009,21 +1147,26 @@
   window.toggleLike = async function() {
     if (!currentUser) return showLoginAlert();
     if (!currentPost) return;
+
     const btn = document.getElementById('likeBtn');
     const countEl = document.getElementById('likeCount');
+
     try {
       const [likeRecords, likeCountResult] = await Promise.all([
         api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
         api(`/likes?post_id=eq.${postId}&select=count`)
       ]);
+
       const currentlyLiked = likeRecords?.length > 0;
       const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
       const uiLiked = btn.classList.contains('liked');
       const uiCount = parseInt(countEl.textContent, 10) || 0;
+
       if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
         btn.classList.toggle('liked', currentlyLiked);
         countEl.textContent = currentServerCount;
       }
+
       if (currentlyLiked) {
         if (likeRecords?.[0]?.id) {
           await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
@@ -1039,6 +1182,7 @@
         countEl.textContent = currentServerCount + 1;
         createNotification(currentPost.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
       }
+
       const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`);
       countEl.textContent = Math.max(0, finalCount?.[0]?.count || 0);
     } catch (err) {
@@ -1070,12 +1214,15 @@
   function displayComments(comments, profileImages = {}) {
     const list = document.getElementById('commentList');
     list.innerHTML = '';
+
     if (comments.length === 0) {
       list.innerHTML = '<div style="text-align:center; color:var(--t3); padding:48px 20px; font-size:14px;">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>';
       return;
     }
+
     const roots = [];
     const repliesByParent = {};
+
     comments.forEach(c => {
       const parentId = c.parent_id || null;
       if (!parentId) roots.push(c);
@@ -1084,9 +1231,11 @@
         repliesByParent[parentId].push(c);
       }
     });
+
     Object.values(repliesByParent).forEach(arr => {
       arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     });
+
     function renderAvatar(userName, userId) {
       let avatar = userName ? userName[0].toUpperCase() : '?';
       if (profileImages[userId]) {
@@ -1097,6 +1246,7 @@
       }
       return avatar;
     }
+
     function renderOneComment(c, { showReplyButton }) {
       const isMine = currentUser?.id === c.user_id;
       const date = new Date(c.created_at).toLocaleString('ko-KR', {
@@ -1108,20 +1258,28 @@
       const replyCount = (repliesByParent[c.id] || []).length;
       const hasReplies = replyCount > 0;
       const isOpen = openReplyThreads.has(c.id);
-      const replyBtnHtml = showReplyButton ? `<button class="reply-btn" onclick="openReplyComposer('${c.id}')">답글 달기</button>` : '';
-      const toggleBtnHtml = hasReplies ? `<button class="replies-toggle-btn" id="toggleReplies-${c.id}" data-count="${replyCount}" onclick="toggleReplies('${c.id}')">${isOpen ? '답글 접기' : `답글 ${replyCount}개 보기`}</button>` : '';
+
+      const replyBtnHtml = showReplyButton
+        ? `<button class="reply-btn" onclick="openReplyComposer('${c.id}')">답글 달기</button>`
+        : '';
+
+      const toggleBtnHtml = hasReplies
+        ? `<button class="replies-toggle-btn" id="toggleReplies-${c.id}" data-count="${replyCount}" onclick="toggleReplies('${c.id}')">${isOpen ? '답글 접기' : `답글 ${replyCount}개 보기`}</button>`
+        : '';
+
       const replyComposeHtml = showReplyButton ? `
-        <div class="reply-compose" id="replyCompose-${c.id}" style="display:none; margin-top:12px; padding:12px; background:var(--bg3); border-radius:var(--r2);">
-          <textarea id="replyInput-${c.id}" class="comment-input" placeholder="답글을 입력하세요 (최대 500자)" maxlength="500" style="min-height:60px;"></textarea>
-          <div style="margin-top:8px; display:flex; gap:8px; justify-content:flex-end;">
-            <button class="delete-modal-btn cancel" onclick="cancelReply('${c.id}')">취소</button>
-            <button class="comment-submit-btn" onclick="submitReply('${c.id}')" style="padding:8px 20px;">답글</button>
+        <div class="reply-compose" id="replyCompose-${c.id}" style="display:none;">
+          <textarea id="replyInput-${c.id}" class="reply-input" placeholder="답글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
+          <div class="reply-compose-actions">
+            <button class="reply-cancel-btn" onclick="cancelReply('${c.id}')">취소</button>
+            <button class="reply-submit-btn" onclick="submitReply('${c.id}')">답글</button>
           </div>
         </div>
       ` : '';
+
       const replies = repliesByParent[c.id] || [];
       const repliesHtml = replies.length ? `
-        <div class="reply-list" id="replyList-${c.id}" style="display:${isOpen ? 'block' : 'none'}; margin-left:40px; margin-top:12px;">
+        <div class="reply-list" id="replyList-${c.id}" style="display: ${isOpen ? 'flex' : 'none'};">
           ${replies.map(r => {
             const rIsMine = currentUser?.id === r.user_id;
             const rDate = new Date(r.created_at).toLocaleString('ko-KR', {
@@ -1130,25 +1288,27 @@
             const rIsVerified = ["JB777", "진정오"].includes(r.user_name);
             const rAvatarContent = renderAvatar(r.user_name, r.user_id);
             const rLinkedText = parseMarkdown(r.text);
+
             return `
-              <div class="comment-item" style="padding:16px 0; border-bottom:1px solid var(--border);">
+              <div class="reply-item">
                 <div class="comment-header">
                   <div class="comment-author-wrapper" onclick="goToProfile('${r.user_id}', '${escapeHtml(r.user_name)}')">
-                    <div class="comment-avatar" style="width:32px;height:32px;font-size:15px;">${rAvatarContent}</div>
+                    <div class="comment-avatar">${rAvatarContent}</div>
                     <span class="comment-author">
                       ${escapeHtml(r.user_name)}
                       ${rIsVerified ? '<span class="verification-badge" style="width:12px;height:12px;"></span>' : ''}
                     </span>
                   </div>
-                  ${rIsMine ? `<button class="comment-del-btn" onclick="deleteComment('${r.id}')" style="font-size:12px;">삭제</button>` : ''}
+                  ${rIsMine ? `<button class="comment-del-btn" onclick="deleteComment('${r.id}')">삭제</button>` : ''}
                 </div>
-                <div class="comment-content" style="margin:8px 0;">${rLinkedText}</div>
-                <div class="comment-date" style="font-size:12px;color:var(--t3);">${rDate}</div>
+                <div class="comment-content">${rLinkedText}</div>
+                <div class="comment-date">${rDate}</div>
               </div>
             `;
           }).join('')}
         </div>
       ` : '';
+
       return `
         <div class="comment-header">
           <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
@@ -1163,7 +1323,7 @@
         <div class="comment-content">${linkedText}</div>
         <div class="comment-date">${date}</div>
         ${showReplyButton ? `
-          <div class="comment-actions" style="margin-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div class="comment-actions">
             ${replyBtnHtml}
             ${toggleBtnHtml}
           </div>
@@ -1172,6 +1332,7 @@
         ` : ''}
       `;
     }
+
     roots.forEach(c => {
       const item = document.createElement('div');
       item.className = 'comment-item';
@@ -1210,6 +1371,7 @@
     const text = input.value.trim();
     if (!currentUser) return showLoginAlert();
     if (!text || !currentPost) return;
+
     try {
       await api("/comments", {
         method: "POST",
@@ -1232,7 +1394,7 @@
     if (!currentUser) return showLoginAlert();
     const compose = document.getElementById(`replyCompose-${commentId}`);
     if (!compose) return;
-    compose.style.display = 'block';
+    compose.style.display = 'flex';
     const input = document.getElementById(`replyInput-${commentId}`);
     if (input) input.focus();
   };
@@ -1249,6 +1411,7 @@
     const text = input?.value?.trim() || '';
     if (!currentUser) return showLoginAlert();
     if (!text || !currentPost) return;
+
     try {
       await api("/comments", {
         method: "POST",
@@ -1264,6 +1427,7 @@
       const parentComment = await getCommentById(parentId);
       const targetUserId = parentComment?.user_id || currentPost.author_id;
       createNotification(targetUserId, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${postId}`);
+
       if (input) input.value = '';
       const compose = document.getElementById(`replyCompose-${parentId}`);
       if (compose) compose.style.display = 'none';
@@ -1276,9 +1440,11 @@
     const listEl = document.getElementById(`replyList-${commentId}`);
     const btn = document.getElementById(`toggleReplies-${commentId}`);
     if (!listEl || !btn) return;
+
     const opening = listEl.style.display === 'none' || !listEl.style.display;
+
     if (opening) {
-      listEl.style.display = 'block';
+      listEl.style.display = 'flex';
       btn.textContent = '답글 접기';
       openReplyThreads.add(commentId);
     } else {
@@ -1319,7 +1485,6 @@
     } catch (e) { alert('게시물 삭제 실패'); }
   };
 
-  // escapeHtml 함수
   function escapeHtml(unsafe) {
     return unsafe
       .replace(/&/g, "&amp;")
