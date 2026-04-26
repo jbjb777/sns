@@ -24,40 +24,29 @@
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <style>
-  
-  .splash-text {
-  text-align: center;
-  animation: fadeUp 0.6s ease forwards;
-  animation-delay: 0.2s;
-  opacity: 1;
-}
+    .splash-text {
+      text-align: center;
+      animation: fadeUp 0.6s ease forwards;
+      animation-delay: 0.2s;
+      opacity: 1;
+    }
+    .splash-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #fff;
+    }
+    .splash-sub {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+      letter-spacing: 0.08em;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-.splash-title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #fff;
-}
-
-.splash-sub {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-  letter-spacing: 0.08em;
-}
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-  
-  
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
@@ -91,10 +80,8 @@
       opacity: 0;
       animation: bodyReveal 0.4s ease forwards;
     }
-
     @keyframes bodyReveal { to { opacity: 1; } }
 
-    /* ─── SPLASH SCREEN ─── */
     #splash {
       position: fixed;
       inset: 0;
@@ -105,11 +92,7 @@
       z-index: 99999;
       transition: opacity 0.45s ease;
     }
-
-    #splash.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
+    #splash.fade-out { opacity: 0; pointer-events: none; }
 
     .splash-inner {
       display: flex;
@@ -117,31 +100,20 @@
       align-items: center;
       gap: 32px;
     }
-
     .splash-logo {
       width: 72px;
       height: 72px;
       animation: splashLogoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
-
     @keyframes splashLogoPop {
       from { opacity: 0; transform: scale(0.7); }
       to   { opacity: 1; transform: scale(1); }
     }
 
-    /* NProgress 커스텀 스타일 */
-    #nprogress .bar {
-      background: #fff !important;
-      height: 2px !important;
-    }
-    #nprogress .peg {
-      display: none !important;
-    }
-    #nprogress .spinner {
-      display: none !important;
-    }
+    #nprogress .bar { background: #fff !important; height: 2px !important; }
+    #nprogress .peg { display: none !important; }
+    #nprogress .spinner { display: none !important; }
 
-    /* ─── SIDEBAR ─── */
     .sidebar-container {
       width: 72px;
       min-width: 72px;
@@ -152,7 +124,6 @@
     }
     .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
-    /* ─── MAIN WRAPPER ─── */
     .main-wrapper {
       margin-left: 72px;
       width: calc(100% - 72px);
@@ -161,7 +132,6 @@
       min-height: 100vh;
     }
 
-    /* ─── MAIN CONTENT ─── */
     .main-content {
       flex: 1;
       display: flex;
@@ -173,13 +143,10 @@
       transform: translateY(16px);
       animation: contentReveal 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
     }
-
     @keyframes contentReveal { to { opacity: 1; transform: translateY(0); } }
 
-    /* ─── FEED ─── */
     .feed-container { max-width: 590px; width: 100%; }
 
-    /* ─── RECOMMEND ─── */
     .recommend-container {
       width: 240px;
       margin-left: 32px;
@@ -192,7 +159,6 @@
       opacity: 0;
       animation: sidebarReveal 0.5s cubic-bezier(0.22,1,0.36,1) 0.25s forwards;
     }
-
     @keyframes sidebarReveal {
       from { opacity: 0; transform: translateX(12px); }
       to { opacity: 1; transform: translateX(0); }
@@ -245,7 +211,6 @@
     }
     .profile-item:hover .profile-nickname { color: var(--t1); }
 
-    /* ─── SKELETON ─── */
     .skeleton {
       background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
       background-size: 300% 100%;
@@ -270,7 +235,6 @@
     .skeleton-profile-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; }
     .skeleton-profile-nickname { width: 90px; height: 10px; }
 
-    /* ─── POST CARD ─── */
     .post-card {
       background: transparent;
       border: none;
@@ -326,7 +290,6 @@
       color: var(--t1);
     }
 
-    /* 홈 피드 이미지 영역: 여러 장일 때 가로 스크롤 캐러셀 */
     .post-image-container {
       position: relative;
       margin: 14px 0;
@@ -357,7 +320,7 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background: rgba(0,0,0,0.65);
+      background: rgba(0,0,0,0.7);
       color: white;
       border: none;
       width: 42px;
@@ -369,10 +332,12 @@
       font-size: 22px;
       cursor: pointer;
       z-index: 10;
-      opacity: 0;
-      transition: opacity 0.2s;
+      opacity: 1; /* 항상 표시 */
+      transition: background 0.2s;
     }
-    .post-card:hover .post-image-nav { opacity: 1; }
+    .post-image-nav:hover {
+      background: rgba(0,0,0,0.9);
+    }
     .post-image-nav.prev { left: 12px; }
     .post-image-nav.next { right: 12px; }
 
@@ -383,22 +348,14 @@
       overflow: hidden;
       position: relative;
     }
-
     .post-content.fade::after {
       display: block;
       content: "";
       position: absolute;
-      left: 0;
-      right: 0;
+      left: 0; right: 0;
       top: calc(1.6em * 6);
       height: calc(1.6em * 4);
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0) 0%,
-        rgba(0,0,0,0.3) 40%,
-        rgba(0,0,0,0.7) 75%,
-        var(--bg) 100%
-      );
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.7) 75%, var(--bg) 100%);
       pointer-events: none;
     }
 
@@ -406,7 +363,6 @@
 
     .post-actions { margin: 8px 0 2px; display: flex; align-items: center; gap: 16px; padding: 0 2px; }
 
-    /* ─── LIKE BUTTON ─── */
     .like-button {
       background: none;
       border: none;
@@ -434,7 +390,6 @@
 
     .like-count { font-weight: 600; font-size: 13px; line-height: 1; min-width: 12px; }
 
-    /* ─── NO POSTS ─── */
     .no-posts {
       text-align: center;
       padding: 100px 20px;
@@ -456,7 +411,6 @@
       50% { transform: translateY(-8px); }
     }
 
-    /* ─── DELETE BTN ─── */
     .delete-btn {
       background: transparent;
       border: 1px solid #2a1a1a;
@@ -482,7 +436,7 @@
       background-size: contain;
       background-position: center;
     }
-    /* ─── FOOTER ─── */
+
     .footer {
       border-top: 1px solid var(--border);
       padding: 24px;
@@ -495,7 +449,6 @@
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
 
-    /* ─── MODALS ─── */
     .auth-modal, .create-modal {
       position: fixed;
       inset: 0;
@@ -601,7 +554,6 @@
     .error-message { color: var(--pink); }
     .success-message { color: var(--green); }
 
-    /* ─── CREATE MODAL ─── */
     .create-modal-header {
       padding: 18px 22px;
       border-bottom: 1px solid var(--border);
@@ -675,13 +627,11 @@
     .upload-btn:hover { border-color: var(--border3); color: var(--t1); background: var(--bg4); transform: scale(1.01); }
     .upload-btn:active { transform: scale(0.98); }
 
-    /* ─── SCROLLBAR ─── */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 2px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
 
-    /* ─── 모바일 프로필 시트(부모, iframe 밖) ─── */
     .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
       position: fixed;
@@ -800,38 +750,29 @@
       font-family: inherit;
     }
 
-    /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .recommend-container { display: none; }
       .sidebar-container {
-        left: 0;
-        right: 0;
-        top: auto;
-        bottom: 0;
-        width: 100%;
-        min-width: 0;
+        left: 0; right: 0; top: auto; bottom: 0;
+        width: 100%; min-width: 0;
         height: calc(64px + env(safe-area-inset-bottom, 0px));
       }
-      .sidebar-container iframe {
-        width: 100% !important;
-        height: 100% !important;
-      }
-      .main-wrapper {
-        margin-left: 0;
-        width: 100%;
-        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-      }
+      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
+      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .main-content { padding: 20px 16px; }
+      .post-image-nav {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- ─── SPLASH SCREEN ─── -->
 <div id="splash">
   <div class="splash-inner">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
-  
     <div class="splash-text">
       <div class="splash-title">Sharer</div>
       <div class="splash-sub">By JBJB</div>
@@ -843,9 +784,9 @@
   <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
 </div>
 <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
+
 <div class="main-wrapper">
 
-  <!-- Login Modal -->
   <div class="auth-modal" id="loginModal">
     <div class="auth-box">
       <button class="auth-close" onclick="closeLoginModal()">✕</button>
@@ -859,7 +800,6 @@
     </div>
   </div>
 
-  <!-- Signup Modal -->
   <div class="auth-modal" id="signupModal">
     <div class="auth-box">
       <button class="auth-close" onclick="closeSignupModal()">✕</button>
@@ -876,7 +816,6 @@
     </div>
   </div>
 
-  <!-- Create Post Modal -->
   <div class="create-modal" id="createModal">
     <div class="create-modal-content">
       <div class="create-modal-header">
@@ -898,10 +837,10 @@
     </div>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
     <div class="feed-container">
       <div id="postsFeed">
+        <!-- 스켈레톤 -->
         <div class="skeleton-post">
           <div class="skeleton-post-header">
             <div class="skeleton skeleton-avatar"></div>
@@ -920,15 +859,6 @@
           <div class="skeleton skeleton-post-image"></div>
           <div class="skeleton skeleton-text text-long"></div>
           <div class="skeleton skeleton-text text-long"></div>
-        </div>
-        <div class="skeleton-post">
-          <div class="skeleton-post-header">
-            <div class="skeleton skeleton-avatar"></div>
-            <div class="skeleton skeleton-username"></div>
-          </div>
-          <div class="skeleton skeleton-text text-medium"></div>
-          <div class="skeleton skeleton-text text-long"></div>
-          <div class="skeleton skeleton-text text-short"></div>
         </div>
       </div>
     </div>
@@ -956,7 +886,7 @@
 </div>
 
 <script src="markdown.js"></script>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ─── NPROGRESS 설정 ───
 NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
 
@@ -1040,17 +970,13 @@ function initCurrentUser() {
 
 function applyFadeEffect() {
   const elements = document.querySelectorAll('.post-content');
-
   elements.forEach(el => {
     const style = getComputedStyle(el);
     const lineHeight = parseFloat(style.lineHeight);
-
     const visualLines = el.scrollHeight / lineHeight;
     const html = el.innerHTML || "";
     const brLines = html.split('<br').length;
-
     const totalLines = Math.max(visualLines, brLines);
-
     if (totalLines >= 7) {
       el.classList.add('fade');
     } else {
@@ -1197,17 +1123,13 @@ async function toggleLike(postId, button) {
     } else {
       await api("/likes", {
         method: "POST",
-        body: JSON.stringify({
-          post_id: postId,
-          user_id: currentUser.id
-        })
+        body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
       });
       button.classList.add('liked');
       countEl.textContent = currentServerCount + 1;
       createNotification(postAuthorIdMap[postId], `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
     }
-    const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`)
-      .then(r => Math.max(0, r?.[0]?.count || 0));
+    const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`).then(r => Math.max(0, r?.[0]?.count || 0));
     countEl.textContent = finalCount;
   } catch (err) {
     console.error("좋아요 처리 중 오류:", err);
@@ -1224,7 +1146,6 @@ async function toggleLike(postId, button) {
   }
 }
 
-// 여러 이미지 캐러셀 렌더링 (홈 피드용)
 function renderPostImages(imageUrl) {
   if (!imageUrl) return '';
   const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
@@ -1264,9 +1185,6 @@ window.nextFeedSlide = function(btn) {
   carousel.scrollBy({ left: carousel.clientWidth, behavior: 'smooth' });
 };
 
-// ──────────────────────────────────────────────────────────────
-// 최적화된 loadPosts
-// ──────────────────────────────────────────────────────────────
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
   try {
@@ -1292,9 +1210,7 @@ async function loadPosts() {
 
     const [allLikes, myLikes] = await Promise.all([
       api(`/likes?post_id=in.(${postIdFilter})&select=post_id`).catch(() => []),
-      currentUser
-        ? api(`/likes?post_id=in.(${postIdFilter})&user_id=eq.${currentUser.id}&select=post_id`).catch(() => [])
-        : Promise.resolve([])
+      currentUser ? api(`/likes?post_id=in.(${postIdFilter})&user_id=eq.${currentUser.id}&select=post_id`).catch(() => []) : Promise.resolve([])
     ]);
 
     const likeCountMap = {};
@@ -1326,9 +1242,7 @@ async function loadPosts() {
 
       let contentHTML = '';
       if (post.content) {
-        contentHTML = `<div class="post-content">
-          ${parseMarkdown(post.content)}
-        </div>`;
+        contentHTML = `<div class="post-content">${parseMarkdown(post.content)}</div>`;
       }
 
       const postCard = document.createElement('div');
@@ -1420,7 +1334,6 @@ window.deletePost = async (postId) => {
   }
 };
 
-// escapeHtml 함수
 function escapeHtml(unsafe) {
   return unsafe
     .replace(/&/g, "&amp;")

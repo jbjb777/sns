@@ -164,7 +164,6 @@
       border-radius: 50%;
     }
 
-    /* 편집 오버레이 */
     .avatar-overlay {
       display: none;
       position: absolute;
@@ -211,7 +210,6 @@
 
     .stat-label { font-size: 12px; color: var(--t3); font-weight: 500; }
 
-    /* ─── SHARE BTN ─── */
     .share-btn {
       background: var(--bg3);
       border: 1px solid var(--border2);
@@ -230,7 +228,6 @@
     .share-btn:active { transform: scale(0.88); }
     .share-btn.success { background: rgba(74,222,128,0.12); border-color: var(--green); color: var(--green); }
 
-    /* ─── STATUS MESSAGE ─── */
     .status-message-container {
       margin-top: 20px;
       padding-top: 20px;
@@ -301,7 +298,7 @@
     .post-item:hover { border-color: var(--border3); transform: translateY(-4px); background: var(--bg3); }
     .post-item:active { transform: translateY(-1px) scale(0.99); }
 
-    /* 여러 이미지 캐러셀 스타일 (프로필 게시물 미리보기) */
+    /* 여러 이미지 캐러셀 */
     .post-item-image-container {
       position: relative;
       width: 100%;
@@ -346,11 +343,11 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
       color: white;
       border: none;
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -358,10 +355,12 @@
       font-size: 18px;
       cursor: pointer;
       z-index: 10;
-      opacity: 0;
-      transition: opacity 0.2s;
+      opacity: 1; /* 항상 표시 */
+      transition: background 0.2s;
     }
-    .post-item:hover .post-item-image-nav { opacity: 1; }
+    .post-item-image-nav:hover {
+      background: rgba(0,0,0,0.9);
+    }
     .post-item-image-nav.prev { left: 8px; }
     .post-item-image-nav.next { right: 8px; }
 
@@ -480,7 +479,6 @@
     .modal-btn-confirm { background: #fff; color: #000; }
     .modal-btn-confirm:hover { background: #e8e8e8; }
 
-    /* 업로드 진행 표시 */
     .upload-toast {
       position: fixed;
       bottom: -60px;
@@ -512,7 +510,7 @@
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
 
-    /* ─── 모바일 프로필 시트(부모) ─── */
+    /* 모바일 프로필 시트 */
     .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
       position: fixed;
@@ -634,21 +632,15 @@
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .sidebar-container {
-        left: 0;
-        right: 0;
-        top: auto;
-        bottom: 0;
-        width: 100%;
-        min-width: 0;
+        left: 0; right: 0; top: auto; bottom: 0;
+        width: 100%; min-width: 0;
         height: calc(64px + env(safe-area-inset-bottom, 0px));
       }
       .sidebar-container iframe {
-        width: 100% !important;
-        height: 100% !important;
+        width: 100% !important; height: 100% !important;
       }
       .main-wrapper {
-        margin-left: 0;
-        width: 100%;
+        margin-left: 0; width: 100%;
         padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
       }
       .container { padding: 20px 16px; }
@@ -657,6 +649,9 @@
       .profile-header { flex-direction: column; text-align: center; gap: 18px; }
       .profile-stats { justify-content: center; }
       .profile-name { font-size: 20px; justify-content: center; }
+      .post-item-image-nav {
+        width: 30px; height: 30px; font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -741,7 +736,7 @@
     </div>
   </div>
 
-  <!-- 프로필 사진 설정 모달 (신규 가입자용) -->
+  <!-- 프로필 사진 설정 모달 -->
   <div class="modal-overlay" id="profilePicModal">
     <div class="modal-content" style="text-align: center;">
       <div class="modal-title" style="font-size:18px;">가입을 환영합니다! 🎉</div>
@@ -793,14 +788,12 @@
         const remaining = Math.max(0, MIN_SPLASH - elapsed);
         setTimeout(finishSplash, remaining);
       });
-      // 안전망: 최대 5초 후 강제 종료
       setTimeout(finishSplash, 5000);
     }
   })();
 
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
-  // Cloudinary 설정 (index.html과 동일)
   const CLOUDINARY_CLOUD = 'dretlhsrk';
   const CLOUDINARY_PRESET = 'unsigned_preset';
 
@@ -824,7 +817,6 @@
     try { return JSON.parse(text); } catch (e) { console.error("JSON 파싱 오류:", e); return null; }
   }
 
-  // Cloudinary로 직접 이미지 업로드 (CORS·413 오류 해결)
   async function uploadImageToCloudinary(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -849,7 +841,6 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const userNickname = urlParams.get('nickname');
-  const userId = urlParams.get('id');
   let currentUser = null;
   let viewingUser = null;
 
@@ -890,27 +881,20 @@
   updateSidebarMode();
   window.addEventListener('resize', updateSidebarMode);
 
-  // ─── 프로필 사진 변경: Cloudinary 직접 업로드 ───
   document.getElementById('profileFileInput').addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (!file || !currentUser?.id) return;
 
     showToast('⏳ 업로드 중...');
     try {
-      // 1) Cloudinary에 직접 업로드 (CORS 없음, 크기 제한 없음)
       const imageUrl = await uploadImageToCloudinary(file);
-
-      // 2) API로 프로필 이미지 URL 업데이트 (id 필터 필수!)
       await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
         method: "PATCH",
         body: JSON.stringify({ profile_image: imageUrl }),
         headers: { "Prefer": "return=minimal" }
       });
-
-      // 3) localStorage의 currentUser도 업데이트
       currentUser.profile_image = imageUrl;
       localStorage.setItem('snsUser', JSON.stringify(currentUser));
-
       viewingUser.profile_image = imageUrl;
       await displayProfile(viewingUser);
       hideToast();
@@ -963,7 +947,6 @@
     const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
     const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
-    // 게시물 수 + 총 좋아요 수를 병렬로 로드
     const userPosts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id`);
     const postCount = userPosts?.length ?? 0;
 
@@ -1061,7 +1044,6 @@
         return;
       }
 
-      // 좋아요 수를 배치로 로드
       const postIds = posts.map(p => p.id).join(',');
       let allLikes = [];
       try {
@@ -1085,23 +1067,22 @@
     if (urls.length === 0) return `<div class="post-item-image-container"><div class="skeleton skeleton-post-image"></div></div>`;
 
     let html = `<div class="post-item-image-container">`;
-    html += `<div class="post-item-image-carousel" id="carousel-preview-${Math.random().toString(36).slice(2)}">`;
+    html += `<div class="post-item-image-carousel">`;
 
-    urls.forEach((url, i) => {
-      html += `
-        <div class="post-item-image-slide">
-          <img src="${escapeHtml(url)}" alt="게시글 이미지" loading="lazy">
-        </div>`;
+    urls.forEach((url) => {
+      html += `<div class="post-item-image-slide"><img src="${escapeHtml(url)}" alt="게시글 이미지" loading="lazy"></div>`;
     });
 
     html += `</div>`;
 
     if (urls.length > 1) {
-      html += `
-        <div class="post-item-image-count">+${urls.length - 1}</div>
-        <button class="post-item-image-nav prev" onclick="event.stopPropagation(); prevPreviewSlide(this)">‹</button>
-        <button class="post-item-image-nav next" onclick="event.stopPropagation(); nextPreviewSlide(this)">›</button>`;
+      html += `<div class="post-item-image-count">+${urls.length - 1}</div>`;
     }
+
+    html += `
+      <button class="post-item-image-nav prev" onclick="event.stopPropagation(); prevPreviewSlide(this)">‹</button>
+      <button class="post-item-image-nav next" onclick="event.stopPropagation(); nextPreviewSlide(this)">›</button>
+    `;
 
     html += `</div>`;
     return html;
@@ -1189,7 +1170,6 @@
     document.getElementById('profileFileInput').click();
   };
 
-  // ─── 상태메시지 저장: id 필터 추가로 오류 수정 ───
   window.saveStatusMessage = async function() {
     const input = document.getElementById('statusInput');
     const newMessage = input.value.trim();
@@ -1228,7 +1208,6 @@
     });
   };
 
-  // escapeHtml 함수
   function escapeHtml(unsafe) {
     return unsafe
       .replace(/&/g, "&amp;")
