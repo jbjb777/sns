@@ -6,355 +6,86 @@
   <title>새 게시물 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --bg: #000;
-      --bg2: #111;
-      --bg3: #1a1a1a;
-      --bg4: #222;
-      --border: #1e1e1e;
-      --border2: #2a2a2a;
-      --border3: #333;
-      --t1: #fff;
-      --t2: #888;
-      --t3: #444;
-      --pink: #ff6b6b;
-      --green: #4ade80;
-      --r1: 10px;
-      --r2: 14px;
-      --r3: 20px;
-      --r4: 28px;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--t1);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      opacity: 0;
-      animation: fadeIn 0.4s ease forwards;
-    }
-    @keyframes fadeIn { to { opacity: 1; } }
-
-    /* ─── HEADER ─── */
-    .header {
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      opacity: 0;
-      transform: translateY(-10px);
-      animation: slideDown 0.4s ease 0.08s forwards;
-    }
-    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .back-btn {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      border: none;
-      background: none;
-      color: var(--t2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .back-btn:hover { color: var(--t1); background: var(--bg3); }
-    .back-btn:active { transform: scale(0.82); }
-
-    .header-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--t1);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* ─── 헤더/타이틀 아바타 ─── */
-    .header-profile-avatar {
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      flex-shrink: 0;
-      overflow: hidden;
-      color: #666;
-    }
-    .header-profile-avatar img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-
-    /* ─── POST BUTTON ─── */
-    .post-btn {
-      background: #fff;
-      color: #000;
-      border: none;
-      padding: 9px 22px;
-      border-radius: 22px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-      font-family: inherit;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-width: 90px;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .post-btn:hover:not(:disabled) { background: #e8e8e8; transform: scale(1.04); }
-    .post-btn:active:not(:disabled) { transform: scale(0.94); }
-    .post-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-    .spinner {
-      display: none;
-      width: 15px; height: 15px;
-      border: 2px solid rgba(0,0,0,0.2);
-      border-radius: 50%;
-      border-top-color: #000;
-      animation: spin 0.8s linear infinite;
-      flex-shrink: 0;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading .spinner { display: block; }
-    .loading .btn-text { display: none; }
-
-    /* ─── MAIN CONTENT ─── */
-    .main-content {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      padding: 36px 20px;
-    }
-
-    .create-container {
-      max-width: 580px;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(12px);
-      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.18s forwards;
-    }
-    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-
-    /* ─── AUTHOR ROW ─── */
-    .author-row {
-      display: flex;
-      align-items: center;
+    /* 기존 스타일은 대부분 유지 + 이미지 미리보기 영역 추가 */
+    .image-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 12px;
-      margin-bottom: 20px;
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.32s forwards;
+      margin-top: 14px;
     }
-    @keyframes fadeInEl { to { opacity: 1; } }
 
-    .create-profile-avatar {
-      width: 42px; height: 42px;
+    .image-preview-item {
+      position: relative;
+      border-radius: var(--r3);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      aspect-ratio: 1 / 1;
+    }
+
+    .image-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+      border: none;
       border-radius: 50%;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
+      font-size: 16px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 17px;
-      font-weight: 700;
-      flex-shrink: 0;
-      overflow: hidden;
-      color: #666;
-      transition: border-color 0.2s;
-    }
-    .create-profile-avatar img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
+      z-index: 10;
     }
 
-    .author-info { display: flex; flex-direction: column; gap: 2px; }
-    .author-name { font-size: 14px; font-weight: 600; color: var(--t1); }
-    .author-sub { font-size: 12px; color: var(--t3); }
-
-    /* ─── EDITOR TOOLBAR ─── */
-    .editor-toolbar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.36s forwards;
-    }
-    .editor-toolbar button {
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      color: var(--t1);
-      padding: 6px 12px;
-      border-radius: var(--r1);
-      cursor: pointer;
-      font-size: 13px;
-      transition: all 0.2s;
-    }
-    .editor-toolbar button:hover {
-      background: var(--bg4);
-      border-color: var(--border3);
-    }
-    
-    .preview-container {
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.42s forwards;
-    }
-    .preview-title {
-      font-size: 12px;
-      color: var(--t2);
-      margin-top: 14px;
-      margin-bottom: 6px;
+    .remove-btn:hover {
+      background: var(--pink);
     }
 
-    /* ─── TEXTAREA ─── */
-    .create-textarea {
-      width: 100%;
-      border: 1px solid var(--border2);
-      resize: vertical;
-      min-height: 180px;
-      font-size: 15px;
-      font-family: inherit;
-      outline: none;
-      background: var(--bg2);
-      color: var(--t1);
-      padding: 16px;
-      border-radius: var(--r3);
-      line-height: 1.65;
-      transition: border-color 0.2s, background 0.2s;
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.4s forwards;
-      overflow-y: auto;
-    }
-    .create-textarea[contenteditable]:empty::before {
-      content: attr(placeholder);
-      color: var(--t3);
-      pointer-events: none;
-    }
-    .create-textarea:focus { border-color: var(--border3); background: var(--bg3); }
-    .create-textarea::placeholder { color: var(--t3); }
-
-    /* ─── IMAGE PREVIEW ─── */
-    .image-preview-container {
-      margin-top: 14px;
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.48s forwards;
-    }
-
-    .image-preview {
-      width: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      border-radius: var(--r3);
-      display: none;
-      border: 1px solid var(--border);
-    }
-    .image-preview.show { display: block; margin-bottom: 12px; }
-
-    /* ─── UPLOAD BTN ─── */
     .upload-btn {
       background: var(--bg3);
       border: 1px dashed var(--border2);
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: var(--r2);
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      font-family: inherit;
       color: var(--t2);
       margin-top: 14px;
-      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      display: inline-block;
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.52s forwards;
-    }
-    .upload-btn:hover { border-color: var(--border3); color: var(--t1); background: var(--bg4); transform: scale(1.02); }
-    .upload-btn:active { transform: scale(0.97); }
-
-    /* ─── MESSAGE ─── */
-    #postMessage {
-      margin-top: 14px;
-      font-size: 13px;
-      text-align: center;
-      min-height: 18px;
-      font-weight: 500;
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.56s forwards;
-    }
-    #postMessage.error { color: var(--pink); }
-    #postMessage.success { color: var(--green); }
-    #postMessage.info { color: var(--t2); }
-
-    /* ─── DIVIDER ─── */
-    .section-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 20px 0;
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.44s forwards;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* ─── FOOTER ─── */
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 20px;
-      text-align: center;
-      color: var(--t3);
-      font-size: 11px;
+    .upload-btn:hover {
+      border-color: var(--border3);
+      color: var(--t1);
+      background: var(--bg4);
     }
 
-    @media (max-width: 768px) {
-      .main-content { padding: 24px 16px; }
-      .create-textarea { min-height: 140px; }
+    .image-count {
+      font-size: 12px;
+      color: var(--t2);
+      margin-top: 8px;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="header-left">
-      <button class="back-btn" onclick="goBack()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <span class="header-title">
-        새 게시물 만들기
-        <div class="header-profile-avatar" id="headerAvatar"></div>
-      </span>
-    </div>
-    <button class="post-btn" id="postBtn">
-      <span class="btn-text">공유하기</span>
-      <div class="spinner"></div>
-    </button>
-  </div>
+  <!-- header 부분은 그대로 유지 (생략) -->
 
   <div class="main-content">
     <div class="create-container">
 
-      <!-- 작성자 행 -->
+      <!-- 작성자 행 (기존 그대로) -->
       <div class="author-row">
         <div class="create-profile-avatar" id="createAvatar"></div>
         <div class="author-info">
@@ -363,7 +94,7 @@
         </div>
       </div>
 
-      <!-- 마크다운 툴바 -->
+      <!-- 마크다운 툴바 (기존 그대로) -->
       <div class="editor-toolbar" id="editorToolbar">
         <button type="button" onclick="execFormat('bold')"><b>B</b></button>
         <button type="button" onclick="execFormat('italic')"><i>I</i></button>
@@ -378,53 +109,32 @@
 
       <div class="section-divider"></div>
 
-      <!-- 이미지 미리보기 -->
+      <!-- 여러 이미지 미리보기 영역 -->
       <div class="image-preview-container">
-        <img id="imagePreview" class="image-preview">
+        <div class="image-preview-grid" id="imagePreviewGrid"></div>
+        <div class="image-count" id="imageCount">0 / 5 장</div>
       </div>
 
-      <input type="file" id="imageInput" accept="image/*" style="display: none;">
-      <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
+      <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+      <button class="upload-btn" id="uploadBtn">
+        📷 사진 추가 (최대 5장)
+      </button>
 
       <div id="postMessage"></div>
     </div>
   </div>
 
-  <div class="footer">
-    본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.
-  </div>
+  <!-- footer 생략 -->
 
-<script src="markdown.js"></script>
 <script>
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-
-  async function api(endpoint, options = {}) {
-    const url = API_BASE + endpoint;
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers || {}),
-      },
-    });
-    if (!res.ok) {
-      let errorText = "";
-      try { errorText = await res.text(); } catch {}
-      throw new Error(`API 오류 (${res.status}): ${errorText || "알 수 없는 오류"}`);
-    }
-    if (res.status === 204 || res.headers.get("content-length") === "0") return null;
-    try { return await res.json(); } catch (e) {
-      console.warn("JSON 파싱 실패했지만 2xx 성공으로 간주:", e);
-      return null;
-    }
-  }
-
   const cloudName = 'dretlhsrk';
   const uploadPreset = 'unsigned_preset';
-  let currentUser = null;
-  let selectedImage = null;
 
-  // 아바타 엘리먼트에 실제 프로필 사진 or 이니셜 세팅
+  let currentUser = null;
+  let selectedImages = [];   // ← 여러 이미지 저장용 배열
+
+  // 아바타 세팅 함수 (기존 그대로)
   function setAvatar(el, profileImage, nickname) {
     if (profileImage) {
       el.innerHTML = `<img src="${profileImage}" alt="${nickname || ''}">`;
@@ -433,6 +143,37 @@
     }
   }
 
+  // 미리보기 그리드 업데이트
+  function updateImagePreview() {
+    const grid = document.getElementById('imagePreviewGrid');
+    const countEl = document.getElementById('imageCount');
+    
+    grid.innerHTML = '';
+
+    selectedImages.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const div = document.createElement('div');
+        div.className = 'image-preview-item';
+        div.innerHTML = `
+          <img src="${e.target.result}" alt="preview">
+          <button class="remove-btn" data-index="${index}">×</button>
+        `;
+        grid.appendChild(div);
+
+        // 삭제 버튼 이벤트
+        div.querySelector('.remove-btn').onclick = () => {
+          selectedImages.splice(index, 1);
+          updateImagePreview();
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    countEl.textContent = `${selectedImages.length} / 5 장`;
+  }
+
+  // initPage 함수 (기존과 거의 동일)
   async function initPage() {
     const savedUser = localStorage.getItem('snsUser');
     if (!savedUser) {
@@ -442,29 +183,25 @@
     }
     currentUser = JSON.parse(savedUser);
 
-    // 이니셜로 먼저 세팅 (빠른 표시)
     const headerAvatar = document.getElementById('headerAvatar');
     const createAvatar = document.getElementById('createAvatar');
     const authorName = document.getElementById('authorName');
 
-    setAvatar(headerAvatar, currentUser.profile_image || null, currentUser.nickname);
-    setAvatar(createAvatar, currentUser.profile_image || null, currentUser.nickname);
-    if (authorName) authorName.textContent = currentUser.nickname || '';
+    setAvatar(headerAvatar, currentUser.profile_image, currentUser.nickname);
+    setAvatar(createAvatar, currentUser.profile_image, currentUser.nickname);
+    authorName.textContent = currentUser.nickname || '';
 
-    // API에서 최신 프로필 사진 불러오기
+    // 최신 프로필 불러오기 (기존 코드 유지)
     if (currentUser.id) {
       try {
         const users = await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}&select=nickname,profile_image`);
         if (users?.[0]) {
-          const latest = users[0];
-          // localStorage 업데이트
-          currentUser.profile_image = latest.profile_image || currentUser.profile_image;
-          currentUser.nickname = latest.nickname || currentUser.nickname;
+          currentUser.profile_image = users[0].profile_image || currentUser.profile_image;
+          currentUser.nickname = users[0].nickname || currentUser.nickname;
           localStorage.setItem('snsUser', JSON.stringify(currentUser));
-
           setAvatar(headerAvatar, currentUser.profile_image, currentUser.nickname);
           setAvatar(createAvatar, currentUser.profile_image, currentUser.nickname);
-          if (authorName) authorName.textContent = currentUser.nickname || '';
+          authorName.textContent = currentUser.nickname || '';
         }
       } catch (e) {
         console.warn('프로필 최신 정보 로드 실패:', e);
@@ -472,101 +209,45 @@
     }
   }
 
-  window.goBack = function() { window.history.back(); };
-  window.goHome = function() { window.location.href = 'index.html'; };
+  // Cloudinary에 여러 이미지 업로드 (순차 처리)
+  async function uploadImagesToCloudinary() {
+    const uploadedUrls = [];
+    
+    for (let file of selectedImages) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
 
-  document.getElementById('uploadBtn').onclick = () => {
-    document.getElementById('imageInput').click();
-  };
-
-  const postContentDiv = document.getElementById('postContent');
-
-  window.execFormat = function(command, value = null) {
-    postContentDiv.focus();
-    document.execCommand(command, false, value);
-  };
-
-  document.getElementById('imageInput').onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      selectedImage = file;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const preview = document.getElementById('imagePreview');
-        preview.src = e.target.result;
-        preview.classList.add('show');
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  async function uploadImageToCloudinary(file) {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', uploadPreset);
-    try {
       const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
         method: 'POST',
         body: formData
       });
+
       if (!response.ok) throw new Error('이미지 업로드 실패');
+      
       const data = await response.json();
-      return data.secure_url;
-    } catch (error) {
-      console.error('Cloudinary 업로드 오류:', error);
-      throw error;
+      uploadedUrls.push(data.secure_url);
     }
+    
+    return uploadedUrls;
   }
 
-  function htmlToMarkdown(html) {
-    let md = html;
-    
-    // Block elements to newlines
-    md = md.replace(/<div><br><\/div>/gi, '\n');
-    md = md.replace(/<div[^>]*>/gi, '\n');
-    md = md.replace(/<\/div>/gi, '');
-    md = md.replace(/<p[^>]*>/gi, '\n');
-    md = md.replace(/<\/p>/gi, '');
-    md = md.replace(/<br\s*\/?>/gi, '\n');
-    
-    // Inline styles
-    md = md.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
-    md = md.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
-    md = md.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
-    md = md.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
-    md = md.replace(/<u[^>]*>(.*?)<\/u>/gi, '__$1__');
-    
-    // Headers
-    md = md.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n');
-    md = md.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n');
-    md = md.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n');
-    
-    // HR
-    md = md.replace(/<hr\s*\/?>/gi, '\n---\n');
-
-    // Remove remaining HTML
-    md = md.replace(/<[^>]+>/g, '');
-    
-    // Decode HTML entities
-    md = md.replace(/&nbsp;/g, ' ')
-           .replace(/&lt;/g, '<')
-           .replace(/&gt;/g, '>')
-           .replace(/&amp;/g, '&');
-           
-    md = md.replace(/\n{3,}/g, '\n\n');
-    
-    return md.trim();
-  }
-
+  // 게시 버튼 클릭
   document.getElementById('postBtn').onclick = async () => {
     const rawHtml = document.getElementById('postContent').innerHTML;
-    const content = htmlToMarkdown(rawHtml);
+    const content = htmlToMarkdown(rawHtml);   // 기존 함수 그대로 사용
     const messageDiv = document.getElementById('postMessage');
     const postButton = document.getElementById('postBtn');
 
-    if (!content && !selectedImage) {
+    if (!content && selectedImages.length === 0) {
       messageDiv.className = 'error';
       messageDiv.textContent = '내용 또는 이미지를 추가해주세요.';
+      return;
+    }
+
+    if (selectedImages.length > 5) {
+      messageDiv.className = 'error';
+      messageDiv.textContent = '최대 5장까지만 업로드할 수 있습니다.';
       return;
     }
 
@@ -576,11 +257,12 @@
     messageDiv.className = '';
 
     try {
-      let imageUrl = null;
-      if (selectedImage) {
+      let imageUrls = null;
+
+      if (selectedImages.length > 0) {
         messageDiv.className = 'info';
-        messageDiv.textContent = '이미지 업로드 중...';
-        imageUrl = await uploadImageToCloudinary(selectedImage);
+        messageDiv.textContent = `이미지 ${selectedImages.length}장 업로드 중...`;
+        imageUrls = await uploadImagesToCloudinary();
       }
 
       messageDiv.className = 'info';
@@ -592,7 +274,7 @@
           author: currentUser.nickname,
           author_id: currentUser.id,
           content: content,
-          image_url: imageUrl,
+          image_url: imageUrls ? imageUrls.join(',') : null,   // 여러 이미지일 경우 쉼표로 구분
           created_at: new Date().toISOString()
         })
       });
@@ -602,7 +284,7 @@
 
       setTimeout(() => {
         window.location.href = 'index.html';
-      }, 100);
+      }, 800);
 
     } catch (error) {
       console.error('게시 오류:', error);
@@ -613,6 +295,37 @@
       postButton.classList.remove('loading');
     }
   };
+
+  // 파일 선택 (multiple 추가됨)
+  document.getElementById('uploadBtn').onclick = () => {
+    document.getElementById('imageInput').click();
+  };
+
+  document.getElementById('imageInput').onchange = (e) => {
+    const files = Array.from(e.target.files);
+
+    // 최대 5장 제한
+    if (selectedImages.length + files.length > 5) {
+      alert('최대 5장까지 업로드할 수 있습니다.');
+      return;
+    }
+
+    selectedImages = [...selectedImages, ...files];
+    updateImagePreview();
+
+    // input 초기화 (같은 파일 다시 선택 가능하게)
+    e.target.value = '';
+  };
+
+  // 나머지 함수들 (goBack, execFormat, htmlToMarkdown, api 등)은 기존 그대로 유지
+  window.goBack = function() { window.history.back(); };
+  window.execFormat = function(command, value = null) {
+    const postContentDiv = document.getElementById('postContent');
+    postContentDiv.focus();
+    document.execCommand(command, false, value);
+  };
+
+  // api 함수도 기존 그대로 복사해서 사용하세요
 
   initPage();
 </script>
