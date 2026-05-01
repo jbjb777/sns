@@ -1062,9 +1062,9 @@
   }
 
   function renderPostImages(imageUrl) {
-    if (!imageUrl) return `<div class="post-item-image-container"><div class="skeleton skeleton-post-image"></div></div>`;
+    if (!imageUrl) return '';
     const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
-    if (urls.length === 0) return `<div class="post-item-image-container"><div class="skeleton skeleton-post-image"></div></div>`;
+    if (urls.length === 0) return '';
 
     let html = `<div class="post-item-image-container">`;
     html += `<div class="post-item-image-carousel">`;
@@ -1078,11 +1078,6 @@
     if (urls.length > 1) {
       html += `<div class="post-item-image-count">+${urls.length - 1}</div>`;
     }
-
-    html += `
-      <button class="post-item-image-nav prev" onclick="event.stopPropagation(); prevPreviewSlide(this)">‹</button>
-      <button class="post-item-image-nav next" onclick="event.stopPropagation(); nextPreviewSlide(this)">›</button>
-    `;
 
     html += `</div>`;
     return html;
