@@ -679,6 +679,125 @@
     .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
+
+    /* ─── Profile Sheet (Mobile) ─── */
+    .sharer-profile-sheet-host[hidden] { display: none !important; }
+    .sharer-profile-sheet-host {
+      position: fixed;
+      inset: 0;
+      z-index: 960;
+    }
+    .sharer-profile-sheet-host .sps-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sharer-profile-sheet-host .sps-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+      max-height: 44vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      will-change: transform;
+      transform: translateY(100%);
+      transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-panel {
+      transform: translateY(0);
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
+      max-height: 88vh;
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
+      transition: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area {
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 6px 16px 14px;
+      margin: -2px -16px 0 -16px;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area:active {
+      cursor: grabbing;
+    }
+    .sharer-profile-sheet-host .sps-grab {
+      width: 40px;
+      height: 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.28);
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .sharer-profile-sheet-host .sps-av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-av img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sharer-profile-sheet-host .sps-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sharer-profile-sheet-host .sps-logout {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
   </style>
 </head>
 <body>
