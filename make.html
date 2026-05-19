@@ -166,7 +166,7 @@
       border: 1px solid var(--border2);
       border-radius: var(--r2);
       padding: 6px;
-      min-width: 140px;
+      min-width: 150px;
       display: none;
       flex-direction: column;
       gap: 4px;
@@ -211,7 +211,7 @@
       margin: 4px 6px;
     }
 
-    /* 자세히 알아보기 전용 이미지 크기 제한 */
+    /* 드롭다운 아이콘 크기 제한 */
     .custom-option img {
       width: 14px;
       height: 14px;
@@ -603,9 +603,15 @@
       <div class="custom-select-container" id="customSelectContainer">
         <div class="custom-select-trigger" id="customSelectTrigger">공개</div>
         <div class="custom-options">
-          <div class="custom-option selected" data-value="public">공개</div>
-          <div class="custom-option" data-value="link">일부 공개</div>
-          <div class="custom-option" data-value="private">비공개</div>
+          <div class="custom-option selected" data-value="public">
+            <img src="earth.svg" alt="public">공개
+          </div>
+          <div class="custom-option" data-value="link">
+            <img src="link.svg" alt="link">일부 공개
+          </div>
+          <div class="custom-option" data-value="private">
+            <img src="service.svg" alt="private">비공개
+          </div>
           <div class="divider"></div>
           <div class="custom-option" id="infoOpenOption" style="color: var(--t2);">
             <img src="i.svg" alt="info">자세히 알아보기
@@ -751,7 +757,10 @@
     option.onclick = (e) => {
       e.stopPropagation();
       currentAccessValue = option.getAttribute('data-value');
-      selectTrigger.textContent = option.textContent;
+      
+      // 선택 시 상단 버튼 텍스트 변경 (아이콘 제외 순수 텍스트만 추출하거나 복사)
+      const pureText = option.textContent.trim();
+      selectTrigger.textContent = pureText;
       
       optionsList.forEach(opt => opt.classList.remove('selected'));
       option.classList.add('selected');
