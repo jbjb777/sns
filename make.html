@@ -758,7 +758,7 @@
       e.stopPropagation();
       currentAccessValue = option.getAttribute('data-value');
       
-      // 선택 시 상단 버튼 텍스트 변경 (아이콘 제외 순수 텍스트만 추출하거나 복사)
+      // 선택 시 상단 버튼 텍스트 변경
       const pureText = option.textContent.trim();
       selectTrigger.textContent = pureText;
       
@@ -967,23 +967,33 @@
       messageDiv.className = 'info';
       messageDiv.textContent = '게시 중...';
 
-      await api("/posts", {
+      // 일부 공개/비공개일 때는 게시글 ID를 받아와 바로 이동시키기 위해 return=representation 사용
+      const responseData = await api("/posts", {
         method: "POST",
         body: JSON.stringify({
           author: currentUser.nickname,
           author_id: currentUser.id,
           content: content,
           image_url: imageUrls ? imageUrls.join(',') : null,
-          access: currentAccessValue, // 커스텀 드롭다운에서 선택된 'public', 'link', 'private' 값이 할당됨
+          access: currentAccessValue, 
           created_at: new Date().toISOString()
-        })
+        }),
+        headers: {
+          "Prefer": "return=representation"
+        }
       });
 
       messageDiv.className = 'success';
       messageDiv.textContent = '게시물이 성공적으로 업로드되었습니다!';
 
       setTimeout(() => {
-        window.location.href = 'index.html';
+        // 일부 공개(link) 또는 비공개(private)일 때는 생성된 view.html?id=ID 주소로 바로 이동
+        if ((currentAccessValue === 'link' || currentAccessValue === 'private') && responseData && responseData[0] && responseData[0].id) {
+          window.location.href = `view.html?id=${responseData[0].id}`;
+        } else {
+          // 공개(public)일 때는 기존대로 메인 피드로 이동
+          window.location.href = 'index.html';
+        }
       }, 1000);
 
     } catch (error) {
