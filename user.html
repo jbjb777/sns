@@ -29,7 +29,6 @@
       --r4: 28px;
     }
 
-    /* NProgress 커스텀 */
     #nprogress .bar { background: #fff !important; height: 2px !important; }
     #nprogress .spinner { display: none !important; }
 
@@ -78,7 +77,7 @@
       gap: 32px;
     }
 
-    /* ─── HEADER HEADER ─── */
+    /* ─── HEADER ─── */
     .profile-header {
       display: flex;
       align-items: center;
@@ -163,7 +162,7 @@
       word-break: break-all;
     }
 
-    /* ─── STATS COUNT ─── */
+    /* ─── STATS ─── */
     .stats-row {
       display: flex;
       gap: 24px;
@@ -211,7 +210,7 @@
       background: var(--t1);
     }
 
-    /* ─── LIST TIMELINE ─── */
+    /* ─── TIMELINE ─── */
     .posts-grid {
       display: flex;
       flex-direction: column;
@@ -246,7 +245,6 @@
       word-break: break-all;
     }
 
-    /* 마크다운 스타일링 패키지 */
     .post-content h1 { font-size: 1.35em; margin-bottom: 6px; font-weight: 700; color: #fff; }
     .post-content h2 { font-size: 1.2em; margin-bottom: 5px; font-weight: 600; color: #fff; }
     .post-content h3 { font-size: 1.1em; margin-bottom: 4px; font-weight: 600; color: #fff; }
@@ -254,7 +252,6 @@
     .post-content em { font-style: italic; }
     .post-content hr { border: none; height: 1px; background: var(--border3); margin: 12px 0; }
 
-    /* 다중 이미지 구조체 */
     .post-image-container {
       border-radius: var(--r3);
       overflow: hidden;
@@ -297,7 +294,7 @@
 
     .no-data-notice { text-align: center; padding: 56px 24px; color: var(--t3); font-size: 14px; }
 
-    /* ─── CUSTOM MODAL DIALOG ─── */
+    /* ─── MODAL ─── */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
@@ -322,7 +319,6 @@
     .modal-textarea:focus { border-color: var(--border3); }
     .modal-foot-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
-    /* ─── FOOTER ─── */
     .profile-footer {
       margin-top: 40px; padding-top: 20px;
       border-top: 1px solid var(--border); text-align: center;
@@ -363,8 +359,7 @@
         <div class="profile-meta-info">
           <div class="name-row">
             <span class="profile-nickname" id="userNicknameLabel">로딩 중...</span>
-            <div class="action-buttons-group" id="profileActionsBox" style="display:none;">
-              </div>
+            <div class="action-buttons-group" id="profileActionsBox" style="display:none;"></div>
           </div>
           <p class="profile-bio-text" id="userBioLabel">등록된 상태메시지가 없습니다.</p>
         </div>
@@ -381,8 +376,7 @@
       </div>
 
       <div id="tabContentWrapper">
-        <div class="posts-grid" id="userPostsTimeline">
-          </div>
+        <div class="posts-grid" id="userPostsTimeline"></div>
       </div>
 
       <div class="profile-footer">
@@ -440,7 +434,6 @@
     const saved = localStorage.getItem('snsUser');
     if (saved) currentUser = JSON.parse(saved);
 
-    // URL 쿼리 파라미터 파싱 분석
     const params = new URLSearchParams(window.location.search);
     viewingUserId = params.get('id');
     viewingUserNickname = params.get('nickname') || "";
@@ -454,12 +447,10 @@
     await loadProfileContext();
   });
 
-  // 대상 유저 핵심 메타데이터 동기화 허브
   async function loadProfileContext() {
     try {
       const users = await api(`/users?id=eq.${encodeURIComponent(viewingUserId)}&select=*`);
       if (!users || users.length === 0) {
-        // 백엔드 비매핑 대응용 가상 구조체 생성 빌드
         viewingUser = {
           id: viewingUserId,
           nickname: viewingUserNickname || '알 수 없는 사용자',
@@ -471,14 +462,13 @@
 
       await displayProfile(viewingUser);
       await loadUserPostsCountAndLikes();
-      switchSubTab('posts'); // 기본 로드 시 타임라인 렌더링 진입
+      switchSubTab('posts');
     } catch (e) {
       console.error('프로필 초기 마운트 실패:', e);
       document.getElementById('userNicknameLabel').textContent = '오류 발생';
     }
   }
 
-  // 데이터 화면 매핑 렌더러
   async function displayProfile(user) {
     document.getElementById('userNicknameLabel').textContent = user.nickname || '익명';
     
@@ -489,11 +479,9 @@
     if (user.profile_image) {
       avatarBox.innerHTML = `<img src="${user.profile_image}" alt="avatar">`;
     } else {
-      avatarBox.textContent = getInitial(user.nickname);
       avatarBox.innerHTML = getInitial(user.nickname);
     }
 
-    // 본인 채널 유무 판정 매퍼 권한 부여 인터페이스 구성
     const actionBox = document.getElementById('profileActionsBox');
     actionBox.innerHTML = '';
     actionBox.style.display = 'flex';
@@ -516,29 +504,30 @@
     }
   }
 
-  // 서브 수치 카운트 밸런서
   async function loadUserPostsCountAndLikes() {
     try {
-      // 총 포스트 갯수 파싱 스캔 (여기서는 전체 카운트 유지를 위해 필터링하지 않거나 통계를 가져옵니다)
-      const posts = await api(`/posts?author_id=eq.${encodeURIComponent(viewingUserId)}&select=id`);
-      const pCount = posts ? posts.length : 0;
-      document.getElementById('cntPosts').textContent = pCount;
+      const posts = await api(`/posts?author_id=eq.${encodeURIComponent(viewingUserId)}&select=*&order=created_at.desc`);
+      const allFetched = posts || [];
+      
+      // 본인이 보는 마이페이지가 아니라 타인이 방문한 프로필인 경우 비공개/일부공개 게시물 수량 필터링
+      const isMe = currentUser && String(currentUser.id) === String(viewingUserId);
+      const visiblePosts = isMe ? allFetched : allFetched.filter(p => p.access !== 'private' && p.access !== 'link');
+      
+      document.getElementById('cntPosts').textContent = visiblePosts.length;
 
       let totalLikes = 0;
-      if (posts && posts.length > 0) {
-        // 받은 총 좋아요 개수 병렬 추적 바인딩 루프
-        for (const p of posts) {
+      if (visiblePosts.length > 0) {
+        for (const p of visiblePosts) {
           const lData = await api(`/likes?post_id=eq.${p.id}&select=id`);
           if (lData) totalLikes += lData.length;
         }
       }
       document.getElementById('cntLikes').textContent = totalLikes;
     } catch (e) {
-      console.warn('카운팅 팩 초기화 누락 무시:', e);
+      console.warn('카운팅 데이터 바인딩 오류 무시:', e);
     }
   }
 
-  // 탭 전환 코디네이터 함수
   window.switchSubTab = function(tabName) {
     currentTab = tabName;
     document.getElementById('tabPostsBtn').classList.toggle('active', tabName === 'posts');
@@ -551,7 +540,6 @@
       wrapper.innerHTML = `<div class="posts-grid" id="userPostsTimeline"></div>`;
       loadUserPosts();
     } else {
-      // 정보 보기 데이터 주입 구조체 구성
       const joinDate = viewingUser && viewingUser.created_at ? new Date(viewingUser.created_at).toLocaleDateString('ko-KR', {
         year: 'numeric', month: 'long', day: 'numeric'
       }) : '확인 불가';
@@ -565,24 +553,29 @@
     }
   };
 
-  // 피드 로드 액션 (비공개, 일부 공개 제외 필터링 반영)
   async function loadUserPosts() {
     const timeline = document.getElementById('userPostsTimeline');
     if (!timeline) return;
     timeline.innerHTML = '<div class="no-data-notice">게시물을 가져오는 중...</div>';
 
     try {
-      // access=eq.public 조건을 주어 공개 범위가 public인 게시물만 조회합니다.
-      const posts = await api(`/posts?author_id=eq.${encodeURIComponent(viewingUserId)}&access=eq.public&select=*&order=created_at.desc`);
+      // 오리지널 불러오기 주소 구조 유지
+      const posts = await api(`/posts?author_id=eq.${encodeURIComponent(viewingUserId)}&select=*&order=created_at.desc`);
       timeline.innerHTML = '';
 
-      if (!posts || posts.length === 0) {
+      const allFetched = posts || [];
+      
+      // 본인이 자신의 프로필을 확인하는 경우에는 비공개 게시물이 보이도록 허용하고,
+      // 다른 사용자가 타인의 프로필을 확인하는 경우에는 비공개(private) 및 일부공개(link) 게시물이 보이지 않도록 클라이언트 필터링 처리합니다.
+      const isMe = currentUser && String(currentUser.id) === String(viewingUserId);
+      const visiblePosts = isMe ? allFetched : allFetched.filter(post => post.access !== 'private' && post.access !== 'link');
+
+      if (visiblePosts.length === 0) {
         timeline.innerHTML = '<div class="no-data-notice">작성된 공개 게시물이 존재하지 않습니다.</div>';
         return;
       }
 
-      // 타임라인 전용 로드 팩 렌더링 루프
-      posts.forEach(post => {
+      visiblePosts.forEach(post => {
         const card = document.createElement('div');
         card.className = 'post-card';
 
@@ -590,7 +583,6 @@
           month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         }) : '';
 
-        // 다중 이미지 빌더 엔진 적용 파싱 구문
         let imgBlock = '';
         if (post.image_url) {
           const arr = post.image_url.split(',').filter(Boolean);
@@ -616,9 +608,14 @@
 
         const parsedContent = post.content ? markdownToHtml(post.content) : '';
 
+        // 비공개 상태 배지 텍스트 유무 가독성 표시 처리 (본인 전용)
+        let lockBadge = '';
+        if (isMe && post.access === 'private') lockBadge = ' <span style="color:var(--pink); font-size:11px; margin-left:4px;">🔒 비공개</span>';
+        if (isMe && post.access === 'link') lockBadge = ' <span style="color:var(--green); font-size:11px; margin-left:4px;">🔗 링크 공개</span>';
+
         card.innerHTML = `
           <div class="post-header">
-            <span class="post-time">${tStr}</span>
+            <span class="post-time">${tStr}${lockBadge}</span>
           </div>
           ${parsedContent ? `<div class="post-content" onclick="window.location.href='view.html?id=${post.id}'" style="cursor:pointer;">${parsedContent}</div>` : ''}
           ${imgBlock}
@@ -643,7 +640,6 @@
     }
   }
 
-  // 실시간 단독 수치 패치 카운터 연동
   async function loadLiveStats(postId) {
     try {
       const likes = await api(`/likes?post_id=eq.${postId}&select=id,user_id`);
@@ -662,7 +658,6 @@
     } catch {}
   }
 
-  // 타임라인 내 좋아요 핸들러 트랜잭션
   window.toggleLike = async function(postId) {
     if (!currentUser) { alert('로그인이 필요한 기능입니다.'); return; }
     const btn = document.getElementById(`lBtn-${postId}`);
@@ -688,7 +683,6 @@
     }
   };
 
-  // 모달 제어 시스템 핸들러 코드 셋트
   window.openStatusModal = () => {
     document.getElementById('statusInput').value = viewingUser.message || '';
     document.getElementById('statusModal').classList.add('open');
@@ -730,18 +724,9 @@
       btn.classList.add('success');
       setTimeout(() => btn.classList.remove('success'), 1500);
     }).catch(err => {
-      console.error('リンク 복사 실패:', err);
+      console.error('링크 복사 실패:', err);
     });
   };
-
-  function escapeHtml(unsafe) {
-    return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
 </script>
 </body>
 </html>
