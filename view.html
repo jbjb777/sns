@@ -1127,12 +1127,21 @@
       }
       const post = posts[0];
 
-      // access 값이 private 일 때 권한 확인 처리 코드 추가
+      // 최신 currentUser 상태(로그인 유저 정보)를 완벽히 동기화한 뒤 비교합니다.
+      const savedUser = localStorage.getItem('snsUser');
+      const activeUser = savedUser ? JSON.parse(savedUser) : null;
+
+      // access 값이 private 일 때 권한 확인 처리 코드
       if (post.access === 'private') {
-        const isAuthor = currentUser && (
-          currentUser.id === post.author_id || 
-          currentUser.nickname === post.author
-        );
+        if (!activeUser) {
+          // 로그인이 안 되어 있다면 예외 없이 즉시 리다이렉트
+          window.location.href = '403.html';
+          return;
+        }
+        
+        // 작성자 ID 또는 작성자 닉네임(author)이 현재 로그인 유저와 맞는지 철저하게 비교
+        const isAuthor = (activeUser.id === post.author_id) || (activeUser.nickname === post.author);
+        
         if (!isAuthor) {
           window.location.href = '403.html';
           return;
