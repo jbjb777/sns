@@ -114,37 +114,36 @@
       gap: 10px;
     }
 
-    /* 공개 범위 선택 드롭다운 스타일 */
-    .access-select-wrapper {
+    /* 커스텀 드롭다운 스타일 */
+    .custom-select-container {
       position: relative;
-      display: flex;
-      align-items: center;
+      display: inline-block;
     }
 
-    .access-select {
-      appearance: none;
-      -webkit-appearance: none;
+    .custom-select-trigger {
       background: var(--bg3);
       color: var(--t1);
       border: 1px solid var(--border2);
-      padding: 9px 34px 9px 16px;
+      padding: 9px 36px 9px 16px;
       border-radius: 22px;
       font-size: 13px;
       font-weight: 500;
       font-family: inherit;
       cursor: pointer;
-      outline: none;
+      user-select: none;
       transition: background 0.15s, border-color 0.15s;
+      display: flex;
+      align-items: center;
     }
-    .access-select:hover {
+    .custom-select-container:hover .custom-select-trigger {
       background: var(--bg4);
       border-color: var(--border3);
     }
 
-    .access-select-wrapper::after {
+    .custom-select-trigger::after {
       content: "";
       position: absolute;
-      right: 14px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
       width: 0;
@@ -153,6 +152,53 @@
       border-right: 4px solid transparent;
       border-top: 5px solid var(--t2);
       pointer-events: none;
+      transition: transform 0.2s;
+    }
+    .custom-select-container.open .custom-select-trigger::after {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .custom-options {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 6px;
+      min-width: 120px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .custom-select-container.open .custom-options {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .custom-option {
+      padding: 8px 14px;
+      color: var(--t2);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: var(--r1);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.12s, color 0.12s;
+    }
+    .custom-option:hover {
+      background: var(--bg3);
+      color: var(--t1);
+    }
+    .custom-option.selected {
+      color: var(--t1);
+      background: var(--border2);
     }
 
     /* ─── POST BUTTON ─── */
@@ -433,12 +479,13 @@
       </span>
     </div>
     <div class="header-right">
-      <div class="access-select-wrapper">
-        <select class="access-select" id="accessSelect">
-          <option value="public" selected>공개</option>
-          <option value="link">일부 공개</option>
-          <option value="private">비공개</option>
-        </select>
+      <div class="custom-select-container" id="customSelectContainer">
+        <div class="custom-select-trigger" id="customSelectTrigger">공개</div>
+        <div class="custom-options">
+          <div class="custom-option selected" data-value="public">공개</div>
+          <div class="custom-option" data-value="link">일부 공개</div>
+          <div class="custom-option" data-value="private">비공개</div>
+        </div>
       </div>
       <button class="post-btn" id="postBtn">
         <span class="btn-text">공유하기</span>
@@ -516,6 +563,7 @@
   const uploadPreset = 'unsigned_preset';
   let currentUser = null;
   let selectedImages = [];   // 여러 이미지 저장 배열
+  let currentAccessValue = "public"; // 기본 선택 값 (public)
 
   function setAvatar(el, profileImage, nickname) {
     if (profileImage) {
@@ -524,6 +572,34 @@
       el.textContent = (nickname?.[0] || '?').toUpperCase();
     }
   }
+
+  // 커스텀 드롭다운 상호작용 제어 로직
+  const selectContainer = document.getElementById('customSelectContainer');
+  const selectTrigger = document.getElementById('customSelectTrigger');
+  const optionsList = selectContainer.querySelectorAll('.custom-option');
+
+  selectTrigger.onclick = (e) => {
+    e.stopPropagation();
+    selectContainer.classList.toggle('open');
+  };
+
+  optionsList.forEach(option => {
+    option.onclick = (e) => {
+      e.stopPropagation();
+      currentAccessValue = option.getAttribute('data-value');
+      selectTrigger.textContent = option.textContent;
+      
+      optionsList.forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+      
+      selectContainer.classList.remove('open');
+    };
+  });
+
+  // 드롭다운 바깥을 누르면 자동으로 메뉴 닫히게 처리
+  window.onclick = () => {
+    selectContainer.classList.remove('open');
+  };
 
   // 미리보기 업데이트 함수
   function updateImagePreview() {
@@ -677,7 +753,6 @@
     const content = htmlToMarkdown(rawHtml);
     const messageDiv = document.getElementById('postMessage');
     const postButton = document.getElementById('postBtn');
-    const accessValue = document.getElementById('accessSelect').value; // 수파베이스에 저장할 access 값 받아오기
 
     if (!content && selectedImages.length === 0) {
       messageDiv.className = 'error';
@@ -708,7 +783,7 @@
           author_id: currentUser.id,
           content: content,
           image_url: imageUrls ? imageUrls.join(',') : null,
-          access: accessValue, // posts 테이블의 access 컬럼으로 'public', 'link', 'private' 중 매칭되어 전달됨
+          access: currentAccessValue, // 커스텀 드롭다운에서 선택된 'public', 'link', 'private' 값이 할당됨
           created_at: new Date().toISOString()
         })
       });
