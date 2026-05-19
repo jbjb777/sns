@@ -107,6 +107,54 @@
       border-radius: 50%;
     }
 
+    /* ─── HEADER RIGHT & ACTIONS ─── */
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* 공개 범위 선택 드롭다운 스타일 */
+    .access-select-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .access-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--bg3);
+      color: var(--t1);
+      border: 1px solid var(--border2);
+      padding: 9px 34px 9px 16px;
+      border-radius: 22px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .access-select:hover {
+      background: var(--bg4);
+      border-color: var(--border3);
+    }
+
+    .access-select-wrapper::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--t2);
+      pointer-events: none;
+    }
+
     /* ─── POST BUTTON ─── */
     .post-btn {
       background: #fff;
@@ -384,16 +432,24 @@
         <div class="header-profile-avatar" id="headerAvatar"></div>
       </span>
     </div>
-    <button class="post-btn" id="postBtn">
-      <span class="btn-text">공유하기</span>
-      <div class="spinner"></div>
-    </button>
+    <div class="header-right">
+      <div class="access-select-wrapper">
+        <select class="access-select" id="accessSelect">
+          <option value="public" selected>공개</option>
+          <option value="link">일부 공개</option>
+          <option value="private">비공개</option>
+        </select>
+      </div>
+      <button class="post-btn" id="postBtn">
+        <span class="btn-text">공유하기</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
   </div>
 
   <div class="main-content">
     <div class="create-container">
 
-      <!-- 작성자 행 -->
       <div class="author-row">
         <div class="create-profile-avatar" id="createAvatar"></div>
         <div class="author-info">
@@ -402,7 +458,6 @@
         </div>
       </div>
 
-      <!-- 마크다운 툴바 -->
       <div class="editor-toolbar" id="editorToolbar">
         <button type="button" onclick="execFormat('bold')"><b>B</b></button>
         <button type="button" onclick="execFormat('italic')"><i>I</i></button>
@@ -412,12 +467,10 @@
         <button type="button" onclick="execFormat('insertHorizontalRule')">HR</button>
       </div>
 
-      <!-- 텍스트 입력 -->
       <div class="create-textarea" id="postContent" contenteditable="true" placeholder="문구를 입력하세요..."></div>
 
       <div class="section-divider"></div>
 
-      <!-- 여러 이미지 미리보기 -->
       <div class="image-preview-container">
         <div class="image-preview-grid" id="imagePreviewGrid"></div>
         <div class="image-count" id="imageCount">0 / 5 장</div>
@@ -624,6 +677,7 @@
     const content = htmlToMarkdown(rawHtml);
     const messageDiv = document.getElementById('postMessage');
     const postButton = document.getElementById('postBtn');
+    const accessValue = document.getElementById('accessSelect').value; // 수파베이스에 저장할 access 값 받아오기
 
     if (!content && selectedImages.length === 0) {
       messageDiv.className = 'error';
@@ -654,6 +708,7 @@
           author_id: currentUser.id,
           content: content,
           image_url: imageUrls ? imageUrls.join(',') : null,
+          access: accessValue, // posts 테이블의 access 컬럼으로 'public', 'link', 'private' 중 매칭되어 전달됨
           created_at: new Date().toISOString()
         })
       });
