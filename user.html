@@ -29,389 +29,771 @@
       --r4: 28px;
     }
 
+    /* NProgress 커스텀 */
     #nprogress .bar { background: #fff !important; height: 2px !important; }
+    #nprogress .peg { display: none !important; }
     #nprogress .spinner { display: none !important; }
+
+    /* ─── SPLASH ─── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease;
+    }
+    #splash.fade-out { opacity: 0; pointer-events: none; }
+    .splash-logo {
+      width: 72px; height: 72px;
+      animation: splashLogoPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes splashLogoPop {
+      from { opacity: 0; transform: scale(0.7); }
+      to   { opacity: 1; transform: scale(1); }
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--t1);
-      display: flex;
       min-height: 100vh;
+      display: flex;
       -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
     }
+    @keyframes fadeIn { to { opacity: 1; } }
 
     /* ─── SIDEBAR ─── */
-    .sidebar-container {
-      width: 72px;
-      min-width: 72px;
-      height: 100vh;
-      position: fixed;
-      left: 0; top: 0;
-      border-right: 1px solid var(--border);
-      z-index: 100;
-      background: var(--bg);
-    }
-    .sidebar-container iframe {
-      width: 72px !important;
-      height: 100%;
-      border: none;
-    }
+    .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
-    /* ─── MAIN LAYOUT ─── */
-    .main-layout {
-      margin-left: 72px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: 0;
-    }
-
-    .profile-container {
-      max-width: 640px;
-      width: 100%;
-      padding: 40px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
+    /* ─── MAIN WRAPPER ─── */
+    .main-wrapper { margin-left: 72px; width: calc(100% - 72px); display: flex; flex-direction: column; min-height: 100vh; }
 
     /* ─── HEADER ─── */
+    .header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      opacity: 0;
+      transform: translateY(-10px);
+      animation: slideDown 0.4s ease 0.1s forwards;
+    }
+    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
+
+    .back-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: none;
+      color: var(--t2);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .back-btn:hover { color: var(--t1); background: var(--bg3); }
+    .back-btn:active { transform: scale(0.82); }
+
+    .header-title { font-size: 16px; font-weight: 600; }
+
+    /* ─── CONTAINER ─── */
+    .container {
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px;
+      flex: 1;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.2s forwards;
+    }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── PROFILE CARD ─── */
+    .profile-card {
+      padding: 28px 0;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeInEl 0.5s ease 0.35s forwards;
+    }
+    @keyframes fadeInEl { to { opacity: 1; } }
+
     .profile-header {
       display: flex;
       align-items: center;
       gap: 28px;
-      position: relative;
+      margin-bottom: 24px;
     }
-    
-    .back-btn {
-      position: absolute;
-      top: -12px; left: -8px;
-      background: none; border: none; color: var(--t2);
-      cursor: pointer; padding: 8px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: color 0.15s, background 0.15s;
-    }
-    .back-btn:hover { color: var(--t1); background: var(--bg3); }
-    .back-btn svg { width: 20px; height: 20px; }
 
-    .avatar-wrapper {
-      width: 96px; height: 96px;
+    .profile-avatar {
+      width: 88px; height: 88px;
       border-radius: 50%;
       background: var(--bg3);
-      border: 2px solid var(--border3);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 36px; font-weight: 700; color: #666;
-      overflow: hidden; flex-shrink: 0;
-    }
-    .avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-
-    .profile-meta-info {
-      flex: 1;
+      border: 1px solid var(--border2);
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: #666;
+      transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-avatar.editable { cursor: pointer; }
+    .profile-avatar.editable:hover { border-color: var(--border3); transform: scale(1.05); }
+    .profile-avatar.editable:active { transform: scale(0.96); }
+
+    .profile-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .avatar-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+    }
+    .profile-avatar.editable:hover .avatar-overlay { display: flex; }
+
+    .profile-info { flex: 1; min-width: 0; }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
+    }
+
+    .verification-badge {
+      display: inline-block;
+      width: 14px; 
+      height: 14px;
+      vertical-align: middle;
+      background-image: url('https://sharer.jbjb.r-e.kr/badge.svg');
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .stat-item { display: flex; flex-direction: column; gap: 3px; }
+
+    .stat-number { font-size: 22px; font-weight: 700; color: var(--t1); }
+
+    .stat-label { font-size: 12px; color: var(--t3); font-weight: 500; }
+
+    .share-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      width: 38px; height: 38px;
+      border-radius: var(--r2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .share-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--border3); }
+    .share-btn:active { transform: scale(0.88); }
+    .share-btn.success { background: rgba(74,222,128,0.12); border-color: var(--green); color: var(--green); }
+
+    .status-message-container {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
       gap: 12px;
     }
-    .name-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .profile-nickname {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    
-    .action-buttons-group {
-      display: flex;
-      gap: 8px;
-    }
 
-    .btn-base {
-      background: var(--bg3);
-      border: 1px solid var(--border3);
-      color: var(--t1);
-      padding: 8px 16px;
-      border-radius: var(--r1);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s, border-color 0.15s, transform 0.1s;
-    }
-    .btn-base:hover { background: var(--bg4); border-color: var(--t3); }
-    .btn-base:active { transform: scale(0.97); }
-    
-    .btn-base.success {
-      background: rgba(74,222,128,0.1);
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .profile-bio-text {
-      font-size: 14px;
-      line-height: 1.5;
+    .status-message-text {
       color: var(--t2);
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    /* ─── STATS ─── */
-    .stats-row {
-      display: flex;
-      gap: 24px;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 4px;
-    }
-    .stat-item {
       font-size: 14px;
-      color: var(--t2);
-    }
-    .stat-item strong {
-      color: var(--t1);
-      font-weight: 600;
-      margin-right: 4px;
-    }
-
-    /* ─── TABS ─── */
-    .tabs-nav {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      margin-top: -12px;
-    }
-    .tab-trigger {
+      line-height: 1.65;
       flex: 1;
-      background: none; border: none;
-      color: var(--t3);
-      padding: 14px 0;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      cursor: pointer;
-      font-family: inherit;
-      text-align: center;
-      position: relative;
-      transition: color 0.15s;
-    }
-    .tab-trigger:hover { color: var(--t2); }
-    .tab-trigger.active { color: var(--t1); }
-    .tab-trigger.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; left: 0; width: 100%; height: 2px;
-      background: var(--t1);
     }
 
-    /* ─── TIMELINE ─── */
-    .posts-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+    .status-message-empty { color: var(--t3); font-style: italic; }
 
-    .post-card {
-      background: var(--bg2);
+    .edit-status-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--bg3);
       border: 1px solid var(--border2);
-      border-radius: var(--r4);
-      padding: 24px;
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-      transition: border-color 0.2s, background 0.2s;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      color: var(--t2);
     }
-    .post-card:hover {
-      border-color: var(--border3);
+    .edit-status-btn:hover { background: var(--bg4); border-color: var(--border3); color: var(--t1); transform: scale(1.08); }
+    .edit-status-btn:active { transform: scale(0.9); }
+
+    /* ─── POSTS SECTION ─── */
+    .posts-section {
+      padding: 20px 0;
+      opacity: 0;
+      animation: fadeInEl 0.5s ease 0.5s forwards;
     }
 
-    .post-header {
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--t3);
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .post-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r3);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
+      position: relative;
+    }
+    .post-item:hover { border-color: var(--border3); transform: translateY(-4px); background: var(--bg3); }
+    .post-item:active { transform: translateY(-1px) scale(0.99); }
+
+    /* 여러 이미지 캐러셀 */
+    .post-item-image-container {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #000;
+      overflow: hidden;
+    }
+    .post-item-image-carousel {
+      display: flex;
+      height: 100%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .post-item-image-carousel::-webkit-scrollbar { display: none; }
+    .post-item-image-slide {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      height: 100%;
+    }
+    .post-item-image-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .post-item-image-count {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 12px;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .post-item-image-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 1; /* 항상 표시 */
+      transition: background 0.2s;
+    }
+    .post-item-image-nav:hover {
+      background: rgba(0,0,0,0.9);
+    }
+    .post-item-image-nav.prev { left: 8px; }
+    .post-item-image-nav.next { right: 8px; }
+
+    .post-item-content { padding: 14px 16px 6px; }
+
+    .post-item-text {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--t2);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-wrap;
+    }
+
+    .post-item-footer {
+      padding: 10px 16px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .post-time { font-size: 11px; color: var(--t3); }
-    .post-content {
-      font-size: 14.5px;
-      line-height: 1.6;
-      color: #eee;
-      white-space: pre-wrap;
-      word-break: break-all;
+
+    .post-item-date { font-size: 11px; color: var(--t3); }
+
+    .post-item-likes {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--pink);
+      font-size: 12px;
+      font-weight: 600;
     }
 
-    .post-content h1 { font-size: 1.35em; margin-bottom: 6px; font-weight: 700; color: #fff; }
-    .post-content h2 { font-size: 1.2em; margin-bottom: 5px; font-weight: 600; color: #fff; }
-    .post-content h3 { font-size: 1.1em; margin-bottom: 4px; font-weight: 600; color: #fff; }
-    .post-content strong { font-weight: 700; color: #fff; }
-    .post-content em { font-style: italic; }
-    .post-content hr { border: none; height: 1px; background: var(--border3); margin: 12px 0; }
-
-    .post-image-container {
-      border-radius: var(--r3);
-      overflow: hidden;
-      border: 1px solid var(--border);
+    /* ─── SKELETON ─── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
+      background-size: 300% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+      border-radius: var(--r1);
     }
-    .image-grid { display: grid; gap: 2px; background: var(--border); cursor: pointer; }
-    .image-grid.count-1 { grid-template-columns: 1fr; }
-    .image-grid.count-2 { grid-template-columns: 1fr 1fr; }
-    .image-grid.count-3 { grid-template-columns: 1.2fr 1fr; grid-template-rows: 1fr 1fr; }
-    .image-grid.count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-    .image-grid.count-5 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1.2fr 1fr; }
+    @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+    .skeleton-avatar { width: 88px; height: 88px; border-radius: 50%; }
+    .skeleton-text { height: 22px; border-radius: 8px; margin-bottom: 12px; }
+    .skeleton-stat { width: 70px; height: 44px; border-radius: var(--r1); }
+    .skeleton-post-image { width: 100%; height: 220px; border-radius: var(--r3) var(--r3) 0 0; }
+    .skeleton-post-text { height: 12px; border-radius: 6px; margin-bottom: 8px; }
 
-    .image-grid-item { position: relative; overflow: hidden; width: 100%; height: 100%; }
-    .image-grid.count-3 .image-grid-item:nth-child(1) { grid-row: span 2; }
-    .image-grid.count-5 .image-grid-item:nth-child(2) { grid-column: span 2; }
-
-    .image-grid img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
-    .image-grid-item:hover img { transform: scale(1.02); }
-
-    .image-grid.count-1 .image-grid-item { aspect-ratio: 16 / 10; max-height: 440px; }
-    .image-grid.count-2 { aspect-ratio: 16 / 10; }
-    .image-grid.count-3 { aspect-ratio: 16 / 11; }
-    .image-grid.count-4 { aspect-ratio: 16 / 11; }
-    .image-grid.count-5 { aspect-ratio: 16 / 12; }
-
-    .image-more-overlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 16px; font-weight: 600; pointer-events: none;
-    }
-
-    .post-actions { display: flex; gap: 16px; }
-    .action-btn-item {
-      background: none; border: none; display: flex; align-items: center; gap: 6px;
-      color: var(--t3); font-size: 12.5px; font-weight: 500;
-    }
-    .action-btn-item.liked { color: var(--pink); }
-    .action-btn-item svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; }
-    .action-btn-item.liked svg { fill: var(--pink); stroke: var(--pink); }
-
-    .no-data-notice { text-align: center; padding: 56px 24px; color: var(--t3); font-size: 14px; }
+    /* ─── NO POSTS ─── */
+    .no-posts { text-align: center; padding: 64px 20px; color: var(--t3); font-size: 14px; }
 
     /* ─── MODAL ─── */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      z-index: 200; display: none; align-items: center; justify-content: center;
-      padding: 20px;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
     }
-    .modal-overlay.open { display: flex; }
-    .modal-card {
-      background: var(--bg2); border: 1px solid var(--border3);
-      border-radius: var(--r3); max-width: 400px; width: 100%;
-      padding: 24px; display: flex; flex-direction: column; gap: 16px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    }
-    .modal-title { font-size: 16px; font-weight: 600; }
-    .modal-textarea {
-      background: var(--bg3); border: 1px solid var(--border2);
-      border-radius: var(--r1); width: 100%; height: 100px;
-      padding: 12px; color: var(--t1); font-size: 14px; font-family: inherit;
-      resize: none; outline: none;
-    }
-    .modal-textarea:focus { border-color: var(--border3); }
-    .modal-foot-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .modal-overlay.active { display: flex; }
 
-    .profile-footer {
-      margin-top: 40px; padding-top: 20px;
-      border-top: 1px solid var(--border); text-align: center;
-      font-size: 11px; color: var(--t3); line-height: 1.6; width: 100%;
+    .modal-content {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r4);
+      padding: 32px;
+      width: 90%;
+      max-width: 440px;
+      animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
     }
-    .profile-footer a { color: var(--t3); text-decoration: none; margin: 0 4px; }
-    .profile-footer a:hover { text-decoration: underline; }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.90) translateY(14px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
 
+    .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 18px; color: var(--t1); }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      color: var(--t1);
+      font-size: 14px;
+      margin-bottom: 18px;
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      line-height: 1.5;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .modal-input:focus { outline: none; border-color: var(--border3); background: var(--bg4); }
+    .modal-input::placeholder { color: var(--t3); }
+
+    .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+
+    .modal-btn {
+      padding: 10px 22px;
+      border-radius: var(--r2);
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .modal-btn:active { transform: scale(0.94); }
+    .modal-btn-cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
+    .modal-btn-cancel:hover { background: var(--bg4); color: var(--t1); }
+    .modal-btn-confirm { background: #fff; color: #000; }
+    .modal-btn-confirm:hover { background: #e8e8e8; }
+
+    .upload-toast {
+      position: fixed;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--t1);
+      padding: 10px 22px;
+      border-radius: 22px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 9999;
+      transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
+      white-space: nowrap;
+    }
+    .upload-toast.show { bottom: 28px; }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      margin-top: auto;
+    }
+    .footer-links { margin-bottom: 8px; }
+    .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--t1); }
+    .footer-text { color: var(--t3); font-size: 11px; }
+
+    /* 모바일 프로필 시트 */
+    .sharer-profile-sheet-host[hidden] { display: none !important; }
+    .sharer-profile-sheet-host {
+      position: fixed;
+      inset: 0;
+      z-index: 960;
+    }
+    .sharer-profile-sheet-host .sps-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sharer-profile-sheet-host .sps-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+      max-height: 44vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      will-change: transform;
+      transform: translateY(100%);
+      transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-panel {
+      transform: translateY(0);
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
+      max-height: 88vh;
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
+      transition: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area {
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 6px 16px 14px;
+      margin: -2px -16px 0 -16px;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area:active {
+      cursor: grabbing;
+    }
+    .sharer-profile-sheet-host .sps-grab {
+      width: 40px;
+      height: 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.28);
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .sharer-profile-sheet-host .sps-av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-av img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sharer-profile-sheet-host .sps-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sharer-profile-sheet-host .sps-logout {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
-      .sidebar-container { display: none; }
-      .main-layout { margin-left: 0; }
-      .profile-container { padding: 24px 16px; gap: 24px; }
-      .profile-header { gap: 20px; flex-direction: column; align-items: flex-start; }
-      .back-btn { top: -16px; left: -4px; }
-      .avatar-wrapper { width: 80px; height: 80px; font-size: 28px; }
-      .action-buttons-group { width: 100%; }
-      .btn-base { flex: 1; justify-content: center; }
-      .post-card { padding: 18px; border-radius: var(--r3); }
+      .sidebar-container {
+        left: 0; right: 0; top: auto; bottom: 0;
+        width: 100%; min-width: 0;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .sidebar-container iframe {
+        width: 100% !important; height: 100% !important;
+      }
+      .main-wrapper {
+        margin-left: 0; width: 100%;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .container { padding: 20px 16px; }
+      .post-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+      .post-item-image-container { height: 160px; }
+      .profile-header { flex-direction: column; text-align: center; gap: 18px; }
+      .profile-stats { justify-content: center; }
+      .profile-name { font-size: 20px; justify-content: center; }
+      .post-item-image-nav {
+        width: 30px; height: 30px; font-size: 16px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="sidebar-container">
-    <iframe src="sidebar.html"></iframe>
+  <div id="splash">
+    <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
 
-  <div class="main-layout">
-    <div class="profile-container">
-      
-      <div class="profile-header">
-        <button class="back-btn" onclick="goBack()" title="뒤로가기">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        </button>
+  <div class="upload-toast" id="uploadToast">⏳ 업로드 중...</div>
 
-        <div class="avatar-wrapper" id="userAvatarBox">?</div>
-        
-        <div class="profile-meta-info">
-          <div class="name-row">
-            <span class="profile-nickname" id="userNicknameLabel">로딩 중...</span>
-            <div class="action-buttons-group" id="profileActionsBox" style="display:none;"></div>
+  <div class="sidebar-container">
+    <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
+  </div>
+  <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
+
+  <div class="main-wrapper">
+    <div class="header">
+      <button class="back-btn" onclick="goBack()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="header-title">프로필</div>
+    </div>
+
+    <div class="container">
+      <div id="profileContent">
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="profile-info" style="flex:1;">
+              <div class="skeleton skeleton-text" style="width:200px;"></div>
+              <div class="profile-stats">
+                <div class="skeleton skeleton-stat"></div>
+                <div class="skeleton skeleton-stat"></div>
+              </div>
+            </div>
           </div>
-          <p class="profile-bio-text" id="userBioLabel">등록된 상태메시지가 없습니다.</p>
         </div>
       </div>
 
-      <div class="stats-row">
-        <div class="stat-item"><strong id="cntPosts">0</strong>게시물</div>
-        <div class="stat-item"><strong id="cntLikes">0</strong>받은 좋아요</div>
+      <div class="posts-section">
+        <div class="section-title">게시물</div>
+        <div id="userPosts">
+          <div class="post-grid">
+            <div class="post-item">
+              <div class="skeleton skeleton-post-image"></div>
+              <div class="post-item-content">
+                <div class="skeleton skeleton-post-text"></div>
+                <div class="skeleton skeleton-post-text" style="width:75%;"></div>
+                <div class="skeleton skeleton-post-text" style="width:55%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div class="tabs-nav">
-        <button class="tab-trigger active" id="tabPostsBtn" onclick="switchSubTab('posts')">게시물</button>
-        <button class="tab-trigger" id="tabInfoBtn" onclick="switchSubTab('info')">정보</button>
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
+        <a href="#" onclick="showTerms(); return false;">이용약관</a>
+        <a href="mailto:alexeom97@outlook.com">문의하기</a>
       </div>
-
-      <div id="tabContentWrapper">
-        <div class="posts-grid" id="userPostsTimeline"></div>
-      </div>
-
-      <div class="profile-footer">
-        <p>© 2026 Sharer. Designed by 정빈777</p>
-        <p style="margin-top:2px;">
-          <a href="#" onclick="showPrivacyPolicy()">개인정보처리방침</a> · 
-          <a href="#" onclick="showTerms()">이용약관</a>
-        </p>
-      </div>
-
+      <div class="footer-text">본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
     </div>
   </div>
 
   <div class="modal-overlay" id="statusModal">
-    <div class="modal-card">
-      <span class="modal-title">상태메시지 설정</span>
-      <textarea class="modal-textarea" id="statusInput" placeholder="나를 표현하는 한 문장을 적어보세요..." maxlength="150"></textarea>
-      <div class="modal-foot-actions">
-        <button class="btn-base" style="background:none; border:none; color:var(--t3);" onclick="closeStatusModal()">취소</button>
-        <button class="btn-base" style="background:var(--t1); color:var(--bg); border:none;" onclick="saveStatusMsg()">저장</button>
+    <div class="modal-content">
+      <div class="modal-title">상태메시지 수정</div>
+      <textarea class="modal-input" id="statusInput" placeholder="상태메시지를 입력하세요..." maxlength="100"></textarea>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
+        <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
       </div>
     </div>
   </div>
 
+  <div class="modal-overlay" id="profilePicModal">
+    <div class="modal-content" style="text-align: center;">
+      <div class="modal-title" style="font-size:18px;">가입을 환영합니다! 🎉</div>
+      <p style="color:var(--t2); font-size:14px; margin-bottom:24px; line-height:1.6;">
+        나만의 개성을 표현할<br>프로필 사진을 설정해 보세요.
+      </p>
+      <div class="modal-buttons" style="justify-content: center; gap:12px;">
+        <button class="modal-btn modal-btn-cancel" onclick="closeProfilePicModal()">나중에 하기</button>
+        <button class="modal-btn modal-btn-confirm" onclick="triggerProfilePicUpload()">설정하기</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
+
 <script src="markdown.js"></script>
 <script>
+  // ─── NPROGRESS 설정 ───
+  NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+
+  window.addEventListener('load', () => { NProgress.done(); });
+
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && link.href && !link.target && !link.hasAttribute('download')) {
+      NProgress.start();
+    }
+  });
+
+  // ─── SPLASH (처음 방문 시에만) ───
+  (function () {
+    const splash = document.getElementById('splash');
+
+    if (!sessionStorage.getItem('splashShown')) {
+      sessionStorage.setItem('splashShown', 'true');
+      splash.style.display = 'flex';
+
+      function finishSplash() {
+        splash.classList.add('fade-out');
+        setTimeout(() => { splash.style.display = 'none'; }, 460);
+      }
+
+      const splashStart = Date.now();
+      const MIN_SPLASH = 2000;
+
+      window.addEventListener('load', () => {
+        const elapsed = Date.now() - splashStart;
+        const remaining = Math.max(0, MIN_SPLASH - elapsed);
+        setTimeout(finishSplash, remaining);
+      });
+      setTimeout(finishSplash, 5000);
+    }
+  })();
+
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-  let currentUser = null;
-  let viewingUserId = null;
-  let viewingUserNickname = "";
-  let viewingUser = null;
-  let currentTab = "posts";
+
+  const CLOUDINARY_CLOUD = 'dretlhsrk';
+  const CLOUDINARY_PRESET = 'unsigned_preset';
 
   async function api(endpoint, options = {}) {
-    const res = await fetch(API_BASE + endpoint, {
+    const url = API_BASE + endpoint;
+    const res = await fetch(url, {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -419,281 +801,378 @@
       },
     });
     if (!res.ok) {
-      let errTxt = ""; try { errTxt = await res.text(); } catch {}
-      throw new Error(`오류 (${res.status}): ${errTxt}`);
+      let errorText;
+      try { errorText = await res.text(); } catch { errorText = "Unknown error"; }
+      throw new Error(`API 오류 (${res.status}): ${errorText}`);
     }
-    if (res.status === 204 || res.headers.get("content-length") === "0") return null;
-    try { return await res.json(); } catch { return null; }
+    if (res.status === 204) return null;
+    const text = await res.text();
+    if (!text) return null;
+    try { return JSON.parse(text); } catch (e) { console.error("JSON 파싱 오류:", e); return null; }
   }
 
-  function getInitial(n) {
-    return (n ? n[0] : '?').toUpperCase();
+  async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+      { method: 'POST', body: formData }
+    );
+    if (!response.ok) throw new Error('이미지 업로드 실패');
+    const data = await response.json();
+    return data.secure_url;
   }
 
-  window.addEventListener('DOMContentLoaded', async () => {
-    const saved = localStorage.getItem('snsUser');
-    if (saved) currentUser = JSON.parse(saved);
+  function showToast(msg) {
+    const t = document.getElementById('uploadToast');
+    t.textContent = msg;
+    t.classList.add('show');
+  }
+  function hideToast() {
+    document.getElementById('uploadToast').classList.remove('show');
+  }
 
-    const params = new URLSearchParams(window.location.search);
-    viewingUserId = params.get('id');
-    viewingUserNickname = params.get('nickname') || "";
+  const urlParams = new URLSearchParams(window.location.search);
+  const userNickname = urlParams.get('nickname');
+  let currentUser = null;
+  let viewingUser = null;
 
-    if (!viewingUserId) {
-      alert('올바르지 않은 접근입니다.');
-      window.location.href = 'index.html';
-      return;
+  function initCurrentUser() {
+    const savedUser = localStorage.getItem('snsUser');
+    if (savedUser) { currentUser = JSON.parse(savedUser); updateSidebar(); }
+  }
+
+  function updateSidebar() {
+    const iframe = document.getElementById('sidebarFrame');
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+  }
+
+  function updateSidebarMode() {
+    const iframe = document.getElementById('sidebarFrame');
+    const narrow = window.innerWidth <= 768;
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+  }
+
+  window.addEventListener('message', (event) => {
+    const { type, page } = event.data || {};
+    if (type === 'navigate') {
+      if (page === 'home') { NProgress.start(); location.href = 'index.html'; }
+      if (page === 'explore') { NProgress.start(); location.href = 'explore.html'; }
     }
-
-    await loadProfileContext();
+    if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; NProgress.start(); location.href = 'index.html'; }
+    if (type === 'requestUserInfo') updateSidebar();
   });
 
-  async function loadProfileContext() {
+  window.onSharerProfileLogout = function () {
+    localStorage.removeItem('snsUser');
+    currentUser = null;
+    NProgress.start();
+    location.href = 'index.html';
+  };
+
+  initCurrentUser();
+  updateSidebarMode();
+  window.addEventListener('resize', updateSidebarMode);
+
+  document.getElementById('profileFileInput').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentUser?.id) return;
+
+    showToast('⏳ 업로드 중...');
     try {
-      const users = await api(`/users?id=eq.${encodeURIComponent(viewingUserId)}&select=*`);
-      if (!users || users.length === 0) {
-        viewingUser = {
-          id: viewingUserId,
-          nickname: viewingUserNickname || '알 수 없는 사용자',
-          message: ''
-        };
-      } else {
-        viewingUser = users[0];
+      const imageUrl = await uploadImageToCloudinary(file);
+      await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ profile_image: imageUrl }),
+        headers: { "Prefer": "return=minimal" }
+      });
+      currentUser.profile_image = imageUrl;
+      localStorage.setItem('snsUser', JSON.stringify(currentUser));
+      viewingUser.profile_image = imageUrl;
+      await displayProfile(viewingUser);
+      hideToast();
+      showToast('✅ 프로필 사진이 변경되었습니다!');
+      setTimeout(hideToast, 2200);
+    } catch (err) {
+      console.error('프로필 사진 업로드 실패:', err);
+      hideToast();
+      showToast('❌ 업로드 실패: ' + (err.message || '알 수 없는 오류'));
+      setTimeout(hideToast, 3000);
+    } finally {
+      e.target.value = '';
+    }
+  });
+
+  if (!userNickname) {
+    showError('사용자 정보(nickname)가 없습니다.');
+  } else {
+    loadUserProfile();
+    loadUserPosts();
+  }
+
+  async function loadUserProfile() {
+    try {
+      let users = await api(`/users?nickname=eq.${encodeURIComponent(userNickname)}&select=*`);
+
+      if (users?.length === 0) {
+        if (userNickname === "JB777" || userNickname === "진정오") {
+          users = [{ nickname: userNickname, isVerified: true, message: null, profile_image: null }];
+        } else {
+          showError('사용자를 찾을 수 없습니다.');
+          return;
+        }
       }
 
+      viewingUser = users[0];
       await displayProfile(viewingUser);
-      await loadUserPostsCountAndLikes();
-      switchSubTab('posts');
+      
+      if (urlParams.get('u') === 'new' && currentUser && currentUser.nickname === viewingUser.nickname) {
+        document.getElementById('profilePicModal').classList.add('active');
+      }
     } catch (e) {
-      console.error('프로필 초기 마운트 실패:', e);
-      document.getElementById('userNicknameLabel').textContent = '오류 발생';
+      console.error('프로필 로드 오류:', e);
+      showError('프로필을 불러오는 중 오류가 발생했습니다.');
     }
   }
 
   async function displayProfile(user) {
-    document.getElementById('userNicknameLabel').textContent = user.nickname || '익명';
-    
-    const bioLabel = document.getElementById('userBioLabel');
-    bioLabel.textContent = user.message ? user.message : '등록된 상태메시지가 없습니다.';
+    const contentDiv = document.getElementById('profileContent');
+    const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
+    const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
 
-    const avatarBox = document.getElementById('userAvatarBox');
-    if (user.profile_image) {
-      avatarBox.innerHTML = `<img src="${user.profile_image}" alt="avatar">`;
-    } else {
-      avatarBox.innerHTML = getInitial(user.nickname);
+    const userPosts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id,access`);
+    // 다른 사람 프로필 조회의 경우 비공개/링크 전용 글은 글 개수 카운트에서도 제외하는 것이 자연스러우므로 필터링 적용
+    const visibleUserPosts = userPosts ? userPosts.filter(p => p.access !== 'private' && p.access !== 'link') : [];
+    const postCount = visibleUserPosts.length;
+
+    let totalLikes = 0;
+    if (visibleUserPosts.length) {
+      const postIds = visibleUserPosts.map(p => p.id).join(',');
+      try {
+        const allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`);
+        totalLikes = allLikes?.length ?? 0;
+      } catch (e) { totalLikes = 0; }
     }
 
-    const actionBox = document.getElementById('profileActionsBox');
-    actionBox.innerHTML = '';
-    actionBox.style.display = 'flex';
+    const statusMessage = user.message || '';
+    const statusDisplay = statusMessage
+      ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
+      : `<div class="status-message-text status-message-empty">상태메시지가 없습니다.</div>`;
 
-    const isMe = currentUser && String(currentUser.id) === String(user.id);
-    if (isMe) {
-      actionBox.innerHTML = `
-        <button class="btn-base" onclick="openStatusModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-          프로필 편집
-        </button>
-      `;
-    } else {
-      actionBox.innerHTML = `
-        <button class="btn-base" id="shareBtn" onclick="copyProfileLink()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-          프로필 공유
-        </button>
-      `;
-    }
-  }
+    const editButton = isOwnProfile
+      ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>
+         </button>`
+      : '';
 
-  async function loadUserPostsCountAndLikes() {
-    try {
-      const posts = await api(`/posts?author_id=eq.${encodeURIComponent(viewingUserId)}&select=*&order=created_at.desc`);
-      const allFetched = posts || [];
-      
-      // 본인이 보는 마이페이지가 아니라 타인이 방문한 프로필인 경우 비공개/일부공개 게시물 수량 필터링
-      const isMe = currentUser && String(currentUser.id) === String(viewingUserId);
-      const visiblePosts = isMe ? allFetched : allFetched.filter(p => p.access !== 'private' && p.access !== 'link');
-      
-      document.getElementById('cntPosts').textContent = visiblePosts.length;
+    const avatarOverlay = isOwnProfile
+      ? `<div class="avatar-overlay">
+           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="#fff" stroke-width="1.8" fill="none"/>
+             <circle cx="12" cy="13" r="4" stroke="#fff" stroke-width="1.8"/>
+           </svg>
+         </div>`
+      : '';
 
-      let totalLikes = 0;
-      if (visiblePosts.length > 0) {
-        for (const p of visiblePosts) {
-          const lData = await api(`/likes?post_id=eq.${p.id}&select=id`);
-          if (lData) totalLikes += lData.length;
-        }
-      }
-      document.getElementById('cntLikes').textContent = totalLikes;
-    } catch (e) {
-      console.warn('카운팅 데이터 바인딩 오류 무시:', e);
-    }
-  }
+    const avatarHtml = user.profile_image
+      ? `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">
+           <img src="${escapeHtml(user.profile_image)}" alt="프로필 사진">
+           ${avatarOverlay}
+         </div>`
+      : `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">
+           ${(user.nickname?.[0] || '?').toUpperCase()}
+           ${avatarOverlay}
+         </div>`;
 
-  window.switchSubTab = function(tabName) {
-    currentTab = tabName;
-    document.getElementById('tabPostsBtn').classList.toggle('active', tabName === 'posts');
-    document.getElementById('tabInfoBtn').classList.toggle('active', tabName === 'info');
-
-    const wrapper = document.getElementById('tabContentWrapper');
-    wrapper.innerHTML = '';
-
-    if (tabName === 'posts') {
-      wrapper.innerHTML = `<div class="posts-grid" id="userPostsTimeline"></div>`;
-      loadUserPosts();
-    } else {
-      const joinDate = viewingUser && viewingUser.created_at ? new Date(viewingUser.created_at).toLocaleDateString('ko-KR', {
-        year: 'numeric', month: 'long', day: 'numeric'
-      }) : '확인 불가';
-      
-      wrapper.innerHTML = `
-        <div style="background:var(--bg2); border:1px solid var(--border2); border-radius:var(--r3); padding:24px; display:flex; flex-direction:column; gap:16px;">
-          <div style="font-size:14px; color:var(--t2);">고유 식별 정보 코드: <span style="color:var(--t1); font-family:monospace; margin-left:6px;">${viewingUser.id}</span></div>
-          <div style="font-size:14px; color:var(--t2);">가입일 및 활동 시작일: <span style="color:var(--t1); margin-left:6px;">${joinDate}</span></div>
+    contentDiv.innerHTML = `
+      <div class="profile-card">
+        <div class="profile-header">
+          ${avatarHtml}
+          <div class="profile-info">
+            <div class="profile-name">
+              ${escapeHtml(user.nickname)}
+              ${isVerified ? '<span class="verification-badge"></span>' : ''}
+            </div>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <div class="stat-number">${postCount}</div>
+                <div class="stat-label">게시물</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">${totalLikes}</div>
+                <div class="stat-label">좋아요</div>
+              </div>
+              <button class="share-btn" id="shareBtn" onclick="copyProfileLink()" title="프로필 링크 복사">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
-      `;
+        <div class="status-message-container">
+          ${statusDisplay}
+          ${editButton}
+        </div>
+      </div>
+    `;
+
+    if (isOwnProfile) {
+      const avatarElement = contentDiv.querySelector('.profile-avatar.editable');
+      if (avatarElement) {
+        avatarElement.onclick = () => document.getElementById('profileFileInput').click();
+      }
     }
-  };
+  }
 
   async function loadUserPosts() {
-    const timeline = document.getElementById('userPostsTimeline');
-    if (!timeline) return;
-    timeline.innerHTML = '<div class="no-data-notice">게시물을 가져오는 중...</div>';
-
+    const postsDiv = document.getElementById('userPosts');
     try {
-      // 오리지널 불러오기 주소 구조 유지
-      const posts = await api(`/posts?author_id=eq.${encodeURIComponent(viewingUserId)}&select=*&order=created_at.desc`);
-      timeline.innerHTML = '';
+      const posts = await api(`/posts?author=eq.${encodeURIComponent(userNickname)}&select=*&order=created_at.desc`);
 
-      const allFetched = posts || [];
-      
-      // 본인이 자신의 프로필을 확인하는 경우에는 비공개 게시물이 보이도록 허용하고,
-      // 다른 사용자가 타인의 프로필을 확인하는 경우에는 비공개(private) 및 일부공개(link) 게시물이 보이지 않도록 클라이언트 필터링 처리합니다.
-      const isMe = currentUser && String(currentUser.id) === String(viewingUserId);
-      const visiblePosts = isMe ? allFetched : allFetched.filter(post => post.access !== 'private' && post.access !== 'link');
-
-      if (visiblePosts.length === 0) {
-        timeline.innerHTML = '<div class="no-data-notice">작성된 공개 게시물이 존재하지 않습니다.</div>';
+      if (!posts?.length) {
+        postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
         return;
       }
 
-      visiblePosts.forEach(post => {
-        const card = document.createElement('div');
-        card.className = 'post-card';
+      // access 컬럼 값이 private 또는 link 인 게시물은 완전히 제외
+      const filteredPosts = posts.filter(post => post.access !== 'private' && post.access !== 'link');
 
-        const tStr = post.created_at ? new Date(post.created_at).toLocaleString('ko-KR', {
-          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        }) : '';
+      if (!filteredPosts.length) {
+        postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
+        return;
+      }
 
-        let imgBlock = '';
-        if (post.image_url) {
-          const arr = post.image_url.split(',').filter(Boolean);
-          if (arr.length > 0) {
-            const gridCls = `count-${Math.min(arr.length, 5)}`;
-            let gridItems = '';
-            arr.slice(0, 5).forEach((url, i) => {
-              const hasMore = i === 4 && arr.length > 5;
-              gridItems += `
-                <div class="image-grid-item">
-                  <img src="${url}" loading="lazy" alt="img">
-                  ${hasMore ? `<div class="image-more-overlay">+${arr.length - 5}</div>` : ''}
-                </div>
-              `;
-            });
-            imgBlock = `
-              <div class="post-image-container" onclick="window.location.href='view.html?id=${post.id}'">
-                <div class="image-grid ${gridCls}">${gridItems}</div>
-              </div>
-            `;
-          }
-        }
+      const postIds = filteredPosts.map(p => p.id).join(',');
+      let allLikes = [];
+      try {
+        allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`) || [];
+      } catch (e) {}
 
-        const parsedContent = post.content ? markdownToHtml(post.content) : '';
+      const likeCountMap = {};
+      allLikes.forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
 
-        // 비공개 상태 배지 텍스트 유무 가독성 표시 처리 (본인 전용)
-        let lockBadge = '';
-        if (isMe && post.access === 'private') lockBadge = ' <span style="color:var(--pink); font-size:11px; margin-left:4px;">🔒 비공개</span>';
-        if (isMe && post.access === 'link') lockBadge = ' <span style="color:var(--green); font-size:11px; margin-left:4px;">🔗 링크 공개</span>';
-
-        card.innerHTML = `
-          <div class="post-header">
-            <span class="post-time">${tStr}${lockBadge}</span>
-          </div>
-          ${parsedContent ? `<div class="post-content" onclick="window.location.href='view.html?id=${post.id}'" style="cursor:pointer;">${parsedContent}</div>` : ''}
-          ${imgBlock}
-          <div class="post-actions">
-            <button class="action-btn-item" id="lBtn-${post.id}" onclick="event.stopPropagation(); toggleLike('${post.id}')">
-              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-              <span id="lCnt-${post.id}">0</span>
-            </button>
-            <button class="action-btn-item" onclick="window.location.href='view.html?id=${post.id}'">
-              <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-              <span id="cCnt-${post.id}">0</span>
-            </button>
-          </div>
-        `;
-
-        timeline.appendChild(card);
-        loadLiveStats(post.id);
-      });
-
+      const postsWithLikes = filteredPosts.map(post => ({ ...post, likeCount: likeCountMap[post.id] || 0 }));
+      displayPosts(postsWithLikes);
     } catch (e) {
-      timeline.innerHTML = '<div class="no-data-notice" style="color:var(--pink);">타임라인 피드를 불러오지 못했습니다.</div>';
+      console.error('게시물 로드 오류:', e);
+      postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
     }
   }
 
-  async function loadLiveStats(postId) {
-    try {
-      const likes = await api(`/likes?post_id=eq.${postId}&select=id,user_id`);
-      const lCnt = document.getElementById(`lCnt-${postId}`);
-      if (lCnt) lCnt.textContent = likes ? likes.length : 0;
+  function renderPostImages(imageUrl) {
+    if (!imageUrl) return '';
+    const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
+    if (urls.length === 0) return '';
 
-      if (currentUser && likes) {
-        const isL = likes.some(l => String(l.user_id) === String(currentUser.id));
-        const btn = document.getElementById(`lBtn-${postId}`);
-        if (btn && isL) btn.classList.add('liked');
-      }
+    let html = `<div class="post-item-image-container">`;
+    html += `<div class="post-item-image-carousel">`;
 
-      const comments = await api(`/comments?post_id=eq.${postId}&select=id`);
-      const cCnt = document.getElementById(`cCnt-${postId}`);
-      if (cCnt) cCnt.textContent = comments ? comments.length : 0;
-    } catch {}
+    urls.forEach((url) => {
+      html += `<div class="post-item-image-slide"><img src="${escapeHtml(url)}" alt="게시글 이미지" loading="lazy"></div>`;
+    });
+
+    html += `</div>`;
+
+    if (urls.length > 1) {
+      html += `<div class="post-item-image-count">+${urls.length - 1}</div>`;
+    }
+
+    html += `</div>`;
+    return html;
   }
 
-  window.toggleLike = async function(postId) {
-    if (!currentUser) { alert('로그인이 필요한 기능입니다.'); return; }
-    const btn = document.getElementById(`lBtn-${postId}`);
-    const cnt = document.getElementById(`lCnt-${postId}`);
-    if (!btn || !cnt) return;
-
-    const isL = btn.classList.contains('liked');
-    let num = parseInt(cnt.textContent || '0');
-
-    try {
-      if (isL) {
-        btn.classList.remove('liked');
-        cnt.textContent = Math.max(0, num - 1);
-        await api(`/likes?post_id=eq.${postId}&user_id=eq.${encodeURIComponent(currentUser.id)}`, { method: "DELETE" });
-      } else {
-        btn.classList.add('liked');
-        cnt.textContent = num + 1;
-        await api("/likes", { method: "POST", body: JSON.stringify({ post_id: postId, user_id: currentUser.id }) });
-      }
-    } catch {
-      if (isL) { btn.classList.add('liked'); cnt.textContent = num; }
-      else { btn.classList.remove('liked'); cnt.textContent = num; }
-    }
+  window.prevPreviewSlide = function(btn) {
+    const container = btn.parentElement.querySelector('.post-item-image-carousel');
+    if (!container) return;
+    const width = container.clientWidth;
+    container.scrollBy({ left: -width, behavior: 'smooth' });
   };
 
-  window.openStatusModal = () => {
-    document.getElementById('statusInput').value = viewingUser.message || '';
-    document.getElementById('statusModal').classList.add('open');
-  };
-  window.closeStatusModal = () => {
-    document.getElementById('statusModal').classList.remove('open');
+  window.nextPreviewSlide = function(btn) {
+    const container = btn.parentElement.querySelector('.post-item-image-carousel');
+    if (!container) return;
+    const width = container.clientWidth;
+    container.scrollBy({ left: width, behavior: 'smooth' });
   };
 
-  window.saveStatusMsg = async () => {
-    const newMessage = document.getElementById('statusInput').value.trim();
-    if (!currentUser) { alert('로그인이 필요합니다.'); return; }
+  function displayPosts(posts) {
+    const postsDiv = document.getElementById('userPosts');
+    const gridDiv = document.createElement('div');
+    gridDiv.className = 'post-grid';
+    posts.forEach((post, idx) => {
+      const postItem = document.createElement('div');
+      postItem.className = 'post-item';
+      postItem.style.cssText = `opacity:0; transform:translateY(10px); transition: opacity 0.35s ease ${idx * 0.06}s, transform 0.35s cubic-bezier(0.22,1,0.36,1) ${idx * 0.06}s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;`;
+      postItem.onclick = () => { NProgress.start(); window.location.href = `view.html?id=${post.id}`; };
+
+      const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
+
+      postItem.innerHTML = `
+        ${renderPostImages(post.image_url)}
+        ${post.content ? `<div class="post-item-content"><div class="post-item-text">${parseMarkdown(post.content)}</div></div>` : ''}
+        <div class="post-item-footer">
+          <div class="post-item-date">${timeStr}</div>
+          <div class="post-item-likes">
+            <svg width="12" height="12" viewBox="0 0 2300 2300" fill="currentColor"><path d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/></svg>
+            ${post.likeCount}
+          </div>
+        </div>
+      `;
+      gridDiv.appendChild(postItem);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        postItem.style.opacity = '1';
+        postItem.style.transform = 'translateY(0)';
+      }));
+    });
+    postsDiv.innerHTML = '';
+    postsDiv.appendChild(gridDiv);
+  }
+
+  function showError(msg) {
+    document.getElementById('profileContent').innerHTML = `
+      <div class="profile-card">
+        <div style="text-align:center; padding:48px 20px;">
+          <div style="color:var(--pink); font-size:14px; margin-bottom:20px;">${msg}</div>
+          <button onclick="window.history.back()" style="background:#fff; color:#000; border:none; padding:10px 24px; border-radius:var(--r2); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">돌아가기</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('userPosts').innerHTML = '';
+  }
+
+  window.openStatusModal = function() {
+    const modal = document.getElementById('statusModal');
+    const input = document.getElementById('statusInput');
+    input.value = viewingUser?.message || '';
+    modal.classList.add('active');
+  };
+
+  window.closeStatusModal = function() {
+    document.getElementById('statusModal').classList.remove('active');
+  };
+
+  window.closeProfilePicModal = function() {
+    document.getElementById('profilePicModal').classList.remove('active');
+    const url = new URL(window.location);
+    url.searchParams.delete('u');
+    window.history.replaceState({}, '', url);
+  };
+
+  window.triggerProfilePicUpload = function() {
+    closeProfilePicModal();
+    document.getElementById('profileFileInput').click();
+  };
+
+  window.saveStatusMessage = async function() {
+    const input = document.getElementById('statusInput');
+    const newMessage = input.value.trim();
+    if (!currentUser?.id) { alert('로그인이 필요합니다.'); return; }
     try {
       await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
         method: "PATCH",
@@ -727,6 +1206,16 @@
       console.error('링크 복사 실패:', err);
     });
   };
+
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 </script>
+<script src="sharer-profile-sheet-host.js"></script>
 </body>
 </html>
