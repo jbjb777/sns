@@ -476,7 +476,6 @@
       from { opacity: 0; transform: scale(0.90) translateY(14px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
-
     .create-modal-content { max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 0; }
 
     .auth-close, .close-btn {
@@ -485,88 +484,105 @@
       color: var(--t2);
       font-size: 16px;
       cursor: pointer;
-      width: 30px; height: 30px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      line-height: 1;
     }
-    .auth-close:hover, .close-btn:hover { background: var(--bg4); color: var(--t1); }
     .auth-close { position: absolute; top: 16px; right: 16px; }
+    .auth-close:hover, .close-btn:hover { background: var(--bg4); color: var(--t1); transform: scale(1.1); }
+    .auth-close:active, .close-btn:active { transform: scale(0.90); }
 
-    .error-message { color: var(--pink); font-size: 12px; margin-top: -4px; margin-bottom: 10px; padding: 0 4px; display: none; }
-    .success-message { color: var(--green); font-size: 12px; margin-top: -4px; margin-bottom: 10px; padding: 0 4px; display: none; }
+    .auth-box h2, .create-modal-header h3 { font-size: 18px; font-weight: 600; color: var(--t1); letter-spacing: -0.02em; }
+    .auth-box h2 { text-align: center; margin-bottom: 26px; }
 
-    /* 모바일 반응형 추가 스태킹 */
-    @media (max-width: 920px) {
-      .recommend-container { display: none; }
-      .main-content { padding: 36px 20px; }
+    .auth-box input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: var(--r2);
+      border: 1px solid var(--border2);
+      font-size: 14px;
+      margin-bottom: 10px;
+      outline: none;
+      background: var(--bg3);
+      color: var(--t1);
+      font-family: inherit;
+      transition: border-color 0.2s, background 0.2s;
     }
-    @media (max-width: 680px) {
-      body { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
-      .sidebar-container {
-        width: 100vw; height: calc(56px + env(safe-area-inset-bottom, 0px));
-        top: auto; bottom: 0; left: 0;
-        border-top: 1px solid var(--border);
-      }
-      .sidebar-container iframe { width: 100vw !important; height: 100%; }
-      .main-wrapper { margin-left: 0; width: 100vw; min-height: calc(100vh - 56px - env(safe-area-inset-bottom, 0px)); }
-      .main-content { padding: 20px 16px; }
-      .post-image-nav { width: 36px; height: 36px; font-size: 20px; }
+    .auth-box input:focus { border-color: var(--border3); background: var(--bg4); }
+    .auth-box input::placeholder { color: var(--t3); }
+
+    .auth-box button {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: var(--r2);
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--t1);
+      color: var(--bg);
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      font-family: inherit;
+      margin-top: 6px;
+    }
+    .auth-box button:hover { background: #eee; transform: scale(1.02); }
+    .auth-box button:active { transform: scale(0.98); }
+
+    .auth-switch { text-align: center; margin-top: 20px; font-size: 13px; color: var(--t2); }
+    .auth-switch span { color: var(--t1); cursor: pointer; font-weight: 500; margin-left: 4px; text-decoration: underline; }
+
+    .auth-error { color: var(--pink); font-size: 12px; margin-top: -4px; margin-bottom: 12px; padding: 0 2px; min-height: 16px; }
+    .auth-success { color: var(--green); font-size: 12px; margin-top: -4px; margin-bottom: 12px; padding: 0 2px; min-height: 16px; }
+
+    @media (max-width: 930px) {
+      .recommend-container { display: none; }
+      .main-content { padding: 24px 16px; }
+    }
+    @media (max-width: 660px) {
+      body { flex-direction: column-reverse; }
+      .sidebar-container { width: 100%; height: 56px; top: auto; bottom: 0; border-top: 1px solid var(--border); }
+      .sidebar-container iframe { width: 100% !important; height: 56px; }
+      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: 56px; }
+      .main-content { padding: 12px 12px 32px; }
+      .post-card { padding: 24px 0; }
     }
   </style>
 </head>
 <body>
+
   <div id="splash">
     <div class="splash-inner">
-      <img src="logo.svg" class="splash-logo" alt="Sharer">
+      <img src="./logo.png" alt="Sharer" class="splash-logo">
       <div class="splash-text">
-        <div class="splash-title">Sharer</div>
-        <div class="splash-sub">By JBJB</div>
+        <div class="splash-title">SHARER</div>
+        <div class="splash-sub">FREE COMMUNITY</div>
       </div>
     </div>
   </div>
 
   <div class="sidebar-container">
-    <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
+    <iframe src="sidebar.html" id="sidebarIframe"></iframe>
   </div>
 
-  <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
-
   <div class="main-wrapper">
-    <div class="auth-modal" id="loginModal">
-      <div class="auth-box">
-        <button class="auth-close" onclick="closeLoginModal()">✕</button>
-        <h2>로그인</h2>
-        <input type="text" id="loginId" placeholder="아이디">
-        <input type="password" id="loginPassword" placeholder="비밀번호">
-        <div class="error-message" id="loginError"></div>
-        <div class="success-message" id="loginSuccess"></div>
-        <button onclick="handleLogin()">로그인</button>
-        <button class="secondary" onclick="showSignup()">회원가입</button>
-      </div>
-    </div>
-
-    <div class="auth-modal" id="signupModal">
-      <div class="auth-box">
-        <button class="auth-close" onclick="closeSignupModal()">✕</button>
-        <h2>회원가입</h2>
-        <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
-        <div class="error-message" id="nicknameError"></div>
-        <input type="text" id="signupId" placeholder="아이디">
-        <div class="error-message" id="idError"></div>
-        <input type="password" id="signupPassword" placeholder="비밀번호">
-        <div class="error-message" id="signupError"></div>
-        <div class="success-message" id="signupSuccess"></div>
-        <button onclick="handleSignup()">가입</button>
-        <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
-      </div>
-    </div>
-
     <main class="main-content">
-      <div class="feed-container">
-        <div id="postsFeed">
+      <div class="feed-container" id="postsContainer">
+        <div id="postsSkeleton">
+          <div class="skeleton-post">
+            <div class="skeleton-post-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-username"></div>
+            </div>
+            <div class="skeleton skeleton-post-image"></div>
+            <div class="skeleton skeleton-text text-long"></div>
+            <div class="skeleton skeleton-text text-medium"></div>
+            <div class="skeleton skeleton-text text-short"></div>
+          </div>
           <div class="skeleton-post">
             <div class="skeleton-post-header">
               <div class="skeleton skeleton-avatar"></div>
@@ -576,33 +592,17 @@
             <div class="skeleton skeleton-text text-long"></div>
             <div class="skeleton skeleton-text text-medium"></div>
           </div>
-          <div class="skeleton-post">
-            <div class="skeleton-post-header">
-              <div class="skeleton skeleton-avatar"></div>
-              <div class="skeleton skeleton-username"></div>
-            </div>
-            <div class="skeleton skeleton-post-image"></div>
-            <div class="skeleton skeleton-text text-long"></div>
-          </div>
         </div>
       </div>
 
       <div class="recommend-container">
         <div class="recommend-title">추천 프로필</div>
-        <div id="recommendedProfiles">
-          <div class="skeleton-profile-item">
-            <div class="skeleton skeleton-profile-avatar"></div>
-            <div class="skeleton skeleton-profile-nickname"></div>
-          </div>
-          <div class="skeleton-profile-item">
-            <div class="skeleton skeleton-profile-avatar"></div>
-            <div class="skeleton skeleton-profile-nickname"></div>
-          </div>
-          <div class="skeleton-profile-item">
-            <div class="skeleton skeleton-profile-avatar"></div>
-            <div class="skeleton skeleton-profile-nickname"></div>
-          </div>
+        <div id="recommendSkeleton" style="display: flex; flex-direction: column; gap: 4px;">
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
         </div>
+        <div id="recommendContainer" style="display: flex; flex-direction: column; gap: 4px;"></div>
       </div>
     </main>
 
@@ -611,386 +611,251 @@
         <a href="privacy.html">개인정보처리방침</a>
         <a href="policy.html">이용약관</a>
       </div>
-      <div class="footer-text">© 2026 Sharer. Designed by 정빈777. All rights reserved.</div>
+      <div class="footer-text">© 2026 Sharer. All rights reserved. Built by 정빈777.</div>
     </footer>
   </div>
 
+  <div class="auth-modal" id="loginModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeLoginModal()">×</button>
+      <h2>로그인</h2>
+      <input type="text" id="loginId" placeholder="아이디">
+      <input type="password" id="loginPassword" placeholder="비밀번호">
+      <div class="auth-error" id="loginError"></div>
+      <div class="auth-success" id="loginSuccess"></div>
+      <button onclick="handleLogin()">로그인</button>
+      <div class="auth-switch">계정이 없으신가요?<span onclick="openSignupModal()">회원가입</span></div>
+    </div>
+  </div>
+
+  <div class="auth-modal" id="signupModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeSignupModal()">×</button>
+      <h2>회원가입</h2>
+      <input type="text" id="signupId" placeholder="아이디 (영문, 숫자 4~15자)">
+      <input type="text" id="signupNickname" placeholder="닉네임 (2~10자)">
+      <input type="password" id="signupPassword" placeholder="비밀번호 (6자 이상)">
+      <div class="auth-error" id="signupError"></div>
+      <div class="auth-success" id="signupSuccess"></div>
+      <button onclick="handleSignup()">회원가입</button>
+      <div class="auth-switch">이미 계정이 있으신가요?<span onclick="openLoginModal()">로그인</span></div>
+    </div>
+  </div>
+
+  <script src="./supabase.js"></script>
   <script>
-    (function () {
-      const splash = document.getElementById('splash');
-      if (sessionStorage.getItem('splashShown')) {
-        splash.style.display = 'none';
-      } else {
-        sessionStorage.setItem('splashShown', 'true');
-        function finishSplash() {
-          splash.classList.add('fade-out');
-          setTimeout(() => {
-            splash.style.display = 'none';
-          }, 460);
-        }
-        const splashStart = Date.now();
-        const MIN_SPLASH = 2000;
-        window.addEventListener('load', () => {
-          NProgress.done();
-          const elapsed = Date.now() - splashStart;
-          const remaining = Math.max(0, MIN_SPLASH - elapsed);
-          setTimeout(finishSplash, remaining);
-        });
-        setTimeout(finishSplash, 5000);
-      }
-    })();
-
-    const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-
-    async function api(endpoint, options = {}) {
-      const url = API_BASE + endpoint;
-      const res = await fetch(url, {
-        ...options,
-        headers: {
-          "Content-Type": "application/json",
-          ...(options.headers || {})
-        },
-      });
-      if (!res.ok) {
-        let errorText;
-        try { errorText = await res.text(); } catch { errorText = ""; }
-        throw new Error(`API 오류 (${res.status}): ${errorText}`);
-      }
-      if (res.status === 204) return null;
-      return res.json();
-    }
-
     let currentUser = null;
-    let selectedImage = null;
-    const postAuthorIdMap = Object.create(null);
-    const cloudName = 'dretlhsrk';
-    const uploadPreset = 'unsigned_preset';
-
-    async function createNotification(targetUserId, detail, link) {
-      if (!targetUserId || targetUserId === currentUser?.id) return;
-      try {
-        await api("/notification", {
-          method: "POST",
-          body: JSON.stringify({ user: targetUserId, detail, link, isread: 0, created_at: new Date().toISOString() })
-        });
-      } catch (e) {}
-    }
+    let likedPostsSet = new Set();
 
     function initCurrentUser() {
-      const savedUser = localStorage.getItem('snsUser');
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        updateSidebar();
+      const stored = localStorage.getItem('snsUser');
+      if (stored) {
+        try { currentUser = JSON.parse(stored); } catch(e) { currentUser = null; }
       }
     }
 
-    function applyFadeEffect() {
-      const elements = document.querySelectorAll('.post-content');
-      elements.forEach(el => {
-        if (el.scrollHeight > el.clientHeight) {
-          el.classList.add('fade');
+    window.addEventListener('load', () => {
+      NProgress.start();
+      initCurrentUser();
+      loadPosts();
+      loadRecommendProfiles();
+      if (currentUser) { loadLikedPosts(); }
+      
+      setTimeout(() => {
+        const splash = document.getElementById('splash');
+        if (splash) {
+          splash.classList.add('fade-out');
+          setTimeout(() => splash.remove(), 450);
         }
+        NProgress.done();
+      }, 600);
+    });
+
+    async function loadLikedPosts() {
+      if (!currentUser) return;
+      try {
+        const likes = await api(`/likes?user_id=eq.${currentUser.id}`);
+        likedPostsSet = new Set(likes.map(l => l.post_id));
+        updateLikeButtonsUI();
+      } catch (e) { console.error('좋아요 로드 실패:', e); }
+    }
+
+    function updateLikeButtonsUI() {
+      likedPostsSet.forEach(postId => {
+        const btn = document.querySelector(`[data-post-id="${postId}"] .like-button`);
+        if (btn) btn.classList.add('liked');
       });
     }
 
-    function formatPostTime(isoString) {
-      if (!isoString) return '';
-      const date = new Date(isoString);
-      const now = new Date();
-      const diffMs = now - date;
-      const diffMins = Math.floor(diffMs / 60000);
-      const diffHours = Math.floor(diffMins / 60);
-
-      if (diffMins < 1) return '방금 전';
-      if (diffMins < 60) return `${diffMins}분 전`;
-      if (diffHours < 24) return `${diffHours}시간 전`;
-
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}년 ${m}월 ${d}일`;
-    }
-
-    function parseMarkdown(text) {
-      if (!text) return '';
-      let html = text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      
-      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-      html = html.replace(/__(.*?)__/g, '<u>$1</u>');
-      html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
-      html = html.replace(/\n/g, '<br>');
-      return html;
-    }
-
-    function escapeHtml(unsafe) {
-      if (!unsafe) return '';
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
+    // 비공개 및 일부 공개 게시물이 노출되지 않도록 필터링 규칙이 결합된 loadPosts 함수입니다.
     async function loadPosts() {
-      const feedDiv = document.getElementById('postsFeed');
+      const container = document.getElementById('postsContainer');
+      const skeleton = document.getElementById('postsSkeleton');
       try {
-        let [rawPosts, users, likes] = await Promise.all([
-          api("/posts?select=*"),
-          api("/users?select=id,nickname,profile_image"),
-          api("/likes?select=post_id")
-        ]);
+        // visibility가 '비공개' 및 '일부 공개'인 것은 불러오지 않도록 Supabase API 호출 파라미터 구성
+        const posts = await api('/posts?order=created_at.desc&visibility=neq.비공개&visibility=neq.일부 공개');
+        if (skeleton) skeleton.remove();
 
-        if (!rawPosts || rawPosts.length === 0) {
+        // 기존 게시글 렌더링 카드들 초기화
+        const existingCards = container.querySelectorAll('.post-card, .no-posts');
+        existingCards.forEach(el => el.remove());
+
+        if (!posts || posts.length === 0) {
           showNoPosts();
           return;
         }
-
-        // 비공개 및 일부 공개 게시물 필터링 추가 (visibility 필터 적용)
-        const posts = rawPosts.filter(post => {
-          return post.visibility !== '비공개' && post.visibility !== '일부 공개' && post.visibility !== '일부공개';
-        });
-
-        if (posts.length === 0) {
-          showNoPosts();
-          return;
-        }
-
-        posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-        const usersMap = Object.create(null);
-        if (users) {
-          users.forEach(u => { usersMap[u.id] = u; });
-        }
-
-        const likeCountMap = Object.create(null);
-        if (likes) {
-          likes.forEach(l => {
-            likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1;
-          });
-        }
-
-        let myLikes = null;
-        if (currentUser) {
-          myLikes = await api(`/likes?user_id=eq.${currentUser.id}&select=post_id`);
-        }
-        const myLikeSet = new Set((myLikes || []).map(l => l.post_id));
-
-        feedDiv.innerHTML = '';
 
         posts.forEach((post, idx) => {
-          postAuthorIdMap[post.id] = post.author_id;
-          const userInfo = usersMap[post.author_id] || null;
-          const authorNickname = userInfo?.nickname || post.author || '알 수 없음';
-          const authorAvatar = userInfo?.profile_image || null;
-          const isVerified = authorNickname === "JB777";
-          const timeStr = formatPostTime(post.created_at);
-          const canDelete = currentUser?.nickname === "JB777";
-          const likeCount = likeCountMap[post.id] || 0;
-          const liked = myLikeSet.has(post.id);
+          const card = document.createElement('div');
+          card.className = 'post-card';
+          card.style.animationDelay = `${idx * 0.04}s`;
 
-          const avatarHTML = authorAvatar 
-            ? `<img src="${escapeHtml(authorAvatar)}" class="post-author-avatar" style="object-fit:cover;" alt="${escapeHtml(authorNickname)}">` 
-            : `<div class="post-author-avatar">${(authorNickname[0] || '?').toUpperCase()}</div>`;
-          
-          const authorDisplay = isVerified 
-            ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>` 
-            : escapeHtml(authorNickname);
-          
-          const deleteButton = canDelete 
-            ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>` 
-            : '';
+          let isLiked = likedPostsSet.has(post.id);
+          let initialHeart = isLiked ? 'liked' : '';
 
-          let contentHTML = '';
-          if (post.content) {
-            contentHTML = `<div class="post-content">${parseMarkdown(post.content)}</div>`;
+          let imagesHTML = '';
+          if (post.image_url) {
+            const urls = post.image_url.split(',').map(u => u.trim()).filter(Boolean);
+            if (urls.length > 0) {
+              let slides = urls.map(u => `<div class="post-image-slide"><img src="${u}" alt="post image" loading="lazy"></div>`).join('');
+              let navButtons = '';
+              if (urls.length > 1) {
+                navButtons = `
+                  <button class="post-image-nav prev" onclick="event.stopPropagation(); moveSlide(this, -1)">‹</button>
+                  <button class="post-image-nav next" onclick="event.stopPropagation(); moveSlide(this, 1)">›</button>
+                `;
+              }
+              imagesHTML = `
+                <div class="post-image-container">
+                  ${navButtons}
+                  <div class="post-image-carousel">${slides}</div>
+                </div>
+              `;
+            }
           }
 
-          const postCard = document.createElement('div');
-          postCard.className = 'post-card';
-          postCard.style.animationDelay = `${Math.min(idx, 7) * 0.07}s`;
-          postCard.innerHTML = `
+          let deleteBtnHTML = '';
+          if (currentUser && (currentUser.id === post.author_id || currentUser.nickname === '정빈777')) {
+            deleteBtnHTML = `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`;
+          }
+
+          let badgeHTML = (post.author === '정빈777') ? '<span class="verification-badge"></span>' : '';
+
+          let initialText = escapeHtml(post.content || '');
+          let hasManyLines = initialText.split('\n').length > 10;
+          let fadeClass = hasManyLines ? 'fade' : '';
+
+          let avatarHTML = post.author_profile 
+            ? `<img src="${post.author_profile}" class="post-author-avatar" alt="">`
+            : `<div class="post-author-avatar">${escapeHtml(post.author ? post.author.substring(0,1) : '?')}</div>`;
+
+          card.setAttribute('data-post-id', post.id);
+          card.innerHTML = `
             <div class="post-header">
-              <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${encodeURIComponent(authorNickname)}')">
+              <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${post.author}')">
                 ${avatarHTML}
-                <span class="post-author-name">${authorDisplay}</span>
+                <span class="post-author-name">${escapeHtml(post.author || '알 수 없음')}${badgeHTML}</span>
               </div>
-              ${deleteButton}
+              ${deleteBtnHTML}
             </div>
-            ${renderPostImages(post.image_url)}
-            ${contentHTML}
-            <div class="post-time">${timeStr}</div>
+            <div class="post-content ${fadeClass}">${initialText.replace(/\n/g, '<br>')}</div>
+            ${imagesHTML}
+            <div class="post-time">${formatTime(post.created_at)}</div>
             <div class="post-actions">
-              <button class="like-button ${liked ? 'liked' : ''}" data-post-id="${post.id}" onclick="event.stopPropagation(); handleLikeClick(this)">
+              <button class="like-button ${initialHeart}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
                 <svg class="like-heart" viewBox="0 0 24 24">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
-                <span class="like-count">${likeCount}</span>
+                <span class="like-count">${post.likes_count || 0}</span>
               </button>
             </div>
           `;
 
-          postCard.onclick = () => {
+          card.onclick = () => {
+            NProgress.start();
             window.location.href = `view.html?id=${post.id}`;
           };
 
-          feedDiv.appendChild(postCard);
+          container.appendChild(card);
         });
-
-        applyFadeEffect();
 
       } catch (err) {
         console.error('피드 로드 오류:', err);
-        feedDiv.innerHTML = '<div class="no-posts"><div class="no-posts-icon">⚠️</div><div class="no-posts-text">피드를 불러오는 중 오류가 발생했습니다.</div></div>';
+        if (skeleton) skeleton.innerHTML = '<div style="text-align:center;color:var(--t3);padding:40px 0;">게시물을 불러오지 못했습니다.</div>';
       }
     }
 
-    function showNoPosts() {
-      document.getElementById('postsFeed').innerHTML = `
-        <div class="no-posts">
-          <div class="no-posts-icon">📭</div>
-          <div class="no-posts-text">
-            아직 게시물이 없습니다.<br>
-            첫 번째 게시물을 작성해보세요!
-          </div>
-        </div>
-      `;
-    }
-
-    async function handleLikeClick(button) {
-      if (!currentUser) {
-        document.getElementById('loginModal').classList.add('active');
-        return;
-      }
-      const postId = button.getAttribute('data-post-id');
-      const countEl = button.querySelector('.like-count');
-      
-      try {
-        const [likeRecords, likeCountResult] = await Promise.all([
-          api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
-          api(`/likes?post_id=eq.${postId}&select=count`)
-        ]);
-
-        const currentlyLiked = likeRecords && likeRecords.length > 0;
-        const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
-
-        const uiLiked = button.classList.contains('liked');
-        const uiCount = parseInt(countEl.textContent, 10) || 0;
-
-        if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
-          button.classList.toggle('liked', currentlyLiked);
-          countEl.textContent = currentServerCount;
-        }
-
-        if (currentlyLiked) {
-          if (likeRecords?.[0]?.id) {
-            await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
-          }
-          button.classList.remove('liked');
-          countEl.textContent = currentServerCount - 1;
-        } else {
-          await api("/likes", {
-            method: "POST",
-            body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
-          });
-          button.classList.add('liked');
-          countEl.textContent = currentServerCount + 1;
-          createNotification(postAuthorIdMap[postId], `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
-        }
-
-        const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`).then(r => Math.max(0, r?.[0]?.count || 0));
-        countEl.textContent = finalCount;
-
-      } catch (err) {
-        console.error("좋아요 처리 중 오류:", err);
-        try {
-          const [records, countRes] = await Promise.all([
-            api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
-            api(`/likes?post_id=eq.${postId}&select=count`)
-          ]);
-          button.classList.toggle('liked', records?.length > 0);
-          countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
-        } catch (recoveryErr) {
-          console.error("복구 실패:", recoveryErr);
-        }
-      }
-    }
-
-    function renderPostImages(imageUrl) {
-      if (!imageUrl) return '';
-      const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
-      if (urls.length === 0) return '';
-
-      let html = `<div class="post-image-container">`;
-      html += `<div class="post-image-carousel">`;
-      urls.forEach(url => {
-        html += `
-          <div class="post-image-slide">
-            <img src="${escapeHtml(url)}" loading="lazy" alt="Post Image">
-          </div>
-        `;
-      });
-      html += `</div>`;
-
-      if (urls.length > 1) {
-        html += `
-          <button class="post-image-nav prev" onclick="event.stopPropagation(); moveCarousel(this, -1)">‹</button>
-          <button class="post-image-nav next" onclick="event.stopPropagation(); moveCarousel(this, 1)">›</button>
-        `;
-      }
-      html += `</div>`;
-      return html;
-    }
-
-    window.moveCarousel = function(button, direction) {
-      const container = button.parentElement.querySelector('.post-image-carousel');
-      if (!container) return;
-      const width = container.clientWidth;
-      container.scrollBy({ left: direction * width, behavior: 'smooth' });
+    window.moveSlide = function(btn, dir) {
+      const container = btn.parentElement;
+      const carousel = container.querySelector('.post-image-carousel');
+      if (!carousel) return;
+      const width = carousel.offsetWidth;
+      carousel.scrollBy({ left: width * dir, behavior: 'smooth' });
     };
 
-    async function loadRecommendedProfiles() {
-      const container = document.getElementById('recommendedProfiles');
-      const skeleton = container.innerHTML;
+    function showNoPosts() {
+      const container = document.getElementById('postsContainer');
+      const div = document.createElement('div');
+      div.className = 'no-posts';
+      div.innerHTML = `
+        <div class="no-posts-icon">📭</div>
+        <div>아직 업로드된 전체 공개 게시물이 없습니다.<br>첫 번째 게시물을 공유해보세요!</div>
+      `;
+      container.appendChild(div);
+    }
+
+    async function toggleLike(postId, btn) {
+      if (!currentUser) { alert('로그인이 필요한 기능입니다.'); openLoginModal(); return; }
+      const countEl = btn.querySelector('.like-count');
+      let currentCount = parseInt(countEl.textContent || '0');
+
+      if (likedPostsSet.has(postId)) {
+        likedPostsSet.delete(postId);
+        btn.classList.remove('liked');
+        countEl.textContent = Math.max(0, currentCount - 1);
+        try {
+          await api(`/likes?user_id=eq.${currentUser.id}&post_id=eq.${postId}`, { method: 'DELETE' });
+        } catch(e) { console.error(e); }
+      } else {
+        likedPostsSet.add(postId);
+        btn.classList.add('liked');
+        countEl.textContent = currentCount + 1;
+        try {
+          await api('/likes', {
+            method: 'POST',
+            body: JSON.stringify({ user_id: currentUser.id, post_id: postId })
+          });
+        } catch(e) { console.error(e); }
+      }
+    }
+
+    async function loadRecommendProfiles() {
+      const container = document.getElementById('recommendContainer');
+      const skeleton = document.getElementById('recommendSkeleton');
       try {
-        let users = await api("/users?select=id,nickname,profile_image");
-        if (!users?.length) {
-          container.innerHTML = '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">사용자 없음</div>';
+        const users = await api('/users?limit=5');
+        if (skeleton) skeleton.remove();
+        container.innerHTML = '';
+
+        if (!users || users.length === 0) {
+          container.innerHTML = '<div style="text-align:center;color:var(--t3);padding:12px 0;font-size:13px;">추천이 없습니다.</div>';
           return;
         }
 
-        for (let i = users.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [users[i], users[j]] = [users[j], users[i]];
-        }
-        users = users.slice(0, 7);
-
-        container.innerHTML = '';
         users.forEach((user, idx) => {
-          const isVerified = user.nickname === "JB777";
-          const avatarHTML = user.profile_image 
-            ? `<img src="${escapeHtml(user.profile_image)}" class="profile-avatar" style="object-fit:cover;" alt="${escapeHtml(user.nickname)}">` 
-            : `<div class="profile-avatar">${(user.nickname[0] || '?').toUpperCase()}</div>`;
-          
-          const nameDisplay = isVerified 
-            ? `${escapeHtml(user.nickname)}<span class="verification-badge"></span>` 
-            : escapeHtml(user.nickname);
-
+          if (currentUser && user.id === currentUser.id) return;
           const item = document.createElement('div');
           item.className = 'profile-item';
+          
+          let avatarHTML = user.profile_image 
+            ? `<img src="${user.profile_image}" class="profile-avatar" alt="">`
+            : `<div class="profile-avatar">${escapeHtml(user.nickname ? user.nickname.substring(0,1) : '?')}</div>`;
+
           item.style.opacity = '0';
-          item.style.transform = 'translateX(8px)';
-          item.style.transition = `opacity 0.4s cubic-bezier(0.22,1,0.36,1) ${idx * 0.05}s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1)`;
-          item.innerHTML = `${avatarHTML}<span class="profile-nickname">${nameDisplay}</span>`;
-          
-          item.onclick = () => { 
-            window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`; 
-          };
-          
+          item.style.transform = 'translateX(10px)';
+          item.style.transition = `opacity 0.4s cubic-bezier(0.22,1,0.36,1) ${idx * 0.05}s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);`;
+          item.innerHTML = `${avatarHTML}<span class=\"profile-nickname\">${escapeHtml(user.nickname)}</span>`;
+          item.onclick = () => { window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`; };
           container.appendChild(item);
           requestAnimationFrame(() => requestAnimationFrame(() => {
             item.style.opacity = '1';
@@ -999,7 +864,7 @@
         });
       } catch (err) {
         console.error('추천 프로필 로드 오류:', err);
-        container.innerHTML = '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">로드 실패</div>';
+        if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">로드 실패</div>';
       }
     }
 
@@ -1018,170 +883,122 @@
       }
     };
 
-    function updateSidebar() {
-      try {
-        const iframe = document.getElementById('sidebarFrame');
-        if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage({ type: 'AUTH_UPDATE' }, '*');
-        }
-      } catch (e) {}
-    }
-
-    function updateSidebarMode() {
-      const iframe = document.getElementById('sidebarFrame');
-      if (!iframe) return;
-      if (window.innerWidth <= 680) {
-        iframe.style.width = '100vw';
-        iframe.style.height = '100%';
-      } else {
-        iframe.style.width = '72px';
-        iframe.style.height = '100vh';
-      }
-    }
-
-    window.addEventListener('message', (e) => {
-      if (e.data && e.data.type === 'OPEN_LOGIN') {
-        if (currentUser) {
-          localStorage.removeItem('snsUser');
-          currentUser = null;
-          updateSidebar();
-          location.reload();
-        } else {
-          document.getElementById('loginModal').classList.add('active');
-        }
-      }
-    });
-
-    window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
-    window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
-    
-    window.showSignup = () => {
-      closeLoginModal();
-      document.getElementById('signupModal').classList.add('active');
-    };
-    
-    window.backToLogin = () => {
-      closeSignupModal();
-      document.getElementById('loginModal').classList.add('active');
-    };
-
+    // 로그인 처리 기능 (기존 코드 누락 부활)
     async function handleLogin() {
-      const idInput = document.getElementById('loginId');
-      const pwInput = document.getElementById('loginPassword');
-      const errDiv = document.getElementById('loginError');
-      const succDiv = document.getElementById('loginSuccess');
+      const loginId = document.getElementById('loginId').value.trim();
+      const loginPassword = document.getElementById('loginPassword').value.trim();
+      const errorDiv = document.getElementById('loginError');
+      const successDiv = document.getElementById('loginSuccess');
 
-      const username = idInput.value.trim();
-      const password = pwInput.value.trim();
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
 
-      errDiv.style.display = 'none';
-      succDiv.style.display = 'none';
-
-      if (!username || !password) {
-        errDiv.textContent = '아이디와 비밀번호를 모두 입력해주세요.';
-        errDiv.style.display = 'block';
+      if (!loginId || !loginPassword) {
+        errorDiv.textContent = '아이디와 비밀번호를 모두 입력해주세요.';
         return;
       }
 
       try {
-        const users = await api(`/users?username=eq.${encodeURIComponent(username)}&password=eq.${encodeURIComponent(password)}`);
-        if (!users || users.length === 0) {
-          errDiv.textContent = '아이디 또는 비밀번호가 올바르지 않습니다.';
-          errDiv.style.display = 'block';
-          return;
+        const users = await api(`/users?id=eq.${encodeURIComponent(loginId)}&password=eq.${encodeURIComponent(loginPassword)}`);
+
+        if (users && users.length > 0) {
+          const loggedInUser = users[0];
+          successDiv.textContent = '로그인 성공! 잠시 후 새로고침됩니다.';
+          
+          localStorage.setItem('snsUser', JSON.stringify({
+            id: loggedInUser.id,
+            nickname: loggedInUser.nickname,
+            profile_image: loggedInUser.profile_image
+          }));
+
+          setTimeout(() => {
+            closeLoginModal();
+            location.reload();
+          }, 1000);
+        } else {
+          errorDiv.textContent = '아이디 또는 비밀번호가 올바르지 않습니다.';
         }
-
-        succDiv.textContent = '로그인 성공!';
-        succDiv.style.display = 'block';
-
-        localStorage.setItem('snsUser', JSON.stringify(users[0]));
-        currentUser = users[0];
-        updateSidebar();
-
-        setTimeout(() => {
-          closeLoginModal();
-          location.reload();
-        }, 600);
-
       } catch (err) {
-        errDiv.textContent = '로그인 중 오류가 발생했습니다.';
-        errDiv.style.display = 'block';
+        console.error('로그인 오류:', err);
+        errorDiv.textContent = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
       }
     }
 
     async function handleSignup() {
-      const nickInput = document.getElementById('signupNickname');
-      const idInput = document.getElementById('signupId');
-      const pwInput = document.getElementById('signupPassword');
-      
-      const nickErr = document.getElementById('nicknameError');
-      const idErr = document.getElementById('idError');
-      const signErr = document.getElementById('signupError');
-      const signSucc = document.getElementById('signupSuccess');
+      const id = document.getElementById('signupId').value.trim();
+      const nick = document.getElementById('signupNickname').value.trim();
+      const pw = document.getElementById('signupPassword').value.trim();
+      const errEl = document.getElementById('signupError');
+      const sucEl = document.getElementById('signupSuccess');
 
-      nickErr.style.display = 'none';
-      idErr.style.display = 'none';
-      signErr.style.display = 'none';
-      signSucc.style.display = 'none';
+      errEl.textContent = ''; sucEl.textContent = '';
 
-      const nickname = nickInput.value.trim();
-      const username = idInput.value.trim();
-      const password = pwInput.value.trim();
-
-      if (!nickname) { nickErr.textContent = '닉네임을 입력해주세요.'; nickErr.style.display = 'block'; return; }
-      if (!username) { idErr.textContent = '아이디를 입력해주세요.'; idErr.style.display = 'block'; return; }
-      if (!password) { signErr.textContent = '비밀번호를 입력해주세요.'; signErr.style.display = 'block'; return; }
+      if (!id || !nick || !pw) { errEl.textContent = '모든 필드를 입력해 주세요.'; return; }
+      if (!/^[a-zA-Z0-9]{4,15}$/.test(id)) { errEl.textContent = '아이디는 영문/숫자 4~15자여야 합니다.'; return; }
+      if (nick.length < 2 || nick.length > 10) { errEl.textContent = '닉네임은 2~10자여야 합니다.'; return; }
+      if (pw.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 합니다.'; return; }
 
       try {
-        const existNick = await api(`/users?nickname=eq.${encodeURIComponent(nickname)}`);
-        if (existNick && existNick.length > 0) {
-          nickErr.textContent = '이미 사용 중인 닉네임입니다.';
-          nickErr.style.display = 'block';
-          return;
-        }
+        const checkId = await api(`/users?id=eq.${encodeURIComponent(id)}`);
+        if (checkId && checkId.length > 0) { errEl.textContent = '이미 사용 중인 아이디입니다.'; return; }
+        const checkNick = await api(`/users?nickname=eq.${encodeURIComponent(nick)}`);
+        if (checkNick && checkNick.length > 0) { errEl.textContent = '이미 사용 중인 닉네임입니다.'; return; }
 
-        const existId = await api(`/users?username=eq.${encodeURIComponent(username)}`);
-        if (existId && existId.length > 0) {
-          idErr.textContent = '이미 사용 중인 아이디입니다.';
-          idErr.style.display = 'block';
-          return;
-        }
-
-        const newUser = await api("/users", {
-          method: "POST",
-          body: JSON.stringify({ nickname, username, password, created_at: new Date().toISOString() })
+        await api('/users', {
+          method: 'POST',
+          body: JSON.stringify({ id: id, nickname: nick, password: pw, created_at: new Date().toISOString() })
         });
 
-        signSucc.textContent = '회원가입이 완료되었습니다!';
-        signSucc.style.display = 'block';
-
-        setTimeout(async () => {
-          try {
-            const loginUsers = await api(`/users?username=eq.${encodeURIComponent(username)}&password=eq.${encodeURIComponent(password)}`);
-            if (loginUsers && loginUsers.length > 0) {
-              localStorage.setItem('snsUser', JSON.stringify(loginUsers[0]));
-            }
-          } catch (e) {}
-          closeSignupModal();
-          location.reload();
-        }, 1000);
-
-      } catch (err) {
-        signErr.textContent = '회원가입 처리 중 오류가 발생했습니다.';
-        signErr.style.display = 'block';
+        sucEl.textContent = '회원가입 완료! 잠시 후 로그인 창으로 이동합니다.';
+        setTimeout(() => { openLoginModal(); }, 1200);
+      } catch (e) {
+        console.error(e);
+        errEl.textContent = '회원가입 진행 중 서버 오류가 발생했습니다.';
       }
     }
 
-    // 초기 로드 실행
-    NProgress.start();
-    initCurrentUser();
-    updateSidebarMode();
-    window.addEventListener('resize', updateSidebarMode);
+    window.openLoginModal = () => {
+      document.getElementById('signupModal').classList.remove('active');
+      document.getElementById('loginModal').classList.add('active');
+      document.getElementById('loginId').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginError').textContent = '';
+      document.getElementById('loginSuccess').textContent = '';
+    };
+    window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadPosts();
-      loadRecommendedProfiles();
-    });
+    window.openSignupModal = () => {
+      document.getElementById('loginModal').classList.remove('active');
+      document.getElementById('signupModal').classList.add('active');
+      document.getElementById('signupId').value = '';
+      document.getElementById('signupNickname').value = '';
+      document.getElementById('signupPassword').value = '';
+      document.getElementById('signupError').textContent = '';
+      document.getElementById('signupSuccess').textContent = '';
+    };
+    window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
+
+    function formatTime(isoString) {
+      if (!isoString) return '';
+      const date = new Date(isoString);
+      const now = new Date();
+      const diff = (now - date) / 1000;
+      if (diff < 60) return '방금 전';
+      if (diff < 3600) return `${Math.floor(diff/60)}분 전`;
+      if (diff < 86400) return `${Math.floor(diff/3600)}시간 전`;
+      return `${date.getFullYear()}. ${date.getMonth()+1}. ${date.getDate()}`;
+    }
+
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    window.handleLogin = handleLogin;
   </script>
 </body>
 </html>
