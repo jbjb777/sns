@@ -801,17 +801,14 @@
   </style>
 </head>
 <body>
-  <!-- SPLASH -->
   <div id="splash">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
 
-  <!-- 로그인 알림 -->
   <div class="login-alert" id="loginAlert">
     <span>로그인 후 사용 가능합니다</span>
   </div>
 
-  <!-- 게시물 삭제 확인 모달 -->
   <div class="delete-modal-overlay" id="deleteModal">
     <div class="delete-modal">
       <img src="careful.png" alt="주의">
@@ -823,7 +820,6 @@
     </div>
   </div>
 
-  <!-- 이미지 라이트박스 -->
   <div id="imageLightbox">
     <div class="lightbox-content">
       <button class="lightbox-close" onclick="closeLightbox()">✕</button>
@@ -1130,6 +1126,19 @@
         return;
       }
       const post = posts[0];
+
+      // access 값이 private 일 때 권한 확인 처리 코드 추가
+      if (post.access === 'private') {
+        const isAuthor = currentUser && (
+          currentUser.id === post.author_id || 
+          currentUser.nickname === post.author
+        );
+        if (!isAuthor) {
+          window.location.href = '403.html';
+          return;
+        }
+      }
+
       const authorProfileImage = await getProfileImage(post.author_id);
       currentPost = { ...post, author_profile_image: authorProfileImage };
       displayPost(currentPost, postId);
