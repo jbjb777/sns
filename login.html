@@ -446,7 +446,7 @@
 
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleLoginBtn" onclick="showGoogleModal('login')">
-          <img src="https://sharer.jbjb.r-e.kr/google.svg" alt="Google">
+          <img src="https://sharer.r-e.kr/google.svg" alt="Google">
           구글로 로그인
         </button>
       </div>
@@ -477,7 +477,7 @@
 
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleSignupBtn" onclick="showGoogleModal('signup')">
-          <img src="https://sharer.jbjb.r-e.kr/google.svg" alt="Google">
+          <img src="https://sharer.r-e.kr/google.svg" alt="Google">
           구글로 가입
         </button>
       </div>
@@ -588,7 +588,7 @@
   }
 
   window.handleNextStep = function() {
-    setTimeout(() => { window.location.href = 'https://sharer.jbjb.r-e.kr/join.html'; }, 300);
+    setTimeout(() => { window.location.href = 'https://sharer.r-e.kr/join.html'; }, 300);
   }
 
   window.showGoogleModal = function(mode) {
@@ -628,7 +628,7 @@
     } else {
       btn.disabled = false;
       const text = buttonId === 'googleLoginBtn' ? '구글로 로그인' : '구글로 가입';
-      btn.innerHTML = `<img src="https://sharer.jbjb.r-e.kr/google.svg" alt="Google"> ${text}`;
+      btn.innerHTML = `<img src="https://sharer.r-e.kr/google.svg" alt="Google"> ${text}`;
     }
   }
 

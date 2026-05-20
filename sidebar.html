@@ -475,9 +475,9 @@
 
     function goCreate() {
       if (isLoggedIn) {
-        window.top.location.href = 'https://sharer.jbjb.r-e.kr/make.html';
+        window.top.location.href = 'https://sharer.r-e.kr/make.html';
       } else {
-        window.top.location.href = 'https://sharer.jbjb.r-e.kr/login.html';
+        window.top.location.href = 'https://sharer.r-e.kr/login.html';
       }
     }
 
@@ -522,16 +522,16 @@
     }
 
     logoContainer.onclick = () => {
-      window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
+      window.top.location.href = 'https://sharer.r-e.kr/index.html';
     };
     homeNav.onclick = () => {
-      window.top.location.href = 'https://sharer.jbjb.r-e.kr/index.html';
+      window.top.location.href = 'https://sharer.r-e.kr/index.html';
     };
     exploreNav.onclick = () => {
-      window.top.location.href = 'https://sharer.jbjb.r-e.kr/explore.html';
+      window.top.location.href = 'https://sharer.r-e.kr/explore.html';
     };
     chatNav.onclick = () => {
-      window.top.location.href = 'https://sharer.jbjb.r-e.kr/chat.html';
+      window.top.location.href = 'https://sharer.r-e.kr/chat.html';
     };
     discordNav.onclick = () => {
       window.open('https://discord.gg/8s6XuWkfQb', '_blank');
@@ -549,7 +549,7 @@
         return;
       }
       if (isLoggedIn && currentUserId && currentUserNickname) {
-        window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
+        window.top.location.href = `https://sharer.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
       }
     };
 
@@ -561,7 +561,7 @@
       if (isMobileBottomLayout()) return;
       if (isLoggedIn && currentUserId && currentUserNickname) {
         closeProfileSheet();
-        window.top.location.href = `https://sharer.jbjb.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
+        window.top.location.href = `https://sharer.r-e.kr/user.html?id=${currentUserId}&nickname=${encodeURIComponent(currentUserNickname)}`;
       }
     };
     sheetLogoutBtn.onclick = (e) => {

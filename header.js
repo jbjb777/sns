@@ -32,7 +32,7 @@ function loadHeader() {
       });
 
       document.getElementById('urlBtn').addEventListener('click', () => {
-        window.location.href = 'https://url.jbjb.r-e.kr';
+        window.location.href = 'https://url.r-e.kr';
       });
       // ✅ 햄버거 메뉴 토글 기능 추가
       const menuToggle = document.getElementById('menuToggle');

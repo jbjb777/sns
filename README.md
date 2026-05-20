@@ -5,11 +5,11 @@
 ## 링크
 
 
-<a href="https://sharer.jbjb.r-e.kr">
-  <img src="https://sharer.jbjb.r-e.kr/logo.svg" width="50" alt="Sharer">
+<a href="https://sharer.r-e.kr">
+  <img src="https://sharer.r-e.kr/logo.svg" width="50" alt="Sharer">
 </a>
 
 **Sharer**
 
 
-> [개인정보 처리방침](https://sharer.jbjb.r-e.kr/privacy) | [이용 약관](https://sharer.jbjb.r-e.kr/policy)
+> [개인정보 처리방침](https://sharer.r-e.kr/privacy) | [이용 약관](https://sharer.r-e.kr/policy)

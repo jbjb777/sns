@@ -76,7 +76,7 @@
 
   function wireDragAndActions(host, panel, dragArea, prof, lo, discordJoin, id, nick) {
     const profileUrl =
-      'https://sharer.jbjb.r-e.kr/user.html?id=' +
+      'https://sharer.r-e.kr/user.html?id=' +
       encodeURIComponent(id) +
       '&nickname=' +
       encodeURIComponent(nick);
