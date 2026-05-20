@@ -166,65 +166,6 @@
       background-size: contain;
       background-position: center;
     }
-    /* ─── ACCESS BADGE ─── */
-    .access-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 9px 16px;
-      border-radius: 22px;
-      transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      font-family: inherit;
-      user-select: none;
-    }
-    .access-badge img {
-      width: 14px;
-      height: 14px;
-      object-fit: contain;
-    }
-    /* 공개 스타일 (초록색 계열) */
-    .access-badge.public {
-      background: rgba(74, 222, 128, 0.06);
-      border: 1px solid rgba(74, 222, 128, 0.2);
-      color: var(--green);
-    }
-    .access-badge.public:hover {
-      background: rgba(74, 222, 128, 0.12);
-      border-color: var(--green);
-      transform: scale(1.04);
-    }
-    .access-badge.public:active { transform: scale(0.94); }
-    
-    /* 비공개 스타일 (검은색/어두운 회색 계열) */
-    .access-badge.private {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid #222;
-      color: #777;
-    }
-    .access-badge.private:hover {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: #444;
-      color: #aaa;
-      transform: scale(1.04);
-    }
-    .access-badge.private:active { transform: scale(0.94); }
-    
-    /* 일부 공개 스타일 (파란색 계열) */
-    .access-badge.link {
-      background: rgba(59, 130, 246, 0.06);
-      border: 1px solid rgba(59, 130, 246, 0.2);
-      color: #3b82f6;
-    }
-    .access-badge.link:hover {
-      background: rgba(59, 130, 246, 0.12);
-      border-color: #3b82f6;
-      color: #60a5fa;
-      transform: scale(1.04);
-    }
-    .access-badge.link:active { transform: scale(0.94); }
-
     /* ─── LIKE BTN ─── */
     .like-btn {
       display: flex;
@@ -266,6 +207,39 @@
     }
     .delete-btn:hover { background: rgba(255,107,107,0.1); border-color: var(--pink); transform: scale(1.04); }
     .delete-btn:active { transform: scale(0.94); }
+    /* ─── ACCESS BADGE ─── */
+    .access-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: 22px;
+      font-family: inherit;
+      background: transparent;
+    }
+    .access-badge img {
+      width: 14px;
+      height: 14px;
+      object-fit: contain;
+    }
+    /* 공개 스타일 (초록색) */
+    .access-badge.public {
+      border: 1px solid rgba(74, 222, 128, 0.2);
+      color: var(--green);
+    }
+    /* 비공개 스타일 (검은색/어두운 회색 조합) */
+    .access-badge.private {
+      border: 1px solid var(--border3);
+      color: #fff;
+      background: var(--bg3);
+    }
+    /* 일부 공개 스타일 (파란색) */
+    .access-badge.link {
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #3b82f6;
+    }
     /* ─── 이미지 캐러셀 ─── */
     .post-images {
       margin: 28px 0;
@@ -597,170 +571,53 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+      backdrop-filter: blur(12px);
     }
     .login-alert.show { top: 24px; }
-    .login-alert::before {
-      content: "🔒";
-      font-size: 14px;
-    }
-    /* ─── MODAL ─── */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-      z-index: 10000;
-    }
-    .modal.show { opacity: 1; pointer-events: auto; }
-    .modal-content {
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: var(--r3);
-      padding: 32px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-      transform: scale(0.9);
-      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .modal.show .modal-content { transform: scale(1); }
-    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--t1); }
-    .modal-desc { font-size: 14px; color: var(--t2); margin-bottom: 28px; line-height: 1.6; }
-    .modal-actions { display: flex; gap: 12px; justify-content: center; }
-    .delete-modal-btn {
-      padding: 10px 28px;
-      border-radius: var(--r2);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      border: none;
-    }
+    .login-alert svg { width: 14px; height: 14px; fill: currentColor; }
+    /* ─── FOOTER ─── */
+    .footer { border-top: 1px solid var(--border); padding: 40px 0; margin-top: 64px; display: flex; flex-direction: column; gap: 16px; }
+    .footer-links { display: flex; gap: 16px; justify-content: center; }
+    .footer-links a { color: var(--t3); font-size: 12px; text-decoration: none; font-weight: 500; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--t2); }
+    .footer-text { max-width: 520px; margin: 0 auto; text-align: center; font-size: 11px; color: #333; line-height: 1.6; }
+    /* ─── MODAL (DELETE) ─── */
+    .delete-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.2s ease; }
+    .delete-modal.show { display: flex; opacity: 1; }
+    .delete-modal-content { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--r3); padding: 28px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .delete-modal.show .delete-modal-content { transform: scale(1); }
+    .delete-modal-title { font-size: 16px; font-weight: 700; margin-bottom: 10px; color: var(--t1); }
+    .delete-modal-desc { font-size: 13px; color: var(--t2); margin-bottom: 24px; line-height: 1.5; }
+    .delete-modal-actions { display: flex; gap: 10px; justify-content: center; }
+    .delete-modal-btn { padding: 10px 28px; border-radius: var(--r2); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1); border: none; }
     .delete-modal-btn.cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
     .delete-modal-btn.cancel:hover { background: var(--bg4); color: var(--t1); }
     .delete-modal-btn.delete { background: rgba(255,107,107,0.15); color: var(--pink); border: 1px solid rgba(255,107,107,0.3); }
     .delete-modal-btn.delete:hover { background: rgba(255,107,107,0.25); border-color: var(--pink); }
-
     /* 라이트박스 (이미지 확대 보기) */
-    #imageLightbox {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.95);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 20000;
-      backdrop-filter: blur(8px);
+    #imageLightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 20000; backdrop-filter: blur(8px); }
+    .lightbox-content { position: relative; max-width: 95vw; max-height: 95vh; display: flex; align-items: center; justify-content: center; }
+    .lightbox-content img { max-width: 100%; max-height: 95vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+    .lightbox-close { position: absolute; top: -44px; right: 0; background: none; border: none; color: #fff; font-size: 32px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+    .lightbox-close:hover { opacity: 1; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border: none; color: #fff; width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: all 0.2s; user-select: none; }
+    .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
+    .lightbox-nav.prev { left: -84px; }
+    .lightbox-nav.next { right: -84px; }
+    .lightbox-counter { position: absolute; bottom: -36px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 14px; font-weight: 500; }
+    @media (max-width: 900px) {
+      .lightbox-nav.prev { left: 16px; background: rgba(0,0,0,0.5); }
+      .lightbox-nav.next { right: 16px; background: rgba(0,0,0,0.5); }
+      .lightbox-close { right: 16px; top: 16px; }
     }
-    .lightbox-content {
-      position: relative;
-      max-width: 95vw;
-      max-height: 95vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .lightbox-content img {
-      max-width: 100%;
-      max-height: 95vh;
-      object-fit: contain;
-      border-radius: 12px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-    }
-    .lightbox-close {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: white;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      z-index: 20002;
-    }
-    .lightbox-close:hover {
-      background: rgba(255,255,255,0.25);
-      transform: scale(1.08);
-    }
-    .lightbox-arrow {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255,255,255,0.08);
-      border: none;
-      color: white;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      font-size: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      z-index: 20001;
-    }
-    .lightbox-arrow:hover {
-      background: rgba(255,255,255,0.2);
-      transform: translateY(-50%) scale(1.08);
-    }
-    .lightbox-arrow.left { left: 24px; }
-    .lightbox-arrow.right { right: 24px; }
-    .lightbox-counter {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
-      padding: 6px 16px;
-      border-radius: 14px;
-      font-size: 13px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.8);
-      z-index: 20001;
-    }
-
-    /* ─── FOOTER ─── */
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 40px 24px;
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      align-items: center;
-      text-align: center;
-    }
-    .footer-links { display: flex; gap: 20px; }
-    .footer-links a { color: var(--t2); font-size: 13px; text-decoration: none; font-weight: 500; transition: color 0.15s; }
-    .footer-links a:hover { color: var(--t1); }
-    .footer-text { font-size: 12px; color: var(--t3); line-height: 1.6; max-width: 480px; }
     @media (max-width: 768px) {
       .sidebar-container { display: none; }
       .main-wrapper { margin-left: 0; width: 100%; }
       .container { padding: 20px 16px; }
+      .post-detail-header { padding: 16px 0; }
       .author-avatar { width: 44px; height: 44px; font-size: 18px; }
       .author-name { font-size: 16px; }
-      .like-btn { padding: 8px 14px; font-size: 12px; }
-      .delete-btn { padding: 8px 14px; font-size: 11px; }
-      .access-badge { padding: 8px 14px; font-size: 11px; }
+      .like-btn, .delete-btn, .access-badge { padding: 8px 14px; font-size: 12px; }
     }
   </style>
 </head>
@@ -769,8 +626,7 @@
   <div id="splash">
     <svg class="splash-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="50" cy="50" r="48" fill="#111" stroke="#222" stroke-width="4"/>
-      <path d="M35 50 C35 40, 40 35, 50 35 C60 35, 65 40, 65 50 C65 60, 60 65, 50 65 C40 65, 35 60, 35 50 Z" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="50" cy="50" r="6" fill="#fff"/>
+      <path d="M35 50 L45 60 L65 40" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
 
@@ -810,11 +666,11 @@
     </div>
   </div>
 
-  <div class="modal" id="deleteModal">
-    <div class="modal-content">
-      <div class="modal-title">게시물 삭제</div>
-      <div class="modal-desc">정말로 이 게시물을 삭제하시겠습니까? 삭제된 게시물은 복구할 수 없으며 연관된 모든 댓글과 좋아요 데이터가 함께 파기됩니다.</div>
-      <div class="modal-actions">
+  <div class="delete-modal" id="deleteModal">
+    <div class="delete-modal-content">
+      <div class="delete-modal-title">게시물 삭제</div>
+      <div class="delete-modal-desc">정말로 이 게시물을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.</div>
+      <div class="delete-modal-actions">
         <button class="delete-modal-btn cancel" onclick="closeDeleteModal()">취소</button>
         <button class="delete-modal-btn delete" id="confirmDeleteBtn">삭제</button>
       </div>
@@ -822,16 +678,19 @@
   </div>
 
   <div id="imageLightbox">
-    <button class="lightbox-close" onclick="closeLightbox()">×</button>
-    <button class="lightbox-arrow left" onclick="prevLightboxImage()">‹</button>
     <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox()">×</button>
+      <button class="lightbox-nav prev" onclick="prevLightboxImage()">‹</button>
       <img id="lightboxImage" src="" alt="확대 이미지">
+      <button class="lightbox-nav next" onclick="nextLightboxImage()">›</button>
+      <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
     </div>
-    <button class="lightbox-arrow right" onclick="nextLightboxImage()">›</button>
-    <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
   </div>
 
-  <div class="login-alert" id="loginAlert">로그인이 필요한 서비스입니다.</div>
+  <div class="login-alert" id="loginAlert">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2v-2h4v8zm0-10h-2V5h2v2z"/></svg>
+    <span>로그인이 필요한 서비스입니다. 여기를 눌러 로그인하세요.</span>
+  </div>
 
   <script src="markdown.js"></script>
   <script>
@@ -845,56 +704,58 @@
     });
 
     // ─── SPLASH ───
-    (function() {
-      const splash = document.getElementById('splash');
+    (function () {
       window.addEventListener('load', () => {
-        setTimeout(() => {
-          splash.classList.add('fade-out');
-          setTimeout(() => splash.remove(), 450);
-        }, 300);
+        const splash = document.getElementById('splash');
+        if (splash) {
+          setTimeout(() => {
+            splash.classList.add('fade-out');
+            setTimeout(() => splash.remove(), 450);
+          }, 300);
+        }
       });
     })();
 
-    const SUPABASE_URL = "https://wzxtbllgffgshscfioas.supabase.co/rest/v1";
-    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6eHRibGxnZmZnc2hzY2Zpb2FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY2NDY2OTIsImV4cCI6MjA1MjIyMjY5Mn0.8-F_9P41Xk3809xO2ZgWd6wH979tC8E8h9pYfFmU8o8";
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get('id');
-
-    let currentUser = null;
-    let currentPost = null;
-    let currentLightboxImages = [];
-    let currentLightboxIndex = 0;
-    let pendingDeletePostId = null;
-
-    let profileImages = {};
-    let openReplyThreads = new Set();
-    let repliesByParent = {};
+    // ─── 코어 API 통신 ───
+    const API_URL = "https://clm-supa.jbjb.r-e.kr/rest/v1";
+    const API_KEY = "내용생략";
 
     async function api(path, options = {}) {
-      const url = `${SUPABASE_URL}${path}`;
+      const url = `${API_URL}${path}`;
       const headers = {
         "apikey": API_KEY,
         "Authorization": `Bearer ${API_KEY}`,
         "Content-Type": "application/json",
-        ...(options.headers || {})
+        ...options.headers
       };
       const res = await fetch(url, { ...options, headers });
       if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`API Error: ${res.status} - ${txt}`);
+        const text = await res.text();
+        throw new Error(`API Error: ${res.status} - ${text}`);
       }
       if (res.status === 204) return null;
-      return res.json();
+      return await res.json();
     }
 
-    window.openLightbox = function(imagesStr, startIndex) {
-      currentLightboxImages = imagesStr.split(',').map(u => u.trim()).filter(Boolean);
+    // ─── 글로벌 상태 관리 ───
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('id');
+    let currentUser = null;
+    let currentPost = null;
+    let openReplyThreads = new Set(); 
+    let repliesByParent = {}; 
+    let profileImages = {}; 
+    let currentLightboxImages = [];
+    let currentLightboxIndex = 0;
+    let pendingDeletePostId = null;
+
+    window.openLightbox = function(startIndex, imageCsvString) {
+      if (!imageCsvString) return;
+      currentLightboxImages = imageCsvString.split(',').map(u => u.trim()).filter(Boolean);
       currentLightboxIndex = startIndex;
       const lightbox = document.getElementById('imageLightbox');
       const imgEl = document.getElementById('lightboxImage');
       const counter = document.getElementById('lightboxCounter');
-      
       imgEl.src = currentLightboxImages[currentLightboxIndex];
       counter.textContent = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
       lightbox.style.display = 'flex';
@@ -942,81 +803,67 @@
           return;
         }
         const post = posts[0];
-        
         const savedUser = localStorage.getItem('snsUser');
         const activeUser = savedUser ? JSON.parse(savedUser) : null;
-
+        
         if (post.access === 'private') {
           if (!activeUser || String(activeUser.id) !== String(post.author_id)) {
             showError('비공개 게시물입니다. 작성자만 확인할 수 있습니다.');
             return;
           }
         }
-
+        
         currentPost = post;
-
-        const pImg = await getProfileImage(post.author_id);
-        let avatarContent = post.author ? post.author[0].toUpperCase() : '?';
-        if (pImg) {
-          avatarContent = `<img src="${pImg}" alt="${escapeHtml(post.author)}">`;
-        }
-
+        const authorImg = await getProfileImage(post.author_id);
+        if (authorImg) profileImages[post.author_id] = authorImg;
+        
+        const contentDiv = document.getElementById('postContent');
+        const timeStr = new Date(post.created_at).toLocaleString('ko-KR', { year:'numeric', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
         const isMine = activeUser && String(activeUser.id) === String(post.author_id);
         const deleteBtnHtml = isMine ? `<button class="delete-btn" onclick="openDeleteModal('${post.id}')">삭제</button>` : '';
-
-        // 공개 범위 정보 구성
-        let accessHtml = '';
-        if (post.access === 'private') {
-          accessHtml = `<div class="access-badge private"><img src="service.svg" alt="비공개">비공개</div>`;
+        
+        // 공개 범위 분기 처리 구조 설정
+        let accessBadgeHtml = '';
+        if (post.access === 'public' || !post.access) {
+          accessBadgeHtml = `<div class="access-badge public"><img src="earth.svg" alt="공개">공개</div>`;
+        } else if (post.access === 'private') {
+          accessBadgeHtml = `<div class="access-badge private"><img src="service.svg" alt="비공개">비공개</div>`;
         } else if (post.access === 'link') {
-          accessHtml = `<div class="access-badge link"><img src="link.svg" alt="일부 공개">일부 공개</div>`;
-        } else {
-          // public 혹은 지정되지 않은 기본 상태일 때 공개로 처리
-          accessHtml = `<div class="access-badge public"><img src="earth.svg" alt="공개">공개</div>`;
+          accessBadgeHtml = `<div class="access-badge link"><img src="link.svg" alt="일부 공개">일부 공개</div>`;
         }
 
-        const timeStr = new Date(post.created_at).toLocaleString('ko-KR', {
-          year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
-
+        let avatarContent = post.author ? post.author[0].toUpperCase() : '?';
+        if (profileImages[post.author_id]) {
+          avatarContent = `<img src="${profileImages[post.author_id]}" alt="${escapeHtml(post.author)}">`;
+        }
+        
         let imagesHtml = '';
         if (post.image_url) {
           const imgs = post.image_url.split(',').map(u => u.trim()).filter(Boolean);
           if (imgs.length > 0) {
             let slides = '';
-            let indicators = '';
-            imgs.forEach((url, index) => {
-              slides += `
-                <div class="carousel-slide">
-                  <img src="${url}" alt="첨부 이미지" onclick="openLightbox('${escapeHtml(post.image_url)}', ${index})">
-                </div>`;
-              indicators += `<div class="indicator ${index === 0 ? 'active' : ''}" data-index="${index}"></div>`;
+            let dots = '';
+            imgs.forEach((img, idx) => {
+              slides += `<div class="carousel-slide"><img src="${img}" alt="첨부이미지" onclick="openLightbox(${idx}, '${escapeHtml(post.image_url)}')"></div>`;
+              dots += `<div class="indicator ${idx === 0 ? 'active' : ''}" onclick="setCarouselSlide(this, ${idx})"></div>`;
             });
-
-            const navButtons = imgs.length > 1 ? `
-              <button class="carousel-nav prev" onclick="moveCarousel('${post.id}', -1)">‹</button>
-              <button class="carousel-nav next" onclick="moveCarousel('${post.id}', 1)">›</button>
+            const navs = imgs.length > 1 ? `
+              <button class="carousel-nav prev" onclick="moveCarousel(this, -1)">‹</button>
+              <button class="carousel-nav next" onclick="moveCarousel(this, 1)">›</button>
             ` : '';
-
-            const indicatorWrapper = imgs.length > 1 ? `
-              <div class="carousel-indicators">${indicators}</div>
-            ` : '';
-
+            const indicators = imgs.length > 1 ? `<div class="carousel-indicators">${dots}</div>` : '';
             imagesHtml = `
-              <div class="post-images" id="carousel-${post.id}">
-                <div class="image-carousel" onscroll="handleCarouselScroll('${post.id}')">
-                  ${slides}
-                </div>
-                ${navButtons}
-                ${indicatorWrapper}
-              </div>`;
+              <div class="post-images">
+                <div class="image-carousel" onscroll="handleCarouselScroll(this)">${slides}</div>
+                ${navs}
+                ${indicators}
+              </div>
+            `;
           }
         }
-
+        
         const isVerified = ["JB777", "진정오"].includes(post.author);
-        const parsedContent = parseMarkdown(post.content || '');
-
-        const contentDiv = document.getElementById('postContent');
+        
         contentDiv.innerHTML = `
           <div class="post-detail-card">
             <div class="post-detail-header">
@@ -1031,28 +878,25 @@
                 </div>
               </div>
               <div class="header-actions">
-                ${accessHtml}
+                ${accessBadgeHtml}
                 <button class="like-btn" id="likeBtn" onclick="toggleLike()">
                   <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1137.466797 2225.031982 1108.432617 2225.031982 C 1079.388428 2225.031982 1051.424316 2218.340332 1025.402588 2204.979248 C 1010.750244 2198.850586 996.63208 2191.470215 983.246338 2182.920898 C 764.973145 2043.705688 576.109131 1897.699951 416.615479 1744.902832 C 257.040771 1592.116455 133.868896 1435.051758 47.108398 1273.707397 C -15.702393 1157.007568 -15.702393 1026.002686 47.108398 909.29248 C 128.261963 757.887207 242.485596 612.921387 389.768555 474.384521 C 537.061768 335.85791 701.374268 218.423096 882.716064 122.091064 C 914.498535 105.210693 948.514404 92.570068 984.75708 84.180908 C 1025.045166 74.850098 1066.398682 70.180176 1108.432617 70.180176 C 1150.456299 70.180176 1191.820068 74.850098 1232.108154 84.180908 C 1268.340576 92.570068 1302.356445 105.210693 1334.14917 122.091064 C 1515.490967 218.423096 1679.803467 335.85791 1827.09668 474.384521 C 1974.379639 612.921387 2088.603271 757.887207 2169.75708 909.29248 C 2232.567871 1026.002686 2232.567871 1157.007568 2169.75708 1273.707397 Z" />
+                    <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1135.539307 2218.420166 1109.436768 2205.199463 C 1094.673828 2199.110596 1080.472656 2191.730225 1066.974854 2183.1604 C 848.711914 2043.945557 659.83783 1897.940063 500.354248 1745.142456 C 340.779541 1592.356567 217.60791 1435.291382 130.837158 1273.947266 C 44.066406 1112.602783 0.680908 952.128418 0.680908 792.524414 C 0.680908 576.438965 69.414795 397.681641 206.882812 256.252441 C 344.350586 114.823242 516.536133 44.108398 723.438965 44.108398 C 837.288574 44.108398 945.719727 71.979004 1048.732422 127.720703 C 1100.238281 155.591309 1147.810547 192.051514 1191.452637 237.101318 C 1235.094727 192.051514 1282.666992 155.591309 1334.172852 127.720703 C 1437.185547 71.979004 1545.616211 44.108398 1659.466797 44.108398 C 1866.368652 44.108398 2038.554688 114.823242 2176.022461 256.252441 C 2313.490234 397.681641 2382.224121 576.438965 2382.224121 792.524414 C 2382.224121 952.128418 2338.438477 1112.602783 2169.75708 1273.707397 Z"/>
                   </svg>
                   <span id="likeCount">0</span>
                 </button>
                 ${deleteBtnHtml}
               </div>
             </div>
-
             ${imagesHtml}
-
             <div class="post-detail-content">
-              <div class="post-text">${parsedContent}</div>
+              <div class="post-text">${parseMarkdown(post.content)}</div>
             </div>
-
             <div class="share-container">
               <div class="share-label">공유 링크</div>
               <div class="share-box-wrapper">
-                <div class="share-url-box" id="shareUrlBox"></div>
-                <button class="copy-btn" id="copyBtn" onclick="copyShareLink()" title="링크 복사">
+                <div class="share-url-box" id="shareUrl">${window.location.href}</div>
+                <button class="copy-btn" id="copyBtn" onclick="copyShareLink()">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -1062,23 +906,18 @@
             </div>
           </div>
         `;
-
-        document.getElementById('shareUrlBox').textContent = window.location.href;
-
-        setupCarouselIndicators(post.id);
-        loadLikes(post.id);
-
-      } catch (error) {
-        console.error('loadPost 오류:', error);
+        
+        loadLikes(postId);
+      } catch (e) {
+        console.error(e);
         showError('게시물을 불러오는 중 오류가 발생했습니다.');
       }
     }
 
     function showError(msg) {
       document.getElementById('postContent').innerHTML = `
-        <div style="text-align:center; padding:80px 24px; color:var(--t2);">
-          <div style="font-size:40px; margin-bottom:16px;">⚠️</div>
-          <div style="font-size:15px; font-weight:600; margin-bottom:24px; color:var(--t1);">${escapeHtml(msg)}</div>
+        <div style="text-align:center; padding:64px 16px; color:var(--t2);">
+          <p style="font-size:15px; margin-bottom:24px; line-height:1.6;">${escapeHtml(msg)}</p>
           <button onclick="goHome()" style="background:#fff; color:#000; border:none; padding:12px 28px; border-radius:var(--r2); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s;" onmouseover="this.style.background='#e8e8e8'" onmouseout="this.style.background='#fff'">돌아가기</button>
         </div>
       `;
@@ -1105,7 +944,6 @@
       const text = input.value.trim();
       if (!currentUser) return showLoginAlert();
       if (!text || !currentPost) return;
-
       try {
         await api("/comments", {
           method: "POST",
@@ -1114,64 +952,256 @@
             user_id: currentUser.id,
             user_name: currentUser.nickname,
             text: text,
+            parent_id: null,
             created_at: new Date().toISOString()
           })
         });
         input.value = '';
+        input.style.height = '48px';
         listenComments(postId);
       } catch (e) { alert('댓글 작성 실패'); }
     };
 
+    window.moveCarousel = function(btn, dir) {
+      const container = btn.closest('.post-images');
+      const carousel = container.querySelector('.image-carousel');
+      const slideWidth = carousel.clientWidth;
+      carousel.scrollBy({ left: slideWidth * dir, behavior: 'smooth' });
+    };
+
+    window.setCarouselSlide = function(dot, idx) {
+      const container = dot.closest('.post-images');
+      const carousel = container.querySelector('.image-carousel');
+      const slideWidth = carousel.clientWidth;
+      carousel.scrollTo({ left: slideWidth * idx, behavior: 'smooth' });
+    };
+
+    window.handleCarouselScroll = function(carousel) {
+      const container = carousel.closest('.post-images');
+      const scrollLeft = carousel.scrollLeft;
+      const slideWidth = carousel.clientWidth;
+      const activeIndex = Math.round(scrollLeft / slideWidth);
+      const dots = container.querySelectorAll('.indicator');
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === activeIndex);
+      });
+    };
+
+    async function loadLikes(postId) {
+      try {
+        const likes = await api(`/likes?post_id=eq.${postId}&select=user_id`);
+        updateLikeUI(likes || []);
+      } catch (e) { console.error('loadLikes 오류:', e); }
+    }
+
+    function updateLikeUI(likes) {
+      const btn = document.getElementById('likeBtn');
+      const countEl = document.getElementById('likeCount');
+      if (!btn || !countEl) return;
+      countEl.textContent = likes.length;
+      if (currentUser && likes.some(l => l.user_id === currentUser.id)) {
+        btn.classList.add('liked');
+      } else {
+        btn.classList.remove('liked');
+      }
+    }
+
+    window.toggleLike = async function() {
+      if (!currentUser) return showLoginAlert();
+      if (!currentPost) return;
+      const btn = document.getElementById('likeBtn');
+      const countEl = document.getElementById('likeCount');
+      try {
+        const [likeRecords, likeCountResult] = await Promise.all([
+          api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+          api(`/likes?post_id=eq.${postId}&select=count`)
+        ]);
+        const currentlyLiked = likeRecords?.length > 0;
+        const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
+        const uiLiked = btn.classList.contains('liked');
+        const uiCount = parseInt(countEl.textContent, 10) || 0;
+        
+        if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
+          btn.classList.toggle('liked', currentlyLiked);
+          countEl.textContent = currentServerCount;
+        }
+        
+        if (currentlyLiked) {
+          if (likeRecords?.[0]?.id) {
+            await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
+          }
+          btn.classList.remove('liked');
+          countEl.textContent = currentServerCount - 1;
+        } else {
+          await api("/likes", {
+            method: "POST",
+            body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
+          });
+          btn.classList.add('liked');
+          countEl.textContent = currentServerCount + 1;
+        }
+      } catch (e) { console.error('좋아요 토글 실패:', e); }
+    };
+
+    async function listenComments(postId) {
+      try {
+        const comments = await api(`/comments?post_id=eq.${postId}&select=*`);
+        comments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        
+        const userIds = [...new Set(comments.map(c => c.user_id))];
+        await Promise.all(userIds.map(async (id) => {
+          if (!profileImages[id]) {
+            const img = await getProfileImage(id);
+            if (img) profileImages[id] = img;
+          }
+        }));
+        
+        repliesByParent = {};
+        const roots = [];
+        comments.forEach(c => {
+          if (!c.parent_id) {
+            roots.push(c);
+          } else {
+            const parentId = c.parent_id;
+            if (!repliesByParent[parentId]) repliesByParent[parentId] = [];
+            repliesByParent[parentId].push(c);
+          }
+        });
+        Object.values(repliesByParent).forEach(arr => {
+          arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        });
+        
+        const listDiv = document.getElementById('commentList');
+        listDiv.innerHTML = '';
+        if (roots.length === 0) {
+          listDiv.innerHTML = `<div style="text-align:center; padding:32px 0; color:var(--t3); font-size:13px;">첫 댓글을 남겨보세요.</div>`;
+          return;
+        }
+        roots.forEach(r => {
+          const item = document.createElement('div');
+          item.className = 'comment-item';
+          item.innerHTML = renderOneComment(r, { showReplyButton: true });
+          
+          const replyListContainer = document.createElement('div');
+          replyListContainer.className = 'reply-list';
+          replyListContainer.id = `replyList-${r.id}`;
+          if (!openReplyThreads.has(r.id)) replyListContainer.style.display = 'none';
+          
+          const childs = repliesByParent[r.id] || [];
+          childs.forEach(ch => {
+            const subItem = document.createElement('div');
+            subItem.className = 'reply-item';
+            subItem.innerHTML = renderOneComment(ch, { showReplyButton: false });
+            replyListContainer.appendChild(subItem);
+          });
+          
+          item.appendChild(replyListContainer);
+          listDiv.appendChild(item);
+        });
+      } catch (e) { console.error('댓글 로드 실패:', e); }
+    }
+
+    function renderAvatar(userName, userId) {
+      let avatar = userName ? userName[0].toUpperCase() : '?';
+      if (profileImages[userId]) {
+        const url = profileImages[userId].includes('?') ? `${profileImages[userId]}&v=${Date.now()}` : `${profileImages[userId]}?v=${Date.now()}`;
+        avatar = `<img src="${url}" alt="${escapeHtml(userName)}">`;
+      }
+      return avatar;
+    }
+
+    function renderOneComment(c, { showReplyButton }) {
+      const isMine = currentUser?.id === c.user_id;
+      const date = new Date(c.created_at).toLocaleString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const isVerified = ["JB777", "진정오"].includes(c.user_name);
+      const avatarContent = renderAvatar(c.user_name, c.user_id);
+      const linkedText = parseMarkdown(c.text);
+      const replyCount = (repliesByParent[c.id] || []).length;
+      const hasReplies = replyCount > 0;
+      const isOpen = openReplyThreads.has(c.id);
+      
+      const replyBtnHtml = showReplyButton ? `<button class="reply-btn" onclick="openReplyComposer('${c.id}')">답글 달기</button>` : '';
+      const toggleBtnHtml = hasReplies ? `<button class="replies-toggle-btn" id="toggleReplies-${c.id}" data-count="${replyCount}" onclick="toggleReplies('${c.id}')">${isOpen ? '답글 접기' : `답글 ${replyCount}개 보기`}</button>` : '';
+      const replyComposeHtml = showReplyButton ? `
+        <div class="reply-compose" id="replyCompose-${c.id}" style="display:none;">
+          <textarea id="replyInput-${c.id}" class="reply-input" placeholder="답글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
+          <div class="reply-compose-actions">
+            <button class="reply-cancel-btn" onclick="cancelReply('${c.id}')">취소</button>
+            <button class="reply-submit-btn" onclick="submitReply('${c.id}')">답글 등록</button>
+          </div>
+        </div>
+      ` : '';
+      const delBtnHtml = isMine ? `<button class="comment-del-btn" onclick="deleteComment('${c.id}')">삭제</button>` : '';
+      
+      return `
+        <div class="comment-header">
+          <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
+            <div class="comment-avatar">${avatarContent}</div>
+            <span class="comment-author">
+              ${escapeHtml(c.user_name)}
+              ${isVerified ? '<span class="verification-badge"></span>' : ''}
+            </span>
+          </div>
+          ${delBtnHtml}
+        </div>
+        <div class="comment-content">${linkedText}</div>
+        <div class="comment-date">${date}</div>
+        <div class="comment-actions">
+          ${replyBtnHtml}
+          ${toggleBtnHtml}
+        </div>
+        ${replyComposeHtml}
+      `;
+    }
+
     window.openReplyComposer = function(commentId) {
-      const comp = document.getElementById(`replyCompose-${commentId}`);
-      if (comp) comp.style.display = comp.style.display === 'none' ? 'flex' : 'none';
+      if (!currentUser) return showLoginAlert();
+      const el = document.getElementById(`replyCompose-${commentId}`);
+      if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none';
     };
 
     window.cancelReply = function(commentId) {
-      const comp = document.getElementById(`replyCompose-${commentId}`);
-      if (comp) comp.style.display = 'none';
-      const input = document.getElementById(`replyInput-${commentId}`);
-      if (input) input.value = '';
+      const el = document.getElementById(`replyCompose-${commentId}`);
+      if (el) el.style.display = 'none';
+      const ta = document.getElementById(`replyInput-${commentId}`);
+      if (ta) ta.value = '';
     };
 
     window.submitReply = async function(commentId) {
       if (!currentUser) return showLoginAlert();
-      const input = document.getElementById(`replyInput-${commentId}`);
-      const text = input.value.trim();
+      const ta = document.getElementById(`replyInput-${commentId}`);
+      const text = ta?.value.trim();
       if (!text) return;
-
       try {
         await api("/comments", {
           method: "POST",
           body: JSON.stringify({
             post_id: postId,
-            parent_id: commentId,
             user_id: currentUser.id,
             user_name: currentUser.nickname,
             text: text,
+            parent_id: commentId,
             created_at: new Date().toISOString()
           })
         });
-        input.value = '';
         openReplyThreads.add(commentId);
         listenComments(postId);
       } catch (e) { alert('답글 작성 실패'); }
     };
 
     window.toggleReplies = function(commentId) {
-      const listEl = document.getElementById(`replyList-${commentId}`);
+      const list = document.getElementById(`replyList-${commentId}`);
       const btn = document.getElementById(`toggleReplies-${commentId}`);
-      if (!listEl || !btn) return;
-
-      const count = btn.getAttribute('data-count') || 0;
-      if (openReplyThreads.has(commentId)) {
-        openReplyThreads.delete(commentId);
-        listEl.style.display = 'none';
-        btn.textContent = `답글 ${count}개 보기`;
-      } else {
-        openReplyThreads.add(commentId);
-        listEl.style.display = 'flex';
+      if (!list || !btn) return;
+      const count = btn.getAttribute('data-count') || '0';
+      if (list.style.display === 'none') {
+        list.style.display = 'flex';
         btn.textContent = '답글 접기';
+        openReplyThreads.add(commentId);
+      } else {
+        list.style.display = 'none';
+        btn.textContent = `답글 ${count}개 보기`;
+        openReplyThreads.delete(commentId);
       }
     };
 
@@ -1214,156 +1244,11 @@
         .replace(/'/g, "&#039;");
     }
 
-    window.moveCarousel = function(id, dir) {
-      const container = document.getElementById(`carousel-${id}`);
-      if (!container) return;
-      const carousel = container.querySelector('.image-carousel');
-      const slideWidth = carousel.clientWidth;
-      carousel.scrollBy({ left: slideWidth * dir, behavior: 'smooth' });
-    };
-
-    window.handleCarouselScroll = function(id) {
-      const container = document.getElementById(`carousel-${id}`);
-      if (!container) return;
-      const carousel = container.querySelector('.image-carousel');
-      const scrollLeft = carousel.scrollLeft;
-      const slideWidth = carousel.clientWidth;
-      const activeIndex = Math.round(scrollLeft / slideWidth);
-
-      const dots = container.querySelectorAll('.indicator');
-      dots.forEach((dot, idx) => {
-        dot.classList.toggle('active', idx === activeIndex);
-      });
-    };
-
-    function setupCarouselIndicators(id) {
-      const container = document.getElementById(`carousel-${id}`);
-      if (!container) return;
-      const dots = container.querySelectorAll('.indicator');
-      const carousel = container.querySelector('.image-carousel');
-      
-      dots.forEach(dot => {
-        dot.onclick = () => {
-          const idx = parseInt(dot.getAttribute('data-index'), 10);
-          const slideWidth = carousel.clientWidth;
-          carousel.scrollTo({ left: slideWidth * idx, behavior: 'smooth' });
-        };
-      });
-    }
-
-    async function listenComments(postId) {
-      try {
-        const comments = await api(`/comments?post_id=eq.${postId}&order=created_at.asc`);
-        
-        const userIds = [...new Set(comments.map(c => c.user_id))];
-        await Promise.all(userIds.map(id => getProfileImage(id)));
-
-        const mainComments = [];
-        repliesByParent = {};
-
-        comments.forEach(c => {
-          if (!c.parent_id) {
-            mainComments.push(c);
-          } else {
-            const parentId = c.parent_id;
-            if (!repliesByParent[parentId]) repliesByParent[parentId] = [];
-            repliesByParent[parentId].push(c);
-          }
-        });
-
-        Object.values(repliesByParent).forEach(arr => {
-          arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        });
-
-        function renderAvatar(userName, userId) {
-          let avatar = userName ? userName[0].toUpperCase() : '?';
-          if (profileImages[userId]) {
-            const url = profileImages[userId].includes('?') ? `${profileImages[userId]}&v=${Date.now()}` : `${profileImages[userId]}?v=${Date.now()}`;
-            avatar = `<img src="${url}" alt="${escapeHtml(userName)}">`;
-          }
-          return avatar;
-        }
-
-        function renderOneComment(c, { showReplyButton }) {
-          const isMine = currentUser?.id === c.user_id;
-          const date = new Date(c.created_at).toLocaleString('ko-KR', {
-            year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
-          });
-          const isVerified = ["JB777", "진정오"].includes(c.user_name);
-          const avatarContent = renderAvatar(c.user_name, c.user_id);
-          const linkedText = parseMarkdown(c.text);
-
-          const replyCount = (repliesByParent[c.id] || []).length;
-          const hasReplies = replyCount > 0;
-          const isOpen = openReplyThreads.has(c.id);
-
-          const replyBtnHtml = showReplyButton ? `<button class="reply-btn" onclick="openReplyComposer('${c.id}')">답글 달기</button>` : '';
-          const toggleBtnHtml = hasReplies ? `<button class="replies-toggle-btn" id="toggleReplies-${c.id}" data-count="${replyCount}" onclick="toggleReplies('${c.id}')">${isOpen ? '답글 접기' : `답글 ${replyCount}개 보기`}</button>` : '';
-          const replyComposeHtml = showReplyButton ? `
-            <div class="reply-compose" id="replyCompose-${c.id}" style="display:none;">
-              <textarea id="replyInput-${c.id}" class="reply-input" placeholder="답글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
-              <div class="reply-compose-actions">
-                <button class="reply-cancel-btn" onclick="cancelReply('${c.id}')">취소</button>
-                <button class="reply-submit-btn" onclick="submitReply('${c.id}')">답글 업로드</button>
-              </div>
-            </div>
-          ` : '';
-
-          let repliesHtml = '';
-          if (hasReplies) {
-            const childArr = repliesByParent[c.id] || [];
-            let childItemsHtml = '';
-            childArr.forEach(child => {
-              childItemsHtml += renderOneComment(child, { showReplyButton: false });
-            });
-            repliesHtml = `
-              <div class="reply-list" id="replyList-${c.id}" style="display: ${isOpen ? 'flex' : 'none'};">
-                ${childItemsHtml}
-              </div>
-            `;
-          }
-
-          const delBtnHtml = isMine ? `<button class="comment-del-btn" onclick="deleteComment('${c.id}')">삭제</button>` : '';
-
-          return `
-            <div class="comment-item">
-              <div class="comment-header">
-                <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
-                  <div class="comment-avatar">${avatarContent}</div>
-                  <div class="comment-author">
-                    ${escapeHtml(c.user_name)}
-                    ${isVerified ? '<span class="verification-badge"></span>' : ''}
-                  </div>
-                </div>
-                ${delBtnHtml}
-              </div>
-              <div class="comment-content">${linkedText}</div>
-              <div class="comment-date">${date}</div>
-              <div class="comment-actions">
-                ${replyBtnHtml}
-                ${toggleBtnHtml}
-              </div>
-              ${replyComposeHtml}
-              ${repliesHtml}
-            </div>
-          `;
-        }
-
-        const listEl = document.getElementById('commentList');
-        if (mainComments.length === 0) {
-          listEl.innerHTML = '<div style="text-align:center; padding:32px; color:var(--t3); font-size:13px;">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>';
-          return;
-        }
-
-        let html = '';
-        mainComments.forEach(c => {
-          html += renderOneComment(c, { showReplyButton: true });
-        });
-        listEl.innerHTML = html;
-
-      } catch (e) {
-        console.error('listenComments 오류:', e);
-      }
+    function parseMarkdown(text) {
+      if (!text) return '';
+      let html = escapeHtml(text);
+      html = html.replace(/(https?:\/\/[^\s]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+      return html;
     }
 
     async function getCommentById(commentId) {
@@ -1441,76 +1326,18 @@
     async function getProfileImage(userId) {
       if (!userId) return null;
       try {
-        const users = await api(`/users?id=eq.${userId}&select=profile_image_url`);
-        if (users && users.length > 0 && users[0].profile_image_url) {
-          profileImages[userId] = users[0].profile_image_url;
-          return users[0].profile_image_url;
-        }
-        return null;
-      } catch (e) {
-        return null;
-      }
+        const users = await api(`/users?id=eq.${userId}&select=avatar_url`);
+        return users?.[0]?.avatar_url || null;
+      } catch (e) { return null; }
     }
 
-    async function loadLikes(postId) {
-      try {
-        const likes = await api(`/likes?post_id=eq.${postId}&select=user_id`);
-        updateLikeUI(likes || []);
-      } catch (e) { console.error('loadLikes 오류:', e); }
+    const tx = document.getElementById('commentInput');
+    if (tx) {
+      tx.addEventListener('input', function() {
+        this.style.height = '48px';
+        this.style.height = Math.min(this.scrollHeight, 180) + 'px';
+      });
     }
-
-    function updateLikeUI(likes) {
-      const btn = document.getElementById('likeBtn');
-      const countEl = document.getElementById('likeCount');
-      if (!btn || !countEl) return;
-      countEl.textContent = likes.length;
-      if (currentUser && likes.some(l => l.user_id === currentUser.id)) {
-        btn.classList.add('liked');
-      } else {
-        btn.classList.remove('liked');
-      }
-    }
-
-    window.toggleLike = async function() {
-      if (!currentUser) return showLoginAlert();
-      if (!currentPost) return;
-
-      const btn = document.getElementById('likeBtn');
-      const countEl = document.getElementById('likeCount');
-
-      try {
-        const [likeRecords, likeCountResult] = await Promise.all([
-          api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
-          api(`/likes?post_id=eq.${postId}&select=count`)
-        ]);
-
-        const currentlyLiked = likeRecords?.length > 0;
-        const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
-
-        const uiLiked = btn.classList.contains('liked');
-        const uiCount = parseInt(countEl.textContent, 10) || 0;
-
-        if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
-          btn.classList.toggle('liked', currentlyLiked);
-          countEl.textContent = currentServerCount;
-        }
-
-        if (currentlyLiked) {
-          if (likeRecords?.[0]?.id) {
-            await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
-          }
-          btn.classList.remove('liked');
-          countEl.textContent = currentServerCount - 1;
-        } else {
-          await api("/likes", {
-            method: "POST",
-            body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
-          });
-          btn.classList.add('liked');
-          countEl.textContent = currentServerCount + 1;
-        }
-      } catch (e) { console.error('좋아요 토글 실패:', e); }
-    };
   </script>
 </body>
 </html>
