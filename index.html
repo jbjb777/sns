@@ -24,6 +24,49 @@
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <style>
+    /* 도메인 변경 안내 바 스타일 */
+    .domain-notice-bar {
+      background: #1a1a1a;
+      color: #fff;
+      text-align: center;
+      padding: 10px 40px 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      border-bottom: 1px solid #2a2a2a;
+      position: relative;
+      z-index: 100000;
+      letter-spacing: -0.01em;
+      line-height: 1.4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      transition: margin-top 0.3s ease, opacity 0.3s ease;
+    }
+    .domain-notice-bar .highlight {
+      color: #4ade80;
+      font-weight: 700;
+    }
+    .domain-notice-bar .close-notice {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+    .domain-notice-bar .close-notice:hover {
+      color: #fff;
+    }
+
     .splash-text {
       text-align: center;
       animation: fadeUp 0.6s ease forwards;
@@ -76,6 +119,7 @@
       color: var(--t1);
       min-height: 100vh;
       display: flex;
+      flex-direction: column; /* 안내 바가 상단에 올바르게 위치하도록 추가 */
       -webkit-font-smoothing: antialiased;
       opacity: 0;
       animation: bodyReveal 0.4s ease forwards;
@@ -122,6 +166,7 @@
       left: 0; top: 0;
       z-index: 100;
     }
+    /* 안내 바가 있을 때 사이드바 위치 유연화 조절을 원할 경우 상단 마진 처리 가능하나 기본 fixed 유지 */
     .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
     .main-wrapper {
@@ -130,6 +175,7 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      flex: 1;
     }
 
     .main-content {
@@ -770,6 +816,11 @@
 </head>
 <body>
 
+<div class="domain-notice-bar" id="domainNotice">
+  📢 Sharer의 공식 도메인이 <span class="highlight">sharer.jbjb.r-e.kr</span>에서 <span class="highlight">sharer.r-e.kr</span>로 변경되었습니다!
+  <button class="close-notice" onclick="closeDomainNotice()">✕</button>
+</div>
+
 <div id="splash">
   <div class="splash-inner">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
@@ -886,6 +937,16 @@
 
 <script src="markdown.js"></script>
 <script>
+// 도메인 안내 바 닫기 함수
+function closeDomainNotice() {
+  const notice = document.getElementById('domainNotice');
+  if (notice) {
+    notice.style.marginTop = `-${notice.offsetHeight}px`;
+    notice.style.opacity = '0';
+    setTimeout(() => { notice.style.display = 'none'; }, 300);
+  }
+}
+
 // ─── NPROGRESS 설정 ───
 NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
 
@@ -1187,7 +1248,6 @@ window.nextFeedSlide = function(btn) {
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
   try {
-    // access 값이 private이거나 link인 게시물은 아예 가져오지 않도록 필터링 추가
     const posts = await api("/posts?select=*&access=not.in.(private,link)&order=created_at.desc");
     if (!posts?.length) {
       feedDiv.innerHTML = '<div class="no-posts"><div class="no-posts-icon">🍃</div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div></div>';
