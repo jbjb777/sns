@@ -61,6 +61,8 @@
       display: flex;
       align-items: center;
       gap: 14px;
+      flex-shrink: 1;
+      min-width: 0;
     }
 
     .back-btn {
@@ -74,6 +76,7 @@
       align-items: center;
       justify-content: center;
       transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      flex-shrink: 0;
     }
     .back-btn:hover { color: var(--t1); background: var(--bg3); }
     .back-btn:active { transform: scale(0.82); }
@@ -85,6 +88,9 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .header-profile-avatar {
@@ -112,6 +118,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     /* 커스텀 드롭다운 스타일 */
@@ -134,6 +141,7 @@
       transition: background 0.15s, border-color 0.15s, transform 0.1s ease;
       display: flex;
       align-items: center;
+      white-space: nowrap;
     }
     .custom-select-container:hover .custom-select-trigger {
       background: var(--bg4);
@@ -248,6 +256,7 @@
       gap: 6px;
       min-width: 90px;
       transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap;
     }
     .post-btn:hover:not(:disabled) { background: #e8e8e8; transform: scale(1.04); }
     .post-btn:active:not(:disabled) { transform: scale(0.94); }
@@ -614,7 +623,43 @@
       font-size: 11px;
     }
 
+    /* ─── MOBILE RESPONSIVE FIX ─── */
     @media (max-width: 768px) {
+      .header {
+        padding: 10px 12px; /* 헤더 여백 최적화 */
+        gap: 8px;
+      }
+      .header-left {
+        gap: 6px;
+      }
+      .back-btn {
+        width: 32px;
+        height: 32px;
+      }
+      .header-title {
+        font-size: 13px; /* 제목 크기 축소로 공간 확보 */
+        gap: 6px;
+      }
+      .header-profile-avatar {
+        width: 26px;
+        height: 26px;
+      }
+      .header-right {
+        gap: 6px;
+      }
+      .custom-select-trigger {
+        padding: 7px 24px 7px 12px; /* 드롭다운 내부 여백 축소 */
+        font-size: 12px;
+      }
+      .custom-select-trigger::after {
+        right: 10px;
+      }
+      .post-btn {
+        padding: 7px 14px; /* 공유하기 버튼 여백 축소 */
+        font-size: 12px;
+        min-width: auto; /* 고정 최소 가로 크기 해제하여 찌그러짐 방지 */
+      }
+      
       .main-content { padding: 24px 16px; }
       .create-textarea { min-height: 140px; font-size: 15px; }
       .image-preview-grid {
