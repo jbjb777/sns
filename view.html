@@ -155,7 +155,25 @@
       gap: 7px;
       letter-spacing: -0.3px;
     }
+    
+    /* 타임스탬프 및 공개 범위 한 줄 정렬 스타일 추가 */
+    .meta-row { display: flex; align-items: center; gap: 8px; }
     .post-timestamp { font-size: 13px; color: var(--t3); }
+    
+    /* 공개 범위 표시 전용 스타일배지 추가 */
+    .access-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--t2);
+      background: var(--bg3);
+      padding: 3px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border2);
+    }
+    .access-badge svg { fill: currentColor; flex-shrink: 0; }
+
     .verification-badge {
       display: inline-block;
       width: 14px;
@@ -207,39 +225,6 @@
     }
     .delete-btn:hover { background: rgba(255,107,107,0.1); border-color: var(--pink); transform: scale(1.04); }
     .delete-btn:active { transform: scale(0.94); }
-    /* ─── ACCESS BADGE ─── */
-    .access-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 9px 16px;
-      border-radius: 22px;
-      font-family: inherit;
-      background: transparent;
-    }
-    .access-badge img {
-      width: 14px;
-      height: 14px;
-      object-fit: contain;
-    }
-    /* 공개 스타일 (초록색) */
-    .access-badge.public {
-      border: 1px solid rgba(74, 222, 128, 0.2);
-      color: var(--green);
-    }
-    /* 비공개 스타일 (검은색/어두운 회색 조합) */
-    .access-badge.private {
-      border: 1px solid var(--border3);
-      color: #fff;
-      background: var(--bg3);
-    }
-    /* 일부 공개 스타일 (파란색) */
-    .access-badge.link {
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      color: #3b82f6;
-    }
     /* ─── 이미지 캐러셀 ─── */
     .post-images {
       margin: 28px 0;
@@ -547,11 +532,14 @@
       flex-direction: column;
       gap: 6px;
       padding: 14px 0 14px 14px;
+      border-bottom: 1px solid var(--border);
     }
+    .reply-item:last-child { border-bottom: none; }
+    .reply-item .comment-header { display: flex; justify-content: space-between; align-items: center; }
     .reply-item .comment-avatar { width: 28px; height: 28px; font-size: 12px; }
     .reply-item .comment-author { font-size: 13px; }
-    .reply-item .comment-content { font-size: 13px; color: #cfcfcf; }
-    .reply-item .comment-date { font-size: 10px; }
+    .reply-item .comment-content { font-size: 13px; color: #cfcfcf; padding-left: 2px; }
+    .reply-item .comment-date { font-size: 10px; color: var(--t3); padding-left: 2px; }
     /* ─── LOGIN ALERT ─── */
     .login-alert {
       position: fixed;
@@ -572,772 +560,675 @@
       align-items: center;
       gap: 8px;
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      white-space: nowrap;
     }
-    .login-alert.show { top: 24px; }
-    .login-alert svg { width: 14px; height: 14px; fill: currentColor; }
-    /* ─── FOOTER ─── */
-    .footer { border-top: 1px solid var(--border); padding: 40px 0; margin-top: 64px; display: flex; flex-direction: column; gap: 16px; }
-    .footer-links { display: flex; gap: 16px; justify-content: center; }
-    .footer-links a { color: var(--t3); font-size: 12px; text-decoration: none; font-weight: 500; transition: color 0.15s; }
-    .footer-links a:hover { color: var(--t2); }
-    .footer-text { max-width: 520px; margin: 0 auto; text-align: center; font-size: 11px; color: #333; line-height: 1.6; }
-    /* ─── MODAL (DELETE) ─── */
-    .delete-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.2s ease; }
-    .delete-modal.show { display: flex; opacity: 1; }
-    .delete-modal-content { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--r3); padding: 28px; max-width: 360px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
-    .delete-modal.show .delete-modal-content { transform: scale(1); }
-    .delete-modal-title { font-size: 16px; font-weight: 700; margin-bottom: 10px; color: var(--t1); }
-    .delete-modal-desc { font-size: 13px; color: var(--t2); margin-bottom: 24px; line-height: 1.5; }
-    .delete-modal-actions { display: flex; gap: 10px; justify-content: center; }
-    .delete-modal-btn { padding: 10px 28px; border-radius: var(--r2); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1); border: none; }
+    .login-alert.show { top: 20px; }
+    /* ─── DELETE MODAL ─── */
+    .delete-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .delete-modal-overlay.show { opacity: 1; visibility: visible; }
+    .delete-modal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r4);
+      padding: 36px 28px;
+      text-align: center;
+      max-width: 360px;
+      width: 90%;
+      transform: scale(0.88) translateY(12px);
+      transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    .delete-modal-overlay.show .delete-modal { transform: scale(1) translateY(0); }
+    .delete-modal img { width: 80px; height: 80px; margin-bottom: 20px; opacity: 0.85; }
+    .delete-modal-title { font-size: 16px; font-weight: 600; margin-bottom: 28px; color: var(--t1); line-height: 1.5; }
+    .delete-modal-buttons { display: flex; gap: 10px; justify-content: center; }
+    .delete-modal-btn {
+      padding: 10px 28px;
+      border-radius: var(--r2);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      border: none;
+    }
     .delete-modal-btn.cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
     .delete-modal-btn.cancel:hover { background: var(--bg4); color: var(--t1); }
     .delete-modal-btn.delete { background: rgba(255,107,107,0.15); color: var(--pink); border: 1px solid rgba(255,107,107,0.3); }
     .delete-modal-btn.delete:hover { background: rgba(255,107,107,0.25); border-color: var(--pink); }
     /* 라이트박스 (이미지 확대 보기) */
-    #imageLightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 20000; backdrop-filter: blur(8px); }
-    .lightbox-content { position: relative; max-width: 95vw; max-height: 95vh; display: flex; align-items: center; justify-content: center; }
-    .lightbox-content img { max-width: 100%; max-height: 95vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-    .lightbox-close { position: absolute; top: -44px; right: 0; background: none; border: none; color: #fff; font-size: 32px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
-    .lightbox-close:hover { opacity: 1; }
-    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border: none; color: #fff; width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: all 0.2s; user-select: none; }
-    .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
-    .lightbox-nav.prev { left: -84px; }
-    .lightbox-nav.next { right: -84px; }
-    .lightbox-counter { position: absolute; bottom: -36px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 14px; font-weight: 500; }
-    @media (max-width: 900px) {
-      .lightbox-nav.prev { left: 16px; background: rgba(0,0,0,0.5); }
-      .lightbox-nav.next { right: 16px; background: rgba(0,0,0,0.5); }
-      .lightbox-close { right: 16px; top: 16px; }
+    #imageLightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+      backdrop-filter: blur(8px);
     }
+    .lightbox-content { position: relative; max-width: 95vw; max-height: 95vh; display: flex; align-items: center; justify-content: center; }
+    .lightbox-content img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--r2); }
+    .lightbox-close { position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+    /* ─── FOOTER ─── */
+    .footer { border-top: 1px solid var(--border); padding: 24px 20px; text-align: center; color: var(--t3); font-size: 11px; display: flex; justify-content: center; gap: 16px; margin-top: 40px; }
+    .footer span { cursor: pointer; transition: color 0.15s; }
+    .footer span:hover { color: var(--t2); }
     @media (max-width: 768px) {
       .sidebar-container { display: none; }
       .main-wrapper { margin-left: 0; width: 100%; }
       .container { padding: 20px 16px; }
-      .post-detail-header { padding: 16px 0; }
-      .author-avatar { width: 44px; height: 44px; font-size: 18px; }
-      .author-name { font-size: 16px; }
-      .like-btn, .delete-btn, .access-badge { padding: 8px 14px; font-size: 12px; }
     }
   </style>
 </head>
 <body>
-
   <div id="splash">
-    <svg class="splash-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="48" fill="#111" stroke="#222" stroke-width="4"/>
-      <path d="M35 50 L45 60 L65 40" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+    <img src="./logo.svg" alt="logo" class="splash-logo">
   </div>
 
   <div class="sidebar-container">
-    <iframe id="sidebarFrame" src="sidebar.html"></iframe>
+    <iframe src="sidebar.html"></iframe>
   </div>
 
   <div class="main-wrapper">
     <div class="header">
       <button class="back-btn" onclick="goHome()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
       </button>
-      <div class="header-title">게시물</div>
+      <div class="header-title">게시물 보기</div>
     </div>
 
     <div class="container">
-      <div id="postContent"></div>
+      <div class="post-detail-card">
+        <div class="post-detail-header">
+          <div class="author-info" id="authorInfo">
+            <div class="author-avatar" id="authorAvatar"></div>
+            <div class="author-details">
+              <div class="author-name" id="authorName"></div>
+              
+              <div class="meta-row">
+                <span class="post-timestamp" id="postTimestamp"></span>
+                <span id="accessBadgeContainer"></span>
+              </div>
+              
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="like-btn" id="likeBtn">
+              <svg class="like-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <span id="likeCount">0</span>
+            </button>
+            <button class="delete-btn" id="deleteBtn" style="display:none;">삭제</button>
+          </div>
+        </div>
+
+        <div class="post-images" id="postImages" style="display:none;">
+          <button class="carousel-nav prev" id="prevBtn" style="display:none;">&lt;</button>
+          <div class="image-carousel" id="imageCarousel"></div>
+          <button class="carousel-nav next" id="nextBtn" style="display:none;">&gt;</button>
+          <div class="carousel-indicators" id="carouselIndicators"></div>
+        </div>
+
+        <div class="post-detail-content">
+          <div class="post-text" id="postContent"></div>
+        </div>
+
+        <div class="share-container">
+          <div class="share-label">공유 링크</div>
+          <div class="share-box-wrapper">
+            <div class="share-url-box" id="shareUrl"></div>
+            <button class="copy-btn" id="copyBtn" onclick="copyShareLink()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div class="comment-section">
         <div class="comment-input-wrapper">
-          <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
-          <button class="comment-submit-btn" onclick="addComment()">업로드</button>
+          <textarea class="comment-input" id="commentInput" placeholder="댓글을 입력하세요..." rows="1"></textarea>
+          <button class="comment-submit-btn" id="commentSubmitBtn">등록</button>
         </div>
-        <div id="commentList" class="comment-list"></div>
+        <div class="comment-list" id="commentList"></div>
       </div>
     </div>
 
     <div class="footer">
-      <div class="footer-links">
-        <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
-        <a href="#" onclick="showTerms(); return false;">이용약관</a>
-        <a href="mailto:alexeom97@outlook.com">문의하기</a>
-      </div>
-      <div class="footer-text">본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
+      <span onclick="showPrivacyPolicy()">개인정보처리방침</span>
+      <span onclick="showTerms()">이용약관</span>
     </div>
   </div>
 
-  <div class="delete-modal" id="deleteModal">
-    <div class="delete-modal-content">
-      <div class="delete-modal-title">게시물 삭제</div>
-      <div class="delete-modal-desc">정말로 이 게시물을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.</div>
-      <div class="delete-modal-actions">
-        <button class="delete-modal-btn cancel" onclick="closeDeleteModal()">취소</button>
+  <div class="login-alert" id="loginAlert">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+    로그인이 필요합니다. 로그인 페이지로 이동합니다.
+  </div>
+
+  <div class="delete-modal-overlay" id="deleteModalOverlay">
+    <div class="delete-modal">
+      <img src="https://sharer.jbjb.r-e.kr/delete.svg" alt="warning">
+      <div class="delete-modal-title">게시물을 완전히 삭제하시겠습니까?<br>삭제된 데이터는 복구할 수 없습니다.</div>
+      <div class="delete-modal-buttons">
+        <button class="delete-modal-btn cancel" id="cancelDeleteBtn">취소</button>
         <button class="delete-modal-btn delete" id="confirmDeleteBtn">삭제</button>
       </div>
     </div>
   </div>
 
-  <div id="imageLightbox">
-    <div class="lightbox-content">
-      <button class="lightbox-close" onclick="closeLightbox()">×</button>
-      <button class="lightbox-nav prev" onclick="prevLightboxImage()">‹</button>
-      <img id="lightboxImage" src="" alt="확대 이미지">
-      <button class="lightbox-nav next" onclick="nextLightboxImage()">›</button>
-      <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+  <div id="imageLightbox" onclick="closeLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+      <img id="lightboxImg" src="" alt="확대 이미지">
     </div>
   </div>
 
-  <div class="login-alert" id="loginAlert">
-    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2v-2h4v8zm0-10h-2V5h2v2z"/></svg>
-    <span>로그인이 필요한 서비스입니다. 여기를 눌러 로그인하세요.</span>
-  </div>
-
-  <script src="markdown.js"></script>
   <script>
-    // ─── NPROGRESS 설정 ───
-    NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
-    document.addEventListener('click', function(e) {
-      const link = e.target.closest('a');
-      if (link && link.href && !link.target && !link.hasAttribute('download')) {
-        NProgress.start();
-      }
-    });
+  const SUPABASE_URL = "https://wzsnmbeffwunmshbshcc.supabase.co";
+  const SUPABASE_KEY = "발급받은_anon_key_넣기";
 
-    // ─── SPLASH ───
-    (function () {
-      window.addEventListener('load', () => {
-        const splash = document.getElementById('splash');
-        if (splash) {
-          setTimeout(() => {
-            splash.classList.add('fade-out');
-            setTimeout(() => splash.remove(), 450);
-          }, 300);
-        }
-      });
-    })();
+  const urlParams = new URLSearchParams(window.location.search);
+  const postId = urlParams.get('id');
 
-    // ─── 코어 API 통신 ───
-    const API_URL = "https://clm-supa.jbjb.r-e.kr/rest/v1";
-    const API_KEY = "내용생략";
+  let currentUser = null;
+  let currentPostAuthorId = null;
+  let pendingDeletePostId = null;
+  let activeImageIndex = 0;
+  let totalImages = 0;
 
-    async function api(path, options = {}) {
-      const url = `${API_URL}${path}`;
-      const headers = {
-        "apikey": API_KEY,
-        "Authorization": `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-        ...options.headers
-      };
-      const res = await fetch(url, { ...options, headers });
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`API Error: ${res.status} - ${text}`);
-      }
-      if (res.status === 204) return null;
-      return await res.json();
+  const activeInputReplies = new Set();
+  const visibleReplies = new Set();
+
+  async function api(path, options = {}) {
+    options.headers = {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    };
+    const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, options);
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText);
+    }
+    if (options.method === 'DELETE' || options.headers['Prefer'] === 'return=minimal') {
+      return null;
+    }
+    return res.json();
+  }
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    NProgress.start();
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try { currentUser = JSON.parse(userStr); } catch(e){}
     }
 
-    // ─── 글로벌 상태 관리 ───
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get('id');
-    let currentUser = null;
-    let currentPost = null;
-    let openReplyThreads = new Set(); 
-    let repliesByParent = {}; 
-    let profileImages = {}; 
-    let currentLightboxImages = [];
-    let currentLightboxIndex = 0;
-    let pendingDeletePostId = null;
-
-    window.openLightbox = function(startIndex, imageCsvString) {
-      if (!imageCsvString) return;
-      currentLightboxImages = imageCsvString.split(',').map(u => u.trim()).filter(Boolean);
-      currentLightboxIndex = startIndex;
-      const lightbox = document.getElementById('imageLightbox');
-      const imgEl = document.getElementById('lightboxImage');
-      const counter = document.getElementById('lightboxCounter');
-      imgEl.src = currentLightboxImages[currentLightboxIndex];
-      counter.textContent = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
-      lightbox.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    };
-
-    window.closeLightbox = function() {
-      const lightbox = document.getElementById('imageLightbox');
-      lightbox.style.display = 'none';
-      document.body.style.overflow = '';
-    };
-
-    window.prevLightboxImage = function() {
-      if (currentLightboxImages.length <= 1) return;
-      currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxImages.length) % currentLightboxImages.length;
-      const imgEl = document.getElementById('lightboxImage');
-      const counter = document.getElementById('lightboxCounter');
-      imgEl.src = currentLightboxImages[currentLightboxIndex];
-      counter.textContent = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
-    };
-
-    window.nextLightboxImage = function() {
-      if (currentLightboxImages.length <= 1) return;
-      currentLightboxIndex = (currentLightboxIndex + 1) % currentLightboxImages.length;
-      const imgEl = document.getElementById('lightboxImage');
-      const counter = document.getElementById('lightboxCounter');
-      imgEl.src = currentLightboxImages[currentLightboxIndex];
-      counter.textContent = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
-    };
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === "Escape") {
-        const lightbox = document.getElementById('imageLightbox');
-        if (lightbox.style.display === 'flex') {
-          closeLightbox();
-        }
-      }
-    });
-
-    async function loadPost(postId) {
-      try {
-        const posts = await api(`/posts?id=eq.${postId}&select=*`);
-        if (!posts?.length) {
-          showError('게시물을 찾을 수 없습니다.');
-          return;
-        }
-        const post = posts[0];
-        const savedUser = localStorage.getItem('snsUser');
-        const activeUser = savedUser ? JSON.parse(savedUser) : null;
-        
-        if (post.access === 'private') {
-          if (!activeUser || String(activeUser.id) !== String(post.author_id)) {
-            showError('비공개 게시물입니다. 작성자만 확인할 수 있습니다.');
-            return;
-          }
-        }
-        
-        currentPost = post;
-        const authorImg = await getProfileImage(post.author_id);
-        if (authorImg) profileImages[post.author_id] = authorImg;
-        
-        const contentDiv = document.getElementById('postContent');
-        const timeStr = new Date(post.created_at).toLocaleString('ko-KR', { year:'numeric', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
-        const isMine = activeUser && String(activeUser.id) === String(post.author_id);
-        const deleteBtnHtml = isMine ? `<button class="delete-btn" onclick="openDeleteModal('${post.id}')">삭제</button>` : '';
-        
-        // 공개 범위 분기 처리 구조 설정
-        let accessBadgeHtml = '';
-        if (post.access === 'public' || !post.access) {
-          accessBadgeHtml = `<div class="access-badge public"><img src="earth.svg" alt="공개">공개</div>`;
-        } else if (post.access === 'private') {
-          accessBadgeHtml = `<div class="access-badge private"><img src="service.svg" alt="비공개">비공개</div>`;
-        } else if (post.access === 'link') {
-          accessBadgeHtml = `<div class="access-badge link"><img src="link.svg" alt="일부 공개">일부 공개</div>`;
-        }
-
-        let avatarContent = post.author ? post.author[0].toUpperCase() : '?';
-        if (profileImages[post.author_id]) {
-          avatarContent = `<img src="${profileImages[post.author_id]}" alt="${escapeHtml(post.author)}">`;
-        }
-        
-        let imagesHtml = '';
-        if (post.image_url) {
-          const imgs = post.image_url.split(',').map(u => u.trim()).filter(Boolean);
-          if (imgs.length > 0) {
-            let slides = '';
-            let dots = '';
-            imgs.forEach((img, idx) => {
-              slides += `<div class="carousel-slide"><img src="${img}" alt="첨부이미지" onclick="openLightbox(${idx}, '${escapeHtml(post.image_url)}')"></div>`;
-              dots += `<div class="indicator ${idx === 0 ? 'active' : ''}" onclick="setCarouselSlide(this, ${idx})"></div>`;
-            });
-            const navs = imgs.length > 1 ? `
-              <button class="carousel-nav prev" onclick="moveCarousel(this, -1)">‹</button>
-              <button class="carousel-nav next" onclick="moveCarousel(this, 1)">›</button>
-            ` : '';
-            const indicators = imgs.length > 1 ? `<div class="carousel-indicators">${dots}</div>` : '';
-            imagesHtml = `
-              <div class="post-images">
-                <div class="image-carousel" onscroll="handleCarouselScroll(this)">${slides}</div>
-                ${navs}
-                ${indicators}
-              </div>
-            `;
-          }
-        }
-        
-        const isVerified = ["JB777", "진정오"].includes(post.author);
-        
-        contentDiv.innerHTML = `
-          <div class="post-detail-card">
-            <div class="post-detail-header">
-              <div class="author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
-                <div class="author-avatar">${avatarContent}</div>
-                <div class="author-details">
-                  <div class="author-name">
-                    ${escapeHtml(post.author)}
-                    ${isVerified ? '<span class="verification-badge"></span>' : ''}
-                  </div>
-                  <div class="post-timestamp">${timeStr}</div>
-                </div>
-              </div>
-              <div class="header-actions">
-                ${accessBadgeHtml}
-                <button class="like-btn" id="likeBtn" onclick="toggleLike()">
-                  <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1135.539307 2218.420166 1109.436768 2205.199463 C 1094.673828 2199.110596 1080.472656 2191.730225 1066.974854 2183.1604 C 848.711914 2043.945557 659.83783 1897.940063 500.354248 1745.142456 C 340.779541 1592.356567 217.60791 1435.291382 130.837158 1273.947266 C 44.066406 1112.602783 0.680908 952.128418 0.680908 792.524414 C 0.680908 576.438965 69.414795 397.681641 206.882812 256.252441 C 344.350586 114.823242 516.536133 44.108398 723.438965 44.108398 C 837.288574 44.108398 945.719727 71.979004 1048.732422 127.720703 C 1100.238281 155.591309 1147.810547 192.051514 1191.452637 237.101318 C 1235.094727 192.051514 1282.666992 155.591309 1334.172852 127.720703 C 1437.185547 71.979004 1545.616211 44.108398 1659.466797 44.108398 C 1866.368652 44.108398 2038.554688 114.823242 2176.022461 256.252441 C 2313.490234 397.681641 2382.224121 576.438965 2382.224121 792.524414 C 2382.224121 952.128418 2338.438477 1112.602783 2169.75708 1273.707397 Z"/>
-                  </svg>
-                  <span id="likeCount">0</span>
-                </button>
-                ${deleteBtnHtml}
-              </div>
-            </div>
-            ${imagesHtml}
-            <div class="post-detail-content">
-              <div class="post-text">${parseMarkdown(post.content)}</div>
-            </div>
-            <div class="share-container">
-              <div class="share-label">공유 링크</div>
-              <div class="share-box-wrapper">
-                <div class="share-url-box" id="shareUrl">${window.location.href}</div>
-                <button class="copy-btn" id="copyBtn" onclick="copyShareLink()">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-        
-        loadLikes(postId);
-      } catch (e) {
-        console.error(e);
-        showError('게시물을 불러오는 중 오류가 발생했습니다.');
-      }
+    if (!postId) {
+      alert('올바르지 않은 접근입니다.');
+      window.location.href = 'index.html';
+      return;
     }
 
-    function showError(msg) {
-      document.getElementById('postContent').innerHTML = `
-        <div style="text-align:center; padding:64px 16px; color:var(--t2);">
-          <p style="font-size:15px; margin-bottom:24px; line-height:1.6;">${escapeHtml(msg)}</p>
-          <button onclick="goHome()" style="background:#fff; color:#000; border:none; padding:12px 28px; border-radius:var(--r2); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s;" onmouseover="this.style.background='#e8e8e8'" onmouseout="this.style.background='#fff'">돌아가기</button>
-        </div>
-      `;
+    document.getElementById('shareUrl').textContent = window.location.href;
+
+    try {
+      await loadPostDetail();
+      await listenComments(postId);
+    } catch (e) {
+      console.error(e);
+      alert('게시물을 불러오지 못했습니다.');
+    } finally {
+      NProgress.done();
+      const splash = document.getElementById('splash');
+      splash.classList.add('fade-out');
+      setTimeout(() => splash.remove(), 450);
     }
 
-    window.openDeleteModal = function(id) {
-      pendingDeletePostId = id;
-      document.getElementById('deleteModal').classList.add('show');
-      document.body.style.overflow = 'hidden';
-    };
+    setupLikeButton();
+    setupDeleteButton();
+    setupCommentSubmit();
+    setupTextareaAutoResize();
+  });
 
-    window.closeDeleteModal = function() {
-      document.getElementById('deleteModal').classList.remove('show');
-      document.body.style.overflow = '';
-      pendingDeletePostId = null;
-    };
+  async function loadPostDetail() {
+    const data = await api(`/posts?id=eq.${postId}&select=*`);
+    if (!data || data.length === 0) {
+      alert('존재하지 않거나 삭제된 게시물입니다.');
+      window.location.href = 'index.html';
+      return;
+    }
 
-    window.goToProfile = function(userId, nickname) {
-      window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
-    };
+    const post = data[0];
+    currentPostAuthorId = post.author_id;
 
-    window.addComment = async function() {
-      const input = document.getElementById('commentInput');
-      const text = input.value.trim();
-      if (!currentUser) return showLoginAlert();
-      if (!text || !currentPost) return;
-      try {
-        await api("/comments", {
-          method: "POST",
-          body: JSON.stringify({
-            post_id: postId,
-            user_id: currentUser.id,
-            user_name: currentUser.nickname,
-            text: text,
-            parent_id: null,
-            created_at: new Date().toISOString()
-          })
+    // 아바타 및 유저 정보 랜더링
+    const avatarEl = document.getElementById('authorAvatar');
+    if (post.author_avatar) {
+      avatarEl.innerHTML = `<img src="${post.author_avatar}" alt="avatar">`;
+    } else {
+      avatarEl.textContent = post.author ? post.author.substring(0, 1) : '?';
+    }
+
+    const nameEl = document.getElementById('authorName');
+    nameEl.innerHTML = `${escapeHtml(post.author || '익명')} ${post.is_verified ? '<span class="verification-badge"></span>' : ''}`;
+    
+    document.getElementById('postTimestamp').textContent = formatDate(post.created_at);
+
+    // ─── [핵심 추가] 공개 범위 배지 렌더링 ───
+    renderAccessBadge(post.access);
+
+    // 본문 내용 렌der
+    const contentEl = document.getElementById('postContent');
+    contentEl.innerHTML = linkify(escapeHtml(post.content || ''));
+
+    // 본문 삭제 버튼 노출 여부
+    if (currentUser && (currentUser.id === post.author_id || currentUser.role === 'admin')) {
+      document.getElementById('deleteBtn').style.display = 'block';
+    }
+
+    // 이미지 렌더링 (캐러셀)
+    if (post.image_url) {
+      const urls = post.image_url.split(',').map(u => u.trim()).filter(Boolean);
+      if (urls.length > 0) {
+        totalImages = urls.length;
+        document.getElementById('postImages').style.display = 'block';
+        const carousel = document.getElementById('imageCarousel');
+        const indicators = document.getElementById('carouselIndicators');
+
+        urls.forEach((url, idx) => {
+          const slide = document.createElement('div');
+          slide.className = 'carousel-slide';
+          slide.innerHTML = `<img src="${url}" alt="post image" onclick="openLightbox('${url}')">`;
+          carousel.appendChild(slide);
+
+          const ind = document.createElement('div');
+          ind.className = `indicator ${idx === 0 ? 'active' : ''}`;
+          ind.onclick = () => scrollToSlide(idx);
+          indicators.appendChild(ind);
         });
-        input.value = '';
-        input.style.height = '48px';
-        listenComments(postId);
-      } catch (e) { alert('댓글 작성 실패'); }
-    };
 
-    window.moveCarousel = function(btn, dir) {
-      const container = btn.closest('.post-images');
-      const carousel = container.querySelector('.image-carousel');
-      const slideWidth = carousel.clientWidth;
-      carousel.scrollBy({ left: slideWidth * dir, behavior: 'smooth' });
-    };
-
-    window.setCarouselSlide = function(dot, idx) {
-      const container = dot.closest('.post-images');
-      const carousel = container.querySelector('.image-carousel');
-      const slideWidth = carousel.clientWidth;
-      carousel.scrollTo({ left: slideWidth * idx, behavior: 'smooth' });
-    };
-
-    window.handleCarouselScroll = function(carousel) {
-      const container = carousel.closest('.post-images');
-      const scrollLeft = carousel.scrollLeft;
-      const slideWidth = carousel.clientWidth;
-      const activeIndex = Math.round(scrollLeft / slideWidth);
-      const dots = container.querySelectorAll('.indicator');
-      dots.forEach((dot, idx) => {
-        dot.classList.toggle('active', idx === activeIndex);
-      });
-    };
-
-    async function loadLikes(postId) {
-      try {
-        const likes = await api(`/likes?post_id=eq.${postId}&select=user_id`);
-        updateLikeUI(likes || []);
-      } catch (e) { console.error('loadLikes 오류:', e); }
+        if (urls.length > 1) {
+          document.getElementById('prevBtn').style.display = 'flex';
+          document.getElementById('nextBtn').style.display = 'flex';
+          setupCarouselScrollListener();
+        }
+      }
     }
 
-    function updateLikeUI(likes) {
+    // 좋아요 상태 업데이트
+    await updateLikeUI();
+  }
+
+  // ─── [핵심 추가] 공개 범위 배지 생성기 함수 ───
+  function renderAccessBadge(accessValue) {
+    const container = document.getElementById('accessBadgeContainer');
+    if (!container) return;
+
+    let badgeText = '공개';
+    let iconSvg = `<svg width="11" height="11" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`; // 지구본
+
+    if (accessValue === 'link') {
+      badgeText = '일부 공개';
+      iconSvg = `<svg width="11" height="11" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>`; // 링크 모양
+    } else if (accessValue === 'private') {
+      badgeText = '비공개';
+      iconSvg = `<svg width="11" height="11" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`; // 자물쇠 모양
+    }
+
+    container.innerHTML = `
+      <span class="access-badge">
+        ${iconSvg}
+        <span>${badgeText}</span>
+      </span>
+    `;
+  }
+
+  function setupCarouselScrollListener() {
+    const carousel = document.getElementById('imageCarousel');
+    carousel.addEventListener('scroll', () => {
+      const width = carousel.clientWidth;
+      const index = Math.round(carousel.scrollLeft / width);
+      if (index !== activeImageIndex) {
+        activeImageIndex = index;
+        updateIndicators();
+      }
+    });
+
+    document.getElementById('prevBtn').onclick = () => {
+      if (activeImageIndex > 0) scrollToSlide(activeImageIndex - 1);
+    };
+    document.getElementById('nextBtn').onclick = () => {
+      if (activeImageIndex < totalImages - 1) scrollToSlide(activeImageIndex + 1);
+    };
+  }
+
+  function scrollToSlide(idx) {
+    const carousel = document.getElementById('imageCarousel');
+    const width = carousel.clientWidth;
+    carousel.scrollTo({ left: idx * width, behavior: 'smooth' });
+  }
+
+  function updateIndicators() {
+    const inds = document.querySelectorAll('.carousel-indicators .indicator');
+    inds.forEach((ind, idx) => {
+      ind.classList.toggle('active', idx === activeImageIndex);
+    });
+  }
+
+  async function updateLikeUI() {
+    const countData = await api(`/likes?post_id=eq.${postId}`, { method: "GET", headers: { "Prefer": "count=exact" } });
+    const totalLikes = countData ? countData.length : 0;
+    document.getElementById('likeCount').textContent = totalLikes;
+
+    if (currentUser) {
+      const myLike = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}`);
       const btn = document.getElementById('likeBtn');
-      const countEl = document.getElementById('likeCount');
-      if (!btn || !countEl) return;
-      countEl.textContent = likes.length;
-      if (currentUser && likes.some(l => l.user_id === currentUser.id)) {
+      if (myLike && myLike.length > 0) {
         btn.classList.add('liked');
       } else {
         btn.classList.remove('liked');
       }
     }
+  }
 
-    window.toggleLike = async function() {
-      if (!currentUser) return showLoginAlert();
-      if (!currentPost) return;
-      const btn = document.getElementById('likeBtn');
-      const countEl = document.getElementById('likeCount');
+  function setupLikeButton() {
+    const btn = document.getElementById('likeBtn');
+    btn.onclick = async () => {
+      if (!currentUser) { showLoginAlert(); return; }
+      btn.disabled = true;
       try {
-        const [likeRecords, likeCountResult] = await Promise.all([
-          api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
-          api(`/likes?post_id=eq.${postId}&select=count`)
-        ]);
-        const currentlyLiked = likeRecords?.length > 0;
-        const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
-        const uiLiked = btn.classList.contains('liked');
-        const uiCount = parseInt(countEl.textContent, 10) || 0;
-        
-        if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
-          btn.classList.toggle('liked', currentlyLiked);
-          countEl.textContent = currentServerCount;
-        }
-        
-        if (currentlyLiked) {
-          if (likeRecords?.[0]?.id) {
-            await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
-          }
-          btn.classList.remove('liked');
-          countEl.textContent = currentServerCount - 1;
+        const isLiked = btn.classList.contains('liked');
+        if (isLiked) {
+          await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}`, { method: "DELETE" });
         } else {
-          await api("/likes", {
+          await api(`/likes`, {
             method: "POST",
             body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
           });
-          btn.classList.add('liked');
-          countEl.textContent = currentServerCount + 1;
         }
-      } catch (e) { console.error('좋아요 토글 실패:', e); }
-    };
-
-    async function listenComments(postId) {
-      try {
-        const comments = await api(`/comments?post_id=eq.${postId}&select=*`);
-        comments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        
-        const userIds = [...new Set(comments.map(c => c.user_id))];
-        await Promise.all(userIds.map(async (id) => {
-          if (!profileImages[id]) {
-            const img = await getProfileImage(id);
-            if (img) profileImages[id] = img;
-          }
-        }));
-        
-        repliesByParent = {};
-        const roots = [];
-        comments.forEach(c => {
-          if (!c.parent_id) {
-            roots.push(c);
-          } else {
-            const parentId = c.parent_id;
-            if (!repliesByParent[parentId]) repliesByParent[parentId] = [];
-            repliesByParent[parentId].push(c);
-          }
-        });
-        Object.values(repliesByParent).forEach(arr => {
-          arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        });
-        
-        const listDiv = document.getElementById('commentList');
-        listDiv.innerHTML = '';
-        if (roots.length === 0) {
-          listDiv.innerHTML = `<div style="text-align:center; padding:32px 0; color:var(--t3); font-size:13px;">첫 댓글을 남겨보세요.</div>`;
-          return;
-        }
-        roots.forEach(r => {
-          const item = document.createElement('div');
-          item.className = 'comment-item';
-          item.innerHTML = renderOneComment(r, { showReplyButton: true });
-          
-          const replyListContainer = document.createElement('div');
-          replyListContainer.className = 'reply-list';
-          replyListContainer.id = `replyList-${r.id}`;
-          if (!openReplyThreads.has(r.id)) replyListContainer.style.display = 'none';
-          
-          const childs = repliesByParent[r.id] || [];
-          childs.forEach(ch => {
-            const subItem = document.createElement('div');
-            subItem.className = 'reply-item';
-            subItem.innerHTML = renderOneComment(ch, { showReplyButton: false });
-            replyListContainer.appendChild(subItem);
-          });
-          
-          item.appendChild(replyListContainer);
-          listDiv.appendChild(item);
-        });
-      } catch (e) { console.error('댓글 로드 실패:', e); }
-    }
-
-    function renderAvatar(userName, userId) {
-      let avatar = userName ? userName[0].toUpperCase() : '?';
-      if (profileImages[userId]) {
-        const url = profileImages[userId].includes('?') ? `${profileImages[userId]}&v=${Date.now()}` : `${profileImages[userId]}?v=${Date.now()}`;
-        avatar = `<img src="${url}" alt="${escapeHtml(userName)}">`;
+        await updateLikeUI();
+      } catch(e) {
+        alert('좋아요 처리 실패');
+      } finally {
+        btn.disabled = false;
       }
-      return avatar;
-    }
+    };
+  }
 
-    function renderOneComment(c, { showReplyButton }) {
-      const isMine = currentUser?.id === c.user_id;
-      const date = new Date(c.created_at).toLocaleString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      const isVerified = ["JB777", "진정오"].includes(c.user_name);
-      const avatarContent = renderAvatar(c.user_name, c.user_id);
-      const linkedText = parseMarkdown(c.text);
-      const replyCount = (repliesByParent[c.id] || []).length;
-      const hasReplies = replyCount > 0;
-      const isOpen = openReplyThreads.has(c.id);
+  function setupDeleteButton() {
+    const delBtn = document.getElementById('deleteBtn');
+    const overlay = document.getElementById('deleteModalOverlay');
+    const cancelBtn = document.getElementById('cancelDeleteBtn');
+
+    delBtn.onclick = () => {
+      pendingDeletePostId = postId;
+      overlay.classList.add('show');
+    };
+
+    cancelBtn.onclick = () => {
+      overlay.classList.remove('show');
+      pendingDeletePostId = null;
+    };
+  }
+
+  function showLoginAlert() {
+    const alertEl = document.getElementById('loginAlert');
+    alertEl.classList.add('show');
+    alertEl.onclick = () => window.location.href = 'login.html';
+    setTimeout(() => alertEl.classList.remove('show'), 4000);
+  }
+
+  async function listenComments(pid) {
+    const comments = await api(`/comments?post_id=eq.${pid}&parent_id=is.null&order=created_at.asc`);
+    const listEl = document.getElementById('commentList');
+    listEl.innerHTML = '';
+
+    for (let c of comments) {
+      const item = document.createElement('div');
+      item.className = 'comment-item';
       
-      const replyBtnHtml = showReplyButton ? `<button class="reply-btn" onclick="openReplyComposer('${c.id}')">답글 달기</button>` : '';
-      const toggleBtnHtml = hasReplies ? `<button class="replies-toggle-btn" id="toggleReplies-${c.id}" data-count="${replyCount}" onclick="toggleReplies('${c.id}')">${isOpen ? '답글 접기' : `답글 ${replyCount}개 보기`}</button>` : '';
-      const replyComposeHtml = showReplyButton ? `
-        <div class="reply-compose" id="replyCompose-${c.id}" style="display:none;">
-          <textarea id="replyInput-${c.id}" class="reply-input" placeholder="답글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
-          <div class="reply-compose-actions">
-            <button class="reply-cancel-btn" onclick="cancelReply('${c.id}')">취소</button>
-            <button class="reply-submit-btn" onclick="submitReply('${c.id}')">답글 등록</button>
-          </div>
-        </div>
-      ` : '';
-      const delBtnHtml = isMine ? `<button class="comment-del-btn" onclick="deleteComment('${c.id}')">삭제</button>` : '';
-      
-      return `
+      const childData = await api(`/comments?parent_id=eq.${c.id}&order=created_at.asc`);
+      const childCount = childData ? childData.length : 0;
+
+      let avatarHTML = c.author_avatar ? `<img src="${c.author_avatar}">` : (c.author ? c.author.substring(0,1) : '?');
+      let isMyComment = currentUser && (currentUser.id === c.user_id || currentUser.role === 'admin');
+      let isToggleChecked = visibleReplies.has(c.id);
+
+      item.innerHTML = `
         <div class="comment-header">
-          <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
-            <div class="comment-avatar">${avatarContent}</div>
-            <span class="comment-author">
-              ${escapeHtml(c.user_name)}
-              ${isVerified ? '<span class="verification-badge"></span>' : ''}
-            </span>
+          <div class="comment-author-wrapper">
+            <div class="comment-avatar">${avatarHTML}</div>
+            <div class="comment-author">
+              ${escapeHtml(c.author || '익명')}
+              ${c.is_verified ? '<span class="verification-badge"></span>' : ''}
+              ${c.user_id === currentPostAuthorId ? '<span style="font-size:10px; background:#333; color:#aaa; padding:1px 5px; border-radius:4px; margin-left:3px;">작성자</span>' : ''}
+            </div>
           </div>
-          ${delBtnHtml}
+          ${isMyComment ? `<button class="comment-del-btn" onclick="deleteComment('${c.id}')">삭제</button>` : ''}
         </div>
-        <div class="comment-content">${linkedText}</div>
-        <div class="comment-date">${date}</div>
+        <div class="comment-content">${linkify(escapeHtml(c.content || ''))}</div>
+        <div class="comment-date">${formatDate(c.created_at)}</div>
         <div class="comment-actions">
-          ${replyBtnHtml}
-          ${toggleBtnHtml}
+          <button class="reply-btn" onclick="toggleReplyCompose('${c.id}')">답글</button>
+          ${childCount > 0 ? `<button class="replies-toggle-btn" onclick="toggleRepliesList('${c.id}')">${isToggleChecked ? '답글 숨기기' : `답글 ${childCount}개 보기`}</button>` : ''}
         </div>
-        ${replyComposeHtml}
+        <div id="replyCompose_${c.id}" class="reply-compose" style="display:${activeInputReplies.has(c.id)?'flex':'none'};">
+          <textarea class="reply-input" id="replyInput_${c.id}" placeholder="답글을 입력하세요..." rows="1"></textarea>
+          <div class="reply-compose-actions">
+            <button class="reply-cancel-btn" onclick="toggleReplyCompose('${c.id}')">취소</button>
+            <button class="reply-submit-btn" onclick="submitReply('${c.id}')">등록</button>
+          </div>
+        </div>
+        <div id="replyList_${c.id}" class="reply-list" style="display:${isToggleChecked?'flex':'none'};"></div>
       `;
+
+      listEl.appendChild(item);
+
+      if (isToggleChecked && childCount > 0) {
+        renderReplies(childData, document.getElementById(`replyList_${c.id}`));
+      }
     }
+  }
 
-    window.openReplyComposer = function(commentId) {
-      if (!currentUser) return showLoginAlert();
-      const el = document.getElementById(`replyCompose-${commentId}`);
-      if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none';
-    };
+  function renderReplies(replies, container) {
+    container.innerHTML = '';
+    replies.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'reply-item';
+      let avatarHTML = r.author_avatar ? `<img src="${r.author_avatar}">` : (r.author ? r.author.substring(0,1) : '?');
+      let isMyReply = currentUser && (currentUser.id === r.user_id || currentUser.role === 'admin');
 
-    window.cancelReply = function(commentId) {
-      const el = document.getElementById(`replyCompose-${commentId}`);
-      if (el) el.style.display = 'none';
-      const ta = document.getElementById(`replyInput-${commentId}`);
-      if (ta) ta.value = '';
-    };
+      div.innerHTML = `
+        <div class="comment-header">
+          <div class="comment-author-wrapper">
+            <div class="comment-avatar">${avatarHTML}</div>
+            <div class="comment-author">
+              ${escapeHtml(r.author || '익명')}
+              ${r.is_verified ? '<span class="verification-badge"></span>' : ''}
+              ${r.user_id === currentPostAuthorId ? '<span style="font-size:10px; background:#333; color:#aaa; padding:1px 5px; border-radius:4px; margin-left:3px;">작성자</span>' : ''}
+            </div>
+          </div>
+          ${isMyReply ? `<button class="comment-del-btn" onclick="deleteComment('${r.id}')">삭제</button>` : ''}
+        </div>
+        <div class="comment-content">${linkify(escapeHtml(r.content || ''))}</div>
+        <div class="comment-date">${formatDate(r.created_at)}</div>
+      `;
+      container.appendChild(div);
+    });
+  }
 
-    window.submitReply = async function(commentId) {
-      if (!currentUser) return showLoginAlert();
-      const ta = document.getElementById(`replyInput-${commentId}`);
-      const text = ta?.value.trim();
-      if (!text) return;
+  window.toggleReplyCompose = function(cid) {
+    if (!currentUser) { showLoginAlert(); return; }
+    const box = document.getElementById(`replyCompose_${cid}`);
+    const textarea = document.getElementById(`replyInput_${cid}`);
+    if (box.style.display === 'none') {
+      box.style.display = 'flex';
+      activeInputReplies.add(cid);
+      textarea.focus();
+    } else {
+      box.style.display = 'none';
+      activeInputReplies.delete(cid);
+      textarea.value = '';
+    }
+  };
+
+  window.toggleRepliesList = function(cid) {
+    const box = document.getElementById(`replyList_${cid}`);
+    if (box.style.display === 'none') {
+      visibleReplies.add(cid);
+    } else {
+      visibleReplies.delete(cid);
+    }
+    listenComments(postId);
+  };
+
+  function setupCommentSubmit() {
+    const btn = document.getElementById('commentSubmitBtn');
+    const input = document.getElementById('commentInput');
+
+    btn.onclick = async () => {
+      if (!currentUser) { showLoginAlert(); return; }
+      const txt = input.value.trim();
+      if (!txt) return;
+      btn.disabled = true;
+
       try {
-        await api("/comments", {
+        await api('/comments', {
           method: "POST",
           body: JSON.stringify({
             post_id: postId,
             user_id: currentUser.id,
-            user_name: currentUser.nickname,
-            text: text,
-            parent_id: commentId,
+            author: currentUser.nickname,
+            author_avatar: currentUser.avatar_url,
+            content: txt,
+            is_verified: currentUser.is_verified || false,
             created_at: new Date().toISOString()
           })
         });
-        openReplyThreads.add(commentId);
-        listenComments(postId);
-      } catch (e) { alert('답글 작성 실패'); }
-    };
-
-    window.toggleReplies = function(commentId) {
-      const list = document.getElementById(`replyList-${commentId}`);
-      const btn = document.getElementById(`toggleReplies-${commentId}`);
-      if (!list || !btn) return;
-      const count = btn.getAttribute('data-count') || '0';
-      if (list.style.display === 'none') {
-        list.style.display = 'flex';
-        btn.textContent = '답글 접기';
-        openReplyThreads.add(commentId);
-      } else {
-        list.style.display = 'none';
-        btn.textContent = `답글 ${count}개 보기`;
-        openReplyThreads.delete(commentId);
+        input.value = '';
+        input.style.height = '48px';
+        await listenComments(postId);
+      } catch(e) {
+        alert('댓글 등록 실패');
+      } finally {
+        btn.disabled = false;
       }
     };
+  }
 
-    window.deleteComment = async function(commentId) {
-      if (!confirm('댓글을 삭제하시겠습니까?')) return;
-      try {
-        await api(`/comments?id=eq.${commentId}`, { method: "DELETE" });
-        listenComments(postId);
-      } catch (e) { alert('댓글 삭제 실패'); }
-    };
+  window.submitReply = async function(parentId) {
+    const input = document.getElementById(`replyInput_${parentId}`);
+    const txt = input.value.trim();
+    if (!txt) return;
 
-    window.copyShareLink = function() {
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        const btn = document.getElementById('copyBtn');
-        btn.classList.add('success');
-        setTimeout(() => btn.classList.remove('success'), 1500);
+    try {
+      await api('/comments', {
+        method: "POST",
+        body: JSON.stringify({
+          post_id: postId,
+          parent_id: parentId,
+          user_id: currentUser.id,
+          author: currentUser.nickname,
+          author_avatar: currentUser.avatar_url,
+          content: txt,
+          is_verified: currentUser.is_verified || false,
+          created_at: new Date().toISOString()
+        })
       });
-    };
-
-    window.goHome = () => window.location.href = "index.html";
-    window.showPrivacyPolicy = () => window.location.href = "privacy.html";
-    window.showTerms = () => window.location.href = "policy.html";
-
-    document.getElementById('confirmDeleteBtn').onclick = async () => {
-      if (!pendingDeletePostId) return;
-      try {
-        await api(`/comments?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
-        await api(`/likes?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
-        await api(`/posts?id=eq.${pendingDeletePostId}`, { method: "DELETE" });
-        window.location.href = 'index.html';
-      } catch (e) { alert('게시물 삭제 실패'); }
-    };
-
-    function escapeHtml(unsafe) {
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function parseMarkdown(text) {
-      if (!text) return '';
-      let html = escapeHtml(text);
-      html = html.replace(/(https?:\/\/[^\s]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-      return html;
-    }
-
-    async function getCommentById(commentId) {
-      if (!commentId) return null;
-      try {
-        const rows = await api(`/comments?id=eq.${commentId}&select=user_id,user_name`);
-        return rows?.[0] || null;
-      } catch (e) { return null; }
-    }
-
-    function showLoginAlert() {
-      const alert = document.getElementById('loginAlert');
-      alert.classList.add('show');
-      setTimeout(() => alert.classList.remove('show'), 3000);
-      alert.onclick = () => window.location.href = 'login.html';
-    }
-
-    function initCurrentUser() {
-      const saved = localStorage.getItem('snsUser');
-      if (saved) {
-        currentUser = JSON.parse(saved);
-        updateSidebar();
-      }
-    }
-
-    function updateSidebar() {
-      const iframe = document.getElementById('sidebarFrame');
-      if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
-    }
-
-    function updateSidebarMode() {
-      const iframe = document.getElementById('sidebarFrame');
-      const narrow = window.innerWidth <= 768;
-      if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-    }
-
-    window.addEventListener('message', (event) => {
-      const { type, page } = event.data || {};
-      if (type === 'navigate') {
-        if (page === 'home') location.href = 'index.html';
-        if (page === 'explore') location.href = 'explore.html';
-      }
-      if (type === 'logout') {
-        localStorage.removeItem('snsUser');
-        currentUser = null;
-        location.href = 'index.html';
-      }
-      if (type === 'requestUserInfo') updateSidebar();
-    });
-
-    window.onSharerProfileLogout = function () {
-      localStorage.removeItem('snsUser');
-      currentUser = null;
-      location.href = 'index.html';
-    };
-
-    document.getElementById('commentInput')?.addEventListener('focus', function() {
-      if (!currentUser) {
-        this.blur();
-        showLoginAlert();
-      }
-    });
-
-    initCurrentUser();
-    updateSidebarMode();
-    window.addEventListener('resize', updateSidebarMode);
-
-    if (!postId) {
-      showError('게시물 ID가 없습니다.');
-    } else {
-      loadPost(postId);
+      activeInputReplies.delete(parentId);
+      visibleReplies.add(parentId);
       listenComments(postId);
+    } catch(e) {
+      alert('답글 등록 실패');
     }
+  };
 
-    async function getProfileImage(userId) {
-      if (!userId) return null;
-      try {
-        const users = await api(`/users?id=eq.${userId}&select=avatar_url`);
-        return users?.[0]?.avatar_url || null;
-      } catch (e) { return null; }
-    }
+  window.deleteComment = async function(commentId) {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    try {
+      await api(`/comments?id=eq.${commentId}`, { method: "DELETE" });
+      listenComments(postId);
+    } catch (e) { alert('댓글 삭제 실패'); }
+  };
 
-    const tx = document.getElementById('commentInput');
-    if (tx) {
-      tx.addEventListener('input', function() {
-        this.style.height = '48px';
-        this.style.height = Math.min(this.scrollHeight, 180) + 'px';
-      });
-    }
+  window.copyShareLink = function() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.classList.add('success');
+      setTimeout(() => btn.classList.remove('success'), 1500);
+    });
+  };
+
+  window.goHome = () => window.location.href = "index.html";
+  window.showPrivacyPolicy = () => window.location.href = "privacy.html";
+  window.showTerms = () => window.location.href = "policy.html";
+
+  document.getElementById('confirmDeleteBtn').onclick = async () => {
+    if (!pendingDeletePostId) return;
+    try {
+      await api(`/comments?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
+      await api(`/likes?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
+      await api(`/posts?id=eq.${pendingDeletePostId}`, { method: "DELETE" });
+      window.location.href = 'index.html';
+    } catch (e) { alert('게시물 삭제 실패'); }
+  };
+
+  function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+  }
+
+  function linkify(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, function(url) {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+  }
+
+  function formatDate(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    return `${y}.${m}.${d} ${hh}:${mm}`;
+  }
+
+  function setupTextareaAutoResize() {
+    const input = document.getElementById('commentInput');
+    input.addEventListener('input', function() {
+      this.style.height = '48px';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+  }
+
+  window.openLightbox = function(url) {
+    document.getElementById('lightboxImg').src = url;
+    document.getElementById('imageLightbox').style.display = 'flex';
+  };
+
+  window.closeLightbox = function() {
+    document.getElementById('imageLightbox').style.display = 'none';
+  };
   </script>
 </body>
 </html>
