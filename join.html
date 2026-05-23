@@ -51,27 +51,28 @@
     }
     .avatar-loading-container {
       position: relative;
-      width: 104px;
-      height: 104px;
-      margin: 10px auto 24px auto;
+
+      width: 110px;
+      height: 110px;
+
+      margin: 12px auto 24px auto;
 
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
     .material-spinner {
       position: absolute;
-      width: 104px;
-      height: 104px;
 
-      top: 0;
-      left: 0;
+      inset: 0;
 
-      transform-origin: center;
+      width: 110px;
+      height: 110px;
+
       animation: spinner-rotate 2s linear infinite;
-
-      overflow: visible;
     }
+
 
     .logo-container {
       display: flex;
@@ -257,18 +258,24 @@
     }
 
     .avatar-loading-user {
-      width: 88px;
-      height: 88px;
+      position: relative;
+      z-index: 2;
+
+      width: 82px;
+      height: 82px;
+
       border-radius: 50%;
+
       background: var(--bg3);
       border: 1px solid var(--border2);
+
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
+
+      font-size: 34px;
       font-weight: 700;
-      color: #666;
-      z-index: 2;
+      color: #777;
     }
 
     /* ─── ERROR ANIMATION ─── */
@@ -366,7 +373,7 @@
             <h2>계정 설정 중</h2>
             <div class="avatar-loading-container">
 
-              <svg class="material-spinner" viewBox="0 0 50 50">
+              <svg class="material-spinner" viewBox="0 0 110 110">
 
                 <defs>
                   <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -377,15 +384,14 @@
 
                 <circle
                   class="spinner-path"
-                  cx="25"
-                  cy="25"
-                  r="20"
+                  cx="55"
+                  cy="55"
+                  r="46"
                   fill="none"
                   stroke="url(#spinnerGradient)"
-                  stroke-width="3.5"
+                  stroke-width="4"
                   stroke-linecap="round"
                 />
-
               </svg>
 
               <div class="avatar-loading-user" id="loadingAvatar">?</div>
