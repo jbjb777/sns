@@ -93,11 +93,11 @@
     }
     .slider-track {
       display: flex;
-      width: 400%; /* 4 steps */
+      width: 500%; /* 5 steps (0 to 4) */
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .slider-step {
-      width: 25%;
+      width: 20%; /* 100 / 5 steps */
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -186,7 +186,43 @@
       margin-right: 6px;
       vertical-align: middle;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { to { transform: rotate(3600deg); } }
+
+    /* ─── CUSTOM LOADING AVATAR BORDER ─── */
+    .avatar-loading-container {
+      position: relative;
+      width: 104px;
+      height: 104px;
+      margin: 10px auto 24px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-loading-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      background: linear-gradient(var(--bg2), var(--bg2)) padding-box,
+                  linear-gradient(135deg, #4239f0, #399ef0) border-box;
+      animation: spin 1.5s linear infinite;
+    }
+
+    .avatar-loading-user {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 700;
+      color: #666;
+      z-index: 2;
+    }
 
     /* ─── ERROR ANIMATION ─── */
     .input-error {
@@ -231,7 +267,6 @@
       <div class="slider-wrap">
         <div class="slider-track" id="sliderTrack">
           
-          <!-- Step 0: 서비스 소개 -->
           <div class="slider-step">
             <img src="service.svg" class="step-icon" alt="서비스 소개" onerror="this.style.display='none'">
             <h2>서비스 소개</h2>
@@ -243,7 +278,6 @@
             </div>
           </div>
 
-          <!-- Step 1: 아이디 설정 -->
           <div class="slider-step">
             <img src="id.svg" class="step-icon" alt="아이디 설정" onerror="this.style.display='none'">
             <h2>아이디 설정</h2>
@@ -256,7 +290,6 @@
             </div>
           </div>
 
-          <!-- Step 2: 닉네임 설정 -->
           <div class="slider-step">
             <img src="name.svg" class="step-icon" alt="닉네임 설정" onerror="this.style.display='none'">
             <h2>닉네임 설정</h2>
@@ -269,7 +302,6 @@
             </div>
           </div>
 
-          <!-- Step 3: 비밀번호 설정 -->
           <div class="slider-step">
             <img src="shield.svg" class="step-icon" alt="비밀번호 설정" onerror="this.style.display='none'">
             <h2>비밀번호 설정</h2>
@@ -281,6 +313,15 @@
               <button class="btn-secondary" onclick="prevStep(2)">이전</button>
               <button id="signupBtn" onclick="handleSignup()">가입 완료</button>
             </div>
+          </div>
+
+          <div class="slider-step">
+            <h2>계정 설정 중</h2>
+            <div class="avatar-loading-container">
+              <div class="avatar-loading-ring"></div>
+              <div class="avatar-loading-user" id="loadingAvatar">?</div>
+            </div>
+            <p class="intro-desc" id="loadingStatusText">새로운 회원 정보를 안전하게 구성하고 있습니다.<br>잠시만 기다려주세요.</p>
           </div>
 
         </div>
@@ -401,12 +442,13 @@
       }
     }
 
-    track.style.transform = `translateX(-${stepIndex * 25}%)`;
+    // Step 이동 시 비율 계산 처리 (5개 스텝이므로 한 칸당 20%)
+    track.style.transform = `translateX(-${stepIndex * 20}%)`;
   }
 
   function prevStep(stepIndex) {
     const track = document.getElementById('sliderTrack');
-    track.style.transform = `translateX(-${stepIndex * 25}%)`;
+    track.style.transform = `translateX(-${stepIndex * 20}%)`;
   }
 
   function setButtonLoading(isLoading, loadingText = '가입 중...') {
@@ -451,23 +493,37 @@
 
     setButtonLoading(true);
 
+    // 최소 3초 타이머 연출을 위한 시작 시간 기록
+    const startTime = Date.now();
+
     try {
+      // 1. API 데이터 요청 전송
       await api("/users", {
         method: "POST",
         body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
       });
 
+      // 로컬 스토리지 데이터 임시 저장
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
-      
-      successDiv.textContent = '가입이 완료되었습니다! 마이페이지로 이동합니다.';
-      setTimeout(() => { 
-        window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new`; 
-      }, 1500);
+
+      // 2. 가입 프로세스 성공 시 아바타 내부 텍스트를 첫 글자로 변경 및 스텝 이동
+      document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
+      nextStep(4); 
+
+      // 3. 최소 3초 보장 연출 핸들링
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
+
+      setTimeout(() => {
+        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">✓ 설정 완료!</span><br>잠시 후 마이페이지로 이동합니다.`;
+        setTimeout(() => {
+          window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new`;
+        }, 800);
+      }, remainingTime);
 
     } catch (error) {
       console.error('회원가입 오류:', error);
       errorDiv.textContent = error.message || '회원가입에 실패했습니다. 다시 시도해주세요.';
-    } finally {
       setButtonLoading(false);
     }
   }
