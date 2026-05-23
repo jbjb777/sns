@@ -24,50 +24,6 @@
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <style>
-    /* 도메인 변경 안내 바 스타일 (스크롤해도 상단 고정되도록 sticky 추가) */
-    .domain-notice-bar {
-      background: #1a1a1a;
-      color: #fff;
-      text-align: center;
-      padding: 10px 40px 10px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      border-bottom: 1px solid #2a2a2a;
-      position: sticky;
-      top: 0;
-      z-index: 100000;
-      letter-spacing: -0.01em;
-      line-height: 1.4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      transition: margin-top 0.3s ease, opacity 0.3s ease;
-    }
-    .domain-notice-bar .highlight {
-      color: #4ade80;
-      font-weight: 700;
-    }
-    .domain-notice-bar .close-notice {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #888;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.15s;
-    }
-    .domain-notice-bar .close-notice:hover {
-      color: #fff;
-    }
-
     .splash-text {
       text-align: center;
       animation: fadeUp 0.6s ease forwards;
@@ -127,6 +83,57 @@
     }
     @keyframes bodyReveal { to { opacity: 1; } }
 
+    /* ─── 상단 공지 배너 스타일 (모바일 글자 압축 및 끊김 방지) ─── */
+    .notice-banner {
+      background: #111;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 101;
+      width: 100%;
+    }
+    .notice-banner-content {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #eee;
+      text-align: center;
+      flex: 1;
+      word-break: keep-all; /* 조사나 글자가 어색하게 찢어져서 줄바꿈되지 않도록 설정 */
+      overflow-wrap: break-word;
+      padding-right: 20px;
+    }
+    .notice-banner-content a {
+      color: var(--green);
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 4px;
+      display: inline-block; /* 링크 주소가 중간에서 강제로 줄바꿈되지 않도록 보장 */
+      white-space: nowrap;   /* 모바일 가로폭이 좁아도 주소 텍스트 자체는 붙어있게 설정 */
+    }
+    .notice-banner-content a:hover {
+      text-decoration: underline;
+    }
+    .notice-banner-close {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .notice-banner-close:hover {
+      color: #fff;
+    }
+
     #splash {
       position: fixed;
       inset: 0;
@@ -174,7 +181,6 @@
       width: calc(100% - 72px);
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
       flex: 1;
     }
 
@@ -667,7 +673,7 @@
       margin-top: 10px;
       color: var(--t2);
       font-family: inherit;
-      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.01,0.64,1);
       width: 100%;
     }
     .upload-btn:hover { border-color: var(--border3); color: var(--t1); background: var(--bg4); transform: scale(1.01); }
@@ -816,9 +822,11 @@
 </head>
 <body>
 
-<div class="domain-notice-bar" id="domainNotice">
-  📢 Sharer의 공식 도메인이 <span class="highlight">sharer.jbjb.r-e.kr</span>에서 <span class="highlight">sharer.r-e.kr</span>로 변경되었습니다!
-  <button class="close-notice" onclick="closeDomainNotice()">✕</button>
+<div class="notice-banner" id="topNoticeBanner">
+  <div class="notice-banner-content">
+    Sharer의 공식 도메인이 <a href="https://sharer.jbjb.r-e.kr">sharer.jbjb.r-e.kr</a> 에서 <a href="https://sharer.r-e.kr">sharer.r-e.kr</a> 로 변경되었습니다!
+  </div>
+  <button class="notice-banner-close" onclick="document.getElementById('topNoticeBanner').style.display='none'">✕</button>
 </div>
 
 <div id="splash">
@@ -937,16 +945,6 @@
 
 <script src="markdown.js"></script>
 <script>
-// 도메인 안내 바 닫기 함수
-function closeDomainNotice() {
-  const notice = document.getElementById('domainNotice');
-  if (notice) {
-    notice.style.marginTop = `-${notice.offsetHeight}px`;
-    notice.style.opacity = '0';
-    setTimeout(() => { notice.style.display = 'none'; }, 300);
-  }
-}
-
 // ─── NPROGRESS 설정 ───
 NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
 
