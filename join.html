@@ -372,7 +372,7 @@
               <div class="avatar-loading-user" id="loadingAvatar">?</div>
 
             </div>
-            <p class="intro-desc" id="loadingStatusText">새로운 회원 정보를 안전하게 구성하고 있습니다.<br>잠시만 기다려주세요.</p>
+            <p class="intro-desc" id="loadingStatusText">계정 정보를 설정하는 중입니다 </p>
           </div>
 
         </div>
@@ -566,7 +566,7 @@
       const remainingTime = Math.max(0, 3000 - elapsedTime);
 
       setTimeout(() => {
-        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">✓ 설정 완료!</span><br>잠시 후 마이페이지로 이동합니다.`;
+        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">설정 완료</span>`;
         setTimeout(() => {
           window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new`;
         }, 800);
