@@ -189,116 +189,47 @@
     @keyframes spin { to { transform: rotate(90deg); } }
 
     /* ─── CUSTOM LOADING AVATAR BORDER ─── */
-    .avatar-loading-ring {
+    /* ─── SVG MATERIAL SPINNER ─── */
+
+    .material-spinner {
       position: absolute;
-      inset: 0;
-      border-radius: 50%;
+      width: 104px;
+      height: 104px;
 
-      background:
-        conic-gradient(
-          from 0deg,
-          transparent 0deg,
-          transparent 25deg,
-          #0d00ff 120deg,
-          #39f0ea 220deg,
-          transparent 320deg
-        );
-
-      -webkit-mask:
-        radial-gradient(
-          farthest-side,
-          transparent calc(100% - 5px),
-          #000 calc(100% - 4px)
-        );
-
-      mask:
-        radial-gradient(
-          farthest-side,
-          transparent calc(100% - 5px),
-          #000 calc(100% - 4px)
-        );
-
-      animation:
-        materialRotate 1.8s linear infinite,
-        materialArc 1.35s ease-in-out infinite;
+      transform-origin: center;
+      animation: spinner-rotate 2s linear infinite;
     }
 
-    @keyframes materialRotate {
+    .spinner-path {
+      stroke-dasharray: 1, 200;
+      stroke-dashoffset: 0;
+
+      animation:
+        spinner-dash 1.5s ease-in-out infinite;
+
+      transform-origin: center;
+    }
+
+    @keyframes spinner-rotate {
       100% {
         transform: rotate(360deg);
       }
     }
 
-    @keyframes materialArc {
+    @keyframes spinner-dash {
       0% {
-        transform: rotate(0deg) scale(1);
-        opacity: 0.95;
-      }
-
-      25% {
-        transform: rotate(90deg) scale(1);
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
       }
 
       50% {
-        transform: rotate(180deg) scale(1);
-      }
-
-      75% {
-        transform: rotate(270deg) scale(1);
+        stroke-dasharray: 100, 200;
+        stroke-dashoffset: -40;
       }
 
       100% {
-        transform: rotate(360deg) scale(1);
-        opacity: 0.95;
-      }
-    }
-    
-    .avatar-loading-ring::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-
-      background:
-        conic-gradient(
-          from 0deg,
-          transparent 0deg,
-          #0d00ff 40deg,
-          #39f0ea 140deg,
-          transparent 220deg
-        );
-
-      -webkit-mask:
-        radial-gradient(
-          farthest-side,
-          transparent calc(100% - 5px),
-          #000 calc(100% - 4px)
-        );
-
-      mask:
-        radial-gradient(
-          farthest-side,
-          transparent calc(100% - 5px),
-          #000 calc(100% - 4px)
-        );
-
-      animation:
-        materialSweep 1.35s ease-in-out infinite;
-    }
-
-
-    @keyframes materialSweep {
-      0% {
-        transform: rotate(0deg);
-        filter: blur(0px);
-      }
-
-      50% {
-        transform: rotate(140deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
+        stroke-dasharray: 100, 200;
+        stroke-dashoffset: -140;
       }
     }
 
@@ -411,8 +342,31 @@
           <div class="slider-step">
             <h2>계정 설정 중</h2>
             <div class="avatar-loading-container">
-              <div class="avatar-loading-ring"></div>
+
+              <svg class="material-spinner" viewBox="0 0 50 50">
+
+                <defs>
+                  <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#0d00ff"/>
+                    <stop offset="100%" stop-color="#39f0ea"/>
+                  </linearGradient>
+                </defs>
+
+                <circle
+                  class="spinner-path"
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  fill="none"
+                  stroke="url(#spinnerGradient)"
+                  stroke-width="3.5"
+                  stroke-linecap="round"
+                />
+
+              </svg>
+
               <div class="avatar-loading-user" id="loadingAvatar">?</div>
+
             </div>
             <p class="intro-desc" id="loadingStatusText">새로운 회원 정보를 안전하게 구성하고 있습니다.<br>잠시만 기다려주세요.</p>
           </div>
