@@ -49,6 +49,29 @@
       justify-content: space-between;
       align-items: center;
     }
+    .avatar-loading-container {
+      position: relative;
+      width: 104px;
+      height: 104px;
+      margin: 10px auto 24px auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .material-spinner {
+      position: absolute;
+      width: 104px;
+      height: 104px;
+
+      top: 0;
+      left: 0;
+
+      transform-origin: center;
+      animation: spinner-rotate 2s linear infinite;
+
+      overflow: visible;
+    }
 
     .logo-container {
       display: flex;
@@ -186,7 +209,7 @@
       margin-right: 6px;
       vertical-align: middle;
     }
-    @keyframes spin { to { transform: rotate(90deg); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ─── CUSTOM LOADING AVATAR BORDER ─── */
     /* ─── SVG MATERIAL SPINNER ─── */
