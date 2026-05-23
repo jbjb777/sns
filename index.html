@@ -332,7 +332,7 @@
       font-size: 22px;
       cursor: pointer;
       z-index: 10;
-      opacity: 1; /* 항상 표시 */
+      opacity: 1;
       transition: background 0.2s;
     }
     .post-image-nav:hover {
@@ -449,7 +449,7 @@
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
 
-    /* 모달 기본 스타일 및 애니메이션 설정 고정 */
+    /* ─── 모달 기본 스타일 및 트랜지션 애니메이션 고정 ─── */
     .auth-modal, .create-modal {
       position: fixed;
       inset: 0;
@@ -630,7 +630,7 @@
     .upload-btn:hover { border-color: var(--border3); color: var(--t1); background: var(--bg4); transform: scale(1.01); }
     .upload-btn:active { transform: scale(0.98); }
 
-    /* 알림창(상단 고정 알림바 스타일 수정) */
+    /* ─── 알림 바: 스크롤해도 화면 최상단에 완전히 고정되는 스타일 ─── */
     #postNotificationBar {
       position: fixed;
       top: 0;
@@ -639,8 +639,8 @@
       background: var(--bg2);
       border-bottom: 1px solid var(--border);
       padding: 14px 20px;
-      z-index: 10001; /* 스플래시 하단, 모달 근처 최상위 */
-      display: flex;
+      z-index: 10001; /* 스플래시창 아래, 일반 요소들보단 무조건 위에 배치 */
+      display: none;
       justify-content: center;
       align-items: center;
       opacity: 0;
@@ -1056,7 +1056,7 @@ initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
 
-// ─── 애니메이션 적용 모달 제어 함수 함수화 ───
+// ─── [수정] 모달 열고 닫을 때 CSS 트랜지션을 부러우면서 확실하게 적용하는 래퍼 함수 ───
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.style.display = 'flex';
@@ -1068,9 +1068,10 @@ function openModal(modalId) {
 function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.classList.remove('active');
+  // CSS에 세팅된 0.24s(240ms) 전환 연출이 모두 완료된 시점에 가려지도록 타임아웃 구성
   setTimeout(() => {
     modal.style.display = 'none';
-  }, 240); // CSS transition 지속 시간과 일치
+  }, 240);
 }
 
 window.closeLoginModal = () => closeModal('loginModal');
@@ -1101,8 +1102,8 @@ document.getElementById('imageInput').onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
-// 상단 알림 바 제어용 함수 (Fixed 배치)
-function showNotificationBar(message, statusClass) {
+// ─── [수정] 상단 고정형 알림 바 활성화/비활성화 제어 함수 ───
+function showNotificationBar(message) {
   const bar = document.getElementById('postNotificationBar');
   const msgDiv = document.getElementById('postNotificationMessage');
   msgDiv.innerHTML = message;
