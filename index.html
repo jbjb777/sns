@@ -76,63 +76,11 @@
       color: var(--t1);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       -webkit-font-smoothing: antialiased;
       opacity: 0;
       animation: bodyReveal 0.4s ease forwards;
     }
     @keyframes bodyReveal { to { opacity: 1; } }
-
-    /* ─── 상단 공지 배너 스타일 (모바일 글자 압축 및 끊김 방지) ─── */
-    .notice-banner {
-      background: #111;
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      z-index: 101;
-      width: 100%;
-    }
-    .notice-banner-content {
-      font-size: 13px;
-      font-weight: 500;
-      line-height: 1.5;
-      color: #eee;
-      text-align: center;
-      flex: 1;
-      word-break: keep-all; /* 조사나 글자가 어색하게 찢어져서 줄바꿈되지 않도록 설정 */
-      overflow-wrap: break-word;
-      padding-right: 20px;
-    }
-    .notice-banner-content a {
-      color: var(--green);
-      text-decoration: none;
-      font-weight: 600;
-      margin: 0 4px;
-      display: inline-block; /* 링크 주소가 중간에서 강제로 줄바꿈되지 않도록 보장 */
-      white-space: nowrap;   /* 모바일 가로폭이 좁아도 주소 텍스트 자체는 붙어있게 설정 */
-    }
-    .notice-banner-content a:hover {
-      text-decoration: underline;
-    }
-    .notice-banner-close {
-      background: none;
-      border: none;
-      color: #666;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.15s;
-      flex-shrink: 0;
-    }
-    .notice-banner-close:hover {
-      color: #fff;
-    }
 
     #splash {
       position: fixed;
@@ -181,7 +129,7 @@
       width: calc(100% - 72px);
       display: flex;
       flex-direction: column;
-      flex: 1;
+      min-height: 100vh;
     }
 
     .main-content {
@@ -384,7 +332,7 @@
       font-size: 22px;
       cursor: pointer;
       z-index: 10;
-      opacity: 1;
+      opacity: 1; /* 항상 표시 */
       transition: background 0.2s;
     }
     .post-image-nav:hover {
@@ -501,6 +449,7 @@
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
 
+    /* 모달 기본 스타일 및 애니메이션 설정 고정 */
     .auth-modal, .create-modal {
       position: fixed;
       inset: 0;
@@ -511,8 +460,10 @@
       z-index: 1000;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+      opacity: 0;
+      transition: opacity 0.24s ease;
     }
-    .auth-modal.active, .create-modal.active { display: flex; }
+    .auth-modal.active, .create-modal.active { display: flex; opacity: 1; }
 
     .auth-box, .create-modal-content {
       background: var(--bg2);
@@ -522,11 +473,11 @@
       width: 90%;
       max-width: 380px;
       position: relative;
-      animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
+      transform: scale(0.93) translateY(10px);
+      transition: transform 0.24s cubic-bezier(0.34, 1.4, 0.64, 1);
     }
-    @keyframes modalPop {
-      from { opacity: 0; transform: scale(0.90) translateY(14px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+    .auth-modal.active .auth-box, .create-modal.active .create-modal-content {
+      transform: scale(1) translateY(0);
     }
 
     .create-modal-content { max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 0; }
@@ -673,11 +624,42 @@
       margin-top: 10px;
       color: var(--t2);
       font-family: inherit;
-      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.01,0.64,1);
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       width: 100%;
     }
     .upload-btn:hover { border-color: var(--border3); color: var(--t1); background: var(--bg4); transform: scale(1.01); }
     .upload-btn:active { transform: scale(0.98); }
+
+    /* 알림창(상단 고정 알림바 스타일 수정) */
+    #postNotificationBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      z-index: 10001; /* 스플래시 하단, 모달 근처 최상위 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+    }
+    #postNotificationBar.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #postNotificationBarInner {
+      max-width: 590px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 500;
+    }
 
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -822,13 +804,6 @@
 </head>
 <body>
 
-<div class="notice-banner" id="topNoticeBanner">
-  <div class="notice-banner-content">
-    Sharer의 공식 도메인이 <a href="https://sharer.jbjb.r-e.kr">sharer.jbjb.r-e.kr</a> 에서 <a href="https://sharer.r-e.kr">sharer.r-e.kr</a> 로 변경되었습니다!
-  </div>
-  <button class="notice-banner-close" onclick="document.getElementById('topNoticeBanner').style.display='none'">✕</button>
-</div>
-
 <div id="splash">
   <div class="splash-inner">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
@@ -836,6 +811,13 @@
       <div class="splash-title">Sharer</div>
       <div class="splash-sub">By JBJB</div>
     </div>
+  </div>
+</div>
+
+<div id="postNotificationBar">
+  <div id="postNotificationBarInner">
+    <div id="postNotificationMessage"></div>
+    <button class="close-btn" style="width:24px; height:24px; font-size:12px;" onclick="closeNotificationBar()">×</button>
   </div>
 </div>
 
@@ -881,7 +863,7 @@
         <h3>새 게시물 만들기</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
           <button class="post-btn" id="modalPostBtn">공유하기</button>
-          <button class="close-btn" id="closeModal">×</button>
+          <button class="close-btn" id="closeModalBtn">×</button>
         </div>
       </div>
       <div class="create-modal-body">
@@ -891,7 +873,6 @@
         </div>
         <input type="file" id="imageInput" accept="image/*" style="display: none;">
         <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
-        <div id="postMessage" style="margin-top: 10px; font-size: 13px; font-weight: 500;"></div>
       </div>
     </div>
   </div>
@@ -1075,20 +1056,37 @@ initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
 
-window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
-window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
-window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
-window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
+// ─── 애니메이션 적용 모달 제어 함수 함수화 ───
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => {
+    modal.classList.add('active');
+  });
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  modal.classList.remove('active');
+  setTimeout(() => {
+    modal.style.display = 'none';
+  }, 240); // CSS transition 지속 시간과 일치
+}
+
+window.closeLoginModal = () => closeModal('loginModal');
+window.closeSignupModal = () => closeModal('signupModal');
+window.showSignup = () => { closeModal('loginModal'); openModal('signupModal'); };
+window.backToLogin = () => { closeModal('signupModal'); openModal('loginModal'); };
 
 function handleCreatePost() {
-  if (!currentUser) { document.getElementById('loginModal').classList.add('active'); return; }
-  document.getElementById('createModal').classList.add('active');
+  if (!currentUser) { openModal('loginModal'); return; }
+  openModal('createModal');
   document.getElementById('postContent').value = '';
   document.getElementById('imagePreview').classList.remove('show');
   selectedImage = null;
 }
 
-document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
+document.getElementById('closeModalBtn').onclick = () => closeModal('createModal');
 document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
 document.getElementById('imageInput').onchange = (e) => {
   const file = e.target.files[0];
@@ -1103,6 +1101,26 @@ document.getElementById('imageInput').onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
+// 상단 알림 바 제어용 함수 (Fixed 배치)
+function showNotificationBar(message, statusClass) {
+  const bar = document.getElementById('postNotificationBar');
+  const msgDiv = document.getElementById('postNotificationMessage');
+  msgDiv.innerHTML = message;
+  
+  bar.style.display = 'flex';
+  requestAnimationFrame(() => {
+    bar.classList.add('active');
+  });
+}
+
+function closeNotificationBar() {
+  const bar = document.getElementById('postNotificationBar');
+  bar.classList.remove('active');
+  setTimeout(() => {
+    bar.style.display = 'none';
+  }, 400);
+}
+
 async function uploadImageToCloudinary(file) {
   const formData = new FormData();
   formData.append('file', file);
@@ -1115,26 +1133,32 @@ async function uploadImageToCloudinary(file) {
 
 document.getElementById('modalPostBtn').onclick = async () => {
   const content = document.getElementById('postContent').value.trim();
-  const messageDiv = document.getElementById('postMessage');
   const postButton = document.getElementById('modalPostBtn');
-  if (!content && !selectedImage) { messageDiv.innerHTML = '<span style="color:var(--pink);">내용 또는 이미지를 추가해주세요.</span>'; return; }
+  if (!content && !selectedImage) { 
+    showNotificationBar('<span style="color:var(--pink);">내용 또는 이미지를 추가해주세요.</span>'); 
+    return; 
+  }
   postButton.disabled = true;
-  messageDiv.innerHTML = '<span style="color:var(--t2);">게시 중...</span>';
+  showNotificationBar('<span style="color:var(--t2);">게시 중...</span>');
   try {
     let imageUrl = null;
     if (selectedImage) {
-      messageDiv.innerHTML = '<span style="color:var(--t2);">이미지 업로드 중...</span>';
+      showNotificationBar('<span style="color:var(--t2);">이미지 업로드 중...</span>');
       imageUrl = await uploadImageToCloudinary(selectedImage);
     }
     await api("/posts", {
       method: "POST",
       body: JSON.stringify({ author: currentUser.nickname, author_id: currentUser.id, content, image_url: imageUrl, created_at: new Date().toISOString() })
     });
-    messageDiv.innerHTML = '<span style="color:var(--green);">게시글이 작성되었습니다!</span>';
-    setTimeout(() => { document.getElementById('createModal').classList.remove('active'); messageDiv.innerHTML = ''; loadPosts(); }, 1200);
+    showNotificationBar('<span style="color:var(--green);">게시글이 작성되었습니다!</span>');
+    setTimeout(() => { 
+      closeModal('createModal'); 
+      closeNotificationBar();
+      loadPosts(); 
+    }, 1200);
   } catch (err) {
     console.error('게시 오류:', err);
-    messageDiv.innerHTML = '<span style="color:var(--pink);">게시에 실패했습니다.</span>';
+    showNotificationBar('<span style="color:var(--pink);">게시에 실패했습니다.</span>');
   } finally { postButton.disabled = false; }
 };
 
@@ -1155,7 +1179,7 @@ function formatPostTime(dateString) {
 
 async function toggleLike(postId, button) {
   if (!currentUser) {
-    document.getElementById('loginModal').classList.add('active');
+    openModal('loginModal');
     return;
   }
   const countEl = button.querySelector('.like-count');
