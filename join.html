@@ -188,7 +188,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── AVATAR LOADING SYSTEM (수정본) ─── */
+    /* ─── AVATAR LOADING SYSTEM (끊김 현상 완벽 수정본) ─── */
     .avatar-loading-container {
       position: relative;
       width: 110px;
@@ -206,14 +206,17 @@
       top: 0;
       left: 0;
       transform-origin: center;
-      animation: spinner-rotate 2s linear infinite;
+      /* 구글 가이드라인 규격 타임라인: 전체 회전 주기 1.4초 상향 */
+      animation: spinner-rotate 1.4s linear infinite;
       z-index: 1;
     }
 
     .spinner-path {
-      stroke-dasharray: 1, 200;
+      /* 원주(2 * PI * r) 값 정밀 계산: 2 * 3.14159 * 51 ≒ 320.4 */
+      stroke-dasharray: 320.4;
       stroke-dashoffset: 0;
-      animation: spinner-dash 1.5s ease-in-out infinite;
+      /* 대시 드로잉 주기를 전체 회전 주기의 배수로 맞추어 끊김 현상 제거 (4배수인 5.6초 적용) */
+      animation: spinner-dash 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
       transform-origin: center;
     }
 
@@ -223,16 +226,16 @@
 
     @keyframes spinner-dash {
       0% {
-        stroke-dasharray: 1, 200;
-        stroke-dashoffset: 0;
+        stroke-dashoffset: 304.38; /* 원의 약 5%만 보임 */
+        transform: rotate(0deg);
       }
       50% {
-        stroke-dasharray: 89, 200;
-        stroke-dashoffset: -35;
+        stroke-dashoffset: 48.06;  /* 원의 약 85%까지 부드럽게 채워짐 */
+        transform: rotate(135deg);
       }
       100% {
-        stroke-dasharray: 89, 200;
-        stroke-dashoffset: -124;
+        stroke-dashoffset: 304.38; /* 다시 수축하면서 360도 회전 완료 지점과 자연스럽게 오버랩 */
+        transform: rotate(450deg);
       }
     }
 
@@ -242,7 +245,7 @@
       width: 96px;
       height: 96px;
       border-radius: 50%;
-      background: var(--bg2); /* 컨테이너 배경과 통일하여 일체감 부여 */
+      background: var(--bg2);
       border: 1px solid var(--border2);
       display: flex;
       align-items: center;
