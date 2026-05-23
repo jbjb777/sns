@@ -76,11 +76,79 @@
       color: var(--t1);
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       -webkit-font-smoothing: antialiased;
       opacity: 0;
       animation: bodyReveal 0.4s ease forwards;
+      padding-top: 45px; /* 상단 고정 배너 높이만큼 여백 제공 (배너가 글을 가리지 않게 함) */
+      transition: padding-top 0.3s ease; /* 배너가 닫힐 때 여백도 부드럽게 사라짐 */
     }
     @keyframes bodyReveal { to { opacity: 1; } }
+
+    /* ─── 상단 공지 배너 스타일 수정 (고정 위치 및 애니메이션 추가) ─── */
+    .notice-banner {
+      background: #111;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed; /* 스크롤해도 항상 고정 */
+      top: 0;
+      left: 0;
+      z-index: 10000; /* 스플래시 제외 가장 최상단 배치 */
+      width: 100%;
+      max-height: 100px;
+      transition: transform 0.3s ease, opacity 0.3s ease, max-height 0.3s ease, padding 0.3s ease;
+      overflow: hidden;
+    }
+    /* 부드럽게 슬라이드업 되며 사라지는 효과 */
+    .notice-banner.hide {
+      transform: translateY(-100%);
+      opacity: 0;
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .notice-banner-content {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #eee;
+      text-align: center;
+      flex: 1;
+      word-break: keep-all; 
+      overflow-wrap: break-word;
+      padding-right: 20px;
+    }
+    .notice-banner-content a {
+      color: var(--green);
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 4px;
+      display: inline-block; 
+      white-space: nowrap;   
+    }
+    .notice-banner-content a:hover {
+      text-decoration: underline;
+    }
+    .notice-banner-close {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .notice-banner-close:hover {
+      color: #fff;
+    }
 
     #splash {
       position: fixed;
@@ -129,7 +197,7 @@
       width: calc(100% - 72px);
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      flex: 1;
     }
 
     .main-content {
@@ -449,7 +517,6 @@
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
 
-    /* ─── 모달 기본 스타일 및 트랜지션 애니메이션 고정 ─── */
     .auth-modal, .create-modal {
       position: fixed;
       inset: 0;
@@ -460,10 +527,8 @@
       z-index: 1000;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      opacity: 0;
-      transition: opacity 0.24s ease;
     }
-    .auth-modal.active, .create-modal.active { display: flex; opacity: 1; }
+    .auth-modal.active, .create-modal.active { display: flex; }
 
     .auth-box, .create-modal-content {
       background: var(--bg2);
@@ -473,11 +538,11 @@
       width: 90%;
       max-width: 380px;
       position: relative;
-      transform: scale(0.93) translateY(10px);
-      transition: transform 0.24s cubic-bezier(0.34, 1.4, 0.64, 1);
+      animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
     }
-    .auth-modal.active .auth-box, .create-modal.active .create-modal-content {
-      transform: scale(1) translateY(0);
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.90) translateY(14px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .create-modal-content { max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 0; }
@@ -624,42 +689,11 @@
       margin-top: 10px;
       color: var(--t2);
       font-family: inherit;
-      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.01,0.64,1);
       width: 100%;
     }
     .upload-btn:hover { border-color: var(--border3); color: var(--t1); background: var(--bg4); transform: scale(1.01); }
     .upload-btn:active { transform: scale(0.98); }
-
-    /* ─── 알림 바: 스크롤해도 화면 최상단에 완전히 고정되는 스타일 ─── */
-    #postNotificationBar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
-      z-index: 10001; /* 스플래시창 아래, 일반 요소들보단 무조건 위에 배치 */
-      display: none;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      transform: translateY(-100%);
-      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
-    }
-    #postNotificationBar.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    #postNotificationBarInner {
-      max-width: 590px;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      font-weight: 500;
-    }
 
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -804,6 +838,13 @@
 </head>
 <body>
 
+<div class="notice-banner" id="topNoticeBanner">
+  <div class="notice-banner-content">
+    Sharer의 공식 도메인이 <a href="https://sharer.jbjb.r-e.kr">sharer.jbjb.r-e.kr</a> 에서 <a href="https://sharer.r-e.kr">sharer.r-e.kr</a> 로 변경되었습니다!
+  </div>
+  <button class="notice-banner-close" onclick="closeNoticeBanner()">✕</button>
+</div>
+
 <div id="splash">
   <div class="splash-inner">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
@@ -811,13 +852,6 @@
       <div class="splash-title">Sharer</div>
       <div class="splash-sub">By JBJB</div>
     </div>
-  </div>
-</div>
-
-<div id="postNotificationBar">
-  <div id="postNotificationBarInner">
-    <div id="postNotificationMessage"></div>
-    <button class="close-btn" style="width:24px; height:24px; font-size:12px;" onclick="closeNotificationBar()">×</button>
   </div>
 </div>
 
@@ -863,7 +897,7 @@
         <h3>새 게시물 만들기</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
           <button class="post-btn" id="modalPostBtn">공유하기</button>
-          <button class="close-btn" id="closeModalBtn">×</button>
+          <button class="close-btn" id="closeModal">×</button>
         </div>
       </div>
       <div class="create-modal-body">
@@ -873,6 +907,7 @@
         </div>
         <input type="file" id="imageInput" accept="image/*" style="display: none;">
         <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
+        <div id="postMessage" style="margin-top: 10px; font-size: 13px; font-weight: 500;"></div>
       </div>
     </div>
   </div>
@@ -926,6 +961,18 @@
 
 <script src="markdown.js"></script>
 <script>
+// 배너 부드럽게 닫기 함수 정의
+function closeNoticeBanner() {
+  const banner = document.getElementById('topNoticeBanner');
+  if (banner) {
+    banner.classList.add('hide');
+    document.body.style.paddingTop = '0px';
+    setTimeout(() => {
+      banner.style.display = 'none';
+    }, 300);
+  }
+}
+
 // ─── NPROGRESS 설정 ───
 NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
 
@@ -1056,38 +1103,20 @@ initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
 
-// ─── [수정] 모달 열고 닫을 때 CSS 트랜지션을 부러우면서 확실하게 적용하는 래퍼 함수 ───
-function openModal(modalId) {
-  const modal = document.getElementById(modalId);
-  modal.style.display = 'flex';
-  requestAnimationFrame(() => {
-    modal.classList.add('active');
-  });
-}
-
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
-  modal.classList.remove('active');
-  // CSS에 세팅된 0.24s(240ms) 전환 연출이 모두 완료된 시점에 가려지도록 타임아웃 구성
-  setTimeout(() => {
-    modal.style.display = 'none';
-  }, 240);
-}
-
-window.closeLoginModal = () => closeModal('loginModal');
-window.closeSignupModal = () => closeModal('signupModal');
-window.showSignup = () => { closeModal('loginModal'); openModal('signupModal'); };
-window.backToLogin = () => { closeModal('signupModal'); openModal('loginModal'); };
+window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
+window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
+window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
+window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
 
 function handleCreatePost() {
-  if (!currentUser) { openModal('loginModal'); return; }
-  openModal('createModal');
+  if (!currentUser) { document.getElementById('loginModal').classList.add('active'); return; }
+  document.getElementById('createModal').classList.add('active');
   document.getElementById('postContent').value = '';
   document.getElementById('imagePreview').classList.remove('show');
   selectedImage = null;
 }
 
-document.getElementById('closeModalBtn').onclick = () => closeModal('createModal');
+document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
 document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
 document.getElementById('imageInput').onchange = (e) => {
   const file = e.target.files[0];
@@ -1102,26 +1131,6 @@ document.getElementById('imageInput').onchange = (e) => {
   reader.readAsDataURL(file);
 };
 
-// ─── [수정] 상단 고정형 알림 바 활성화/비활성화 제어 함수 ───
-function showNotificationBar(message) {
-  const bar = document.getElementById('postNotificationBar');
-  const msgDiv = document.getElementById('postNotificationMessage');
-  msgDiv.innerHTML = message;
-  
-  bar.style.display = 'flex';
-  requestAnimationFrame(() => {
-    bar.classList.add('active');
-  });
-}
-
-function closeNotificationBar() {
-  const bar = document.getElementById('postNotificationBar');
-  bar.classList.remove('active');
-  setTimeout(() => {
-    bar.style.display = 'none';
-  }, 400);
-}
-
 async function uploadImageToCloudinary(file) {
   const formData = new FormData();
   formData.append('file', file);
@@ -1134,32 +1143,26 @@ async function uploadImageToCloudinary(file) {
 
 document.getElementById('modalPostBtn').onclick = async () => {
   const content = document.getElementById('postContent').value.trim();
+  const messageDiv = document.getElementById('postMessage');
   const postButton = document.getElementById('modalPostBtn');
-  if (!content && !selectedImage) { 
-    showNotificationBar('<span style="color:var(--pink);">내용 또는 이미지를 추가해주세요.</span>'); 
-    return; 
-  }
+  if (!content && !selectedImage) { messageDiv.innerHTML = '<span style="color:var(--pink);">내용 또는 이미지를 추가해주세요.</span>'; return; }
   postButton.disabled = true;
-  showNotificationBar('<span style="color:var(--t2);">게시 중...</span>');
+  messageDiv.innerHTML = '<span style="color:var(--t2);">게시 중...</span>';
   try {
     let imageUrl = null;
     if (selectedImage) {
-      showNotificationBar('<span style="color:var(--t2);">이미지 업로드 중...</span>');
+      messageDiv.innerHTML = '<span style="color:var(--t2);">이미지 업로드 중...</span>';
       imageUrl = await uploadImageToCloudinary(selectedImage);
     }
     await api("/posts", {
       method: "POST",
       body: JSON.stringify({ author: currentUser.nickname, author_id: currentUser.id, content, image_url: imageUrl, created_at: new Date().toISOString() })
     });
-    showNotificationBar('<span style="color:var(--green);">게시글이 작성되었습니다!</span>');
-    setTimeout(() => { 
-      closeModal('createModal'); 
-      closeNotificationBar();
-      loadPosts(); 
-    }, 1200);
+    messageDiv.innerHTML = '<span style="color:var(--green);">게시글이 작성되었습니다!</span>';
+    setTimeout(() => { document.getElementById('createModal').classList.remove('active'); messageDiv.innerHTML = ''; loadPosts(); }, 1200);
   } catch (err) {
     console.error('게시 오류:', err);
-    showNotificationBar('<span style="color:var(--pink);">게시에 실패했습니다.</span>');
+    messageDiv.innerHTML = '<span style="color:var(--pink);">게시에 실패했습니다.</span>';
   } finally { postButton.disabled = false; }
 };
 
@@ -1180,7 +1183,7 @@ function formatPostTime(dateString) {
 
 async function toggleLike(postId, button) {
   if (!currentUser) {
-    openModal('loginModal');
+    document.getElementById('loginModal').classList.add('active');
     return;
   }
   const countEl = button.querySelector('.like-count');
