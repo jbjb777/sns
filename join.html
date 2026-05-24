@@ -3,13 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-
-
   <title>회원가입 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback&render=explicit" async defer></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -98,11 +94,11 @@
     }
     .slider-track {
       display: flex;
-      width: 500%; /* 5 steps (0 to 4) */
+      width: 600%; /* 6단계 구조 */
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .slider-step {
-      width: 20%; /* 100 / 5 steps */
+      width: 16.6666%; /* 100 / 6 단계 */
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -193,7 +189,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── AVATAR LOADING SYSTEM (구글 머티리얼 규격 완전 동기화) ─── */
+    /* ─── AVATAR LOADING SYSTEM ─── */
     .avatar-loading-container {
       position: relative;
       width: 110px;
@@ -211,16 +207,13 @@
       top: 0;
       left: 0;
       transform-origin: center;
-      /* 구글 표준 회전 속도: 1.4초 동안 등속 회전 */
       animation: spinner-rotate 1.4s linear infinite;
       z-index: 1;
     }
 
     .spinner-path {
-      /* 반지름 51 기준 정확한 원주 둘레: 2 * Math.PI * 51 = 320.442 */
       stroke-dasharray: 320.442;
       transform-origin: center;
-      /* 끝날 때 툭 끊기는 현상을 없애기 위해 전체 회전 주기의 정확히 4배(5.6초) 동안 자연스럽게 수축/이완 순환 */
       animation: spinner-dash 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     }
 
@@ -228,44 +221,16 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* 구글 머티리얼 규격 4사이클(4회전) 대시 offset 타임라인 매칭 구조 */
     @keyframes spinner-dash {
-      0% {
-        stroke-dashoffset: 304.42; /* 점 크기로 시작 (5%) */
-        transform: rotate(0deg);
-      }
-      12.5% {
-        stroke-dashoffset: 80.11;  /* 늘어남 (75%) */
-        transform: rotate(0deg);
-      }
-      25% {
-        stroke-dashoffset: 304.42; /* 줄어듦 (5%) */
-        transform: rotate(270deg);
-      }
-      37.5% {
-        stroke-dashoffset: 80.11;  /* 늘어남 (75%) */
-        transform: rotate(270deg);
-      }
-      50% {
-        stroke-dashoffset: 304.42; /* 줄어듦 (5%) */
-        transform: rotate(540deg);
-      }
-      62.5% {
-        stroke-dashoffset: 80.11;  /* 늘어남 (75%) */
-        transform: rotate(540deg);
-      }
-      75% {
-        stroke-dashoffset: 304.42; /* 줄어듦 (5%) */
-        transform: rotate(810deg);
-      }
-      87.5% {
-        stroke-dashoffset: 80.11;  /* 늘어남 (75%) */
-        transform: rotate(810deg);
-      }
-      100% {
-        stroke-dashoffset: 304.42; /* 처음 시작 상태와 완벽히 겹치며 종료 (5%) */
-        transform: rotate(1080deg);
-      }
+      0% { stroke-dashoffset: 304.42; transform: rotate(0deg); }
+      12.5% { stroke-dashoffset: 80.11; transform: rotate(0deg); }
+      25% { stroke-dashoffset: 304.42; transform: rotate(270deg); }
+      37.5% { stroke-dashoffset: 80.11; transform: rotate(270deg); }
+      50% { stroke-dashoffset: 304.42; transform: rotate(540deg); }
+      62.5% { stroke-dashoffset: 80.11; transform: rotate(540deg); }
+      75% { stroke-dashoffset: 304.42; transform: rotate(810deg); }
+      87.5% { stroke-dashoffset: 80.11; transform: rotate(810deg); }
+      100% { stroke-dashoffset: 304.42; transform: rotate(1080deg); }
     }
 
     .avatar-loading-user {
@@ -306,7 +271,14 @@
       margin-top: auto;
     }
 
-    /* ─── RESPONSIVE ─── */
+    /* Turnstile 중앙 정렬 컨테이너 */
+    .turnstile-container {
+      display: flex;
+      justify-content: center;
+      margin: 15px 0 25px 0;
+      min-height: 65px;
+    }
+
     @media (max-width: 768px) {
       .auth-container { padding: 28px 20px; }
       .slider-step h2 { font-size: 18px; }
@@ -339,14 +311,30 @@
           </div>
 
           <div class="slider-step">
+            <img src="shield.svg" class="step-icon" alt="보안 확인" onerror="this.style.display='none'">
+            <h2>보안 확인</h2>
+            <p class="intro-desc">안전한 서비스 이용을 위해 아래 인증을 완료해주세요.</p>
+            
+            <div class="turnstile-container">
+              <div id="turnstileWidget"></div>
+            </div>
+            
+            <div class="error-message" id="turnstileError"></div>
+            <div style="margin-top:auto;">
+              <button class="btn-secondary" onclick="prevStep(0)">이전</button>
+              <button id="turnstileNextBtn" onclick="nextStep(2, this)" disabled>다음으로</button>
+            </div>
+          </div>
+
+          <div class="slider-step">
             <img src="id.svg" class="step-icon" alt="아이디 설정" onerror="this.style.display='none'">
             <h2>아이디 설정</h2>
             <p class="intro-desc">로그인에 사용할 아이디를 입력해주세요.</p>
             <input type="text" id="signupId" placeholder="아이디">
             <div class="error-message" id="idError"></div>
             <div style="margin-top:auto;">
-              <button class="btn-secondary" onclick="prevStep(0)">이전</button>
-              <button onclick="nextStep(2, this)">다음으로</button>
+              <button class="btn-secondary" onclick="prevStep(1)">이전</button>
+              <button onclick="nextStep(3, this)">다음으로</button>
             </div>
           </div>
 
@@ -357,8 +345,8 @@
             <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
             <div class="error-message" id="nicknameError"></div>
             <div style="margin-top:auto;">
-              <button class="btn-secondary" onclick="prevStep(1)">이전</button>
-              <button onclick="nextStep(3, this)">다음으로</button>
+              <button class="btn-secondary" onclick="prevStep(2)">이전</button>
+              <button onclick="nextStep(4, this)">다음으로</button>
             </div>
           </div>
 
@@ -370,7 +358,7 @@
             <div class="error-message" id="signupError"></div>
             <div class="success-message" id="signupSuccess"></div>
             <div style="margin-top:auto;">
-              <button class="btn-secondary" onclick="prevStep(2)">이전</button>
+              <button class="btn-secondary" onclick="prevStep(3)">이전</button>
               <button id="signupBtn" onclick="handleSignup()">가입 완료</button>
             </div>
           </div>
@@ -378,7 +366,6 @@
           <div class="slider-step">
             <h2>계정 설정 중</h2>
             <div class="avatar-loading-container">
-
               <svg class="material-spinner" viewBox="0 0 110 110">
                 <defs>
                   <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -397,9 +384,7 @@
                   stroke-linecap="round"
                 />
               </svg>
-
               <div class="avatar-loading-user" id="loadingAvatar">?</div>
-
             </div>
             <p class="intro-desc" id="loadingStatusText">새로운 회원 정보를 안전하게 구성하고 있습니다.<br>잠시만 기다려주세요.</p>
           </div>
@@ -415,6 +400,31 @@
 
 <script>
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+  let turnstileToken = ""; // 발급받은 토큰을 안전하게 전역 저장하여 400 에러 원천 차단
+
+  // Turnstile 스크립트 로드 완료 시 명시적으로 호출되는 초기화 함수
+  window.onloadTurnstileCallback = function () {
+    if (window.turnstile) {
+      window.turnstile.render('#turnstileWidget', {
+        sitekey: '여기에_SITE_KEY', // 발급받으신 Cloudflare Site Key를 정확히 기입하세요 [cite: 13, 31, 51]
+        theme: 'dark',
+        callback: function (token) {
+          turnstileToken = token; // 토큰 취득 성공 [cite: 13, 51]
+          document.getElementById('turnstileError').textContent = '';
+          document.getElementById('turnstileNextBtn').disabled = false; // 완료 시 다음 버튼 활성화
+        },
+        'error-callback': function () {
+          document.getElementById('turnstileError').textContent = '인증 중 에러가 발생했습니다. 다시 시도해 주세요.';
+          document.getElementById('turnstileNextBtn').disabled = true;
+        },
+        'expired-callback': function () {
+          turnstileToken = "";
+          document.getElementById('turnstileError').textContent = '인증이 만료되었습니다. 다시 인증해 주세요.';
+          document.getElementById('turnstileNextBtn').disabled = true;
+        }
+      });
+    }
+  };
 
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
@@ -450,7 +460,18 @@
   async function nextStep(stepIndex, btn) {
     const track = document.getElementById('sliderTrack');
     
-    if(stepIndex === 2) {
+    // Step 1 -> Step 2 이동 시 (보안 확인 완료 검증)
+    if (stepIndex === 2) {
+      const err = document.getElementById('turnstileError');
+      if (!turnstileToken) {
+        if (err) err.textContent = '봇 방지 인증을 완료해주세요.';
+        return;
+      }
+      if (err) err.textContent = '';
+    }
+    
+    // 아이디 중복 확인 (인덱스 수정됨)
+    if(stepIndex === 3) {
       const idInput = document.getElementById('signupId');
       const id = idInput.value.trim();
       const err = document.getElementById('idError');
@@ -481,7 +502,8 @@
       }
     }
     
-    if(stepIndex === 3) {
+    // 닉네임 중복 확인 (인덱스 수정됨)
+    if(stepIndex === 4) {
       const nickInput = document.getElementById('signupNickname');
       const nick = nickInput.value.trim();
       const err = document.getElementById('nicknameError');
@@ -522,12 +544,13 @@
       }
     }
 
-    track.style.transform = `translateX(-${stepIndex * 20}%)`;
+    // 총 6개 단계이므로 슬라이더 폭 비율(100 / 6)에 맞춰 정확히 트랙 변환 처리
+    track.style.transform = `translateX(-${stepIndex * (100 / 6)}%)`;
   }
 
   function prevStep(stepIndex) {
     const track = document.getElementById('sliderTrack');
-    track.style.transform = `translateX(-${stepIndex * 20}%)`;
+    track.style.transform = `translateX(-${stepIndex * (100 / 6)}%)`;
   }
 
   function setButtonLoading(isLoading, loadingText = '가입 중...') {
@@ -570,19 +593,32 @@
       return; 
     }
 
+    // Worker 서버단에서 CAPTCHA 검증을 처리할 수 있도록 사전에 획득한 토큰이 비어있는지 마지막 검증 단계 추가 (400 방지 에러)
+    if (!turnstileToken) {
+      errorDiv.textContent = '보안 인증 토큰이 누락되었습니다. 앞 단계로 돌아가 인증을 다시 해주세요.';
+      return;
+    }
+
     setButtonLoading(true);
     const startTime = Date.now();
 
     try {
+      // POST 통신 본문 JSON 구조에 수집한 봇 방지 인증용 토큰 변수명 매칭 처리 [cite: 14]
       await api("/users", {
         method: "POST",
-        body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
+        body: JSON.stringify({ 
+          id, 
+          nickname, 
+          password, 
+          captcha: turnstileToken, // 워커단으로 검증용 토큰 변수 전송 [cite: 14]
+          created_at: new Date().toISOString() 
+        })
       });
 
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
 
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
-      nextStep(4); 
+      nextStep(5); // 최종 상태 로딩 바 서브트랙 이동 인덱스 타겟팅 변경
 
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, 3000 - elapsedTime);
