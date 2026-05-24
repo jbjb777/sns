@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
+
+
+
   <title>회원가입 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
@@ -95,11 +99,11 @@
     }
     .slider-track {
       display: flex;
-      width: 500%; /* 5 steps (0 to 4) */
+      width: 600%; /* 6 steps (0 to 5) */
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .slider-step {
-      width: 20%; /* 100 / 5 steps */
+      width: 16.6666%; /* 100 / 6 steps */
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -310,12 +314,11 @@
       .main-content { padding: 28px 16px; }
     }
 
-    /* Turnstile 중앙 정렬 및 여백 스타일 추가 */
+    /* Turnstile 중앙 정렬 스타일 */
     .turnstile-container {
       display: flex;
       justify-content: center;
-      margin-top: 5px;
-      margin-bottom: 15px;
+      margin: 10px 0 20px 0;
       min-height: 65px;
     }
   </style>
@@ -345,19 +348,30 @@
           </div>
 
           <div class="slider-step">
+            <img src="shield.svg" class="step-icon" alt="보안 확인" onerror="this.style.display='none'">
+            <h2>보안 확인</h2>
+            <p class="intro-desc">안전한 서비스 이용을 위해 아래 인증을 완료해주세요.</p>
+            
+            <div class="turnstile-container">
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAADVZM9k2emiawgeQ"></div>
+            </div>
+            
+            <div class="error-message" id="turnstileError"></div>
+            <div style="margin-top:auto;">
+              <button class="btn-secondary" onclick="prevStep(0)">이전</button>
+              <button onclick="nextStep(2, this)">다음으로</button>
+            </div>
+          </div>
+
+          <div class="slider-step">
             <img src="id.svg" class="step-icon" alt="아이디 설정" onerror="this.style.display='none'">
             <h2>아이디 설정</h2>
             <p class="intro-desc">로그인에 사용할 아이디를 입력해주세요.</p>
             <input type="text" id="signupId" placeholder="아이디">
-            
-            <div class="turnstile-container">
-              <div class="cf-turnstile" data-sitekey="여기에_SITE_KEY"></div>
-            </div>
-
             <div class="error-message" id="idError"></div>
             <div style="margin-top:auto;">
-              <button class="btn-secondary" onclick="prevStep(0)">이전</button>
-              <button onclick="nextStep(2, this)">다음으로</button>
+              <button class="btn-secondary" onclick="prevStep(1)">이전</button>
+              <button onclick="nextStep(3, this)">다음으로</button>
             </div>
           </div>
 
@@ -368,8 +382,8 @@
             <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
             <div class="error-message" id="nicknameError"></div>
             <div style="margin-top:auto;">
-              <button class="btn-secondary" onclick="prevStep(1)">이전</button>
-              <button onclick="nextStep(3, this)">다음으로</button>
+              <button class="btn-secondary" onclick="prevStep(2)">이전</button>
+              <button onclick="nextStep(4, this)">다음으로</button>
             </div>
           </div>
 
@@ -381,7 +395,7 @@
             <div class="error-message" id="signupError"></div>
             <div class="success-message" id="signupSuccess"></div>
             <div style="margin-top:auto;">
-              <button class="btn-secondary" onclick="prevStep(2)">이전</button>
+              <button class="btn-secondary" onclick="prevStep(3)">이전</button>
               <button id="signupBtn" onclick="handleSignup()">가입 완료</button>
             </div>
           </div>
@@ -461,7 +475,18 @@
   async function nextStep(stepIndex, btn) {
     const track = document.getElementById('sliderTrack');
     
+    // Turnstile 검증 체크 (Step 1 -> Step 2 이동 시 실행)
     if(stepIndex === 2) {
+      const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
+      const err = document.getElementById('turnstileError');
+      if(!turnstileResponse || !turnstileResponse.value) {
+        if(err) err.textContent = '봇 방지 인증을 완료해주세요.';
+        return;
+      }
+      if(err) err.textContent = '';
+    }
+
+    if(stepIndex === 3) {
       const idInput = document.getElementById('signupId');
       const id = idInput.value.trim();
       const err = document.getElementById('idError');
@@ -469,13 +494,6 @@
       if(!id) {
         err.textContent = '아이디를 입력해주세요.';
         idInput.classList.add('input-error');
-        return;
-      }
-      
-      // 다음 단계로 넘어가기 전 Turnstile 체크박스 검증 수행
-      const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
-      if(!turnstileResponse || !turnstileResponse.value) {
-        err.textContent = '봇 방지 인증을 완료해주세요.';
         return;
       }
       
@@ -499,7 +517,7 @@
       }
     }
     
-    if(stepIndex === 3) {
+    if(stepIndex === 4) {
       const nickInput = document.getElementById('signupNickname');
       const nick = nickInput.value.trim();
       const err = document.getElementById('nicknameError');
@@ -540,12 +558,13 @@
       }
     }
 
-    track.style.transform = `translateX(-${stepIndex * 20}%)`;
+    // 총 6단계 이동 처리 비율로 정교하게 맞춤 조정 (100 / 6)
+    track.style.transform = `translateX(-${stepIndex * (100 / 6)}%)`;
   }
 
   function prevStep(stepIndex) {
     const track = document.getElementById('sliderTrack');
-    track.style.transform = `translateX(-${stepIndex * 20}%)`;
+    track.style.transform = `translateX(-${stepIndex * (100 / 6)}%)`;
   }
 
   function setButtonLoading(isLoading, loadingText = '가입 중...') {
@@ -592,7 +611,7 @@
     const startTime = Date.now();
 
     try {
-      // 가입 요청 본문에 원래 스키마 구조만 넘겨 에러 원인 제거
+      // 400 에러 해결 핵심: captcha 토큰을 body 필드가 아닌 원래 DB 컬럼만 매칭해 가입 요청 발송
       await api("/users", {
         method: "POST",
         body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
@@ -601,7 +620,7 @@
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
 
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
-      nextStep(4); 
+      nextStep(5); // 6단계 레이아웃 규칙에 맞춰 최종 인덱스 5로 이동
 
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, 3000 - elapsedTime);
