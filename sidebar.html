@@ -88,26 +88,36 @@
     .create-btn {
       width: 56px;
       height: 56px;
-      margin: 24px auto;
-      padding: 0;
       border: none;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #5269FF, #5722B3, #FF00EC);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-      transition: all 0.25s;
+      border-radius: 35%;
+
+      background: #151515;
+      border: 1px solid #2a2a2a;
+
+      border: 1px solid rgba(255,255,255,0.08);
+
+      box-shadow:
+        0 0 18px rgba(82,105,255,0.18);
+
+      transition: all .25s ease;
     }
     .create-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transform: translateY(-2px) scale(1.05);
+
+      border-color: rgba(255,255,255,0.16);
+
+      box-shadow:
+        0 10px 24px rgba(0,0,0,0.5),
+        0 0 20px rgba(255,255,255,0.04);
     }
     .btn-icon-img {
       width: 32px;
       height: 32px;
       margin: 0;
+
+      filter:
+        drop-shadow(0 0 8px rgba(255,255,255,0.18));
+
     }
     .btn-text { display: none; }
     .user-info {
