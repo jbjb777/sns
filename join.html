@@ -4,10 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
-
-
-
   <title>회원가입 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
@@ -440,6 +436,9 @@
 
 <script>
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+  
+  // 클라이언트 측 우회 방지를 위한 검증 상태 트리 선언 (0: 소개, 1: 인증대기, 2: 아이디, 3: 닉네임, 4: 비밀번호, 5: 완료)
+  let currentProgress = 0;
 
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
@@ -475,15 +474,24 @@
   async function nextStep(stepIndex, btn) {
     const track = document.getElementById('sliderTrack');
     
-    // Turnstile 검증 체크 (Step 1 -> Step 2 이동 시 실행)
+    // 콘솔 우회 전면 차단 로직: 현재 내부 허용 단계보다 높게 넘어가려고 하면 강제 제자리 고정
+    if (stepIndex > currentProgress + 1) {
+      track.style.transform = `translateX(-${currentProgress * (100 / 6)}%)`;
+      return;
+    }
+
+    // 1단계 -> 2단계 이동 시 (인증 페이지에서 다음으로 넘어갈 때)
     if(stepIndex === 2) {
       const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
       const err = document.getElementById('turnstileError');
       if(!turnstileResponse || !turnstileResponse.value) {
         if(err) err.textContent = '봇 방지 인증을 완료해주세요.';
+        // 강제로 콘솔로 부른 경우 트랙 위치를 다시 1번 단계(보안 확인)로 되돌림
+        track.style.transform = `translateX(-${1 * (100 / 6)}%)`;
         return;
       }
       if(err) err.textContent = '';
+      currentProgress = 1; // 인증이 검증 완료되었으므로 내부 진행도를 정식 업데이트
     }
 
     if(stepIndex === 3) {
@@ -497,6 +505,9 @@
         return;
       }
       
+      // 인라인 가드: 버튼 객체가 없이 콘솔 호출된 경우 비정상 접근 처리
+      if(!btn) return;
+
       const originalText = btn.innerHTML;
       btn.innerHTML = `<span class="spinner"></span>확인 중...`;
       btn.disabled = true;
@@ -508,6 +519,7 @@
           return; 
         }
         err.textContent = '';
+        currentProgress = 2; // 아이디 중복 체크 완료 시 진행도 업데이트
       } catch (e) {
         err.textContent = '확인 중 오류가 발생했습니다.';
         return;
@@ -538,6 +550,8 @@
         return;
       }
       
+      if(!btn) return;
+
       const originalText = btn.innerHTML;
       btn.innerHTML = `<span class="spinner"></span>확인 중...`;
       btn.disabled = true;
@@ -549,6 +563,7 @@
           return; 
         }
         err.textContent = '';
+        currentProgress = 3; // 닉네임 중복 체크 완료 시 진행도 업데이트
       } catch (e) {
         err.textContent = '확인 중 오류가 발생했습니다.';
         return;
@@ -558,12 +573,24 @@
       }
     }
 
+    if(stepIndex === 1) {
+      currentProgress = 0; // 정상적인 동의 절차 수행 시 진행도 초기 배치
+    }
+
+    if(stepIndex === 5) {
+      currentProgress = 4; // 최종 가입 트랙 도달
+    }
+
     // 총 6단계 이동 처리 비율로 정교하게 맞춤 조정 (100 / 6)
     track.style.transform = `translateX(-${stepIndex * (100 / 6)}%)`;
   }
 
   function prevStep(stepIndex) {
     const track = document.getElementById('sliderTrack');
+    // 이전으로 돌아갈 때 진행도 한 칸 깎기
+    if(stepIndex >= 0) {
+      currentProgress = stepIndex;
+    }
     track.style.transform = `translateX(-${stepIndex * (100 / 6)}%)`;
   }
 
@@ -601,6 +628,21 @@
     idInput.classList.remove('input-error');
     passwordInput.classList.remove('input-error');
 
+    // 최종 가입단에서도 Turnstile 토큰 유무를 엄격하게 다시 교차 검증
+    const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
+    if (!turnstileResponse || !turnstileResponse.value) {
+      errorDiv.textContent = '보안 인증(Turnstile) 정보가 올바르지 않습니다. 처음부터 다시 시도해주세요.';
+      const track = document.getElementById('sliderTrack');
+      currentProgress = 1;
+      track.style.transform = `translateX(-${1 * (100 / 6)}%)`;
+      return;
+    }
+
+    if (!id || !nickname) {
+      errorDiv.textContent = '아이디와 닉네임 설정을 올바르게 완료해주세요.';
+      return;
+    }
+
     if (!password) { 
       errorDiv.textContent = '비밀번호를 입력해주세요.'; 
       passwordInput.classList.add('input-error');
@@ -620,7 +662,11 @@
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
 
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
-      nextStep(5); // 6단계 레이아웃 규칙에 맞춰 최종 인덱스 5로 이동
+      
+      // 트랙 해제 권한 활성화 후 최종 인덱스 5로 이동
+      currentProgress = 5;
+      const track = document.getElementById('sliderTrack');
+      track.style.transform = `translateX(-${5 * (100 / 6)}%)`;
 
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, 3000 - elapsedTime);
