@@ -21,6 +21,24 @@
   <meta name="twitter:title" content="Sharer | 커뮤니티 · SNS">
   <meta name="twitter:description" content="이미지와 텍스트를 업로드하고 사람들과 소통해보세요.">
   <meta name="twitter:image" content="https://sharer.r-e.kr/logo.png">
+
+
+
+  <meta
+  http-equiv="Content-Security-Policy"
+  content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob: https:;
+  connect-src 'self' https://*.supabase.co https://api.cloudinary.com;
+  frame-src https://accounts.google.com https://content.googleapis.com;
+  object-src 'none';
+  base-uri 'self';
+  ">
+
+
+
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <style>
