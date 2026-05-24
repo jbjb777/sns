@@ -586,13 +586,24 @@
   }
 
   function prevStep(stepIndex) {
-    const track = document.getElementById('sliderTrack');
-    // 이전으로 돌아갈 때 진행도 한 칸 깎기
-    if(stepIndex >= 0) {
-      currentProgress = stepIndex;
+      const track = document.getElementById('sliderTrack');
+      const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
+      
+      // 핵심 로직: 만약 턴스틸 인증이 이미 완료된 상태(토큰이 존재)인데, 
+      // 사용자가 '이전'을 눌러서 1단계(보안 확인)나 0단계(서비스 소개)로 가려고 하면
+      if (turnstileResponse && turnstileResponse.value && stepIndex <= 1) {
+        // 굳이 인증을 다시 시키지 않고 아이디 설정 단계(인덱스 2)에 강제로 고정시킵니다.
+        currentProgress = 2;
+        track.style.transform = `translateX(-${2 * (100 / 6)}%)`;
+        return;
+      }
+
+      // 그 외의 정상적인 후진(예: 닉네임에서 아이디로 이동 등)은 기존대로 안전하게 처리
+      if(stepIndex >= 0) {
+        currentProgress = stepIndex;
+      }
+      track.style.transform = `translateX(-${stepIndex * (100 / 6)}%)`;
     }
-    track.style.transform = `translateX(-${stepIndex * (100 / 6)}%)`;
-  }
 
   function setButtonLoading(isLoading, loadingText = '가입 중...') {
     const button = document.getElementById('signupBtn');
