@@ -583,7 +583,7 @@
       const remainingTime = Math.max(0, 3000 - elapsedTime);
 
       setTimeout(() => {
-        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">✓ 설정 완료!</span><br>잠시 후 마이페이지로 이동합니다.`;
+        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">가입이 완료되었습니다</span>`;
         setTimeout(() => {
           window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new`;
         }, 800);
