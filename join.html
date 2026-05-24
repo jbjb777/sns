@@ -188,7 +188,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── AVATAR LOADING SYSTEM (끊김 현상 완벽 수정본) ─── */
+    /* ─── AVATAR LOADING SYSTEM (구글 머티리얼 규격 완전 동기화) ─── */
     .avatar-loading-container {
       position: relative;
       width: 110px;
@@ -206,36 +206,60 @@
       top: 0;
       left: 0;
       transform-origin: center;
-      /* 구글 가이드라인 규격 타임라인: 전체 회전 주기 1.4초 상향 */
+      /* 구글 표준 회전 속도: 1.4초 동안 등속 회전 */
       animation: spinner-rotate 1.4s linear infinite;
       z-index: 1;
     }
 
     .spinner-path {
-      /* 원주(2 * PI * r) 값 정밀 계산: 2 * 3.14159 * 51 ≒ 320.4 */
-      stroke-dasharray: 320.4;
-      stroke-dashoffset: 0;
-      /* 대시 드로잉 주기를 전체 회전 주기의 배수로 맞추어 끊김 현상 제거 (4배수인 5.6초 적용) */
-      animation: spinner-dash 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      /* 반지름 51 기준 정확한 원주 둘레: 2 * Math.PI * 51 = 320.442 */
+      stroke-dasharray: 320.442;
       transform-origin: center;
+      /* 끝날 때 툭 끊기는 현상을 없애기 위해 전체 회전 주기의 정확히 4배(5.6초) 동안 자연스럽게 수축/이완 순환 */
+      animation: spinner-dash 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     }
 
     @keyframes spinner-rotate {
       100% { transform: rotate(360deg); }
     }
 
+    /* 구글 머티리얼 규격 4사이클(4회전) 대시 offset 타임라인 매칭 구조 */
     @keyframes spinner-dash {
       0% {
-        stroke-dashoffset: 304.38; /* 원의 약 5%만 보임 */
+        stroke-dashoffset: 304.42; /* 점 크기로 시작 (5%) */
         transform: rotate(0deg);
       }
+      12.5% {
+        stroke-dashoffset: 80.11;  /* 늘어남 (75%) */
+        transform: rotate(0deg);
+      }
+      25% {
+        stroke-dashoffset: 304.42; /* 줄어듦 (5%) */
+        transform: rotate(270deg);
+      }
+      37.5% {
+        stroke-dashoffset: 80.11;  /* 늘어남 (75%) */
+        transform: rotate(270deg);
+      }
       50% {
-        stroke-dashoffset: 48.06;  /* 원의 약 85%까지 부드럽게 채워짐 */
-        transform: rotate(135deg);
+        stroke-dashoffset: 304.42; /* 줄어듦 (5%) */
+        transform: rotate(540deg);
+      }
+      62.5% {
+        stroke-dashoffset: 80.11;  /* 늘어남 (75%) */
+        transform: rotate(540deg);
+      }
+      75% {
+        stroke-dashoffset: 304.42; /* 줄어듦 (5%) */
+        transform: rotate(810deg);
+      }
+      87.5% {
+        stroke-dashoffset: 80.11;  /* 늘어남 (75%) */
+        transform: rotate(810deg);
       }
       100% {
-        stroke-dashoffset: 304.38; /* 다시 수축하면서 360도 회전 완료 지점과 자연스럽게 오버랩 */
-        transform: rotate(450deg);
+        stroke-dashoffset: 304.42; /* 처음 시작 상태와 완벽히 겹치며 종료 (5%) */
+        transform: rotate(1080deg);
       }
     }
 
@@ -372,7 +396,7 @@
               <div class="avatar-loading-user" id="loadingAvatar">?</div>
 
             </div>
-            <p class="intro-desc" id="loadingStatusText">계정 정보를 설정하는 중입니다 </p>
+            <p class="intro-desc" id="loadingStatusText">새로운 회원 정보를 안전하게 구성하고 있습니다.<br>잠시만 기다려주세요.</p>
           </div>
 
         </div>
@@ -493,7 +517,6 @@
       }
     }
 
-    // Step 이동 시 비율 계산 처리 (5개 스텝이므로 한 칸당 20%)
     track.style.transform = `translateX(-${stepIndex * 20}%)`;
   }
 
@@ -543,30 +566,24 @@
     }
 
     setButtonLoading(true);
-
-    // 최소 3초 타이머 연출을 위한 시작 시간 기록
     const startTime = Date.now();
 
     try {
-      // 1. API 데이터 요청 전송
       await api("/users", {
         method: "POST",
         body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
       });
 
-      // 로컬 스토리지 데이터 임시 저장
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
 
-      // 2. 가입 프로세스 성공 시 아바타 내부 텍스트를 첫 글자로 변경 및 스텝 이동
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
       nextStep(4); 
 
-      // 3. 최소 3초 보장 연출 핸들링
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, 3000 - elapsedTime);
 
       setTimeout(() => {
-        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">설정 완료</span>`;
+        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">✓ 설정 완료!</span><br>잠시 후 마이페이지로 이동합니다.`;
         setTimeout(() => {
           window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new`;
         }, 800);
