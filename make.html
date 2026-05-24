@@ -239,7 +239,12 @@
       object-fit: contain;
     }
 
-    /* ─── POST BUTTON ─── */
+    /* ─── POST BUTTON & MATERIAL SPIN SYSTEM ─── */
+    .post-btn-container {
+      position: relative;
+      display: inline-block;
+    }
+
     .post-btn {
       background: #fff;
       color: #000;
@@ -255,25 +260,101 @@
       justify-content: center;
       gap: 6px;
       min-width: 90px;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), color 0.15s;
       white-space: nowrap;
+      position: relative;
+      z-index: 2;
     }
     .post-btn:hover:not(:disabled) { background: #e8e8e8; transform: scale(1.04); }
     .post-btn:active:not(:disabled) { transform: scale(0.94); }
-    .post-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .post-btn:disabled { cursor: not-allowed; transform: none; }
+    
+    /* 로딩 중일 때 버튼 내부를 투명하거나 다른 배경으로 디자인 처리 */
+    .post-btn.loading {
+      background: var(--bg2);
+      color: var(--t2);
+      border: 1px solid transparent;
+    }
 
-    .spinner {
+    /* 공유하기 버튼 전용 구글 머티리얼 로더 패널 */
+    .btn-material-spinner {
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      width: calc(100% + 6px);
+      height: calc(100% + 6px);
+      z-index: 1;
       display: none;
-      width: 15px; height: 15px;
-      border: 2px solid rgba(0,0,0,0.2);
-      border-radius: 50%;
-      border-top-color: #000;
-      animation: spin 0.8s linear infinite;
+      pointer-events: none;
+      transform-origin: center;
+      animation: btn-spinner-rotate 1.4s linear infinite;
+    }
+    .loading + .btn-material-spinner {
+      display: block;
+    }
+
+    .btn-spinner-path {
+      /* 가로 폭 유동적 대응을 위해 원형 대신 보정 처리, 수축 끊김 제거 규격 */
+      stroke-dasharray: 240;
+      transform-origin: center;
+      animation: btn-spinner-dash 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes btn-spinner-rotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes btn-spinner-dash {
+      0% { stroke-dashoffset: 228; transform: rotate(0deg); }
+      12.5% { stroke-dashoffset: 60; transform: rotate(0deg); }
+      25% { stroke-dashoffset: 228; transform: rotate(270deg); }
+      37.5% { stroke-dashoffset: 60; transform: rotate(270deg); }
+      50% { stroke-dashoffset: 228; transform: rotate(540deg); }
+      62.5% { stroke-dashoffset: 60; transform: rotate(540deg); }
+      75% { stroke-dashoffset: 228; transform: rotate(810deg); }
+      87.5% { stroke-dashoffset: 60; transform: rotate(810deg); }
+      100% { stroke-dashoffset: 228; transform: rotate(1080deg); }
+    }
+
+    /* ─── TOAST NOTIFICATION SYSTEM ─── */
+    .toast-container {
+      position: fixed;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e1b1b;
+      border: 1px solid rgba(255,107,107,0.3);
+      padding: 14px 24px;
+      border-radius: var(--r2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.7);
+      z-index: 9999;
+      transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+      max-width: 90%;
+      width: max-content;
+    }
+    .toast-container.show {
+      bottom: 30px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .toast-icon {
+      color: var(--pink);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
       flex-shrink: 0;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading .spinner { display: block; }
-    .loading .btn-text { display: none; }
+    .toast-text {
+      color: var(--t1);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
 
     /* ─── MAIN CONTENT ─── */
     .main-content {
@@ -365,13 +446,13 @@
       margin-bottom: 6px;
     }
 
-    /* ─── TEXTAREA (모바일 글자 겹침/깨짐 수정됨) ─── */
+    /* ─── TEXTAREA ─── */
     .create-textarea {
       width: 100%;
       border: 1px solid var(--border2);
       resize: vertical;
       min-height: 180px;
-      font-size: 16px; /* 모바일 사파리 자동 줌 방지 및 가독성 확보 */
+      font-size: 16px;
       font-family: inherit;
       outline: none;
       background: var(--bg2);
@@ -384,9 +465,8 @@
       opacity: 0;
       animation: fadeInEl 0.4s ease 0.4s forwards;
       overflow-y: auto;
-      word-break: break-all; /* 모바일 화면 글자 잘림 방지 */
+      word-break: break-all;
     }
-    /* contenteditable placeholder 가독성 및 겹침 문제 전면 개선 */
     .create-textarea[contenteditable]:empty::before {
       content: attr(placeholder);
       color: var(--t3);
@@ -473,20 +553,6 @@
       margin-top: 6px;
     }
 
-    /* ─── MESSAGE ─── */
-    #postMessage {
-      margin-top: 14px;
-      font-size: 13px;
-      text-align: center;
-      min-height: 18px;
-      font-weight: 500;
-      opacity: 0;
-      animation: fadeInEl 0.4s ease 0.56s forwards;
-    }
-    #postMessage.error { color: var(--pink); }
-    #postMessage.success { color: var(--green); }
-    #postMessage.info { color: var(--t2); }
-
     /* ─── DIVIDER ─── */
     .section-divider {
       height: 1px;
@@ -496,7 +562,7 @@
       animation: fadeInEl 0.4s ease 0.44s forwards;
     }
 
-    /* ─── MODAL (POPUP) STYLE 애니메이션 추가 ─── */
+    /* ─── MODAL (POPUP) STYLE ─── */
     .modal {
       display: flex;
       position: fixed;
@@ -530,7 +596,6 @@
       position: relative;
       box-shadow: 0 20px 40px rgba(0,0,0,0.6);
       
-      /* 스프링 팝업 바운스 효과 적용 */
       opacity: 0;
       transform: scale(0.85) translateY(30px);
       transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
@@ -573,7 +638,6 @@
       color: var(--t1);
     }
 
-    /* 정보 상세 행 가이드 */
     .info-section {
       display: flex;
       flex-direction: column;
@@ -626,7 +690,7 @@
     /* ─── MOBILE RESPONSIVE FIX ─── */
     @media (max-width: 768px) {
       .header {
-        padding: 10px 12px; /* 헤더 여백 최적화 */
+        padding: 10px 12px;
         gap: 8px;
       }
       .header-left {
@@ -637,7 +701,7 @@
         height: 32px;
       }
       .header-title {
-        font-size: 13px; /* 제목 크기 축소로 공간 확보 */
+        font-size: 13px;
         gap: 6px;
       }
       .header-profile-avatar {
@@ -648,16 +712,16 @@
         gap: 6px;
       }
       .custom-select-trigger {
-        padding: 7px 24px 7px 12px; /* 드롭다운 내부 여백 축소 */
+        padding: 7px 24px 7px 12px;
         font-size: 12px;
       }
       .custom-select-trigger::after {
         right: 10px;
       }
       .post-btn {
-        padding: 7px 14px; /* 공유하기 버튼 여백 축소 */
+        padding: 7px 14px;
         font-size: 12px;
-        min-width: auto; /* 고정 최소 가로 크기 해제하여 찌그러짐 방지 */
+        min-width: auto;
       }
       
       .main-content { padding: 24px 16px; }
@@ -700,10 +764,31 @@
           </div>
         </div>
       </div>
-      <button class="post-btn" id="postBtn">
-        <span class="btn-text">공유하기</span>
-        <div class="spinner"></div>
-      </button>
+      
+      <div class="post-btn-container">
+        <button class="post-btn" id="postBtn">
+          <span class="btn-text">공유하기</span>
+        </button>
+        <svg class="btn-material-spinner" viewBox="0 0 100 40" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="btnSpinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0d00ff"/>
+              <stop offset="100%" stop-color="#39f0ea"/>
+            </linearGradient>
+          </defs>
+          <rect
+            class="btn-spinner-path"
+            x="1" y="1"
+            width="98" height="38"
+            rx="19" ry="19"
+            fill="none"
+            stroke="url(#btnSpinnerGradient)"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+
     </div>
   </div>
 
@@ -739,8 +824,12 @@
       <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
       <button class="upload-btn" id="uploadBtn">📷 사진 추가 (최대 5장)</button>
 
-      <div id="postMessage"></div>
     </div>
+  </div>
+
+  <div class="toast-container" id="errorToast">
+    <div class="toast-icon">✕</div>
+    <div class="toast-text" id="toastMessage">알림 내용</div>
   </div>
 
   <div class="modal" id="accessInfoModal">
@@ -812,8 +901,8 @@
   const cloudName = 'dretlhsrk';
   const uploadPreset = 'unsigned_preset';
   let currentUser = null;
-  let selectedImages = [];   // 여러 이미지 저장 배열
-  let currentAccessValue = "public"; // 기본 선택 값 (public)
+  let selectedImages = [];
+  let currentAccessValue = "public";
 
   function setAvatar(el, profileImage, nickname) {
     if (profileImage) {
@@ -823,7 +912,20 @@
     }
   }
 
-  // 커스텀 드롭다운 상호작용 제어 로직
+  // 아래에서 위로 올라오는 토스트 팝업 제어 함수
+  function showToast(msg) {
+    const toast = document.getElementById('errorToast');
+    const toastMsg = document.getElementById('toastMessage');
+    toastMsg.textContent = msg;
+    
+    toast.classList.add('show');
+    
+    // 3.5초 뒤 자동 수축 언로드
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3500);
+  }
+
   const selectContainer = document.getElementById('customSelectContainer');
   const selectTrigger = document.getElementById('customSelectTrigger');
   const optionsList = selectContainer.querySelectorAll('.custom-option:not(#infoOpenOption)');
@@ -840,7 +942,6 @@
       e.stopPropagation();
       currentAccessValue = option.getAttribute('data-value');
       
-      // 선택 시 상단 버튼 텍스트 변경
       const pureText = option.textContent.trim();
       selectTrigger.textContent = pureText;
       
@@ -851,7 +952,6 @@
     };
   });
 
-  // 자세히 알아보기 클릭 제어
   infoOpenOption.onclick = (e) => {
     e.stopPropagation();
     selectContainer.classList.remove('open');
@@ -866,7 +966,6 @@
     infoModal.classList.remove('open');
   }
 
-  // 드롭다운 바깥 및 팝업 외부 영역 클릭 통합 제어
   window.onclick = (e) => {
     selectContainer.classList.remove('open');
     if (e.target === infoModal) {
@@ -874,7 +973,6 @@
     }
   };
 
-  // 미리보기 업데이트 함수
   function updateImagePreview() {
     const grid = document.getElementById('imagePreviewGrid');
     const countEl = document.getElementById('imageCount');
@@ -946,7 +1044,6 @@
     document.execCommand(command, false, value);
   };
 
-  // 파일 선택 (multiple 지원)
   document.getElementById('uploadBtn').onclick = () => {
     document.getElementById('imageInput').click();
   };
@@ -955,14 +1052,14 @@
     const files = Array.from(e.target.files);
     
     if (selectedImages.length + files.length > 5) {
-      alert('최대 5장까지 업로드할 수 있습니다.');
+      showToast('최대 5장까지 업로드할 수 있습니다.');
       return;
     }
 
     selectedImages = [...selectedImages, ...files];
     updateImagePreview();
 
-    e.target.value = ''; // 같은 파일 재선택 가능하게 초기화
+    e.target.value = '';
   };
 
   async function uploadImagesToCloudinary() {
@@ -978,7 +1075,7 @@
         body: formData
       });
 
-      if (!response.ok) throw new Error('이미지 업로드 실패');
+      if (!response.ok) throw new Error('이미지 업로드에 실패했습니다.');
       const data = await response.json();
       uploadedUrls.push(data.secure_url);
     }
@@ -1020,36 +1117,27 @@
     return md.trim();
   }
 
-  // 게시 버튼
+  // 게시 버튼 클릭 이벤트
   document.getElementById('postBtn').onclick = async () => {
     const rawHtml = document.getElementById('postContent').innerHTML;
     const content = htmlToMarkdown(rawHtml);
-    const messageDiv = document.getElementById('postMessage');
     const postButton = document.getElementById('postBtn');
 
     if (!content && selectedImages.length === 0) {
-      messageDiv.className = 'error';
-      messageDiv.textContent = '내용 또는 이미지를 추가해주세요.';
+      showToast('내용 또는 이미지를 추가해주세요.');
       return;
     }
 
+    // 버튼 잠금 및 스피너 가동 트리거 활성화
     postButton.disabled = true;
     postButton.classList.add('loading');
-    messageDiv.textContent = '';
-    messageDiv.className = '';
 
     try {
       let imageUrls = null;
       if (selectedImages.length > 0) {
-        messageDiv.className = 'info';
-        messageDiv.textContent = `이미지 ${selectedImages.length}장 업로드 중...`;
         imageUrls = await uploadImagesToCloudinary();
       }
 
-      messageDiv.className = 'info';
-      messageDiv.textContent = '게시 중...';
-
-      // 일부 공개/비공개일 때는 게시글 ID를 받아와 바로 이동시키기 위해 return=representation 사용
       const responseData = await api("/posts", {
         method: "POST",
         body: JSON.stringify({
@@ -1065,24 +1153,18 @@
         }
       });
 
-      messageDiv.className = 'success';
-      messageDiv.textContent = '게시물이 성공적으로 업로드되었습니다!';
-
       setTimeout(() => {
-        // 일부 공개(link) 또는 비공개(private)일 때는 생성된 view.html?id=ID 주소로 바로 이동
         if ((currentAccessValue === 'link' || currentAccessValue === 'private') && responseData && responseData[0] && responseData[0].id) {
           window.location.href = `view.html?id=${responseData[0].id}`;
         } else {
-          // 공개(public)일 때는 기존대로 메인 피드로 이동
           window.location.href = 'index.html';
         }
-      }, 1000);
+      }, 800);
 
     } catch (error) {
       console.error('게시 오류:', error);
-      messageDiv.className = 'error';
-      messageDiv.textContent = '게시에 실패했습니다. 다시 시도해주세요.';
-    } finally {
+      // 실패 시 아래에서 부드럽게 위로 올라오는 토스트 호출 및 버튼 리셋
+      showToast(error.message || '게시에 실패했습니다. 다시 시도해주세요.');
       postButton.disabled = false;
       postButton.classList.remove('loading');
     }
