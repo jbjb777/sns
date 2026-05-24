@@ -146,7 +146,7 @@
       /* 모서리가 둥근 사각형(rx/ry=20) 둘레 기준 */
       stroke-dasharray: 230;
       /* 정확히 3번 반복 후 멈추도록 유한 루프 적용 (2초 * 3회 = 6초) */
-      animation: btn-line-flow 2s cubic-bezier(0.4, 0, 0.2, 1) 3;
+      animation: btn-line-flow 2s cubic-bezier(0.4, 0, 0.2, 1) 2;
     }
 
     @keyframes btn-line-flow {
@@ -544,6 +544,9 @@
 
     // 3번 애니메이션을 실행시키고 깔끔하게 제거하는 공통 제어 함수
     function triggerBorderFlow() {
+      // sessionStorage를 확인하여 이번 탭 세션에서 이미 실행된 적이 있다면 작동하지 않음
+      if (sessionStorage.getItem('sharerAnimationPlayed')) return;
+
       createBtnSpinner.classList.remove('animate');
       void createBtnSpinner.offsetWidth; // 브라우저 리플로우 트리거로 애니메이션 초기화
       createBtnSpinner.classList.add('animate');
@@ -551,7 +554,9 @@
       // 애니메이션 사이클 종료(2초 * 3 = 6초) 후 DOM 성능을 위해 제거 처리
       setTimeout(() => {
         createBtnSpinner.classList.remove('animate');
-      }, 6100);
+        // 애니메이션이 성공적으로 끝까지 실행되었음을 세션에 기록
+        sessionStorage.setItem('sharerAnimationPlayed', 'true');
+      }, 4000);
     }
 
     function openProfileSheet() {
@@ -740,7 +745,7 @@
           sidebarBar.classList.add('has-profile');
           syncSheetProfileFromUser();
           
-          // 유저 데이터가 성공적으로 업데이트 및 동기화되었을 때 라인 흐름 효과 3번 작동
+          // 유저 데이터가 성공적으로 업데이트 및 동기화되었을 때 라인 흐름 효과 작동 조건 처리
           triggerBorderFlow();
         } else {
           isLoggedIn = false;
@@ -765,7 +770,7 @@
     updateIcons();
     parent.postMessage({ type: 'requestUserInfo' }, '*');
 
-    // 페이지 첫 진입 시 최초 3번 작동
+    // 페이지 첫 진입 시 최초 작동 조건 처리
     triggerBorderFlow();
   </script>
 </body>
