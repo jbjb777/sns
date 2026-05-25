@@ -48,7 +48,6 @@
       color: #ff6b6b;
     }
 
-    /* 단순한 CSS 로딩 스피너 디자인 */
     .loader {
       border: 3px solid #222;
       border-top: 3px solid #fff;
@@ -75,9 +74,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // 본인의 Supabase Project URL과 Anon Key 정보를 기입해주세요.
-    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_vxGxR4uBuYldz-0l_tQXGw_Cz0V6Mj6";
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -85,7 +83,9 @@
       const statusBox = document.getElementById('statusBox');
       const hash = window.location.hash;
 
-      // URL 해시에 토큰 정보가 아예 넘어오지 않은 경우의 예외 처리
+      // 요청하신 디버깅용 console.log 추가
+      console.log(hash);
+
       if (!hash) {
         statusBox.innerHTML = `
           <h1 class="error-text">잘못된 접근</h1>
@@ -94,14 +94,15 @@
         return;
       }
 
-      // 해시 정보에서 access_token과 refresh_token 값 추출 파싱
       const params = new URLSearchParams(hash.substring(1));
+      // 요청하신 디버깅용 console.log 추가
+      console.log(params.toString());
+
       const access_token = params.get('access_token');
       const refresh_token = params.get('refresh_token');
 
       if (access_token && refresh_token) {
         try {
-          // Supabase Auth에 세션을 강제로 주입 및 동기화 처리하여 로그인 유도
           const { data, error } = await supabase.auth.setSession({
             access_token,
             refresh_token
@@ -109,7 +110,6 @@
 
           if (error) throw error;
 
-          // 로컬스토리지 내 가입 기록 데이터의 인증 상태 플래그 변경 업데이트
           const localUser = localStorage.getItem('snsUser');
           if (localUser) {
             const parsed = JSON.parse(localUser);
@@ -134,7 +134,6 @@
           `;
         }
       } else {
-        // 토큰이 유실되었거나 이미 만료 처리(Outlook 사전 스캔 등)된 상황 대응
         statusBox.innerHTML = `
           <h1 class="error-text">인증 실패</h1>
           <p>링크가 이미 사용되었거나, 유효 시간이 만료되었습니다.</p>
@@ -142,7 +141,6 @@
       }
     }
 
-    // 문서 로드 완료 시 초기 작동 시작
     init();
   </script>
 </body>

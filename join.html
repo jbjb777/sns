@@ -94,7 +94,7 @@
     }
     .slider-track {
       display: flex;
-      width: 700%; /* 7 steps (0 to 6) */
+      width: 700%; /* 7 steps */
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .slider-step {
@@ -412,9 +412,8 @@
 
 <script>
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-  // 본인의 Supabase Project URL과 Anon Key 정보를 기입해주세요.
-  const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_vxGxR4uBuYldz-0l_tQXGw_Cz0V6Mj6";
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
@@ -546,7 +545,6 @@
       err.textContent = '';
     }
 
-    // 총 7단계 이동 처리 비율로 정교하게 맞춤 조정 (100 / 7)
     track.style.transform = `translateX(-${stepIndex * (100 / 7)}%)`;
   }
 
@@ -566,7 +564,6 @@
     }
   }
 
-  // 이메일 없이 가입을 건너뛸 때 작동하는 함수
   window.skipEmail = async function() {
     const nickname = document.getElementById('signupNickname').value.trim();
     const id = document.getElementById('signupId').value.trim();
@@ -574,7 +571,6 @@
     const errorDiv = document.getElementById('signupError');
 
     try {
-      // 이메일 연동 없이 본래의 커스텀 API 서버 워커즈로 DB에 유저 direct 생성 처리
       await api("/users", {
         method: "POST",
         body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
@@ -583,7 +579,7 @@
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
       
-      nextStep(6); // 최종 로딩 인덱스로 이동
+      nextStep(6);
 
       setTimeout(() => {
         document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">가입이 완료되었습니다</span>`;
@@ -626,13 +622,13 @@
     const startTime = Date.now();
 
     try {
-      // 1단계: 본래 로직대로 커스텀 백엔드 DB에 유저 데이터 입력 생성
+      // 1단계: 기존 자체 워커즈 백엔드 DB 생성 수행
       await api("/users", {
         method: "POST",
         body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
       });
 
-      // 2단계: 오직 단순 이메일 인증 링크 전송 목적을 위해 Supabase Auth SignUp 호출 (비밀번호는 고정값 "aaaaaa")
+      // 2단계: 피드백 주신대로 password 난수화 처리 및 emailRedirectTo 추가하여 Supabase Auth 회원가입 호출
       const supabaseSignupUrl = `${SUPABASE_URL}/auth/v1/signup`;
       const supabaseRes = await fetch(supabaseSignupUrl, {
         method: "POST",
@@ -642,9 +638,13 @@
         },
         body: JSON.stringify({
           email: email,
-          password: "aaaaaa",
+          password: crypto.randomUUID(),
           options: {
-            data: { id: id, nickname: nickname }
+            emailRedirectTo: "https://sharer.r-e.kr/verify.html",
+            data: {
+              id: id,
+              nickname: nickname
+            }
           }
         })
       });
@@ -657,7 +657,7 @@
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
 
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
-      nextStep(6); // 7단계 레이아웃 규칙에 맞춰 최종 인덱스 6으로 이동
+      nextStep(6);
 
       const elapsedTime = Date.now() - startTime;
       const remainingTime = Math.max(0, 3000 - elapsedTime);
@@ -668,7 +668,6 @@
           `<span style="font-size:12px;color:var(--t2);">메일함 확인 후 링크를 클릭하여 인증을 마무리하세요.</span>`;
         
         setTimeout(() => {
-          // 가입 이후 바로 상세 페이지로 넘기되, 파라미터 전달 유지
           window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new&email_check=pending`;
         }, 3000);
       }, remainingTime);
@@ -697,7 +696,7 @@
 
   document.getElementById('signupEmail').addEventListener('input', function() {
     this.classList.remove('input-error');
-    errorDiv.textContent = '';
+    document.getElementById('signupError').textContent = '';
   });
 
   document.getElementById('signupEmail').addEventListener('keypress', (e) => {
