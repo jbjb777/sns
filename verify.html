@@ -68,23 +68,29 @@
 
   <div class="box" id="statusBox">
     <div class="loader"></div>
-    <h1>이메일 인증 중...</h1>
+    <h1>이메일 인증 확인 중...</h1>
     <p>새로운 계정 연결을 확인하고 있습니다.<br>잠시만 기다려주세요.</p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
+    // verify.html은 클라이언트 단에서 토큰 세션의 검증 활성화만 관장하므로, 최소화된 퍼블릭 초기화만 유지합니다.
+    const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co"; 
     const SUPABASE_ANON_KEY = "sb_publishable_vxGxR4uBuYldz-0l_tQXGw_Cz0V6Mj6";
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function init() {
       const statusBox = document.getElementById('statusBox');
-      const hash = window.location.hash;
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      const nickname = urlParams.get('nickname');
+      const email = urlParams.get('email');
+      const password = urlParams.get('password');
 
-      // 요청하신 디버깅용 console.log 추가
-      console.log(hash);
+      const hash = window.location.hash;
+      console.log("Hash Data:", hash);
 
       if (!hash) {
         statusBox.innerHTML = `
@@ -95,39 +101,27 @@
       }
 
       const params = new URLSearchParams(hash.substring(1));
-      // 요청하신 디버깅용 console.log 추가
-      console.log(params.toString());
-
       const access_token = params.get('access_token');
       const refresh_token = params.get('refresh_token');
 
       if (access_token && refresh_token) {
         try {
-          const { data, error } = await supabase.auth.setSession({
-            access_token,
-            refresh_token
-          });
-
+          // Supabase Auth 세션 확정 활성화 실행
+          const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
           if (error) throw error;
 
-          const localUser = localStorage.getItem('snsUser');
-          if (localUser) {
-            const parsed = JSON.parse(localUser);
-            parsed.isVerified = true;
-            localStorage.setItem('snsUser', JSON.stringify(parsed));
-          }
-
           statusBox.innerHTML = `
-            <h1 class="success-text">인증 완료</h1>
-            <p>이메일 연결이 성공적으로 마무리되었습니다!<br>잠시 후 메인 화면으로 이동합니다.</p>
+            <h1 class="success-text">인증 확인 완료</h1>
+            <p>회원가입 창으로 돌아가 최종 등록을 마무리합니다.</p>
           `;
 
+          // 세션 증명이 완료되면 가입 대기 스핀들이 떠 있는 join.html로 파라미터를 들고 복귀합니다.
           setTimeout(() => {
-            window.location.href = '/';
-          }, 2000);
+            window.location.href = `join.html?u=verified&id=${encodeURIComponent(id)}&nickname=${encodeURIComponent(nickname)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+          }, 1500);
 
         } catch (err) {
-          console.error("인증 처리 중 오류 발생:", err);
+          console.error("인증 실패 처리 에러:", err);
           statusBox.innerHTML = `
             <h1 class="error-text">인증 실패</h1>
             <p>토큰 설정 중 서버 통신 에러가 발생했습니다.<br>다시 가입을 진행해주세요.</p>

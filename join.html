@@ -94,7 +94,7 @@
     }
     .slider-track {
       display: flex;
-      width: 700%; /* 7 steps */
+      width: 700%; /* 7 steps (0 to 6) */
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .slider-step {
@@ -351,7 +351,7 @@
           </div>
 
           <div class="slider-step">
-            <img src="key.svg" class="step-icon" alt="비밀번호 설정" onerror="this.style.display='none'">
+            <img src="key.svg" class="step-icon" alt="비밀번호 설정" onerror="this.style.removeProperty('display')">
             <h2>비밀번호 설정</h2>
             <p class="intro-desc">안전한 비밀번호를 설정해주세요.</p>
             <input type="password" id="signupPassword" placeholder="비밀번호">
@@ -370,13 +370,13 @@
             <div class="error-message" id="signupError"></div>
             <div class="success-message" id="signupSuccess"></div>
             <div style="margin-top:auto;">
-              <button class="btn-secondary" onclick="skipEmail()">나중에 인증</button>
-              <button id="signupBtn" onclick="handleSignup()">지금 설정하기</button>
+              <button class="btn-secondary" onclick="skipEmail()">건너뛰기</button>
+              <button id="signupBtn" onclick="handleSignup()">인증 메일 보내기</button>
             </div>
           </div>
 
           <div class="slider-step">
-            <h2>계정 설정 중</h2>
+            <h2 id="loadingTitle">이메일 인증 대기 중</h2>
             <div class="avatar-loading-container">
               <svg class="material-spinner" viewBox="0 0 110 110">
                 <defs>
@@ -398,7 +398,10 @@
               </svg>
               <div class="avatar-loading-user" id="loadingAvatar">?</div>
             </div>
-            <p class="intro-desc" id="loadingStatusText">새로운 회원 정보를 안전하게 구성하고 있습니다.<br>잠시만 기다려주세요.</p>
+            <p class="intro-desc" id="loadingStatusText">
+              입력하신 메일함으로 인증 링크를 전송했습니다.<br>
+              인증이 완료될 때까지 이 창을 닫지 말고 기다려주세요.
+            </p>
           </div>
 
         </div>
@@ -411,9 +414,8 @@
   </div>
 
 <script>
+  // 프론트엔드에서는 자체 Workers 백엔드 서버 주소만 사용합니다.
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-  const SUPABASE_URL = "https://hoeevmstbhulbzqyfsug.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_vxGxR4uBuYldz-0l_tQXGw_Cz0V6Mj6";
 
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
@@ -449,7 +451,6 @@
   async function nextStep(stepIndex, btn) {
     const track = document.getElementById('sliderTrack');
     
-    // Turnstile 검증 체크
     if(stepIndex === 2) {
       const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
       const err = document.getElementById('turnstileError');
@@ -553,17 +554,18 @@
     track.style.transform = `translateX(-${stepIndex * (100 / 7)}%)`;
   }
 
-  function setButtonLoading(isLoading, loadingText = '가입 중...') {
+  function setButtonLoading(isLoading, loadingText = '보내는 중...') {
     const button = document.getElementById('signupBtn');
     if (isLoading) {
       button.disabled = true;
       button.innerHTML = `<span class="spinner"></span>${loadingText}`;
     } else {
       button.disabled = false;
-      button.innerHTML = '지금 설정하기';
+      button.innerHTML = '인증 메일 보내기';
     }
   }
 
+  // [건너뛰기] - 이메일 없이 즉시 저장 엔드포인트 호출
   window.skipEmail = async function() {
     const nickname = document.getElementById('signupNickname').value.trim();
     const id = document.getElementById('signupId').value.trim();
@@ -571,13 +573,15 @@
     const errorDiv = document.getElementById('signupError');
 
     try {
+      // 이메일 없이 저장 요청
       await api("/users", {
         method: "POST",
-        body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
+        body: JSON.stringify({ id, nickname, password, email: null, created_at: new Date().toISOString() })
       });
 
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
+      document.getElementById('loadingTitle').textContent = "계정 설정 중";
       
       nextStep(6);
 
@@ -594,6 +598,7 @@
     }
   }
 
+  // [인증 메일 보내기] - 백엔드 내부의 인증 요청 전 전용 엔드포인트 호출
   window.handleSignup = async function() {
     const nicknameInput = document.getElementById('signupNickname');
     const idInput = document.getElementById('signupId');
@@ -606,10 +611,7 @@
     const email = emailInput.value.trim();
 
     const errorDiv = document.getElementById('signupError');
-    const successDiv = document.getElementById('signupSuccess');
-
     errorDiv.textContent = '';
-    successDiv.textContent = '';
     emailInput.classList.remove('input-error');
 
     if (!email) { 
@@ -619,86 +621,84 @@
     }
 
     setButtonLoading(true);
-    const startTime = Date.now();
 
     try {
-      // 1단계: 기존 자체 워커즈 백엔드 DB 생성 수행
-      await api("/users", {
+      // 프론트엔드에서 보안 키를 숨기기 위해 백엔드에 개설한 인증 가입 요청 주소를 호출합니다.
+      await api("/users/signup-request", {
         method: "POST",
-        body: JSON.stringify({ id, nickname, password, created_at: new Date().toISOString() })
+        body: JSON.stringify({ id, nickname, password, email })
       });
 
-      // 2단계: 피드백 주신대로 password 난수화 처리 및 emailRedirectTo 추가하여 Supabase Auth 회원가입 호출
-      const supabaseSignupUrl = `${SUPABASE_URL}/auth/v1/signup`;
-      const supabaseRes = await fetch(supabaseSignupUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey": SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({
-          email: email,
-          password: crypto.randomUUID(),
-          options: {
-            emailRedirectTo: "https://sharer.r-e.kr/verify.html",
-            data: {
-              id: id,
-              nickname: nickname
-            }
-          }
-        })
-      });
-
-      if (!supabaseRes.ok) {
-        const errData = await supabaseRes.json();
-        throw new Error(errData.error_description || errData.message || "Supabase 인증 메일 발송 실패");
-      }
-
-      localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
-
+      // 발송에 성공하면 인증 대기 스핀들 레이아웃으로 변경하고 멈춰서 기다리게 유도합니다.
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
       nextStep(6);
 
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(0, 3000 - elapsedTime);
-
-      setTimeout(() => {
-        document.getElementById('loadingStatusText').innerHTML = 
-          `<span style="color:var(--green);font-weight:600;">인증 메일이 발송되었습니다!</span><br>` +
-          `<span style="font-size:12px;color:var(--t2);">메일함 확인 후 링크를 클릭하여 인증을 마무리하세요.</span>`;
-        
-        setTimeout(() => {
-          window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new&email_check=pending`;
-        }, 3000);
-      }, remainingTime);
-
     } catch (error) {
-      console.error('회원가입 오류:', error);
-      errorDiv.textContent = error.message || '회원가입에 실패했습니다. 다시 시도해주세요.';
+      console.error('인증 요청 오류:', error);
+      errorDiv.textContent = error.message || '인증 메일 발송에 실패했습니다.';
       setButtonLoading(false);
     }
   }
+
+  // [초기 로드 감지 시스템] : 이메일 인증 후 다시 join.html?u=verified... 로 돌아왔을 때 작동
+  window.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const uType = urlParams.get('u');
+    
+    if (uType === 'verified') {
+      // 즉시 6단계 화면 포지션으로 고정
+      const track = document.getElementById('sliderTrack');
+      track.style.transition = 'none';
+      track.style.transform = `translateX(-${6 * (100 / 7)}%)`;
+      
+      const id = urlParams.get('id');
+      const nickname = urlParams.get('nickname');
+      const email = urlParams.get('email');
+      const password = urlParams.get('password');
+
+      document.getElementById('loadingTitle').textContent = "계정 설정 중";
+      document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
+      document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green); font-weight:600;">이메일 인증이 확인되었습니다!</span><br><span style="font-size:12px;color:var(--t2);">계정을 최종 생성 중입니다...</span>`;
+
+      try {
+        // 자체 Cloudflare Workers 백엔드 서버에 email 컬럼을 포함하여 최종 회원등록 처리 완료 진행
+        await api("/users", {
+          method: "POST",
+          body: JSON.stringify({ id, nickname, password, email, created_at: new Date().toISOString() })
+        });
+
+        localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: true }));
+
+        setTimeout(() => {
+          document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">가입이 완료되었습니다!</span>`;
+          setTimeout(() => {
+            window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new`;
+          }, 800);
+        }, 1500);
+
+      } catch (error) {
+        console.error("최종 가입 DB 처리 실패:", error);
+        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--pink)">가입 처리 중 오류 발생: ${error.message}</span>`;
+      }
+    }
+  });
 
   document.getElementById('signupNickname').addEventListener('input', function() {
     this.classList.remove('input-error');
     document.getElementById('nicknameError').textContent = '';
   });
-
   document.getElementById('signupId').addEventListener('input', function() {
     this.classList.remove('input-error');
     document.getElementById('idError').textContent = '';
   });
-
   document.getElementById('signupPassword').addEventListener('input', function() {
     this.classList.remove('input-error');
     document.getElementById('passwordError').textContent = '';
   });
-
   document.getElementById('signupEmail').addEventListener('input', function() {
     this.classList.remove('input-error');
     document.getElementById('signupError').textContent = '';
   });
-
   document.getElementById('signupEmail').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSignup();
   });
