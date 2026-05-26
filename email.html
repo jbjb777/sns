@@ -1,76 +1,232 @@
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sharer 이메일 테스트</title>
+
+<style>
+
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:sans-serif;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  min-height:100vh;
+}
+
+.card{
+  width:100%;
+  max-width:420px;
+
+  background:#111;
+
+  border:1px solid #222;
+  border-radius:24px;
+
+  padding:28px;
+}
+
+input{
+  width:100%;
+  height:52px;
+
+  background:#1a1a1a;
+
+  border:1px solid #333;
+  border-radius:14px;
+
+  color:#fff;
+
+  padding:0 14px;
+
+  margin-bottom:14px;
+
+  outline:none;
+}
+
+button{
+  width:100%;
+  height:52px;
+
+  border:none;
+  border-radius:14px;
+
+  background:#fff;
+  color:#000;
+
+  font-weight:700;
+
+  cursor:pointer;
+}
+
+#status{
+  margin-top:16px;
+  color:#888;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Resend 메일 테스트</h2>
+
+<input
+type="email"
+id="email"
+placeholder="받는 이메일"
+/>
+
+<button id="sendBtn">
+인증번호 보내기
+</button>
+
+<div id="status">
+대기 중
+</div>
+
+</div>
 
 <script>
 
-const firebaseConfig = {
+const API_KEY =
+  're_YijxwSrc_KNqGfYvm8h8YRC7KZxHnLYxw';
 
-  apiKey: "여기에 apiKey",
-
-  authDomain: "여기에 authDomain",
-
-  projectId: "여기에 projectId",
-
-  storageBucket: "여기에 storageBucket",
-
-  messagingSenderId: "여기에 messagingSenderId",
-
-  appId: "여기에 appId"
-
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-
-const signupBtn =
-  document.getElementById("signupBtn");
+const sendBtn =
+  document.getElementById('sendBtn');
 
 const statusEl =
-  document.getElementById("status");
+  document.getElementById('status');
 
-signupBtn.onclick = async () => {
+sendBtn.onclick = async () => {
 
   const email =
-    document.getElementById("email").value;
+    document.getElementById('email')
+    .value
+    .trim();
 
-  const password =
-    document.getElementById("password").value;
-
-  if(!email || !password){
+  if(!email){
 
     statusEl.textContent =
-      "이메일과 비밀번호 입력";
+      '이메일 입력';
 
     return;
-
   }
+
+  const code =
+    Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
+  statusEl.textContent =
+    '메일 보내는 중...';
 
   try{
 
-    const userCredential =
+    const response = await fetch(
+      'https://api.resend.com/emails',
+      {
+        method:'POST',
 
-      await auth
-      .createUserWithEmailAndPassword(
-        email,
-        password
-      );
+        headers:{
+          'Authorization':
+            'Bearer ' + API_KEY,
 
-    await userCredential.user
-      .sendEmailVerification();
+          'Content-Type':
+            'application/json'
+        },
 
-    statusEl.innerHTML =
-      "인증 메일 전송 완료!";
+        body:JSON.stringify({
+
+          from:
+            'Sharer 인증 <verify@sharer.r-e.kr>',
+
+          to:[email],
+
+          subject:
+            '[Sharer] 인증번호',
+
+          html:`
+
+            <div style="
+              background:#000;
+              color:#fff;
+              padding:40px;
+              font-family:sans-serif;
+            ">
+
+              <h1>
+                Sharer 인증번호
+              </h1>
+
+              <div style="
+                font-size:48px;
+                font-weight:700;
+                margin:30px 0;
+                letter-spacing:8px;
+              ">
+                ${code}
+              </div>
+
+              <p>
+                5분 안에 입력해주세요.
+              </p>
+
+            </div>
+
+          `
+
+        })
+
+      }
+    );
+
+    console.log(response.status);
+
+    const text =
+      await response.text();
+
+    console.log(text);
+
+    console.log(data);
+
+    if(data.id){
+
+      statusEl.innerHTML =
+        `
+        메일 전송 성공<br>
+        인증번호:
+        <b>${code}</b>
+        `;
+
+    }else{
+
+      statusEl.textContent =
+        JSON.stringify(data);
+
+    }
 
   }catch(err){
 
-    statusEl.textContent =
-      err.message;
-
     console.error(err);
+
+    statusEl.textContent =
+      '오류 발생';
 
   }
 
 };
 
 </script>
+
+</body>
+</html>
