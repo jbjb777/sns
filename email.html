@@ -31,6 +31,8 @@ body{
   border-radius:24px;
 
   padding:28px;
+
+  box-sizing:border-box;
 }
 
 h2{
@@ -70,6 +72,8 @@ button{
   font-weight:700;
 
   cursor:pointer;
+
+  margin-bottom:10px;
 }
 
 button:disabled{
@@ -81,6 +85,14 @@ button:disabled{
   margin-top:16px;
   color:#888;
   line-height:1.6;
+}
+
+.success{
+  color:#4ade80;
+}
+
+.error{
+  color:#ff6b6b;
 }
 
 </style>
@@ -104,7 +116,7 @@ placeholder="이메일 입력"
 
 <input
 type="text"
-id="verifyInput"
+id="code"
 placeholder="인증번호 입력"
 />
 
@@ -132,8 +144,6 @@ const verifyBtn =
 const statusEl =
   document.getElementById('status');
 
-let currentCode = null;
-
 sendBtn.onclick = async () => {
 
   const email =
@@ -143,18 +153,11 @@ sendBtn.onclick = async () => {
 
   if(!email){
 
-    statusEl.textContent =
-      '이메일을 입력하세요';
+    statusEl.innerHTML =
+      '<span class="error">이메일 입력</span>';
 
     return;
   }
-
-  const code =
-    Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
-
-  currentCode = code;
 
   sendBtn.disabled = true;
 
@@ -175,46 +178,7 @@ sendBtn.onclick = async () => {
           },
 
           body:JSON.stringify({
-
-            from:
-              'Sharer 인증 <verify@sharer.r-e.kr>',
-
-            to:[email],
-
-            subject:
-              '[Sharer] 이메일 인증번호',
-
-            html:`
-
-            <div style="
-              background:#000;
-              color:#fff;
-              padding:40px;
-              font-family:sans-serif;
-            ">
-
-              <h1 style="
-                margin-top:0;
-              ">
-                Sharer 인증번호
-              </h1>
-
-              <div style="
-                font-size:48px;
-                font-weight:700;
-                letter-spacing:10px;
-                margin:30px 0;
-              ">
-                ${code}
-              </div>
-
-              <p>
-                5분 안에 입력해주세요.
-              </p>
-
-            </div>
-
-            `
+            email
           })
         }
       );
@@ -222,21 +186,25 @@ sendBtn.onclick = async () => {
     const text =
       await response.text();
 
-    const data =
-      JSON.parse(text);
+    console.log(text);
 
-    if(data.id){
+    if(response.ok){
 
       statusEl.innerHTML =
         `
-        인증번호가 전송되었습니다.<br>
-        이메일을 확인해주세요.
+        <span class="success">
+        인증번호가 전송되었습니다.
+        </span>
         `;
 
     }else{
 
-      statusEl.textContent =
-        text;
+      statusEl.innerHTML =
+        `
+        <span class="error">
+        전송 실패
+        </span>
+        `;
 
     }
 
@@ -244,8 +212,12 @@ sendBtn.onclick = async () => {
 
     console.error(err);
 
-    statusEl.textContent =
-      '전송 실패';
+    statusEl.innerHTML =
+      `
+      <span class="error">
+      오류 발생
+      </span>
+      `;
 
   }
 
@@ -253,33 +225,82 @@ sendBtn.onclick = async () => {
 
 };
 
-verifyBtn.onclick = () => {
+verifyBtn.onclick = async () => {
 
-  const input =
-    document.getElementById('verifyInput')
+  const email =
+    document.getElementById('email')
     .value
     .trim();
 
-  if(!currentCode){
+  const code =
+    document.getElementById('code')
+    .value
+    .trim();
 
-    statusEl.textContent =
-      '먼저 인증번호를 보내세요';
+  if(!email || !code){
+
+    statusEl.innerHTML =
+      `
+      <span class="error">
+      이메일과 인증번호 입력
+      </span>
+      `;
 
     return;
   }
 
-  if(input === currentCode){
+  try{
+
+    const response =
+      await fetch(
+        WORKER_URL + 'verify',
+        {
+          method:'POST',
+
+          headers:{
+            'Content-Type':
+              'application/json'
+          },
+
+          body:JSON.stringify({
+            email,
+            code
+          })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if(data.success){
+
+      statusEl.innerHTML =
+        `
+        <span class="success">
+        인증 성공 ✅
+        </span>
+        `;
+
+    }else{
+
+      statusEl.innerHTML =
+        `
+        <span class="error">
+        인증번호 불일치
+        </span>
+        `;
+
+    }
+
+  }catch(err){
+
+    console.error(err);
 
     statusEl.innerHTML =
       `
-      인증 성공 ✅
-      `;
-
-  }else{
-
-    statusEl.innerHTML =
-      `
-      인증번호가 틀렸습니다.
+      <span class="error">
+      인증 실패
+      </span>
       `;
 
   }
