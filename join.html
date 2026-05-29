@@ -690,7 +690,7 @@
         document.getElementById('loadingTitle').textContent = "계정 설정 중";
         codeInput.style.display = 'none';
         verifyBtn.style.display = 'none';
-        document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green); font-weight:600;">이메일 인증이 확인되었습니다!</span><br><span style="font-size:12px;color:var(--t2);">계정을 최종 생성 중입니다...</span>`;
+        document.getElementById('loadingStatusText').innerHTML = `<span font-weight:600;">이메일 인증 성공</span><br><span style="font-size:12px;color:var(--t2);">계정 설정 중</span>`;
 
         // 자체 백엔드 DB 서버에 email 컬럼을 추가하여 회원가입 최종 기록
         await api("/users", {
@@ -707,7 +707,7 @@
         localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: true }));
 
         setTimeout(() => {
-          document.getElementById('loadingStatusText').innerHTML = `<span style="color:var(--green)">가입이 완료되었습니다!</span>`;
+          document.getElementById('loadingStatusText').innerHTML = `<span>가입이 완료되었습니다</span>`;
           setTimeout(() => {
             window.location.href = `user.html?nickname=${encodeURIComponent(nickname)}&id=${encodeURIComponent(id)}&u=new`;
           }, 800);
