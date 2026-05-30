@@ -1116,15 +1116,14 @@
       </div>
     `;
 
-    // 본인 프로필이면서 스토리가 없을 때 아바타를 누르면 업로드창 실행되도록 바인딩
+    // 본인 프로필일 때는 항상 아바타를 누르면 업로드창 실행되도록 바인딩
     if (isOwnProfile) {
       const avatarElement = contentDiv.querySelector('.profile-avatar.editable');
       if (avatarElement) {
         avatarElement.onclick = (e) => {
-          // 스토리가 작동 중이지 않을 때만 이미지 업로드 동작 유도
-          if (!document.getElementById('profileAvatarWrapper').classList.contains('has-story')) {
-            document.getElementById('profileFileInput').click();
-          }
+          e.stopPropagation();
+          // 스토리가 있든 없든 이미지 업로드 동작 유도
+          document.getElementById('profileFileInput').click();
         };
       }
     }
@@ -1182,15 +1181,23 @@
     const wrapper = document.getElementById('profileAvatarWrapper');
     if (!wrapper) return;
 
+    const isOwnProfile = currentUser && viewingUser && currentUser.nickname === viewingUser.nickname;
     const items = extractStoryItems(rawPostsCached);
+
     if (items.length > 0) {
       wrapper.classList.add('has-story');
-      wrapper.onclick = (e) => {
-        e.stopPropagation();
-        startStories(rawPostsCached);
-      };
+      // 본인 프로필이 아닐 때만 래퍼 클릭 시 스토리 재생
+      if (!isOwnProfile) {
+        wrapper.onclick = (e) => {
+          e.stopPropagation();
+          startStories(rawPostsCached);
+        };
+      } else {
+        wrapper.onclick = null; // 본인일 땐 래퍼에서 스토리 이벤트 막기
+      }
     } else {
       wrapper.classList.remove('has-story');
+      wrapper.onclick = null;
     }
   }
 
@@ -1332,7 +1339,7 @@
       btn.classList.add('success');
       setTimeout(() => btn.classList.remove('success'), 1500);
     }).catch(err => {
-      console.error('링크 복사 실패:', err);
+      console.error('링크 복 복사 실패:', err);
     });
   };
 
