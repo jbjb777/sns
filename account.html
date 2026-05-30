@@ -117,7 +117,7 @@
   const EMAIL_WORKER_URL = "https://white-salad-5eb7.alexeom97.workers.dev/";
 
   let recoveryType = ''; // 'ID' or 'PW'
-  let foundUser = null; // 인증 성공 전까지는 절대 노출 금지
+  let foundUser = null; 
 
   function moveStep(step) {
     document.getElementById('sliderTrack').style.transform = `translateX(-${step * 25}%)`;
@@ -147,7 +147,6 @@
     if (!val) { err.textContent = "정보를 입력해주세요."; return; }
 
     try {
-      // 1. 유저 찾기
       const query = recoveryType === 'ID' ? `id=eq.${encodeURIComponent(val)}` : `password=eq.${encodeURIComponent(val)}`;
       const res = await fetch(`${API_BASE}/users?${query}&select=*`);
       const users = await res.json();
@@ -157,14 +156,13 @@
         return;
       }
 
-      foundUser = users[0]; // 메모리에 저장 (인증 성공 시 노출 예정)
+      foundUser = users[0];
       
       if (!foundUser.email) {
         err.textContent = "이 계정은 등록된 이메일이 없습니다.";
         return;
       }
 
-      // 2. 인증 메일 발송
       const emailRes = await fetch(EMAIL_WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -194,9 +192,17 @@
       const data = await res.json();
 
       if (data.success) {
-        // 성공시 최종 결과 노출
-        const secret = recoveryType === 'ID' ? foundUser.id : foundUser.password;
-        document.getElementById('resultTitle').textContent = recoveryType === 'ID' ? "아이디 복구 완료" : "비밀번호 복구 완료";
+        let secret, title;
+        // 수정된 로직: ID 입력 시 비번 노출, PW 입력 시 ID 노출
+        if (recoveryType === 'ID') {
+          secret = foundUser.password;
+          title = "비밀번호 복구 완료";
+        } else {
+          secret = foundUser.id;
+          title = "아이디 복구 완료";
+        }
+        
+        document.getElementById('resultTitle').textContent = title;
         document.getElementById('resultValue').textContent = secret;
         moveStep(3);
       } else {
