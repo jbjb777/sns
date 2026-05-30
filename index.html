@@ -213,7 +213,7 @@
     .profile-item:hover { background: var(--bg3); transform: translateX(3px); }
     .profile-item:active { transform: scale(0.97); }
 
-    /* 2일이내 게시물 있을 때 그라데이션 테두리 공통 스타일 */
+    /* 움직이는 그라데이션 스토리 링 스타일 추가 */
     .profile-avatar-wrapper {
       position: relative;
       display: flex;
@@ -232,9 +232,9 @@
         #0740ba
       );
       background-size: 200% 200%;
-      animation: indexStoryRing 3s linear infinite;
+      animation: storyRing 3s linear infinite;
     }
-    @keyframes indexStoryRing {
+    @keyframes storyRing {
       0% { background-position: 0% 50%; }
       100% { background-position: 200% 50%; }
     }
@@ -252,10 +252,10 @@
       flex-shrink: 0;
       object-fit: cover;
       color: #666;
+      box-sizing: border-box;
     }
-    /* 그라데이션이 적용되었을 때 간격을 만들어주기 위해 수정된 보더 설정 */
     .profile-avatar-wrapper.has-story .profile-avatar {
-      border: 2px solid #000;
+      border: 2px solid #000 !important;
       width: 100%; height: 100%;
     }
 
@@ -320,13 +320,6 @@
 
     .post-author-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 
-    .post-author-avatar-wrapper {
-      width: 42px; height: 42px;
-    }
-    .post-author-avatar-wrapper.has-story {
-      padding: 2.5px;
-    }
-
     .post-author-avatar {
       width: 38px; height: 38px;
       border-radius: 50%;
@@ -341,14 +334,37 @@
       flex-shrink: 0;
       transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       color: #666;
-    }
-    .post-author-avatar-wrapper.has-story .post-author-avatar {
-      border: 3px solid #000;
-      width: 100%; height: 100%;
+      box-sizing: border-box;
     }
     .post-author-info:hover .post-author-avatar {
       border-color: var(--border3);
       transform: scale(1.06);
+    }
+    /* 게시글 내 스토리 보유 프사 스타일 분기 */
+    .post-author-avatar-wrapper.has-story .post-author-avatar {
+      border: 3px solid #000 !important;
+      width: 100%; height: 100%;
+    }
+    .post-author-avatar-wrapper {
+      position: relative;
+      width: 38px; height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .post-author-avatar-wrapper.has-story {
+      padding: 2px;
+      border-radius: 50%;
+      background: linear-gradient(
+        270deg,
+        #0740ba,
+        #651fff,
+        #29b1ff,
+        #0740ba
+      );
+      background-size: 200% 200%;
+      animation: storyRing 3s linear infinite;
     }
 
     .post-author-name {
@@ -507,38 +523,28 @@
       background-position: center;
     }
 
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 24px;
-      text-align: center;
-      font-size: 12px;
-      margin-top: auto;
-    }
+    .footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 12px; margin-top: auto; }
     .footer-links { margin-bottom: 8px; }
     .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
 
     .auth-modal, .create-modal {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: rgba(0,0,0,0.75);
       display: none;
-      justify-content: center;
-      align-items: center;
+      justify-content: center; align-items: center;
       z-index: 1000;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
     .auth-modal.active, .create-modal.active { display: flex; }
-
     .auth-box, .create-modal-content {
       background: var(--bg2);
       border: 1px solid var(--border2);
       border-radius: var(--r4);
       padding: 40px;
-      width: 90%;
-      max-width: 380px;
+      width: 90%; max-width: 380px;
       position: relative;
       animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
     }
@@ -547,195 +553,664 @@
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
     .create-modal-content { max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 0; }
+
+    .auth-close, .close-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      font-size: 16px;
+      cursor: pointer;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .auth-close:hover, .close-btn:hover { background: var(--bg4); color: var(--t1); transform: scale(1.08); }
+    .auth-close:active, .close-btn:active { transform: scale(0.92); }
+    .auth-close { position: absolute; top: 20px; right: 20px; }
+
+    .auth-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; text-align: center; color: var(--t1); }
+    .auth-form { display: flex; flex-direction: column; gap: 14px; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label { font-size: 11px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: 0.05em; }
+    .auth-input {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 12px 14px;
+      color: var(--t1);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .auth-input:focus { outline: none; border-color: var(--border3); background: var(--bg4); }
+    .auth-input::placeholder { color: var(--t3); }
+
+    .auth-btn {
+      background: #fff; color: #000;
+      border: none; border-radius: var(--r2);
+      padding: 14px; font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: inherit; margin-top: 10px;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .auth-btn:hover { background: #e8e8e8; }
+    .auth-btn:active { transform: scale(0.97); }
+
+    .auth-switch { text-align: center; font-size: 13px; color: var(--t2); margin-top: 20px; }
+    .auth-switch span { color: var(--t1); cursor: pointer; font-weight: 600; margin-left: 4px; text-decoration: none; }
+    .auth-switch span:hover { text-decoration: underline; }
+
+    .error-msg { color: var(--pink); font-size: 12px; margin-top: 4px; font-weight: 500; display: none; }
+
+    /* 글쓰기 모달 커스텀 */
+    .create-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--bg2); z-index: 10;
+    }
+    .create-title { font-size: 15px; font-weight: 600; color: var(--t1); }
+    .create-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+    .textarea-wrapper { position: relative; }
+    .create-textarea {
+      width: 100%; min-height: 140px;
+      background: transparent; border: none;
+      color: var(--t1); font-size: 15px; font-family: inherit;
+      resize: none; line-height: 1.6;
+    }
+    .create-textarea:focus { outline: none; }
+    .create-textarea::placeholder { color: var(--t3); }
+
+    .media-preview-container {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px; margin-top: 10px;
+    }
+    .media-preview-item {
+      position: relative; aspect-ratio: 1;
+      border-radius: var(--r1); overflow: hidden;
+      background: var(--bg3); border: 1px solid var(--border2);
+    }
+    .media-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .media-remove-btn {
+      position: absolute; top: 4px; right: 4px;
+      background: rgba(0,0,0,0.7); color: #fff;
+      border: none; border-radius: 50%;
+      width: 22px; height: 22px; font-size: 12px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    .create-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg2);
+    }
+    .media-upload-label {
+      color: var(--t2); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      transition: background 0.15s, color 0.15s;
+    }
+    .media-upload-label:hover { background: var(--bg3); color: var(--t1); }
+    .submit-post-btn {
+      background: #fff; color: #000;
+      border: none; border-radius: 20px;
+      padding: 8px 20px; font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), opacity 0.15s;
+    }
+    .submit-post-btn:hover { background: #e8e8e8; }
+    .submit-post-btn:active { transform: scale(0.95); }
+    .submit-post-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .toast {
+      position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%);
+      background: var(--bg2); border: 1px solid var(--border2); color: var(--t1);
+      padding: 10px 22px; border-radius: 22px; font-size: 13px; font-weight: 500;
+      z-index: 9999; transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
+      white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .toast.show { bottom: 28px; }
+
+    .top-banner {
+      position: fixed;
+      top: 0; left: 72px; right: 0;
+      height: 45px;
+      background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 99;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .top-banner.hide {
+      transform: translateY(-45px);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .top-banner-content {
+      font-size: 13px;
+      color: var(--t1);
+      font-weight: 500;
+    }
+    .top-banner-close {
+      background: transparent;
+      border: none;
+      color: var(--t2);
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: color 0.15s;
+    }
+    .top-banner-close:hover {
+      color: var(--t1);
+    }
+
+    @media (max-width: 880px) {
+      .recommend-container { display: none; }
+      .main-content { padding: 24px 16px; }
+    }
+    @media (max-width: 640px) {
+      body { padding-top: 45px; padding-bottom: 64px; }
+      .sidebar-container {
+        width: 100vw; height: 64px;
+        top: auto; bottom: 0; left: 0;
+      }
+      .sidebar-container iframe { width: 100vw !important; height: 64px; }
+      .main-wrapper { margin-left: 0; width: 100%; }
+      .main-content { padding: 12px 14px; }
+      .post-card { padding: 24px 0; }
+      .top-banner { left: 0; }
+    }
   </style>
 </head>
 <body>
 
   <div id="splash">
     <div class="splash-inner">
-      <img src="./logo.png" class="splash-logo" alt="Logo">
+      <img src="./logo.png" alt="Sharer" class="splash-logo">
       <div class="splash-text">
-        <div class="splash-title">Sharer</div>
-        <div class="splash-sub">CONNECT &amp; SHARE</div>
+        <div class="splash-title">SHARER</div>
+        <div class="splash-sub">커뮤니티 · SNS</div>
       </div>
     </div>
   </div>
 
+  <div class="top-banner" id="topBanner">
+    <div class="top-banner-content">📢 Sharer의 새로운 기능과 공지사항을 확인해보세요!</div>
+    <button class="top-banner-close" onclick="closeTopBanner()">✕</button>
+  </div>
+
   <div class="sidebar-container">
-    <iframe src="sidebar.html"></iframe>
+    <iframe src="./sidebar.html" id="sidebarIframe"></iframe>
   </div>
 
   <div class="main-wrapper">
     <main class="main-content">
-      <div class="feed-container" id="posts-container">
-        <div class="skeleton-post">
-          <div class="skeleton-post-header">
-            <div class="skeleton skeleton-avatar"></div>
-            <div class="skeleton skeleton-username"></div>
+      <div class="feed-container" id="postsContainer">
+        <div id="feedSkeleton">
+          <div class="skeleton-post">
+            <div class="skeleton-post-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-username"></div>
+            </div>
+            <div class="skeleton skeleton-post-image"></div>
+            <div class="skeleton skeleton-text text-long"></div>
+            <div class="skeleton skeleton-text text-medium"></div>
+            <div class="skeleton skeleton-text text-short"></div>
           </div>
-          <div class="skeleton skeleton-post-image"></div>
-          <div class="skeleton skeleton-text text-long"></div>
-          <div class="skeleton skeleton-text text-medium"></div>
+          <div class="skeleton-post">
+            <div class="skeleton-post-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-username"></div>
+            </div>
+            <div class="skeleton skeleton-post-image"></div>
+            <div class="skeleton skeleton-text text-long"></div>
+          </div>
         </div>
-      </div>
+        </div>
 
       <aside class="recommend-container">
         <div class="recommend-title">추천 프로필</div>
-        <div id="recommend-profiles">
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div id="recommendList">
+          <div id="recommendSkeleton">
+            <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+            <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+            <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          </div>
         </div>
       </aside>
     </main>
 
     <footer class="footer">
       <div class="footer-links">
-        <a href="terms.html">이용약관</a>
-        <a href="privacy.html">개인정보처리방침</a>
+        <a href="https://github.com/정빈정빈" target="_blank">GitHub</a>
+        <a href="mailto:contact@r-e.kr">Contact</a>
+        <a href="./privacy.html">개인정보처리방침</a>
       </div>
-      <div class="footer-text">© 2026 Sharer. All rights reserved. Built by JBJB.</div>
+      <div class="footer-text">© 2025 Sharer. All rights reserved. JBJB</div>
     </footer>
   </div>
 
-  <script src="https://unpkg.com/supabase-js"></script>
+  <div class="auth-modal" id="authModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeAuthModal()">✕</button>
+      <div class="auth-title" id="authTitle">로그인</div>
+      <form class="auth-form" id="authForm" onsubmit="handleAuthSubmit(event)">
+        <div class="input-group">
+          <label for="authEmail">이메일</label>
+          <input type="email" id="authEmail" class="auth-input" placeholder="example@email.com" required>
+        </div>
+        <div class="input-group">
+          <label for="authPassword">비밀번호</label>
+          <input type="password" id="authPassword" class="auth-input" placeholder="••••••••" required>
+        </div>
+        <div class="input-group" id="nicknameGroup" style="display: none;">
+          <label for="authNickname">닉네임</label>
+          <input type="text" id="authNickname" class="auth-input" placeholder="멋진닉네임">
+        </div>
+        <div class="error-msg" id="authError">오류 메시지</div>
+        <button type="submit" class="auth-btn" id="authSubmitBtn">로그인</button>
+      </form>
+      <div class="auth-switch" id="authSwitch">
+        계정이 없으신가요? <span onclick="switchAuthMode('signup')">회원가입</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="create-modal" id="createModal">
+    <div class="create-modal-content">
+      <div class="create-header">
+        <div class="create-title">새 게시물 만들기</div>
+        <button class="close-btn" onclick="closeCreateModal()">✕</button>
+      </div>
+      <form id="createPostForm" onsubmit="handlePostSubmit(event)">
+        <div class="create-body">
+          <div class="textarea-wrapper">
+            <textarea id="postText" class="create-textarea" placeholder="나누고 싶은 이야기를 적어보세요... (Markdown 지원)" maxlength="2000"></textarea>
+          </div>
+          <div class="media-preview-container" id="mediaPreviewContainer"></div>
+        </div>
+        <div class="create-footer">
+          <label for="mediaUpload" class="media-upload-label">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          </label>
+          <input type="file" id="mediaUpload" accept="image/*" multiple style="display: none;" onchange="handleMediaSelect(event)">
+          <button type="submit" class="submit-post-btn" id="submitPostBtn" disabled>공유하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">알림 메시지</div>
+
   <script>
-    // API 주소 및 초기 세팅 생략하지 않고 유기적으로 구현
-    const API_URL = "https://sharer.r-e.kr/api"; 
-    
-    async function api(path, options = {}) {
-      const res = await fetch(`${API_URL}${path}`, options);
-      if(!res.ok) throw new Error('API Error');
-      return res.json();
+    // Supabase 및 상태 설정 기본 주소 (기존 데이터 구조 유지)
+    const API_BASE = "https://supabase-api.r-e.kr";
+    let currentUser = null;
+    let authMode = "login";
+    let selectedFiles = [];
+
+    // 배너 쿠키/로컬스토리지 제어 함수
+    function checkTopBanner() {
+      const bannerStatus = localStorage.getItem('topBannerHidden');
+      const bannerEl = document.getElementById('topBanner');
+      if (bannerStatus === 'true') {
+        if(bannerEl) bannerEl.classList.add('hide');
+        document.body.style.paddingTop = '0px';
+      } else {
+        if(bannerEl) bannerEl.classList.remove('hide');
+        document.body.style.paddingTop = '45px';
+      }
     }
 
-    function escapeHtml(str) {
-      if(!str) return '';
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-    }
-
-    // 2일 이내 게시물 존재 여부 확인 헬퍼 함수
-    function checkRecentPost(lastPostCreatedAt) {
-      if (!lastPostCreatedAt) return false;
-      const createdDate = new Date(lastPostCreatedAt);
-      const now = new Date();
-      const diffTime = Math.abs(now - createdDate);
-      const diffDays = diffTime / (1000 * 60 * 60 * 24);
-      return diffDays <= 2;
+    function closeTopBanner() {
+      const bannerEl = document.getElementById('topBanner');
+      if(bannerEl) bannerEl.classList.add('hide');
+      localStorage.setItem('topBannerHidden', 'true');
+      document.body.style.paddingTop = '0px';
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      checkTopBanner();
+      // 세션 확인 및 초기화
+      checkSession();
+      loadRecommendProfiles();
+      loadPosts();
+      
+      // 스플래시 화면 제어
       setTimeout(() => {
         const splash = document.getElementById('splash');
         if(splash) {
           splash.classList.add('fade-out');
           setTimeout(() => splash.remove(), 450);
         }
-      }, 600);
-
-      loadPosts();
-      loadRecommendProfiles();
+      }, 800);
     });
 
-    async function loadPosts() {
-      const container = document.getElementById('posts-container');
-      try {
-        // 실제 운영 환경의 엔드포인트 및 조인 구조에 부합하도록 데이터를 바인딩합니다.
-        const posts = await api('/posts?select=*,users(*)&order=created_at.desc');
-        container.innerHTML = '';
-        
-        if(posts.length === 0) {
-          container.innerHTML = '<div class="no-posts"><div class="no-posts-icon">📭</div>게시물이 없습니다.<br>첫 게시물을 공유해보세요!</div>';
-          return;
+    async function api(path, options = {}) {
+      const token = localStorage.getItem("sb_token");
+      options.headers = {
+        "Content-Type": "application/json",
+        ...options.headers
+      };
+      if (token) {
+        options.headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await fetch(`${API_BASE}${path}`, options);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || `API 오류: ${res.status}`);
+      }
+      if (res.status === 204) return null;
+      return res.json();
+    }
+
+    function checkSession() {
+      const token = localStorage.getItem("sb_token");
+      const userStr = localStorage.getItem("sb_user");
+      if (token && userStr) {
+        try {
+          currentUser = JSON.parse(userStr);
+          updateSidebarAuth(true);
+        } catch(e) {
+          logout();
         }
-
-        posts.forEach(post => {
-          const user = post.users || {};
-          const isVerified = user.verified ? '<span class="verification-badge"></span>' : '';
-          
-          // 2일 이내 새 글 존재 조건 체크 (추천 프로필 등과의 연동을 위해 유저 기준 데이터 분석)
-          const hasRecentPost = checkRecentPost(user.last_post_created_at || post.created_at);
-          const borderClass = hasRecentPost ? 'has-story' : '';
-
-          let avatarHTML = '';
-          if (user.avatar_url) {
-            avatarHTML = `<div class="profile-avatar-wrapper ${borderClass}" style="width:38px; height:38px;"><div class="profile-avatar"><img src="${escapeHtml(user.avatar_url)}" alt="avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"/></div></div>`;
-          } else {
-            const firstChar = escapeHtml(user.nickname || 'U').charAt(0).toUpperCase();
-            avatarHTML = `<div class="profile-avatar-wrapper ${borderClass}" style="width:38px; height:38px;"><div class="profile-avatar">${firstChar}</div></div>`;
-          }
-
-          const card = document.createElement('div');
-          card.className = 'post-card';
-          
-          // 이미지 캐러셀 로직 파싱
-          let images = [];
-          if(post.image_url) {
-            try { images = JSON.parse(post.image_url); } catch(e) { images = [post.image_url]; }
-          }
-          if(!Array.isArray(images)) images = [images];
-
-          let carouselHTML = '';
-          if(images.length > 0) {
-            carouselHTML = `
-              <div class="post-image-container">
-                <div class="post-image-carousel">
-                  ${images.map(img => `<div class="post-image-slide"><img src="${escapeHtml(img)}" alt="post img"></div>`).join('')}
-                </div>
-                ${images.length > 1 ? '<button class="post-image-nav prev">‹</button><button class="post-image-nav next">›</button>' : ''}
-              </div>
-            `;
-          }
-
-          card.innerHTML = `
-            <div class="post-header">
-              <div class="post-author-info" onclick="goToProfile('${user.id}', '${encodeURIComponent(user.nickname || '')}')">
-                ${avatarHTML}
-                <span class="post-author-name">${escapeHtml(user.nickname || '알 수 없음')}${isVerified}</span>
-              </div>
-            </div>
-            ${carouselHTML}
-            <div class="post-content">${escapeHtml(post.content || '')}</div>
-            <div class="post-time">${new Date(post.created_at).toLocaleString()}</div>
-          `;
-
-          container.appendChild(card);
-        });
-      } catch (err) {
-        console.error('게시물 로드 오류:', err);
-        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--t3);">로드 중 오류가 발생했습니다.</div>';
+      } else {
+        updateSidebarAuth(false);
       }
     }
 
-    async function loadRecommendProfiles() {
-      const container = document.getElementById('recommend-profiles');
-      const skeleton = container.innerHTML;
+    function updateSidebarAuth(isAuth) {
+      const iframe = document.getElementById('sidebarIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'AUTH_CHANGE', isAuth, user: currentUser }, '*');
+      }
+    }
+
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type) {
+        if (e.data.type === 'OPEN_LOGIN') openAuthModal('login');
+        if (e.data.type === 'OPEN_CREATE') openCreateModal();
+        if (e.data.type === 'SIDEBAR_READY') updateSidebarAuth(!!currentUser);
+        if (e.data.type === 'LOGOUT') logout();
+      }
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      if(!t) return;
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // 인증 관련 모달 제어
+    function openAuthModal(mode = 'login') {
+      authMode = mode;
+      const modal = document.getElementById('authModal');
+      if(!modal) return;
+      modal.classList.add('active');
+      switchAuthMode(mode);
+    }
+    function closeAuthModal() {
+      const modal = document.getElementById('authModal');
+      if(modal) modal.classList.remove('active');
+      document.getElementById('authError').style.display = 'none';
+    }
+    function switchAuthMode(mode) {
+      authMode = mode;
+      const title = document.getElementById('authTitle');
+      const nickGroup = document.getElementById('nicknameGroup');
+      const submitBtn = document.getElementById('authSubmitBtn');
+      const sw = document.getElementById('authSwitch');
+      if(!title || !nickGroup || !submitBtn || !sw) return;
+
+      if(mode === 'login') {
+        title.innerText = '로그인';
+        nickGroup.style.display = 'none';
+        document.getElementById('authNickname').removeAttribute('required');
+        submitBtn.innerText = '로그인';
+        sw.innerHTML = `계정이 없으신가요? <span onclick="switchAuthMode('signup')">회원가입</span>`;
+      } else {
+        title.innerText = '회원가입';
+        nickGroup.style.display = 'flex';
+        document.getElementById('authNickname').setAttribute('required', 'true');
+        submitBtn.innerText = '가입하기';
+        sw.innerHTML = `이미 계정이 있으신가요? <span onclick="switchAuthMode('login')">로그인</span>`;
+      }
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value;
+      const password = document.getElementById('authPassword').value;
+      const nickname = document.getElementById('authNickname').value;
+      const errEl = document.getElementById('authError');
+      errEl.style.display = 'none';
+
       try {
-        const users = await api('/users?limit=5');
-        container.innerHTML = '';
-        
-        users.forEach((user, idx) => {
-          // 추천 프로필 리스트 유저들의 2일 이내 게시물 작성 트래킹 검증
-          const hasRecentPost = checkRecentPost(user.last_post_created_at);
-          const borderClass = hasRecentPost ? 'has-story' : '';
+        NProgress.start();
+        if (authMode === 'login') {
+          const data = IndianAuthMock ? await mockLogin(email, password) : await api('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password })
+          });
+          localStorage.setItem('sb_token', data.token);
+          localStorage.setItem('sb_user', JSON.stringify(data.user));
+          currentUser = data.user;
+          showToast('성공적으로 로그인되었습니다.');
+        } else {
+          await api('/auth/signup', {
+            method: 'POST',
+            body: JSON.stringify({ email, password, nickname })
+          });
+          showToast('회원가입이 완료되었습니다! 로그인 해주세요.');
+          switchAuthMode('login');
+          NProgress.done();
+          return;
+        }
+        closeAuthModal();
+        updateSidebarAuth(true);
+        loadPosts();
+      } catch(err) {
+        errEl.innerText = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        NProgress.done();
+      }
+    }
 
-          let avatarHTML = '';
-          if (user.avatar_url) {
-            avatarHTML = `<div class="profile-avatar-wrapper ${borderClass}" style="width:32px; height:32px;"><div class="profile-avatar"><img src="${escapeHtml(user.avatar_url)}" alt="avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"/></div></div>`;
-          } else {
-            const firstChar = escapeHtml(user.nickname || 'U').charAt(0).toUpperCase();
-            avatarHTML = `<div class="profile-avatar-wrapper ${borderClass}" style="width:32px; height:32px;"><div class="profile-avatar">${firstChar}</div></div>`;
+    function logout() {
+      localStorage.removeItem('sb_token');
+      localStorage.removeItem('sb_user');
+      currentUser = null;
+      updateSidebarAuth(false);
+      showToast('로그아웃되었습니다.');
+      loadPosts();
+    }
+
+    // 글쓰기 관련 제어
+    function openCreateModal() {
+      if(!currentUser) { openAuthModal('login'); return; }
+      const modal = document.getElementById('createModal');
+      if(modal) modal.classList.add('active');
+      validatePostForm();
+    }
+    function closeCreateModal() {
+      const modal = document.getElementById('createModal');
+      if(modal) modal.classList.remove('active');
+      document.getElementById('createPostForm').reset();
+      selectedFiles = [];
+      document.getElementById('mediaPreviewContainer').innerHTML = '';
+    }
+
+    function handleMediaSelect(e) {
+      const files = Array.from(e.target.files);
+      if(selectedFiles.length + files.length > 10) { alert('이미지는 최대 10장까지 업로드 가능합니다.'); return; }
+      
+      files.forEach(file => {
+        if(!file.type.startsWith('image/')) return;
+        selectedFiles.push(file);
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const container = document.getElementById('mediaPreviewContainer');
+          const item = document.createElement('div');
+          item.className = 'media-preview-item';
+          item.innerHTML = `<img src="${event.target.result}"><button type="button" class="media-remove-btn">✕</button>`;
+          item.querySelector('.media-remove-btn').onclick = () => {
+            const idx = selectedFiles.indexOf(file);
+            if(idx > -1) selectedFiles.splice(idx, 1);
+            item.remove();
+            validatePostForm();
+          };
+          container.appendChild(item);
+        };
+        reader.readAsDataURL(file);
+      });
+      setTimeout(validatePostForm, 100);
+    }
+
+    document.getElementById('postText').oninput = validatePostForm;
+    function validatePostForm() {
+      const txt = document.getElementById('postText').value.trim();
+      const btn = document.getElementById('submitPostBtn');
+      if(!btn) return;
+      btn.disabled = !(txt.length > 0 || selectedFiles.length > 0);
+    }
+
+    async function handlePostSubmit(e) {
+      e.preventDefault();
+      const text = document.getElementById('postText').value;
+      const btn = document.getElementById('submitPostBtn');
+      btn.disabled = true;
+
+      try {
+        NProgress.start();
+        let imageUrls = [];
+        if(selectedFiles.length > 0) {
+          for(const file of selectedFiles) {
+            const formData = new FormData();
+            formData.append('file', file);
+            const token = localStorage.getItem("sb_token");
+            const res = await fetch(`${API_BASE}/storage/upload`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: formData
+            });
+            if(!res.ok) throw new Error('이미지 업로드 실패');
+            const data = await res.json();
+            imageUrls.push(data.url);
           }
+        }
 
+        await api('/posts', {
+          method: 'POST',
+          body: JSON.stringify({ text, images: imageUrls })
+        });
+
+        showToast('게시물이 성공적으로 공유되었습니다.');
+        closeCreateModal();
+        loadPosts();
+        loadRecommendProfiles(); // 내가 작성하여 2일 이내 조건이 생겼을 수 있으므로 갱신
+      } catch(err) {
+        alert(err.message);
+        btn.disabled = false;
+      } finally {
+        NProgress.done();
+      }
+    }
+
+    // 마크다운 파싱 헬퍼 함수
+    function parseMarkdown(text) {
+      if (!text) return '';
+      let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+      html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+      html = html.replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
+      html = html.replace(/\*(.*)\*/gim, '<em>$1</em>');
+      html = html.replace(/`([^`]+)`/gim, '<code>$1</code>');
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank">$1</a>');
+      return html.replace(/\n/g, '<br>');
+    }
+
+    function escapeHtml(text) {
+      if(!text) return '';
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    // 캐러셀 조작 바인딩
+    window.moveCarousel = (btn, direction) => {
+      event.stopPropagation();
+      const carousel = btn.parentElement.querySelector('.post-image-carousel');
+      if(!carousel) return;
+      const width = carousel.offsetWidth;
+      carousel.scrollBy({ left: direction * width, behavior: 'smooth' });
+    };
+
+    // 2일 이내 게시글 확인 도우미 함수 (움직이는 그라데이션 스토리 표시 기준)
+    function checkRecentPost(latestPostCreatedAt) {
+      if (!latestPostCreatedAt) return false;
+      const postDate = new Date(latestPostCreatedAt);
+      const now = new Date();
+      const diffTime = Math.abs(now - postDate);
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      return diffDays <= 2;
+    }
+
+    // 추천 프로필 로드 및 2일 이내 스토리 링 추가
+    async function loadRecommendProfiles() {
+      const container = document.getElementById('recommendList');
+      const skeleton = document.getElementById('recommendSkeleton');
+      if(!container) return;
+      try {
+        // 유저 정보 가져오기 시 최근 포스트 생성일을 함께 조회 가능하도록 구성되어 있다고 가정하거나 
+        // 기존 api가 최신 글 정보를 담고 있는 구조를 매핑합니다.
+        const users = await api('/users/recommend');
+        if(skeleton) skeleton.remove();
+        
+        // 기존 데이터를 안전하게 비우고 새로 채움
+        const existingItems = container.querySelectorAll('.profile-item');
+        existingItems.forEach(el => el.remove());
+
+        users.slice(0, 5).forEach((user, idx) => {
           const item = document.createElement('div');
           item.className = 'profile-item';
+          
+          const badgeHTML = user.verified ? '<span class="verification-badge"></span>' : '';
+          const initial = user.nickname ? user.nickname.charAt(0).toUpperCase() : '?';
+          
+          let avatarContent = `<div class="profile-avatar">${initial}</div>`;
+          if (user.avatar_url) {
+            avatarContent = `<div class="profile-avatar"><img src="${user.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`;
+          }
+
+          // 2일 이내 게시물이 있을 경우 그라데이션 링 (.has-story) 적용
+          const hasStory = checkRecentPost(user.latest_post_created_at || user.updated_at);
+          const avatarHTML = `
+            <div class="profile-avatar-wrapper ${hasStory ? 'has-story' : ''}">
+              ${avatarContent}
+            </div>
+          `;
+
           item.style.opacity = '0';
           item.style.transform = 'translateX(8px)';
           item.style.transition = `opacity 0.4s cubic-bezier(0.22,1,0.36,1) ${idx * 0.05}s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);`;
-          item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}</span>`;
+          item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}${badgeHTML}</span>`;
           item.onclick = () => { window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`; };
           container.appendChild(item);
-          
           requestAnimationFrame(() => requestAnimationFrame(() => {
             item.style.opacity = '1';
             item.style.transform = 'translateX(0)';
@@ -743,12 +1218,175 @@
         });
       } catch (err) {
         console.error('추천 프로필 로드 오류:', err);
-        if (skeleton) container.innerHTML = '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">로드 실패</div>';
+        if (skeleton) skeleton.innerHTML = '<div style=\"text-align:center; color:var(--t3); padding:12px 0; font-size:13px;\">로드 실패</div>';
       }
+    }
+
+    // 메인 피드 로드 및 각 게시글 상단 프사에 2일 이내 스토리 링 추가
+    async function loadPosts() {
+      const container = document.getElementById('postsContainer');
+      const skeleton = document.getElementById('feedSkeleton');
+      if(!container) return;
+      try {
+        NProgress.start();
+        const posts = await api('/posts');
+        if(skeleton) skeleton.remove();
+
+        // 기존 게시물 카드 초기화
+        const existingCards = container.querySelectorAll('.post-card, .no-posts');
+        existingCards.forEach(el => el.remove());
+
+        if(posts.length === 0) {
+          container.innerHTML += `
+            <div class="no-posts">
+              <div class="no-posts-icon">✨</div>
+              정적 피드가 비어있습니다.<br>첫 번째 이야기를 세상에 공유해보세요!
+            </div>
+          `;
+          return;
+        }
+
+        posts.forEach(post => {
+          const card = document.createElement('article');
+          card.className = 'post-card';
+          
+          // 피드 상세 이동 페이지로 라우팅 처리 바인딩
+          card.onclick = () => { window.location.href = `post.html?id=${post.id}`; };
+
+          const badgeHTML = post.user_verified ? '<span class="verification-badge"></span>' : '';
+          const initial = post.user_nickname ? post.user_nickname.charAt(0).toUpperCase() : '?';
+          
+          let avatarInner = `<div class="post-author-avatar">${initial}</div>`;
+          if (post.user_avatar_url) {
+            avatarInner = `<div class="post-author-avatar"><img src="${post.user_avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`;
+          }
+
+          // 작성자의 2일 이내 게시글 보유 상태에 따라 그라데이션 스토리 표시 처리
+          const authorHasStory = checkRecentPost(post.user_latest_post_created_at || post.created_at);
+          const avatarHTML = `
+            <div class="post-author-avatar-wrapper ${authorHasStory ? 'has-story' : ''}">
+              ${avatarInner}
+            </div>
+          `;
+
+          // 이미지 캐러셀 구성
+          let mediaHTML = '';
+          if (post.images && post.images.length > 0) {
+            let slides = post.images.map(img => `<div class="post-image-slide"><img src="${img}" alt="Post image"></div>`).join('');
+            let navButtons = post.images.length > 1 ? `
+              <button class="post-image-nav prev" onclick="moveCarousel(this, -1)">‹</button>
+              <button class="post-image-nav next" onclick="moveCarousel(this, 1)">›</button>
+            ` : '';
+            mediaHTML = `
+              <div class="post-image-container">
+                <div class="post-image-carousel">${slides}</div>
+                ${navButtons}
+              </div>
+            `;
+          }
+
+          // 좋아요 상태 및 버튼 바인딩 클래스
+          const isLiked = post.liked_by_me ? 'liked' : '';
+          const likeHeartFill = post.liked_by_me ? '#ff6b6b' : 'none';
+          
+          // 삭제 버튼 권한 식별
+          let deleteBtnHTML = '';
+          if (currentUser && (currentUser.id === post.user_id || currentUser.role === 'admin')) {
+            deleteBtnHTML = `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`;
+          }
+
+          // 상대 시간 계산 포맷터
+          const timeLabel = formatRelativeTime(post.created_at);
+
+          card.innerHTML = `
+            <div class="post-header">
+              <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.user_id}', '${escapeHtml(post.user_nickname)}')">
+                ${avatarHTML}
+                <div class="post-author-name">${escapeHtml(post.user_nickname)}${badgeHTML}</div>
+              </div>
+              ${deleteBtnHTML}
+            </div>
+            <div class="post-content">${parseMarkdown(post.text)}</div>
+            ${mediaHTML}
+            <div class="post-time">${timeLabel}</div>
+            <div class="post-actions">
+              <button class="like-button ${isLiked}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
+                <svg class="like-heart" viewBox="0 0 24 24" fill="${likeHeartFill}" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <span class="like-count">${post.likes_count || 0}</span>
+              </button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch(err) {
+        console.error('게시물 피드 로드 오류:', err);
+        container.innerHTML += `<div class="no-posts">피드를 불러오는 도중 오류가 발생했습니다.</div>`;
+      } finally {
+        NProgress.done();
+      }
+    }
+
+    function formatRelativeTime(dateStr) {
+      const created = new Date(dateStr);
+      const now = new Date();
+      const diff = Math.floor((now - created) / 1000);
+      if (diff < 60) return '방금 전';
+      const mins = Math.floor(diff / 60);
+      if (mins < 60) return `${mins}분 전`;
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return `${hours}시간 전`;
+      const days = Math.floor(hours / 24);
+      if (days < 7) return `${days}일 전`;
+      return created.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
     }
 
     window.goToProfile = (userId, nickname) => {
       if (userId && nickname) window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
+    };
+
+    window.deletePost = async (postId) => {
+      if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
+      try {
+        await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
+        loadPosts();
+        loadRecommendProfiles();
+      } catch (err) {
+        console.error('삭제 오류:', err);
+        alert('삭제에 실패했습니다.');
+      }
+    };
+
+    window.toggleLike = async (postId, btn) => {
+      if (!currentUser) { openAuthModal('login'); return; }
+      const heart = btn.querySelector('.like-heart');
+      const countEl = btn.querySelector('.like-count');
+      let currentCount = parseInt(countEl.innerText) || 0;
+      
+      try {
+        if (btn.classList.contains('liked')) {
+          // 좋아요 취소 조작
+          btn.classList.remove('liked');
+          heart.setAttribute('fill', 'none');
+          countEl.innerText = Math.max(0, currentCount - 1);
+          await api(`/posts/like?postId=${postId}`, { method: 'DELETE' });
+        } else {
+          // 좋아요 처리 조작
+          btn.classList.add('liked');
+          heart.setAttribute('fill', '#ff6b6b');
+          countEl.innerText = currentCount + 1;
+          await api(`/posts/like?postId=${postId}`, { method: 'POST' });
+        }
+      } catch(err) {
+        // 에러 발생 시 UI 상태 롤백 복원
+        if (btn.classList.contains('liked')) {
+          btn.classList.remove('liked'); heart.setAttribute('fill', 'none'); countEl.innerText = currentCount;
+        } else {
+          btn.classList.add('liked'); heart.setAttribute('fill', '#ff6b6b'); countEl.innerText = currentCount;
+        }
+        showToast('좋아요 처리에 실패했습니다.');
+      }
     };
   </script>
 </body>
