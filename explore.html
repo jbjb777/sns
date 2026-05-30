@@ -456,6 +456,31 @@
     .comment-del-btn:hover { color: #ff6b6b; background: rgba(255,107,107,0.08); }
     .comment-del-btn:active { transform: scale(0.88); }
     
+    /* ─── STORY RING (스토리 프로필 테두리 그라데이션) ─── */
+    .story-ring-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+    .story-ring-wrapper.has-story {
+      padding: 2.5px;
+      background: linear-gradient(270deg, #0740ba, #651fff, #29b1ff, #0740ba);
+      background-size: 200% 200%;
+      animation: storyRing 3s linear infinite;
+    }
+    @keyframes storyRing {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .story-ring-wrapper.has-story .short-avatar,
+    .story-ring-wrapper.has-story .comment-avatar {
+      border: 3px solid #1e1e1e !important;
+    }
+
     /* REPLIES */
     .comment-actions { display: flex; align-items: center; gap: 10px; padding-left: 2px; margin-top: 2px; }
     .reply-btn, .replies-toggle-btn {
@@ -982,6 +1007,7 @@
   let loadedPostIndices = new Set();
   const INITIAL_LOAD = 2;
   const openReplyThreads = new Set();
+  let recentStoryAuthors = new Set();
 
   // 댓글 창 드래그 기능
   const _commentModal = document.getElementById('commentModal');
@@ -1015,6 +1041,20 @@
     _commentModal.style.transform = '';
     _currentCommentY = _startCommentY;
   });
+
+  async function fetchRecentStories() {
+    try {
+      const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+      const posts = await api(`/posts?created_at=gte.${twoDaysAgo}&select=author_id`);
+      if (posts) {
+        posts.forEach(p => {
+          if (p.author_id) recentStoryAuthors.add(p.author_id);
+        });
+      }
+    } catch (e) {
+      console.error("스토리 상태 확인 실패", e);
+    }
+  }
 
   async function createNotification(targetUserId, detail, link) {
     if (!targetUserId || targetUserId === currentUser?.id) return;
@@ -1278,11 +1318,14 @@
 
     // 작성자 프로필 이미지 비동기 가져오기
     const authorProfileUrl = await getProfileImage(post.author_id);
-    let avatarHTML = post.author ? post.author[0].toUpperCase() : '?';
+    const hasStory = recentStoryAuthors.has(post.author_id);
+    let avatarInnerHtml = post.author ? post.author[0].toUpperCase() : '?';
+    
     if (authorProfileUrl) {
       const cacheBuster = authorProfileUrl.includes('?') ? '&' : '?';
-      avatarHTML = `<img src="${authorProfileUrl}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(post.author)}">`;
+      avatarInnerHtml = `<img src="${authorProfileUrl}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(post.author)}">`;
     }
+    const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="short-avatar">${avatarInnerHtml}</div></div>`;
 
     let contentHTML = '';
     if (hasImage && hasContent) {
@@ -1320,7 +1363,7 @@
       ${contentHTML}
       <div class="short-info-bar">
         <div class="short-author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
-          <div class="short-avatar">${avatarHTML}</div>
+          ${avatarHTML}
           <div class="short-author-name">
             ${escapeHtml(post.author)}
             ${isVerified ? '<span class="verification-badge"></span>' : ''}
@@ -1493,14 +1536,15 @@
       });
 
       function renderAvatar(userName, userId) {
-        let avatar = userName ? userName[0].toUpperCase() : '?';
+        let avatarInner = userName ? userName[0].toUpperCase() : '?';
         if (profileMap[userId]) {
           const url = profileMap[userId].includes('?')
             ? `${profileMap[userId]}&v=${Date.now()}`
             : `${profileMap[userId]}?v=${Date.now()}`;
-          avatar = `<img src="${url}" alt="${escapeHtml(userName)}">`;
+          avatarInner = `<img src="${url}" alt="${escapeHtml(userName)}">`;
         }
-        return avatar;
+        const hasStory = recentStoryAuthors.has(userId);
+        return `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="comment-avatar">${avatarInner}</div></div>`;
       }
 
       function renderOneComment(c, { showReplyButton }) {
@@ -1549,7 +1593,7 @@
                 <div class="reply-item">
                   <div class="comment-header">
                     <div class="comment-author-wrapper" onclick="goToProfile('${r.user_id}', '${escapeHtml(r.user_name)}')">
-                      <div class="comment-avatar">${rAvatarContent}</div>
+                      ${rAvatarContent}
                       <span class="comment-author">
                         ${escapeHtml(r.user_name)}
                         ${rIsVerified ? '<span class="verification-badge" style="width:12px;height:12px;"></span>' : ''}
@@ -1568,7 +1612,7 @@
         return `
           <div class="comment-header">
             <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
-              <div class="comment-avatar">${avatarContent}</div>
+              ${avatarContent}
               <span class="comment-author">
                 ${escapeHtml(c.user_name)}
                 ${isVerified ? '<span class="verification-badge" style="width:13px;height:13px;"></span>' : ''}
@@ -1760,10 +1804,10 @@
     `;
   }
 
-
-
-  // 초기 로드
-  loadAllPosts();
+  // 초기 로드 (최근 스토리 정보를 가져온 뒤 게시물을 로드합니다)
+  fetchRecentStories().then(() => {
+    loadAllPosts();
+  });
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
 </body>
