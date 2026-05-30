@@ -473,13 +473,17 @@
         <div class="tab" onclick="showTab('signup')">회원가입</div>
       </div>
 
-      <!-- 로그인 탭 -->
       <div class="form-section active" id="loginForm">
         <input type="text" id="loginId" placeholder="아이디">
         <input type="password" id="loginPassword" placeholder="비밀번호">
         <div class="error-message" id="loginError"></div>
         <div class="success-message" id="loginSuccess"></div>
         <button id="loginBtn" onclick="handleLogin()">로그인</button>
+        
+        <div style="text-align: center; margin-bottom: 20px; font-size: 13px; color: var(--t2);">
+          계정을 잊으셨나요?
+          <button type="button" onclick="location.href='account.html'" style="background:none; border:none; color:var(--t1); text-decoration:underline; cursor:pointer; font-size:13px; padding:0 0 0 5px;">계정 복구</button>
+        </div>
 
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleLoginBtn" onclick="showGoogleModal('login')">
@@ -488,7 +492,6 @@
         </button>
       </div>
 
-      <!-- 회원가입 탭 -->
       <div class="form-section" id="signupForm">
         <div class="progress-container">
           <div class="progress-steps">
@@ -520,7 +523,6 @@
       </div>
     </div>
 
-    <!-- Google 모달 -->
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="google-modal" id="googleModal">
       <h3 id="modalTitle">구글로 로그인</h3>
