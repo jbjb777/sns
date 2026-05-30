@@ -31,786 +31,1430 @@
     }
 
     /* NProgress 커스텀 */
-    #nprogress .bar { background: #fff !important; height: 3px !important; }
+    #nprogress .bar { background: #fff !important; height: 2px !important; }
+    #nprogress .peg { display: none !important; }
     #nprogress .spinner { display: none !important; }
 
+    /* ─── SPLASH ─── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: opacity 0.45s ease;
+    }
+    #splash.fade-out { opacity: 0; pointer-events: none; }
+    .splash-logo {
+      width: 72px; height: 72px;
+      animation: splashLogoPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes splashLogoPop {
+      from { opacity: 0; transform: scale(0.7); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
     body {
-      background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
       color: var(--t1);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      overflow-x: hidden;
       min-height: 100vh;
-      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
     }
+    @keyframes fadeIn { to { opacity: 1; } }
 
-    /* 상단 바 */
-    .top-nav {
-      position: fixed; top: 0; left: 0; right: 0; height: 60px;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 16px; border-bottom: 1px solid var(--border); z-index: 100;
-    }
-    .nav-btn {
-      background: none; border: none; color: var(--t1); font-size: 20px; cursor: pointer;
-      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; transition: background 0.2s;
-    }
-    .nav-btn:active { background: var(--bg2); }
-    .nav-title { font-size: 16px; font-weight: 700; letter-spacing: -0.5px; }
+    /* ─── SIDEBAR ─── */
+    .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
-    /* 메인 컨테이너 */
-    .container { max-width: 600px; margin: 0 auto; padding: 76px 16px 100px 16px; }
+    /* ─── MAIN WRAPPER ─── */
+    .main-wrapper { margin-left: 72px; width: calc(100% - 72px); display: flex; flex-direction: column; min-height: 100vh; }
 
-    /* 프로필 섹션 */
-    .profile-header { display: flex; align-items: center; gap: 24px; margin-bottom: 28px; padding: 4px; }
-    
-    /* 인스타 스토리 스타일 프로필 테두리 애니메이션 효과 추가 */
-    .avatar-wrapper { 
-      position: relative; width: 86px; height: 86px; 
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    /* ─── HEADER ─── */
+    .header {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      opacity: 0;
+      transform: translateY(-10px);
+      animation: slideDown 0.4s ease 0.1s forwards;
     }
-    .avatar-wrapper.has-stories {
-      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
+
+    .back-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: none;
+      color: var(--t2);
+      font-size: 20px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .avatar-wrapper.has-stories:active {
-      transform: scale(0.95);
-      transition: transform 0.1s;
-    }
-    
-    .avatar { 
-      width: 80px; height: 80px; border-radius: 50%; object-fit: cover; 
-      background: var(--bg3); border: 2px solid var(--bg);
-    }
-    
-    .profile-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-    .name-row { display: flex; align-items: center; gap: 12px; }
-    .nickname { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-    .badge {
-      background: var(--bg2); border: 1px solid var(--border2); color: var(--t2);
-      font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 20px;
-    }
-    .status-msg {
-      font-size: 14px; color: var(--t2); line-height: 1.4; word-break: break-all;
-      cursor: pointer; padding: 4px 0; transition: color 0.2s;
-    }
-    .status-msg:hover { color: var(--t1); }
-    .status-msg.empty { color: var(--t3); font-style: italic; }
+    .back-btn:hover { color: var(--t1); background: var(--bg3); }
+    .back-btn:active { transform: scale(0.82); }
 
-    /* 버튼 그룹 */
-    .btn-group { display: flex; gap: 8px; margin-bottom: 32px; }
-    .btn {
-      flex: 1; height: 42px; background: var(--bg2); border: 1px solid var(--border);
-      color: var(--t1); font-size: 14px; font-weight: 600; border-radius: var(--r2);
-      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: all 0.2s;
-    }
-    .btn:active { background: var(--bg3); transform: scale(0.98); }
-    .btn.primary { background: var(--t1); color: var(--bg); border: none; }
-    .btn.primary:active { background: #e0e0e0; }
-    
-    #shareBtn.success { background: var(--green); color: var(--bg); border-color: var(--green); }
-    #shareBtn.success::before { content: "✓ "; }
+    .header-title { font-size: 16px; font-weight: 600; }
 
-    /* 통계 */
-    .stats-row {
-      display: flex; background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--r3); padding: 16px 0; margin-bottom: 32px;
+    /* ─── CONTAINER ─── */
+    .container {
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px;
+      flex: 1;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.2s forwards;
     }
-    .stat-item { flex: 1; text-align: center; display: flex; flex-direction: column; gap: 4px; }
-    .stat-item:not(:last-child) { border-right: 1px solid var(--border); }
-    .stat-val { font-size: 18px; font-weight: 700; }
-    .stat-lbl { font-size: 12px; color: var(--t2); font-weight: 500; }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-    /* 게시물 그리드 */
-    .grid-title { font-size: 14px; font-weight: 700; color: var(--t2); margin-bottom: 16px; padding-left: 4px; }
-    .post-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-    .grid-item {
-      position: relative; width: 100%; aspect-ratio: 1; background: var(--bg2);
-      border-radius: 4px; overflow: hidden; cursor: pointer;
+    /* ─── PROFILE CARD ─── */
+    .profile-card {
+      padding: 28px 0;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeInEl 0.5s ease 0.35s forwards;
     }
-    .grid-item img, .grid-item video { width: 100%; height: 100%; object-fit: cover; }
-    .grid-item .multi-icon {
-      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px); padding: 4px; border-radius: 6px; font-size: 12px; z-index: 2;
-    }
-    .grid-item .video-icon {
-      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px); padding: 4px; border-radius: 6px; font-size: 12px; z-index: 2;
+    @keyframes fadeInEl { to { opacity: 1; } }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 24px;
     }
 
-    /* 모달 공통 스타일 */
-    .modal {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      z-index: 1000; display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s; padding: 16px;
+    .profile-avatar {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: #666;
+      transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      overflow: hidden;
     }
-    .modal.active { opacity: 1; pointer-events: auto; }
+    .profile-avatar.editable { cursor: pointer; }
+    .profile-avatar.editable:hover { border-color: var(--border3); transform: scale(1.05); }
+    .profile-avatar.editable:active { transform: scale(0.96); }
+
+    .profile-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .avatar-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+    }
+    .profile-avatar.editable:hover .avatar-overlay { display: flex; }
+
+    .profile-info { flex: 1; min-width: 0; }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
+    }
+
+    .verification-badge {
+      display: inline-block;
+      width: 14px; 
+      height: 14px;
+      vertical-align: middle;
+      background-image: url('https://sharer.r-e.kr/badge.svg');
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .stat-item { display: flex; flex-direction: column; gap: 3px; }
+
+    .stat-number { font-size: 22px; font-weight: 700; color: var(--t1); }
+
+    .stat-label { font-size: 12px; color: var(--t3); font-weight: 500; }
+
+    .share-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      width: 38px; height: 38px;
+      border-radius: var(--r2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .share-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--border3); }
+    .share-btn:active { transform: scale(0.88); }
+    .share-btn.success { background: rgba(74,222,128,0.12); border-color: var(--green); color: var(--green); }
+
+    .status-message-container {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .status-message-text {
+      color: var(--t2);
+      font-size: 14px;
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .status-message-empty { color: var(--t3); font-style: italic; }
+
+    .edit-status-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      color: var(--t2);
+    }
+    .edit-status-btn:hover { background: var(--bg4); border-color: var(--border3); color: var(--t1); transform: scale(1.08); }
+    .edit-status-btn:active { transform: scale(0.9); }
+
+    /* ─── POSTS SECTION ─── */
+    .posts-section {
+      padding: 20px 0;
+      opacity: 0;
+      animation: fadeInEl 0.5s ease 0.5s forwards;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--t3);
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .post-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r3);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
+      position: relative;
+    }
+    .post-item:hover { border-color: var(--border3); transform: translateY(-4px); background: var(--bg3); }
+    .post-item:active { transform: translateY(-1px) scale(0.99); }
+
+    /* 여러 이미지 캐러셀 */
+    .post-item-image-container {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #000;
+      overflow: hidden;
+    }
+    .post-item-image-carousel {
+      display: flex;
+      height: 100%;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .post-item-image-carousel::-webkit-scrollbar { display: none; }
+    .post-item-image-slide {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      height: 100%;
+    }
+    .post-item-image-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .post-item-image-count {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 12px;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .post-item-image-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 1; /* 항상 표시 */
+      transition: background 0.2s;
+    }
+    .post-item-image-nav:hover {
+      background: rgba(0,0,0,0.9);
+    }
+    .post-item-image-nav.prev { left: 8px; }
+    .post-item-image-nav.next { right: 8px; }
+
+    .post-item-content { padding: 14px 16px 6px; }
+
+    .post-item-text {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--t2);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-wrap;
+    }
+
+    .post-item-footer {
+      padding: 10px 16px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .post-item-date { font-size: 11px; color: var(--t3); }
+
+    .post-item-likes {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--pink);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ─── SKELETON ─── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
+      background-size: 300% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+      border-radius: var(--r1);
+    }
+    @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+    .skeleton-avatar { width: 88px; height: 88px; border-radius: 50%; }
+    .skeleton-text { height: 22px; border-radius: 8px; margin-bottom: 12px; }
+    .skeleton-stat { width: 70px; height: 44px; border-radius: var(--r1); }
+    .skeleton-post-image { width: 100%; height: 220px; border-radius: var(--r3) var(--r3) 0 0; }
+    .skeleton-post-text { height: 12px; border-radius: 6px; margin-bottom: 8px; }
+
+    /* ─── NO POSTS ─── */
+    .no-posts { text-align: center; padding: 64px 20px; color: var(--t3); font-size: 14px; }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+
     .modal-content {
-      background: var(--bg2); border: 1px solid var(--border2); width: 100%; max-width: 400px;
-      border-radius: var(--r4); padding: 24px; display: flex; flex-direction: column; gap: 20px;
-      transform: scale(0.95); transition: transform 0.2s;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r4);
+      padding: 32px;
+      width: 90%;
+      max-width: 440px;
+      animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
     }
-    .modal.active .modal-content { transform: scale(1); }
-    .modal-title { font-size: 16px; font-weight: 700; text-align: center; }
-    
-    .input-wrapper { position: relative; width: 100%; }
-    .text-input {
-      width: 100%; height: 50px; background: var(--bg3); border: 1px solid var(--border3);
-      border-radius: var(--r2); padding: 0 16px; color: var(--t1); font-size: 14px; outline: none;
-      transition: border-color 0.2s;
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.90) translateY(14px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
-    .text-input:focus { border-color: #444; }
-    
-    .modal-btns { display: flex; gap: 8px; }
+
+    .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 18px; color: var(--t1); }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      color: var(--t1);
+      font-size: 14px;
+      margin-bottom: 18px;
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      line-height: 1.5;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .modal-input:focus { outline: none; border-color: var(--border3); background: var(--bg4); }
+    .modal-input::placeholder { color: var(--t3); }
+
+    .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+
     .modal-btn {
-      flex: 1; height: 46px; border-radius: var(--r2); font-size: 14px; font-weight: 600;
-      cursor: pointer; border: none; display: flex; align-items: center; justify-content: center;
+      padding: 10px 22px;
+      border-radius: var(--r2);
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .modal-btn.cancel { background: var(--bg4); color: var(--t1); }
-    .modal-btn.confirm { background: var(--t1); color: var(--bg); }
+    .modal-btn:active { transform: scale(0.94); }
+    .modal-btn-cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
+    .modal-btn-cancel:hover { background: var(--bg4); color: var(--t1); }
+    .modal-btn-confirm { background: #fff; color: #000; }
+    .modal-btn-confirm:hover { background: #e8e8e8; }
 
-    /* 하단 푸터 */
+    .upload-toast {
+      position: fixed;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--t1);
+      padding: 10px 22px;
+      border-radius: 22px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 9999;
+      transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
+      white-space: nowrap;
+    }
+    .upload-toast.show { bottom: 28px; }
+
+    /* ─── FOOTER ─── */
     .footer {
-      margin-top: 60px; border-top: 1px solid var(--border); padding-top: 24px;
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      margin-top: auto;
     }
-    .footer-links { display: flex; gap: 16px; }
-    .footer-link { font-size: 12px; color: var(--t3); text-decoration: none; cursor: pointer; }
-    .footer-link:hover { color: var(--t2); }
-    .copyright { font-size: 11px; color: var(--t3); font-weight: 500; }
+    .footer-links { margin-bottom: 8px; }
+    .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--t1); }
+    .footer-text { color: var(--t3); font-size: 11px; }
 
-    /* 상태 표시 */
-    .info-box {
-      text-align: center; padding: 40px 20px; color: var(--t2); font-size: 14px;
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    /* 모바일 프로필 시트 */
+    .sharer-profile-sheet-host[hidden] { display: none !important; }
+    .sharer-profile-sheet-host {
+      position: fixed;
+      inset: 0;
+      z-index: 960;
     }
-    .info-icon { font-size: 28px; }
+    .sharer-profile-sheet-host .sps-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sharer-profile-sheet-host .sps-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+      max-height: 44vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      will-change: transform;
+      transform: translateY(100%);
+      transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-panel {
+      transform: translateY(0);
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
+      max-height: 88vh;
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
+      transition: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area {
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 6px 16px 14px;
+      margin: -2px -16px 0 -16px;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area:active {
+      cursor: grabbing;
+    }
+    .sharer-profile-sheet-host .sps-grab {
+      width: 40px;
+      height: 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.28);
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .sharer-profile-sheet-host .sps-av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-av img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sharer-profile-sheet-host .sps-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sharer-profile-sheet-host .sps-logout {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
 
-    /* ==========================================
-       인스타 스토리 모달 스타일 추가
-       ========================================== */
-    .story-modal {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: #000; z-index: 2000; display: none; flex-direction: column;
-      justify-content: center; align-items: center; user-select: none; -webkit-user-select: none;
+    /* ─── STORY OVERLAY ─── */
+    #storyOverlay {
+      position: fixed; inset: 0; background: #121212; z-index: 100000;
+      display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s;
     }
-    .story-modal.active { display: flex; }
+    #storyOverlay.active { display: flex; opacity: 1; }
+    .story-header { position: absolute; top: 0; left: 0; right: 0; padding: 16px 12px 20px; z-index: 20; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+    .story-progress-container { display: flex; gap: 4px; margin-bottom: 12px; }
+    .story-progress-segment { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
+    .story-progress-fill { height: 100%; background: #fff; width: 0%; transform-origin: left; }
+    .story-info-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
+    .story-user-info { display: flex; align-items: center; gap: 10px; }
+    .story-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #333; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; overflow: hidden; }
+    .story-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .story-username { color: #fff; font-size: 14px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+    .story-time { color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 400; margin-left: 6px; }
+    .story-close-btn { color: #fff; font-size: 24px; cursor: pointer; padding: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); background: none; border: none; }
     
-    .story-container {
-      position: relative; width: 100%; max-width: 480px; height: 100%;
-      display: flex; flex-direction: column; background: #000; overflow: hidden;
-    }
+    .story-content-area { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: #121212; padding-bottom: env(safe-area-inset-bottom); overflow: hidden; }
     
-    /* 상단 진행 바 관리 */
-    .story-progress-container {
-      position: absolute; top: 12px; left: 0; right: 0; 
-      display: flex; gap: 4px; padding: 0 12px; z-index: 2010;
-    }
-    .story-progress-bar {
-      flex: 1; height: 3px; background: rgba(255, 255, 255, 0.3);
-      border-radius: 2px; overflow: hidden; position: relative;
-    }
-    .story-progress-fill {
-      width: 0%; height: 100%; background: #fff; transition: width linear;
-    }
-    
-    /* 스토리 상단 정보 */
-    .story-header {
-      position: absolute; top: 24px; left: 0; right: 0;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 16px; z-index: 2010; color: #fff;
-    }
-    .story-user-info { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .story-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
-    .story-nickname { font-size: 14px; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
-    .story-time { font-size: 13px; color: rgba(255,255,255,0.7); text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
-    .story-close-btn {
-      background: none; border: none; color: #fff; font-size: 24px; cursor: pointer;
-      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-    }
-    
-    /* 스토리 본문 컨텐츠 영역 */
-    .story-content-area {
-      flex: 1; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-      background: #000; position: relative;
-    }
-    .story-media {
-      width: 100%; max-height: 100%; object-fit: contain; pointer-events: none;
-    }
-    
-    /* 캡션/내용 표시 overlay */
-    .story-caption-overlay {
-      position: absolute; bottom: 40px; left: 0; right: 0;
-      padding: 20px 16px; background: linear-gradient(transparent, rgba(0,0,0,0.8));
-      color: #fff; font-size: 14px; line-height: 1.5; z-index: 2010;
-      max-height: 150px; overflow-y: auto; word-break: break-all;
-    }
-    
-    /* 좌우 터치 영역 핸들러 */
-    .story-nav-edge {
-      position: absolute; top: 60px; bottom: 0; width: 25%; z-index: 2005;
-    }
-    .story-nav-edge.left { left: 0; }
-    .story-nav-edge.right { right: 0; width: 75%; } /* 오른쪽 터치 범위를 넓게 배치 */
+    .story-tap-left { position: absolute; left: 0; top: 0; bottom: 0; width: 30%; z-index: 5; }
+    .story-tap-right { position: absolute; right: 0; top: 0; bottom: 0; width: 70%; z-index: 5; }
 
+    .story-dynamic-content {
+      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 10;
+    }
+    .story-dynamic-content .short-content {
+      max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px;
+    }
+    .story-dynamic-content img.short-image {
+      max-height: 70vh; max-width: 100%; width: auto; height: auto; border-radius: 16px; object-fit: contain; box-shadow: 0 8px 24px rgba(0,0,0,0.6); pointer-events: auto;
+    }
+    .story-dynamic-content .short-text-only {
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a); border: 1px solid #333; border-radius: 16px; padding: 40px; max-width: 500px; width: 100%; max-height: 70vh; overflow-y: auto; text-align: center; font-size: 20px; line-height: 1.6; color: #fff; word-break: break-word; box-shadow: 0 8px 24px rgba(0,0,0,0.6); pointer-events: auto;
+    }
+    .story-dynamic-content .short-caption {
+      padding: 16px 20px; background: rgba(30,30,30,0.9); border-radius: 12px; max-width: 500px; width: 100%; backdrop-filter: blur(10px); border: 1px solid #333; color: #fff; font-size: 15px; line-height: 1.5; word-break: break-word; pointer-events: auto;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .sidebar-container {
+        left: 0; right: 0; top: auto; bottom: 0;
+        width: 100%; min-width: 0;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .sidebar-container iframe {
+        width: 100% !important; height: 100% !important;
+      }
+      .main-wrapper {
+        margin-left: 0; width: 100%;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .container { padding: 20px 16px; }
+      .post-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+      .post-item-image-container { height: 160px; }
+      .profile-header { flex-direction: column; text-align: center; gap: 18px; }
+      .profile-stats { justify-content: center; }
+      .profile-name { font-size: 20px; justify-content: center; }
+      .post-item-image-nav {
+        width: 30px; height: 30px; font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <div class="top-nav">
-    <button class="nav-btn" onclick="goBack()">←</button>
-    <div class="nav-title" id="navTitle">프로필</div>
-    <div style="width:40px;"></div>
+  <div id="splash">
+    <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
 
-  <div class="container" id="mainContainer">
-    <div class="profile-header">
-      <div class="avatar-wrapper" id="avatarWrapper" onclick="tryOpenStories()">
-        <img class="avatar" id="userAvatar" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>" alt="프로필 사진">
-      </div>
-      <div class="profile-info">
-        <div class="name-row">
-          <span class="nickname" id="userNickname">-</span>
-          <span class="badge" id="userBadge" style="display:none;">Admin</span>
-        </div>
-        <div class="status-msg empty" id="userStatus" onclick="openStatusModal()">상태메시지가 없습니다.</div>
-      </div>
-    </div>
+  <div class="upload-toast" id="uploadToast">⏳ 업로드 중...</div>
 
-    <div class="btn-group">
-      <button class="btn primary" id="actionBtn" style="display:none;"></button>
-      <button class="btn" id="shareBtn" onclick="copyProfileLink()">프로필 공유</button>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-item">
-        <span class="stat-val" id="cntPosts">0</span>
-        <span class="stat-lbl">게시물</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-val" id="cntLikes">0</span>
-        <span class="stat-lbl">받은 좋아요</span>
-      </div>
-    </div>
-
-    <div class="grid-title">게시물</div>
-    <div class="post-grid" id="postGrid"></div>
+  <div class="sidebar-container">
+    <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
   </div>
+  <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
 
-  <div class="modal" id="statusModal">
-    <div class="modal-content">
-      <div class="modal-title">상태메시지 변경</div>
-      <div class="input-wrapper">
-        <input type="text" class="text-input" id="statusInput" placeholder="새로운 상태메시지를 입력하세요." maxlength="60">
-      </div>
-      <div class="modal-btns">
-        <button class="modal-btn cancel" onclick="closeStatusModal()">취소</button>
-        <button class="modal-btn confirm" onclick="saveStatusMessage()">저장</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="story-modal" id="storyModal">
-    <div class="story-container">
+  <div id="storyOverlay">
+    <div class="story-header">
       <div class="story-progress-container" id="storyProgressContainer"></div>
-      
-      <div class="story-header">
+      <div class="story-info-bar">
         <div class="story-user-info">
-          <img class="story-avatar" id="storyHeaderAvatar" src="" alt="">
-          <span class="story-nickname" id="storyHeaderNickname">-</span>
-          <span class="story-time" id="storyHeaderTime">-</span>
+          <div class="story-avatar" id="storyAvatar"></div>
+          <div class="story-username"><span id="storyUsername"></span><span class="story-time" id="storyTime"></span></div>
         </div>
-        <button class="story-close-btn" onclick="closeStories()">&times;</button>
+        <button class="story-close-btn" onclick="closeStory()">✕</button>
       </div>
-      
-      <div class="story-nav-edge left" onclick="storyPrevPage()"></div>
-      <div class="story-nav-edge right" onclick="storyNextPage()"></div>
-      
-      <div class="story-content-area" id="storyContentArea"></div>
-      
-      <div class="story-caption-overlay" id="storyCaptionOverlay" style="display:none;"></div>
+    </div>
+    <div class="story-content-area" id="storyContentArea">
+      <div class="story-tap-left" onclick="prevStory()"></div>
+      <div class="story-tap-right" onclick="nextStory()"></div>
     </div>
   </div>
 
-  <script>
-    // Supabase 및 API 설정
-    const API_URL = "https://ryun.r-e.kr/api";
-    async function api(path, options = {}) {
-      const res = await fetch(`${API_URL}${path}`, {
-        ...options,
-        headers: { "Content-Type": "application/json", ...options.headers }
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || res.statusText);
-      }
-      if (res.status === 204) return null;
-      return res.json();
-    }
+  <div class="main-wrapper">
+    <div class="header">
+      <button class="back-btn" onclick="goBack()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="header-title">프로필</div>
+    </div>
 
-    // URL 파라미터 파싱
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetUserId = urlParams.get('id');
-    const paramNickname = urlParams.get('nickname');
+    <div class="container">
+      <div id="profileContent">
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="profile-info" style="flex:1;">
+              <div class="skeleton skeleton-text" style="width:200px;"></div>
+              <div class="profile-stats">
+                <div class="skeleton skeleton-stat"></div>
+                <div class="skeleton skeleton-stat"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    let currentUser = null;
-    let viewingUser = null;
-    let allUserPosts = []; // 사용자의 전체 게시물 기록 저장 변수
-    
-    // 스토리 관련 전역 상태 변수
-    let storyPages = []; // { post, mediaUrl, isVideo, type, timeText } 형태로 플래트닝된 페이지 배열
-    let currentStoryIndex = 0;
-    let storyTimer = null;
-    let storyDuration = 5000; // 페이지당 기본 재생 시간 (5초)
-    let storyStartTime = 0;
-    let storyRemainingTime = 5000;
+      <div class="posts-section">
+        <div class="section-title">게시물</div>
+        <div id="userPosts">
+          <div class="post-grid">
+            <div class="post-item">
+              <div class="skeleton skeleton-post-image"></div>
+              <div class="post-item-content">
+                <div class="skeleton skeleton-post-text"></div>
+                <div class="skeleton skeleton-post-text" style="width:75%;"></div>
+                <div class="skeleton skeleton-post-text" style="width:55%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    // 로컬스토리지 로그인 체크
-    try {
-      const sessionStr = localStorage.getItem('sb-lpsscfclwunrreiesknb-auth-token');
-      if (sessionStr) {
-        const session = JSON.parse(sessionStr);
-        if (session && session.user) currentUser = session.user;
-      }
-    } catch(e) { console.error(e); }
+    <div class="footer">
+      <div class="footer-links">
+        <a href="#" onclick="showPrivacyPolicy(); return false;">개인정보처리방침</a>
+        <a href="#" onclick="showTerms(); return false;">이용약관</a>
+        <a href="mailto:alexeom97@outlook.com">문의하기</a>
+      </div>
+      <div class="footer-text">본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
+    </div>
+  </div>
 
-    // 초기화
-    window.addEventListener('DOMContentLoaded', async () => {
+  <div class="modal-overlay" id="statusModal">
+    <div class="modal-content">
+      <div class="modal-title">상태메시지 수정</div>
+      <textarea class="modal-input" id="statusInput" placeholder="상태메시지를 입력하세요..." maxlength="100"></textarea>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
+        <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="profilePicModal">
+    <div class="modal-content" style="text-align: center;">
+      <div class="modal-title" style="font-size:18px;">가입을 환영합니다! 🎉</div>
+      <p style="color:var(--t2); font-size:14px; margin-bottom:24px; line-height:1.6;">
+        나만의 개성을 표현할<br>프로필 사진을 설정해 보세요.
+      </p>
+      <div class="modal-buttons" style="justify-content: center; gap:12px;">
+        <button class="modal-btn modal-btn-cancel" onclick="closeProfilePicModal()">나중에 하기</button>
+        <button class="modal-btn modal-btn-confirm" onclick="triggerProfilePicUpload()">설정하기</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
+
+<script src="markdown.js"></script>
+<script>
+  // ─── NPROGRESS 설정 ───
+  NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+
+  window.addEventListener('load', () => { NProgress.done(); });
+
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && link.href && !link.target && !link.hasAttribute('download')) {
       NProgress.start();
-      if (paramNickname) {
-        document.getElementById('navTitle').textContent = paramNickname;
-        document.getElementById('userNickname').textContent = paramNickname;
+    }
+  });
+
+  // ─── SPLASH (처음 방문 시에만) ───
+  (function () {
+    const splash = document.getElementById('splash');
+
+    if (!sessionStorage.getItem('splashShown')) {
+      sessionStorage.setItem('splashShown', 'true');
+      splash.style.display = 'flex';
+
+      function finishSplash() {
+        splash.classList.add('fade-out');
+        setTimeout(() => { splash.style.display = 'none'; }, 460);
       }
-      
-      try {
-        if (!targetUserId) {
-          showEmpty('사용자 ID가 없습니다.');
+
+      const splashStart = Date.now();
+      const MIN_SPLASH = 2000;
+
+      window.addEventListener('load', () => {
+        const elapsed = Date.now() - splashStart;
+        const remaining = Math.max(0, MIN_SPLASH - elapsed);
+        setTimeout(finishSplash, remaining);
+      });
+      setTimeout(finishSplash, 5000);
+    }
+  })();
+
+  const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
+  const CLOUDINARY_CLOUD = 'dretlhsrk';
+  const CLOUDINARY_PRESET = 'unsigned_preset';
+
+  async function api(endpoint, options = {}) {
+    const url = API_BASE + endpoint;
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
+    if (!res.ok) {
+      let errorText;
+      try { errorText = await res.text(); } catch { errorText = "Unknown error"; }
+      throw new Error(`API 오류 (${res.status}): ${errorText}`);
+    }
+    if (res.status === 204) return null;
+    const text = await res.text();
+    if (!text) return null;
+    try { return JSON.parse(text); } catch (e) { console.error("JSON 파싱 오류:", e); return null; }
+  }
+
+  async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+      { method: 'POST', body: formData }
+    );
+    if (!response.ok) throw new Error('이미지 업로드 실패');
+    const data = await response.json();
+    return data.secure_url;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('uploadToast');
+    t.textContent = msg;
+    t.classList.add('show');
+  }
+  function hideToast() {
+    document.getElementById('uploadToast').classList.remove('show');
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const userNickname = urlParams.get('nickname');
+  let currentUser = null;
+  let viewingUser = null;
+
+  function initCurrentUser() {
+    const savedUser = localStorage.getItem('snsUser');
+    if (savedUser) { currentUser = JSON.parse(savedUser); updateSidebar(); }
+  }
+
+  function updateSidebar() {
+    const iframe = document.getElementById('sidebarFrame');
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+  }
+
+  function updateSidebarMode() {
+    const iframe = document.getElementById('sidebarFrame');
+    const narrow = window.innerWidth <= 768;
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+  }
+
+  window.addEventListener('message', (event) => {
+    const { type, page } = event.data || {};
+    if (type === 'navigate') {
+      if (page === 'home') { NProgress.start(); location.href = 'index.html'; }
+      if (page === 'explore') { NProgress.start(); location.href = 'explore.html'; }
+    }
+    if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; NProgress.start(); location.href = 'index.html'; }
+    if (type === 'requestUserInfo') updateSidebar();
+  });
+
+  window.onSharerProfileLogout = function () {
+    localStorage.removeItem('snsUser');
+    currentUser = null;
+    NProgress.start();
+    location.href = 'index.html';
+  };
+
+  initCurrentUser();
+  updateSidebarMode();
+  window.addEventListener('resize', updateSidebarMode);
+
+  document.getElementById('profileFileInput').addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentUser?.id) return;
+
+    showToast('⏳ 업로드 중...');
+    try {
+      const imageUrl = await uploadImageToCloudinary(file);
+      await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ profile_image: imageUrl }),
+        headers: { "Prefer": "return=minimal" }
+      });
+      currentUser.profile_image = imageUrl;
+      localStorage.setItem('snsUser', JSON.stringify(currentUser));
+      viewingUser.profile_image = imageUrl;
+      await displayProfile(viewingUser);
+      hideToast();
+      showToast('✅ 프로필 사진이 변경되었습니다!');
+      setTimeout(hideToast, 2200);
+    } catch (err) {
+      console.error('프로필 사진 업로드 실패:', err);
+      hideToast();
+      showToast('❌ 업로드 실패: ' + (err.message || '알 수 없는 오류'));
+      setTimeout(hideToast, 3000);
+    } finally {
+      e.target.value = '';
+    }
+  });
+
+  if (!userNickname) {
+    showError('사용자 정보(nickname)가 없습니다.');
+  } else {
+    loadUserProfile();
+    loadUserPosts();
+  }
+
+  async function loadUserProfile() {
+    try {
+      let users = await api(`/users?nickname=eq.${encodeURIComponent(userNickname)}&select=*`);
+
+      if (users?.length === 0) {
+        if (userNickname === "JB777" || userNickname === "진정오") {
+          users = [{ nickname: userNickname, isVerified: true, message: null, profile_image: null }];
+        } else {
+          showError('사용자를 찾을 수 없습니다.');
           return;
         }
-        await loadProfile();
-      } catch (e) {
-        console.error(e);
-        showEmpty('사용자를 찾을 수 없거나 오류가 발생했습니다.');
-      } finally {
-        NProgress.done();
       }
+
+      viewingUser = users[0];
+      await displayProfile(viewingUser);
+      
+      if (urlParams.get('u') === 'new' && currentUser && currentUser.nickname === viewingUser.nickname) {
+        document.getElementById('profilePicModal').classList.add('active');
+      }
+    } catch (e) {
+      console.error('프로필 로드 오류:', e);
+      showError('프로필을 불러오는 중 오류가 발생했습니다.');
+    }
+  }
+
+  async function displayProfile(user) {
+    const contentDiv = document.getElementById('profileContent');
+    const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
+    const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
+
+    const userPosts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id,access`);
+    
+    // 본인일 때만 private, link 게시물 개수를 합산하여 카운트
+    const visibleUserPosts = userPosts ? userPosts.filter(p => {
+      if (isOwnProfile) return true;
+      return p.access !== 'private' && p.access !== 'link';
+    }) : [];
+    const postCount = visibleUserPosts.length;
+
+    let totalLikes = 0;
+    if (visibleUserPosts.length) {
+      const postIds = visibleUserPosts.map(p => p.id).join(',');
+      try {
+        const allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`);
+        totalLikes = allLikes?.length ?? 0;
+      } catch (e) { totalLikes = 0; }
+    }
+
+    const statusMessage = user.message || '';
+    const statusDisplay = statusMessage
+      ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
+      : `<div class="status-message-text status-message-empty">상태메시지가 없습니다.</div>`;
+
+    const editButton = isOwnProfile
+      ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+           </svg>
+         </button>`
+      : '';
+
+    const avatarOverlay = isOwnProfile
+      ? `<div class="avatar-overlay">
+           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="#fff" stroke-width="1.8" fill="none"/>
+             <circle cx="12" cy="13" r="4" stroke="#fff" stroke-width="1.8"/>
+           </svg>
+         </div>`
+      : '';
+
+    const avatarHtml = user.profile_image
+      ? `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">
+           <img src="${escapeHtml(user.profile_image)}" alt="프로필 사진">
+           ${avatarOverlay}
+         </div>`
+      : `<div class="profile-avatar${isOwnProfile ? ' editable' : ''}">
+           ${(user.nickname?.[0] || '?').toUpperCase()}
+           ${avatarOverlay}
+         </div>`;
+
+    contentDiv.innerHTML = `
+      <div class="profile-card">
+        <div class="profile-header">
+          ${avatarHtml}
+          <div class="profile-info">
+            <div class="profile-name">
+              ${escapeHtml(user.nickname)}
+              ${isVerified ? '<span class="verification-badge"></span>' : ''}
+            </div>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <div class="stat-number">${postCount}</div>
+                <div class="stat-label">게시물</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">${totalLikes}</div>
+                <div class="stat-label">좋아요</div>
+              </div>
+              <button class="share-btn" id="shareBtn" onclick="copyProfileLink()" title="프로필 링크 복사">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="status-message-container">
+          ${statusDisplay}
+          ${editButton}
+        </div>
+      </div>
+    `;
+
+    if (isOwnProfile) {
+      const avatarElement = contentDiv.querySelector('.profile-avatar.editable');
+      if (avatarElement) {
+        avatarElement.onclick = () => document.getElementById('profileFileInput').click();
+      }
+    }
+  }
+
+  async function loadUserPosts() {
+    const postsDiv = document.getElementById('userPosts');
+    try {
+      const posts = await api(`/posts?author=eq.${encodeURIComponent(userNickname)}&select=*&order=created_at.desc`);
+
+      if (!posts?.length) {
+        postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
+        return;
+      }
+
+      const isOwnProfile = currentUser && currentUser.nickname === userNickname;
+
+      // 본인일 때만 private, link 게시물이 뜨게 필터링 조건 추가
+      const filteredPosts = posts.filter(post => {
+        if (isOwnProfile) return true;
+        return post.access !== 'private' && post.access !== 'link';
+      });
+
+      if (!filteredPosts.length) {
+        postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
+        return;
+      }
+
+      const postIds = filteredPosts.map(p => p.id).join(',');
+      let allLikes = [];
+      try {
+        allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`) || [];
+      } catch (e) {}
+
+      const likeCountMap = {};
+      allLikes.forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
+
+      const postsWithLikes = filteredPosts.map(post => ({ ...post, likeCount: likeCountMap[post.id] || 0 }));
+      displayPosts(postsWithLikes);
+      
+      // 사용자 페이지 진입 시 최근 2일 이내의 게시물이 있다면 스토리 형식으로 보여주기
+      startStories(filteredPosts);
+
+    } catch (e) {
+      console.error('게시물 로드 오류:', e);
+      postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+    }
+  }
+
+  function renderPostImages(imageUrl) {
+    if (!imageUrl) return '';
+    const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
+    if (urls.length === 0) return '';
+
+    let html = `<div class="post-item-image-container">`;
+    html += `<div class="post-item-image-carousel">`;
+
+    urls.forEach((url) => {
+      html += `<div class="post-item-image-slide"><img src="${escapeHtml(url)}" alt="게시글 이미지" loading="lazy"></div>`;
     });
 
-    // 프로필 데이터 로드
-    async function loadProfile() {
-      const users = await api(`/users?id=eq.${encodeURIComponent(targetUserId)}`);
-      if (!users || users.length === 0) {
-        showEmpty('존재하지 않는 사용자입니다.');
-        return;
-      }
-      viewingUser = users[0];
+    html += `</div>`;
 
-      // UI 반영
-      document.getElementById('navTitle').textContent = viewingUser.nickname;
-      document.getElementById('userNickname').textContent = viewingUser.nickname;
-      document.getElementById('userAvatar').src = viewingUser.avatar_url || './logo.png';
-      
-      if (viewingUser.role === 'admin') {
-        document.getElementById('userBadge').style.display = 'inline-block';
-      }
-      
-      if (viewingUser.message) {
-        document.getElementById('userStatus').textContent = viewingUser.message;
-        document.getElementById('userStatus').classList.remove('empty');
-      } else {
-        document.getElementById('userStatus').textContent = '상태메시지가 없습니다.';
-        document.getElementById('userStatus').classList.add('empty');
-      }
-
-      // 본인 여부에 따른 버튼 분기 처리
-      const actionBtn = document.getElementById('actionBtn');
-      if (currentUser && currentUser.id === viewingUser.id) {
-        actionBtn.textContent = '프로필 편집';
-        actionBtn.className = 'btn';
-        actionBtn.onclick = () => openStatusModal();
-        actionBtn.style.display = 'flex';
-      } else {
-        actionBtn.style.display = 'none';
-      }
-
-      // 게시물 및 통계 가져오기
-      await loadPostsAndStats();
+    if (urls.length > 1) {
+      html += `<div class="post-item-image-count">+${urls.length - 1}</div>`;
     }
 
-    // 게시물 정보 및 통계 바인딩
-    async function loadPostsAndStats() {
-      // 작성자의 전체 게시물을 생성일 내림차순 정렬하여 획득
-      const posts = await api(`/posts?user_id=eq.${encodeURIComponent(targetUserId)}&order=created_at.desc`);
-      allUserPosts = posts || [];
-      
-      document.getElementById('cntPosts').textContent = allUserPosts.length;
+    html += `</div>`;
+    return html;
+  }
 
-      let totalLikes = 0;
-      const grid = document.getElementById('postGrid');
-      grid.innerHTML = '';
+  window.prevPreviewSlide = function(btn) {
+    const container = btn.parentElement.querySelector('.post-item-image-carousel');
+    if (!container) return;
+    const width = container.clientWidth;
+    container.scrollBy({ left: -width, behavior: 'smooth' });
+  };
 
-      if (allUserPosts.length === 0) {
-        grid.insertAdjacentHTML('afterend', `
-          <div class="info-box">
-            <div class="info-icon">📸</div>
-            <div>아직 게시물이 없습니다.</div>
+  window.nextPreviewSlide = function(btn) {
+    const container = btn.parentElement.querySelector('.post-item-image-carousel');
+    if (!container) return;
+    const width = container.clientWidth;
+    container.scrollBy({ left: width, behavior: 'smooth' });
+  };
+
+  function displayPosts(posts) {
+    const postsDiv = document.getElementById('userPosts');
+    const gridDiv = document.createElement('div');
+    gridDiv.className = 'post-grid';
+    posts.forEach((post, idx) => {
+      const postItem = document.createElement('div');
+      postItem.className = 'post-item';
+      postItem.style.cssText = `opacity:0; transform:translateY(10px); transition: opacity 0.35s ease ${idx * 0.06}s, transform 0.35s cubic-bezier(0.22,1,0.36,1) ${idx * 0.06}s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;`;
+      postItem.onclick = () => { NProgress.start(); window.location.href = `view.html?id=${post.id}`; };
+
+      const timeStr = new Date(post.created_at).toLocaleDateString('ko-KR');
+
+      postItem.innerHTML = `
+        ${renderPostImages(post.image_url)}
+        ${post.content ? `<div class="post-item-content"><div class="post-item-text">${parseMarkdown(post.content)}</div></div>` : ''}
+        <div class="post-item-footer">
+          <div class="post-item-date">${timeStr}</div>
+          <div class="post-item-likes">
+            <svg width="12" height="12" viewBox="0 0 2300 2300" fill="currentColor"><path d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/></svg>
+            ${post.likeCount}
           </div>
-        `);
-        document.getElementById('cntLikes').textContent = '0';
-        return;
-      }
-
-      // 2일 이내(48시간 이내) 게시물 필터링하여 인스타 프로필 스토리 데이터셋 생성
-      const now = new Date();
-      const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-      let storyPosts = [];
-
-      allUserPosts.forEach(post => {
-        totalLikes += (post.likes_count || 0);
-
-        // 그리드 아이템 렌더링 (explore.html 스타일 구조 차용)
-        let mediaUrls = [];
-        if (post.media_urls) {
-          try { mediaUrls = typeof post.media_urls === 'string' ? JSON.parse(post.media_urls) : post.media_urls; }
-          catch(e) { mediaUrls = []; }
-        }
-        if (!Array.now && mediaUrls.length === 0 && post.image_url) {
-          mediaUrls = [post.image_url];
-        }
-
-        const firstMedia = mediaUrls[0] || './logo.png';
-        const isVideo = firstMedia.match(/\.(mp4|webm|ogg|mov)$/i) || post.video_url;
-        
-        let iconHtml = '';
-        if (mediaUrls.length > 1) {
-          iconHtml = `<div class="multi-icon">📁</div>`;
-        } else if (isVideo) {
-          iconHtml = `<div class="video-icon">🎬</div>`;
-        }
-
-        const itemHtml = `
-          <div class="grid-item" onclick="goToExplorePost('${post.id}')">
-            ${iconHtml}
-            ${isVideo ? `<video src="${firstMedia}#t=0.1" muted playsinline></video>` : `<img src="${firstMedia}" alt="post">`}
-          </div>
-        `;
-        grid.insertAdjacentHTML('beforeend', itemHtml);
-
-        // 2일 이내에 작성된 스토리 타겟 대상 적재 (시간 오름차순으로 정렬하기 위해 언쉬프트 혹은 추후 가공)
-        const postDate = new Date(post.created_at);
-        if (postDate >= twoDaysAgo) {
-          storyPosts.push(post);
-        }
-      });
-
-      document.getElementById('cntLikes').textContent = totalLikes;
-
-      // 2일 이내 게시물이 존재할 시 아바타 그라데이션 링 활성화 및 스토리 가공
-      if (storyPosts.length > 0) {
-        // 과거 스토리부터 순차 재생되도록 시간 오름차순(과거 -> 최신) 정렬
-        storyPosts.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-        
-        setupStoryDataset(storyPosts);
-        document.getElementById('avatarWrapper').classList.add('has-stories');
-      }
-    }
-
-    // ==========================================
-    // 인스타 스토리 가공 및 분할 기능 파트 추가
-    // ==========================================
-    function setupStoryDataset(posts) {
-      storyPages = [];
-      const now = new Date();
-
-      posts.forEach(post => {
-        let mediaUrls = [];
-        if (post.media_urls) {
-          try { mediaUrls = typeof post.media_urls === 'string' ? JSON.parse(post.media_urls) : post.media_urls; }
-          catch(e) { mediaUrls = []; }
-        }
-        if (mediaUrls.length === 0 && post.image_url) {
-          mediaUrls = [post.image_url];
-        }
-        if (mediaUrls.length === 0 && post.video_url) {
-          mediaUrls = [post.video_url];
-        }
-        if (mediaUrls.length === 0) {
-          mediaUrls = ['./logo.png'];
-        }
-
-        // 경과 시간 계산 및 텍스트 포맷 처리 (몇 시간 전 표시)
-        const postDate = new Date(post.created_at);
-        const diffMs = now - postDate;
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        let timeText = '';
-        if (diffHours < 1) {
-          const diffMins = Math.floor(diffMs / (1000 * 60));
-          timeText = diffMins <= 0 ? '방금 전' : `${diffMins}분 전`;
-        } else {
-          timeText = `${diffHours}시간 전`;
-        }
-
-        // 하나의 게시물에 이미지/비디오가 여러 개 존재할 때도 각각 개별 페이지 분할 처리
-        mediaUrls.forEach((url) => {
-          const isVideo = url.match(/\.(mp4|webm|ogg|mov)$/i);
-          storyPages.push({
-            post: post,
-            mediaUrl: url,
-            isVideo: isVideo,
-            timeText: timeText
-          });
-        });
-      });
-    }
-
-    // 스토리 모달 진입 시도 함수
-    function tryOpenStories() {
-      if (document.getElementById('avatarWrapper').classList.contains('has-stories') && storyPages.length > 0) {
-        openStories();
-      }
-    }
-
-    // 스토리 모달 열기 실행
-    function openStories() {
-      currentStoryIndex = 0;
-      document.getElementById('storyHeaderAvatar').src = viewingUser.avatar_url || './logo.png';
-      document.getElementById('storyHeaderNickname').textContent = viewingUser.nickname;
-      
-      document.getElementById('storyModal').classList.add('active');
-      
-      // 등분 상단 진행 바 인터페이스 동적 구현
-      buildStoryProgressBar();
-      renderStoryPage();
-    }
-
-    // 상단 진행 바 레이아웃 분할 구성
-    function buildStoryProgressBar() {
-      const container = document.getElementById('storyProgressContainer');
-      container.innerHTML = '';
-      
-      storyPages.forEach((page, idx) => {
-        const bar = document.createElement('div');
-        bar.className = 'story-progress-bar';
-        
-        const fill = document.createElement('div');
-        fill.className = 'story-progress-fill';
-        fill.id = `storyProgressFill_${idx}`;
-        
-        // 탐색 완료한 앞단 페이지는 100% 채움 유지 처리
-        if (idx < currentStoryIndex) {
-          fill.style.width = '100%';
-        }
-        
-        bar.appendChild(fill);
-        container.appendChild(bar);
-      });
-    }
-
-    // 특정 스토리 인덱스 페이지 화면 렌더링
-    function renderStoryPage() {
-      if (storyTimer) { clearTimeout(storyTimer); storyTimer = null; }
-      
-      // 진행 바 리셋 및 상태 동기화 업데이트
-      storyPages.forEach((_, idx) => {
-        const fill = document.getElementById(`storyProgressFill_${idx}`);
-        if (fill) {
-          fill.style.transition = 'none';
-          if (idx < currentStoryIndex) fill.style.width = '100%';
-          else fill.style.width = '0%';
-        }
-      });
-
-      const page = storyPages[currentStoryIndex];
-      document.getElementById('storyHeaderTime').textContent = page.timeText;
-
-      // 캡션 오버레이 컨텐츠 업데이트 바인딩
-      const captionOverlay = document.getElementById('storyCaptionOverlay');
-      if (page.post.content && page.post.content.trim() !== '') {
-        captionOverlay.innerHTML = escapeHtml(page.post.content).replace(/\n/g, '<br>');
-        captionOverlay.style.display = 'block';
-      } else {
-        captionOverlay.style.display = 'none';
-      }
-
-      // 미디어 요소 동적 바인딩 및 가공 생성
-      const contentArea = document.getElementById('storyContentArea');
-      contentArea.innerHTML = '';
-
-      if (page.isVideo) {
-        const video = document.createElement('video');
-        video.className = 'story-media';
-        video.src = page.mediaUrl;
-        video.autoplay = true;
-        video.muted = false; // 소리 재생 허용
-        video.playsInline = true;
-        
-        contentArea.appendChild(video);
-        
-        // 비디오 재생 준비 완료 시 타이머 동작 분기 연동
-        video.onloadedmetadata = function() {
-          const duration = (video.duration && !isNaN(video.duration)) ? video.duration * 1000 : storyDuration;
-          startStoryTimer(duration);
-        };
-        video.onerror = function() {
-          startStoryTimer(storyDuration);
-        };
-      } else {
-        const img = document.createElement('img');
-        img.className = 'story-media';
-        img.src = page.mediaUrl;
-        
-        contentArea.appendChild(img);
-        startStoryTimer(storyDuration);
-      }
-    }
-
-    // 스토리 진행 바 애니메이션 및 타이머 동작 관리 함수
-    function startStoryTimer(duration) {
-      storyRemainingTime = duration;
-      storyStartTime = Date.now();
-      
-      const fill = document.getElementById(`storyProgressFill_${currentStoryIndex}`);
-      if (fill) {
-        // 리플로우 강제 유도 후 트랜지션 애니메이션 실행 적용
-        fill.getBoundingClientRect();
-        fill.style.transition = `width ${duration}ms linear`;
-        fill.style.width = '100%';
-      }
-
-      storyTimer = setTimeout(() => {
-        storyNextPage();
-      }, duration);
-    }
-
-    // 오른쪽 터치 클릭: 다음 페이지로 이동 처리 핸들러
-    function storyNextPage() {
-      if (currentStoryIndex < storyPages.length - 1) {
-        currentStoryIndex++;
-        renderStoryPage();
-      } else {
-        // 마지막 페이지에서 우측클릭했을 때 스토리 닫고 본래 사용자 페이지 표출 구현
-        closeStories();
-      }
-    }
-
-    // 왼쪽 터치 클릭: 이전 페이지로 이동 처리 핸들러
-    function storyPrevPage() {
-      if (currentStoryIndex > 0) {
-        currentStoryIndex--;
-        renderStoryPage();
-      } else {
-        // 처음 페이지일 때는 동작 대기 무시
-        if (storyTimer) {
-          // 타이머 초기화 후 현재 페이지 재시작 처리 리셋
-          renderStoryPage();
-        }
-      }
-    }
-
-    // 스토리 종료 및 사용자 페이지 복귀 트래킹 함수
-    function closeStories() {
-      if (storyTimer) { clearTimeout(storyTimer); storyTimer = null; }
-      document.getElementById('storyModal').classList.remove('active');
-      // 백그라운드 오디오 차단을 위해 내부 미디어 소스 제거 처리
-      document.getElementById('storyContentArea').innerHTML = '';
-    }
-
-    // explore 페이지 상세 게시물로 연결 이동 기능 라우터
-    function goToExplorePost(postId) {
-      NProgress.start();
-      window.location.href = `explore.html?id=${postId}`;
-    }
-
-    // 빈 화면 및 에러 피드백 컴포넌트 렌더러
-    function showEmpty(msg) {
-      const container = document.getElementById('mainContainer');
-      container.innerHTML = `
-        <div class="info-box">
-          <div class="info-icon">⚠️</div>
-          <div>${msg}</div>
         </div>
       `;
+      gridDiv.appendChild(postItem);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        postItem.style.opacity = '1';
+        postItem.style.transform = 'translateY(0)';
+      }));
+    });
+    postsDiv.innerHTML = '';
+    postsDiv.appendChild(gridDiv);
+  }
+
+  function showError(msg) {
+    document.getElementById('profileContent').innerHTML = `
+      <div class="profile-card">
+        <div style="text-align:center; padding:48px 20px;">
+          <div style="color:var(--pink); font-size:14px; margin-bottom:20px;">${msg}</div>
+          <button onclick="window.history.back()" style="background:#fff; color:#000; border:none; padding:10px 24px; border-radius:var(--r2); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">돌아가기</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('userPosts').innerHTML = '';
+  }
+
+  window.openStatusModal = function() {
+    const modal = document.getElementById('statusModal');
+    const input = document.getElementById('statusInput');
+    input.value = viewingUser?.message || '';
+    modal.classList.add('active');
+  };
+
+  window.closeStatusModal = function() {
+    document.getElementById('statusModal').classList.remove('active');
+  };
+
+  window.closeProfilePicModal = function() {
+    document.getElementById('profilePicModal').classList.remove('active');
+    const url = new URL(window.location);
+    url.searchParams.delete('u');
+    window.history.replaceState({}, '', url);
+  };
+
+  window.triggerProfilePicUpload = function() {
+    closeProfilePicModal();
+    document.getElementById('profileFileInput').click();
+  };
+
+  window.saveStatusMessage = async function() {
+    const input = document.getElementById('statusInput');
+    const newMessage = input.value.trim();
+    if (!currentUser?.id) { alert('로그인이 필요합니다.'); return; }
+    try {
+      await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ message: newMessage }),
+        headers: { "Prefer": "return=minimal" }
+      });
+      viewingUser.message = newMessage;
+      await displayProfile(viewingUser);
+      closeStatusModal();
+    } catch (e) {
+      console.error('상태메시지 저장 실패:', e);
+      alert('상태메시지 저장에 실패했습니다.');
     }
+  };
 
-    // 상태메시지 편집 다이얼로그 제어 파트
-    window.openStatusModal = function() {
-      if (!currentUser || currentUser.id !== viewingUser.id) return;
-      document.getElementById('statusInput').value = viewingUser.message || '';
-      document.getElementById('statusModal').classList.add('active');
-      document.getElementById('statusInput').focus();
-    };
+  document.getElementById('statusModal').addEventListener('click', function(e) {
+    if (e.target === this) closeStatusModal();
+  });
 
-    window.closeStatusModal = function() {
-      document.getElementById('statusModal').classList.remove('active');
-    };
+  window.goBack = () => { NProgress.start(); window.history.back(); };
+  window.showPrivacyPolicy = () => { NProgress.start(); window.location.href = "privacy.html"; };
+  window.showTerms = () => { NProgress.start(); window.location.href = "policy.html"; };
 
-    window.saveStatusMessage = async function() {
-      const newMessage = document.getElementById('statusInput').value.trim();
-      if (!currentUser) { alert('로그인이 필요합니다.'); return; }
-      try {
-        await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
-          method: "PATCH",
-          body: JSON.stringify({ message: newMessage }),
-          headers: { "Prefer": "return=minimal" }
-        });
-        viewingUser.message = newMessage;
+  window.copyProfileLink = function() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const btn = document.getElementById('shareBtn');
+      if (!btn) return;
+      btn.classList.add('success');
+      setTimeout(() => btn.classList.remove('success'), 1500);
+    }).catch(err => {
+      console.error('링크 복사 실패:', err);
+    });
+  };
+
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // ─── STORY LOGIC ───
+  let storyItems = [];
+  let currentStoryIndex = 0;
+  let storyStartTime = 0;
+  const STORY_DURATION = 5000;
+  let storyAnimationFrame;
+
+  function getTimeElapsed(dateString) {
+    const postDate = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - postDate;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    if (diffHours >= 24) {
+      return `${Math.floor(diffHours/24)}일 전`;
+    } else if (diffHours > 0) {
+      return `${diffHours}시간 전`;
+    } else if (diffMins > 0) {
+      return `${diffMins}분 전`;
+    }
+    return `방금 전`;
+  }
+
+  function extractStoryItems(posts) {
+    const now = new Date();
+    const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+    
+    let items = [];
+    
+    posts.forEach(post => {
+      const postDate = new Date(post.created_at);
+      if (now - postDate <= twoDaysMs) {
+        const imageUrls = post.image_url ? post.image_url.split(',').map(u => u.trim()).filter(Boolean) : [];
         
-        if (viewingUser.message) {
-          document.getElementById('userStatus').textContent = viewingUser.message;
-          document.getElementById('userStatus').classList.remove('empty');
-        } else {
-          document.getElementById('userStatus').textContent = '상태메시지가 없습니다.';
-          document.getElementById('userStatus').classList.add('empty');
+        if (imageUrls.length > 0) {
+          imageUrls.forEach((url, imgIndex) => {
+            items.push({
+              type: 'image',
+              url: url,
+              text: imgIndex === 0 ? post.content : null,
+              created_at: post.created_at,
+              author: post.author
+            });
+          });
+        } else if (post.content && post.content.trim()) {
+          items.push({
+            type: 'text',
+            text: post.content,
+            created_at: post.created_at,
+            author: post.author
+          });
         }
-        
-        closeStatusModal();
-      } catch (e) {
-        console.error('상태메시지 저장 실패:', e);
-        alert('상태메시지 저장에 실패했습니다.');
       }
-    };
+    });
+    
+    return items.reverse(); // 과거에서 현재 순으로
+  }
 
-    document.getElementById('statusModal').addEventListener('click', function(e) {
-      if (e.target === this) closeStatusModal();
+  function startStories(posts) {
+    storyItems = extractStoryItems(posts);
+    if (storyItems.length === 0) return;
+
+    const progressContainer = document.getElementById('storyProgressContainer');
+    progressContainer.innerHTML = '';
+    storyItems.forEach((_, idx) => {
+      const seg = document.createElement('div');
+      seg.className = 'story-progress-segment';
+      seg.innerHTML = `<div class="story-progress-fill" id="story-fill-${idx}"></div>`;
+      progressContainer.appendChild(seg);
     });
 
-    window.goBack = () => { NProgress.start(); window.history.back(); };
-    window.showPrivacyPolicy = () => { NProgress.start(); window.location.href = "privacy.html"; };
-    window.showTerms = () => { NProgress.start(); window.location.href = "policy.html"; };
-
-    window.copyProfileLink = function() {
-      navigator.clipboard.writeText(window.location.href).then(() => {
-        const btn = document.getElementById('shareBtn');
-        if (!btn) return;
-        btn.classList.add('success');
-        setTimeout(() => btn.classList.remove('success'), 1500);
-      }).catch(err => {
-        console.error('링크 복사 실패:', err });
-      });
-    };
-
-    function escapeHtml(unsafe) {
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    const avatarContainer = document.getElementById('storyAvatar');
+    if (viewingUser && viewingUser.profile_image) {
+      avatarContainer.innerHTML = `<img src="${escapeHtml(viewingUser.profile_image)}" alt="avatar">`;
+    } else {
+      avatarContainer.innerHTML = ((viewingUser && viewingUser.nickname?.[0]) || '?').toUpperCase();
     }
-  </script>
+    document.getElementById('storyUsername').textContent = viewingUser ? viewingUser.nickname : '';
 
-  <div class="container" style="padding-top:0; padding-bottom:40px;">
-    <footer class="footer">
-      <div class="footer-links">
-        <span class="footer-link" onclick="showPrivacyPolicy()">개인정보처리방침</span>
-        <span class="footer-link" onclick="showTerms()">이용약관</span>
-      </div>
-      <div class="copyright">© Sharer. All rights reserved.</div>
-    </footer>
-  </div>
+    document.getElementById('storyOverlay').classList.add('active');
+    currentStoryIndex = 0;
+    showStory(currentStoryIndex);
+  }
 
+  function showStory(index) {
+    if (index >= storyItems.length) {
+      closeStory();
+      return;
+    }
+    currentStoryIndex = index;
+    const item = storyItems[index];
+
+    for (let i = 0; i < storyItems.length; i++) {
+      const fill = document.getElementById(`story-fill-${i}`);
+      if (fill) {
+        if (i < index) fill.style.width = '100%';
+        else fill.style.width = '0%';
+      }
+    }
+
+    document.getElementById('storyTime').textContent = getTimeElapsed(item.created_at);
+
+    const contentArea = document.getElementById('storyContentArea');
+    const oldContent = contentArea.querySelectorAll('.story-dynamic-content');
+    oldContent.forEach(el => el.remove());
+
+    const dynamicDiv = document.createElement('div');
+    dynamicDiv.className = 'story-dynamic-content';
+
+    let contentHtml = `<div class="short-content">`;
+    
+    if (item.type === 'image') {
+      contentHtml += `<img src="${escapeHtml(item.url)}" class="short-image" alt="스토리 이미지">`;
+      if (item.text && item.text.trim()) {
+        contentHtml += `<div class="short-caption">${parseMarkdown(item.text)}</div>`;
+      }
+    } else {
+      contentHtml += `<div class="short-text-only">${parseMarkdown(item.text)}</div>`;
+    }
+    
+    contentHtml += `</div>`;
+    dynamicDiv.innerHTML = contentHtml;
+    
+    contentArea.appendChild(dynamicDiv);
+
+    cancelAnimationFrame(storyAnimationFrame);
+    storyStartTime = performance.now();
+    animateStoryProgress();
+  }
+
+  function animateStoryProgress() {
+    const now = performance.now();
+    const elapsed = now - storyStartTime;
+    const fill = document.getElementById(`story-fill-${currentStoryIndex}`);
+    
+    if (elapsed >= STORY_DURATION) {
+      if(fill) fill.style.width = '100%';
+      nextStory();
+    } else {
+      if(fill) {
+        const percent = (elapsed / STORY_DURATION) * 100;
+        fill.style.width = `${percent}%`;
+      }
+      storyAnimationFrame = requestAnimationFrame(animateStoryProgress);
+    }
+  }
+
+  window.nextStory = function() {
+    if (currentStoryIndex < storyItems.length - 1) {
+      showStory(currentStoryIndex + 1);
+    } else {
+      closeStory();
+    }
+  };
+
+  window.prevStory = function() {
+    if (currentStoryIndex > 0) {
+      showStory(currentStoryIndex - 1);
+    } else {
+      showStory(0);
+    }
+  };
+
+  window.closeStory = function() {
+    cancelAnimationFrame(storyAnimationFrame);
+    document.getElementById('storyOverlay').classList.remove('active');
+  };
+
+</script>
+<script src="sharer-profile-sheet-host.js"></script>
 </body>
 </html>
