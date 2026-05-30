@@ -213,32 +213,6 @@
     .profile-item:hover { background: var(--bg3); transform: translateX(3px); }
     .profile-item:active { transform: scale(0.97); }
 
-    /* 움직이는 그라데이션 스토리 링 스타일 추가 */
-    .profile-avatar-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .profile-avatar-wrapper.has-story {
-      padding: 2px;
-      border-radius: 50%;
-      background: linear-gradient(
-        270deg,
-        #0740ba,
-        #651fff,
-        #29b1ff,
-        #0740ba
-      );
-      background-size: 200% 200%;
-      animation: storyRing 3s linear infinite;
-    }
-    @keyframes storyRing {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 200% 50%; }
-    }
-
     .profile-avatar {
       width: 32px; height: 32px;
       border-radius: 50%;
@@ -252,11 +226,30 @@
       flex-shrink: 0;
       object-fit: cover;
       color: #666;
-      box-sizing: border-box;
     }
-    .profile-avatar-wrapper.has-story .profile-avatar {
-      border: 2px solid #000 !important;
-      width: 100%; height: 100%;
+
+    /* 스토리 프로필 테두리 그라데이션 */
+    .story-ring-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .story-ring-wrapper.has-story {
+      padding: 2.5px;
+      background: linear-gradient(270deg, #0740ba, #651fff, #29b1ff, #0740ba);
+      background-size: 200% 200%;
+      animation: storyRing 3s linear infinite;
+    }
+    @keyframes storyRing {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .story-ring-wrapper.has-story .post-author-avatar,
+    .story-ring-wrapper.has-story .profile-avatar {
+      border: 3px solid var(--bg) !important;
     }
 
     .profile-nickname {
@@ -334,37 +327,10 @@
       flex-shrink: 0;
       transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       color: #666;
-      box-sizing: border-box;
     }
     .post-author-info:hover .post-author-avatar {
       border-color: var(--border3);
       transform: scale(1.06);
-    }
-    /* 게시글 내 스토리 보유 프사 스타일 분기 */
-    .post-author-avatar-wrapper.has-story .post-author-avatar {
-      border: 3px solid #000 !important;
-      width: 100%; height: 100%;
-    }
-    .post-author-avatar-wrapper {
-      position: relative;
-      width: 38px; height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .post-author-avatar-wrapper.has-story {
-      padding: 2px;
-      border-radius: 50%;
-      background: linear-gradient(
-        270deg,
-        #0740ba,
-        #651fff,
-        #29b1ff,
-        #0740ba
-      );
-      background-size: 200% 200%;
-      animation: storyRing 3s linear infinite;
     }
 
     .post-author-name {
@@ -514,7 +480,7 @@
 
     .verification-badge {
       display: inline-block;
-      width: 14px;
+      width: 14px; 
       height: 14px;
       vertical-align: middle;
       background-image: url('https://sharer.r-e.kr/badge.svg');
@@ -523,28 +489,38 @@
       background-position: center;
     }
 
-    .footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 12px; margin-top: auto; }
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      margin-top: auto;
+    }
     .footer-links { margin-bottom: 8px; }
     .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
 
     .auth-modal, .create-modal {
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background: rgba(0,0,0,0.75);
       display: none;
-      justify-content: center; align-items: center;
+      justify-content: center;
+      align-items: center;
       z-index: 1000;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
     .auth-modal.active, .create-modal.active { display: flex; }
+
     .auth-box, .create-modal-content {
       background: var(--bg2);
       border: 1px solid var(--border2);
       border-radius: var(--r4);
       padding: 40px;
-      width: 90%; max-width: 380px;
+      width: 90%;
+      max-width: 380px;
       position: relative;
       animation: modalPop 0.28s cubic-bezier(0.34,1.4,0.64,1);
     }
@@ -552,6 +528,7 @@
       from { opacity: 0; transform: scale(0.90) translateY(14px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
+
     .create-modal-content { max-width: 540px; max-height: 90vh; overflow-y: auto; padding: 0; }
 
     .auth-close, .close-btn {
@@ -562,832 +539,909 @@
       cursor: pointer;
       width: 30px; height: 30px;
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s, color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .auth-close:hover, .close-btn:hover { background: var(--bg4); color: var(--t1); transform: scale(1.08); }
-    .auth-close:active, .close-btn:active { transform: scale(0.92); }
-    .auth-close { position: absolute; top: 20px; right: 20px; }
-
-    .auth-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; text-align: center; color: var(--t1); }
-    .auth-form { display: flex; flex-direction: column; gap: 14px; }
-    .input-group { display: flex; flex-direction: column; gap: 6px; }
-    .input-group label { font-size: 11px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: 0.05em; }
-    .auth-input {
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      border-radius: var(--r2);
-      padding: 12px 14px;
-      color: var(--t1);
-      font-size: 14px;
-      font-family: inherit;
-      transition: border-color 0.15s, background 0.15s;
-    }
-    .auth-input:focus { outline: none; border-color: var(--border3); background: var(--bg4); }
-    .auth-input::placeholder { color: var(--t3); }
-
-    .auth-btn {
-      background: #fff; color: #000;
-      border: none; border-radius: var(--r2);
-      padding: 14px; font-size: 14px; font-weight: 600;
-      cursor: pointer; font-family: inherit; margin-top: 10px;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .auth-btn:hover { background: #e8e8e8; }
-    .auth-btn:active { transform: scale(0.97); }
-
-    .auth-switch { text-align: center; font-size: 13px; color: var(--t2); margin-top: 20px; }
-    .auth-switch span { color: var(--t1); cursor: pointer; font-weight: 600; margin-left: 4px; text-decoration: none; }
-    .auth-switch span:hover { text-decoration: underline; }
-
-    .error-msg { color: var(--pink); font-size: 12px; margin-top: 4px; font-weight: 500; display: none; }
-
-    /* 글쓰기 모달 커스텀 */
-    .create-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; background: var(--bg2); z-index: 10;
-    }
-    .create-title { font-size: 15px; font-weight: 600; color: var(--t1); }
-    .create-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
-
-    .textarea-wrapper { position: relative; }
-    .create-textarea {
-      width: 100%; min-height: 140px;
-      background: transparent; border: none;
-      color: var(--t1); font-size: 15px; font-family: inherit;
-      resize: none; line-height: 1.6;
-    }
-    .create-textarea:focus { outline: none; }
-    .create-textarea::placeholder { color: var(--t3); }
-
-    .media-preview-container {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 10px; margin-top: 10px;
-    }
-    .media-preview-item {
-      position: relative; aspect-ratio: 1;
-      border-radius: var(--r1); overflow: hidden;
-      background: var(--bg3); border: 1px solid var(--border2);
-    }
-    .media-preview-item img { width: 100%; height: 100%; object-fit: cover; }
-    .media-remove-btn {
-      position: absolute; top: 4px; right: 4px;
-      background: rgba(0,0,0,0.7); color: #fff;
-      border: none; border-radius: 50%;
-      width: 22px; height: 22px; font-size: 12px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
-
-    .create-footer {
-      padding: 16px 24px;
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--bg2);
-    }
-    .media-upload-label {
-      color: var(--t2); cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      width: 36px; height: 36px; border-radius: 50%;
-      transition: background 0.15s, color 0.15s;
-    }
-    .media-upload-label:hover { background: var(--bg3); color: var(--t1); }
-    .submit-post-btn {
-      background: #fff; color: #000;
-      border: none; border-radius: 20px;
-      padding: 8px 20px; font-size: 13px; font-weight: 600;
-      cursor: pointer; font-family: inherit;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), opacity 0.15s;
-    }
-    .submit-post-btn:hover { background: #e8e8e8; }
-    .submit-post-btn:active { transform: scale(0.95); }
-    .submit-post-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .toast {
-      position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%);
-      background: var(--bg2); border: 1px solid var(--border2); color: var(--t1);
-      padding: 10px 22px; border-radius: 22px; font-size: 13px; font-weight: 500;
-      z-index: 9999; transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
-      white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    }
-    .toast.show { bottom: 28px; }
-
-    .top-banner {
-      position: fixed;
-      top: 0; left: 72px; right: 0;
-      height: 45px;
-      background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      z-index: 99;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-      transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-    .top-banner.hide {
-      transform: translateY(-45px);
-      opacity: 0;
-      pointer-events: none;
-    }
-    .top-banner-content {
-      font-size: 13px;
-      color: var(--t1);
-      font-weight: 500;
-    }
-    .top-banner-close {
-      background: transparent;
-      border: none;
-      color: var(--t2);
-      cursor: pointer;
-      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4px;
-      transition: color 0.15s;
+      transition: background 0.15s, color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      line-height: 1;
     }
-    .top-banner-close:hover {
+    .auth-close { position: absolute; top: 16px; right: 16px; }
+    .auth-close:hover, .close-btn:hover { background: var(--bg4); color: var(--t1); transform: scale(1.1); }
+    .auth-close:active, .close-btn:active { transform: scale(0.90); }
+
+    .auth-box h2, .create-modal-header h3 {
+      font-size: 18px;
+      font-weight: 600;
       color: var(--t1);
+      letter-spacing: -0.02em;
+    }
+    .auth-box h2 { text-align: center; margin-bottom: 26px; }
+
+    .auth-box input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: var(--r2);
+      border: 1px solid var(--border2);
+      font-size: 14px;
+      margin-bottom: 10px;
+      outline: none;
+      background: var(--bg3);
+      color: var(--t1);
+      font-family: inherit;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .auth-box input:focus { border-color: var(--border3); background: var(--bg4); }
+    .auth-box input::placeholder { color: var(--t3); }
+
+    .auth-box button {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: var(--r2);
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #fff;
+      color: #000;
+      margin-bottom: 8px;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .auth-box button:hover { background: #e8e8e8; transform: scale(1.02); }
+    .auth-box button:active { transform: scale(0.97); }
+    .auth-box button.secondary {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+    }
+    .auth-box button.secondary:hover { background: var(--bg4); color: var(--t1); }
+
+    .error-message, .success-message {
+      font-size: 12px;
+      margin-top: -6px;
+      margin-bottom: 8px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .error-message { color: var(--pink); }
+    .success-message { color: var(--green); }
+
+    .create-modal-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    @media (max-width: 880px) {
-      .recommend-container { display: none; }
-      .main-content { padding: 24px 16px; }
+    .post-btn {
+      background: #fff;
+      border: none;
+      color: #000;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 22px;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    @media (max-width: 640px) {
-      body { padding-top: 45px; padding-bottom: 64px; }
+    .post-btn:hover { background: #e8e8e8; transform: scale(1.04); }
+    .post-btn:active { transform: scale(0.94); }
+    .post-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    .create-modal-body { padding: 20px 22px 24px; }
+
+    .create-modal textarea {
+      width: 100%;
+      min-height: 110px;
+      padding: 12px 14px;
+      border-radius: var(--r2);
+      border: 1px solid var(--border2);
+      font-size: 14px;
+      outline: none;
+      background: var(--bg3);
+      color: var(--t1);
+      resize: vertical;
+      font-family: inherit;
+      line-height: 1.65;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .create-modal textarea:focus { border-color: var(--border3); background: var(--bg4); }
+    .create-modal textarea::placeholder { color: var(--t3); }
+
+    .image-preview-container { margin-top: 12px; }
+
+    .image-preview {
+      width: 100%;
+      max-height: 340px;
+      object-fit: cover;
+      border-radius: var(--r2);
+      display: none;
+      border: 1px solid var(--border);
+    }
+    .image-preview.show { display: block; }
+
+    .upload-btn {
+      background: var(--bg3);
+      border: 1px dashed var(--border2);
+      padding: 10px 18px;
+      border-radius: var(--r2);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 10px;
+      color: var(--t2);
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.01,0.64,1);
+      width: 100%;
+    }
+    .upload-btn:hover { border-color: var(--border3); color: var(--t1); background: var(--bg4); transform: scale(1.01); }
+    .upload-btn:active { transform: scale(0.98); }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+
+    .sharer-profile-sheet-host[hidden] { display: none !important; }
+    .sharer-profile-sheet-host {
+      position: fixed;
+      inset: 0;
+      z-index: 960;
+    }
+    .sharer-profile-sheet-host .sps-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sharer-profile-sheet-host .sps-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+      max-height: 44vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      will-change: transform;
+      transform: translateY(100%);
+      transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-panel {
+      transform: translateY(0);
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
+      max-height: 88vh;
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
+      transition: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area {
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 6px 16px 14px;
+      margin: -2px -16px 0 -16px;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area:active {
+      cursor: grabbing;
+    }
+    .sharer-profile-sheet-host .sps-grab {
+      width: 40px;
+      height: 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.28);
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .sharer-profile-sheet-host .sps-av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-av img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sharer-profile-sheet-host .sps-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sharer-profile-sheet-host .sps-logout {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    @media (max-width: 768px) {
+      .recommend-container { display: none; }
       .sidebar-container {
-        width: 100vw; height: 64px;
-        top: auto; bottom: 0; left: 0;
+        left: 0; right: 0; top: auto; bottom: 0;
+        width: 100%; min-width: 0;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
       }
-      .sidebar-container iframe { width: 100vw !important; height: 64px; }
-      .main-wrapper { margin-left: 0; width: 100%; }
-      .main-content { padding: 12px 14px; }
-      .post-card { padding: 24px 0; }
-      .top-banner { left: 0; }
+      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
+      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+      .main-content { padding: 20px 16px; }
+      .post-image-nav {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div id="splash">
-    <div class="splash-inner">
-      <img src="./logo.png" alt="Sharer" class="splash-logo">
-      <div class="splash-text">
-        <div class="splash-title">SHARER</div>
-        <div class="splash-sub">커뮤니티 · SNS</div>
-      </div>
+
+
+<div id="splash">
+  <div class="splash-inner">
+    <img src="logo.svg" class="splash-logo" alt="Sharer">
+    <div class="splash-text">
+      <div class="splash-title">Sharer</div>
+      <div class="splash-sub">By JBJB</div>
+    </div>
+  </div>
+</div>
+
+<div class="sidebar-container">
+  <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
+</div>
+<div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
+
+<div class="main-wrapper">
+
+  <div class="auth-modal" id="loginModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeLoginModal()">✕</button>
+      <h2>로그인</h2>
+      <input type="text" id="loginId" placeholder="아이디">
+      <input type="password" id="loginPassword" placeholder="비밀번호">
+      <div class="error-message" id="loginError"></div>
+      <div class="success-message" id="loginSuccess"></div>
+      <button onclick="handleLogin()">로그인</button>
+      <button class="secondary" onclick="showSignup()">회원가입</button>
     </div>
   </div>
 
-  <div class="top-banner" id="topBanner">
-    <div class="top-banner-content">📢 Sharer의 새로운 기능과 공지사항을 확인해보세요!</div>
-    <button class="top-banner-close" onclick="closeTopBanner()">✕</button>
-  </div>
-
-  <div class="sidebar-container">
-    <iframe src="./sidebar.html" id="sidebarIframe"></iframe>
-  </div>
-
-  <div class="main-wrapper">
-    <main class="main-content">
-      <div class="feed-container" id="postsContainer">
-        <div id="feedSkeleton">
-          <div class="skeleton-post">
-            <div class="skeleton-post-header">
-              <div class="skeleton skeleton-avatar"></div>
-              <div class="skeleton skeleton-username"></div>
-            </div>
-            <div class="skeleton skeleton-post-image"></div>
-            <div class="skeleton skeleton-text text-long"></div>
-            <div class="skeleton skeleton-text text-medium"></div>
-            <div class="skeleton skeleton-text text-short"></div>
-          </div>
-          <div class="skeleton-post">
-            <div class="skeleton-post-header">
-              <div class="skeleton skeleton-avatar"></div>
-              <div class="skeleton skeleton-username"></div>
-            </div>
-            <div class="skeleton skeleton-post-image"></div>
-            <div class="skeleton skeleton-text text-long"></div>
-          </div>
-        </div>
-        </div>
-
-      <aside class="recommend-container">
-        <div class="recommend-title">추천 프로필</div>
-        <div id="recommendList">
-          <div id="recommendSkeleton">
-            <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-            <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-            <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-          </div>
-        </div>
-      </aside>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-links">
-        <a href="https://github.com/정빈정빈" target="_blank">GitHub</a>
-        <a href="mailto:contact@r-e.kr">Contact</a>
-        <a href="./privacy.html">개인정보처리방침</a>
-      </div>
-      <div class="footer-text">© 2025 Sharer. All rights reserved. JBJB</div>
-    </footer>
-  </div>
-
-  <div class="auth-modal" id="authModal">
+  <div class="auth-modal" id="signupModal">
     <div class="auth-box">
-      <button class="auth-close" onclick="closeAuthModal()">✕</button>
-      <div class="auth-title" id="authTitle">로그인</div>
-      <form class="auth-form" id="authForm" onsubmit="handleAuthSubmit(event)">
-        <div class="input-group">
-          <label for="authEmail">이메일</label>
-          <input type="email" id="authEmail" class="auth-input" placeholder="example@email.com" required>
-        </div>
-        <div class="input-group">
-          <label for="authPassword">비밀번호</label>
-          <input type="password" id="authPassword" class="auth-input" placeholder="••••••••" required>
-        </div>
-        <div class="input-group" id="nicknameGroup" style="display: none;">
-          <label for="authNickname">닉네임</label>
-          <input type="text" id="authNickname" class="auth-input" placeholder="멋진닉네임">
-        </div>
-        <div class="error-msg" id="authError">오류 메시지</div>
-        <button type="submit" class="auth-btn" id="authSubmitBtn">로그인</button>
-      </form>
-      <div class="auth-switch" id="authSwitch">
-        계정이 없으신가요? <span onclick="switchAuthMode('signup')">회원가입</span>
-      </div>
+      <button class="auth-close" onclick="closeSignupModal()">✕</button>
+      <h2>회원가입</h2>
+      <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
+      <div class="error-message" id="nicknameError"></div>
+      <input type="text" id="signupId" placeholder="아이디">
+      <div class="error-message" id="idError"></div>
+      <input type="password" id="signupPassword" placeholder="비밀번호">
+      <div class="error-message" id="signupError"></div>
+      <div class="success-message" id="signupSuccess"></div>
+      <button onclick="handleSignup()">가입</button>
+      <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
     </div>
   </div>
 
   <div class="create-modal" id="createModal">
     <div class="create-modal-content">
-      <div class="create-header">
-        <div class="create-title">새 게시물 만들기</div>
-        <button class="close-btn" onclick="closeCreateModal()">✕</button>
+      <div class="create-modal-header">
+        <h3>새 게시물 만들기</h3>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button class="post-btn" id="modalPostBtn">공유하기</button>
+          <button class="close-btn" id="closeModal">×</button>
+        </div>
       </div>
-      <form id="createPostForm" onsubmit="handlePostSubmit(event)">
-        <div class="create-body">
-          <div class="textarea-wrapper">
-            <textarea id="postText" class="create-textarea" placeholder="나누고 싶은 이야기를 적어보세요... (Markdown 지원)" maxlength="2000"></textarea>
-          </div>
-          <div class="media-preview-container" id="mediaPreviewContainer"></div>
+      <div class="create-modal-body">
+        <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
+        <div class="image-preview-container">
+          <img id="imagePreview" class="image-preview">
         </div>
-        <div class="create-footer">
-          <label for="mediaUpload" class="media-upload-label">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-          </label>
-          <input type="file" id="mediaUpload" accept="image/*" multiple style="display: none;" onchange="handleMediaSelect(event)">
-          <button type="submit" class="submit-post-btn" id="submitPostBtn" disabled>공유하기</button>
-        </div>
-      </form>
+        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
+        <div id="postMessage" style="margin-top: 10px; font-size: 13px; font-weight: 500;"></div>
+      </div>
     </div>
   </div>
 
-  <div class="toast" id="toast">알림 메시지</div>
+  <div class="main-content">
+    <div class="feed-container">
+      <div id="postsFeed">
+        <div class="skeleton-post">
+          <div class="skeleton-post-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-username"></div>
+          </div>
+          <div class="skeleton skeleton-post-image"></div>
+          <div class="skeleton skeleton-text text-long"></div>
+          <div class="skeleton skeleton-text text-medium"></div>
+          <div class="skeleton skeleton-text text-short"></div>
+        </div>
+        <div class="skeleton-post">
+          <div class="skeleton-post-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-username"></div>
+          </div>
+          <div class="skeleton skeleton-post-image"></div>
+          <div class="skeleton skeleton-text text-long"></div>
+          <div class="skeleton skeleton-text text-long"></div>
+        </div>
+      </div>
+    </div>
 
-  <script>
-    // Supabase 및 상태 설정 기본 주소 (기존 데이터 구조 유지)
-    const API_BASE = "https://supabase-api.r-e.kr";
-    let currentUser = null;
-    let authMode = "login";
-    let selectedFiles = [];
+    <div class="recommend-container" id="recommendProfiles">
+      <div class="recommend-title">프로필 추천</div>
+      <div id="recommendSkeleton">
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+      </div>
+    </div>
+  </div>
 
-    // 배너 쿠키/로컬스토리지 제어 함수
-    function checkTopBanner() {
-      const bannerStatus = localStorage.getItem('topBannerHidden');
-      const bannerEl = document.getElementById('topBanner');
-      if (bannerStatus === 'true') {
-        if(bannerEl) bannerEl.classList.add('hide');
-        document.body.style.paddingTop = '0px';
-      } else {
-        if(bannerEl) bannerEl.classList.remove('hide');
-        document.body.style.paddingTop = '45px';
-      }
+  <div class="footer">
+    <div class="footer-links">
+      <a href="/privacy.html">개인정보처리방침</a>
+      <a href="/policy.html">이용약관</a>
+      <a href="/cdn-cgi/l/email-protection#a0c1ccc5d8c5cfcd9997e0cfd5d4cccfcfcb8ec3cfcd">문의하기</a>
+    </div>
+    <div class="footer-text">본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
+  </div>
+</div>
+
+<script src="markdown.js"></script>
+<script>
+// 배너 부드럽게 닫기 함수 정의
+function closeNoticeBanner() {
+  const banner = document.getElementById('topNoticeBanner');
+  if (banner) {
+    banner.classList.add('hide');
+    document.body.style.paddingTop = '0px';
+    setTimeout(() => {
+      banner.style.display = 'none';
+    }, 300);
+  }
+}
+
+// ─── NPROGRESS 설정 ───
+NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+
+document.addEventListener('click', function(e) {
+  const link = e.target.closest('a');
+  if (link && link.href && !link.target && !link.hasAttribute('download')) {
+    NProgress.start();
+  }
+});
+
+// ─── SPLASH ───
+(function () {
+  const splash = document.getElementById('splash');
+
+  if (sessionStorage.getItem('splashShown')) {
+    splash.style.display = 'none';
+  } else {
+    sessionStorage.setItem('splashShown', 'true');
+
+    function finishSplash() {
+      splash.classList.add('fade-out');
+      setTimeout(() => { splash.style.display = 'none'; }, 460);
     }
 
-    function closeTopBanner() {
-      const bannerEl = document.getElementById('topBanner');
-      if(bannerEl) bannerEl.classList.add('hide');
-      localStorage.setItem('topBannerHidden', 'true');
-      document.body.style.paddingTop = '0px';
-    }
+    const splashStart = Date.now();
+    const MIN_SPLASH = 2000;
 
-    window.addEventListener('DOMContentLoaded', () => {
-      checkTopBanner();
-      // 세션 확인 및 초기화
-      checkSession();
-      loadRecommendProfiles();
-      loadPosts();
-      
-      // 스플래시 화면 제어
-      setTimeout(() => {
-        const splash = document.getElementById('splash');
-        if(splash) {
-          splash.classList.add('fade-out');
-          setTimeout(() => splash.remove(), 450);
-        }
-      }, 800);
+    window.addEventListener('load', () => {
+      NProgress.done();
+      const elapsed = Date.now() - splashStart;
+      const remaining = Math.max(0, MIN_SPLASH - elapsed);
+      setTimeout(finishSplash, remaining);
     });
+    setTimeout(finishSplash, 5000);
+  }
+})();
 
-    async function api(path, options = {}) {
-      const token = localStorage.getItem("sb_token");
-      options.headers = {
-        "Content-Type": "application/json",
-        ...options.headers
-      };
-      if (token) {
-        options.headers["Authorization"] = `Bearer ${token}`;
-      }
-      const res = await fetch(`${API_BASE}${path}`, options);
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || `API 오류: ${res.status}`);
-      }
-      if (res.status === 204) return null;
-      return res.json();
-    }
+const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
-    function checkSession() {
-      const token = localStorage.getItem("sb_token");
-      const userStr = localStorage.getItem("sb_user");
-      if (token && userStr) {
-        try {
-          currentUser = JSON.parse(userStr);
-          updateSidebarAuth(true);
-        } catch(e) {
-          logout();
-        }
-      } else {
-        updateSidebarAuth(false);
-      }
-    }
+async function api(endpoint, options = {}) {
+  const url = API_BASE + endpoint;
+  const res = await fetch(url, {
+    ...options,
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+  });
+  if (!res.ok) {
+    let errorText;
+    try { errorText = await res.text(); } catch { errorText = ""; }
+    throw new Error(`API 오류 (${res.status}): ${errorText}`);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
 
-    function updateSidebarAuth(isAuth) {
-      const iframe = document.getElementById('sidebarIframe');
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'AUTH_CHANGE', isAuth, user: currentUser }, '*');
-      }
-    }
+let currentUser = null;
+let selectedImage = null;
+const postAuthorIdMap = Object.create(null);
+const cloudName = 'dretlhsrk';
+const uploadPreset = 'unsigned_preset';
 
-    window.addEventListener('message', (e) => {
-      if (e.data && e.data.type) {
-        if (e.data.type === 'OPEN_LOGIN') openAuthModal('login');
-        if (e.data.type === 'OPEN_CREATE') openCreateModal();
-        if (e.data.type === 'SIDEBAR_READY') updateSidebarAuth(!!currentUser);
-        if (e.data.type === 'LOGOUT') logout();
-      }
-    });
+// ─── 48시간 내 게시물 작성 유저 추적 ───
+let recentStoryAuthors = new Set();
 
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      if(!t) return;
-      t.innerText = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    // 인증 관련 모달 제어
-    function openAuthModal(mode = 'login') {
-      authMode = mode;
-      const modal = document.getElementById('authModal');
-      if(!modal) return;
-      modal.classList.add('active');
-      switchAuthMode(mode);
-    }
-    function closeAuthModal() {
-      const modal = document.getElementById('authModal');
-      if(modal) modal.classList.remove('active');
-      document.getElementById('authError').style.display = 'none';
-    }
-    function switchAuthMode(mode) {
-      authMode = mode;
-      const title = document.getElementById('authTitle');
-      const nickGroup = document.getElementById('nicknameGroup');
-      const submitBtn = document.getElementById('authSubmitBtn');
-      const sw = document.getElementById('authSwitch');
-      if(!title || !nickGroup || !submitBtn || !sw) return;
-
-      if(mode === 'login') {
-        title.innerText = '로그인';
-        nickGroup.style.display = 'none';
-        document.getElementById('authNickname').removeAttribute('required');
-        submitBtn.innerText = '로그인';
-        sw.innerHTML = `계정이 없으신가요? <span onclick="switchAuthMode('signup')">회원가입</span>`;
-      } else {
-        title.innerText = '회원가입';
-        nickGroup.style.display = 'flex';
-        document.getElementById('authNickname').setAttribute('required', 'true');
-        submitBtn.innerText = '가입하기';
-        sw.innerHTML = `이미 계정이 있으신가요? <span onclick="switchAuthMode('login')">로그인</span>`;
-      }
-    }
-
-    async function handleAuthSubmit(e) {
-      e.preventDefault();
-      const email = document.getElementById('authEmail').value;
-      const password = document.getElementById('authPassword').value;
-      const nickname = document.getElementById('authNickname').value;
-      const errEl = document.getElementById('authError');
-      errEl.style.display = 'none';
-
-      try {
-        NProgress.start();
-        if (authMode === 'login') {
-          const data = IndianAuthMock ? await mockLogin(email, password) : await api('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password })
-          });
-          localStorage.setItem('sb_token', data.token);
-          localStorage.setItem('sb_user', JSON.stringify(data.user));
-          currentUser = data.user;
-          showToast('성공적으로 로그인되었습니다.');
-        } else {
-          await api('/auth/signup', {
-            method: 'POST',
-            body: JSON.stringify({ email, password, nickname })
-          });
-          showToast('회원가입이 완료되었습니다! 로그인 해주세요.');
-          switchAuthMode('login');
-          NProgress.done();
-          return;
-        }
-        closeAuthModal();
-        updateSidebarAuth(true);
-        loadPosts();
-      } catch(err) {
-        errEl.innerText = err.message;
-        errEl.style.display = 'block';
-      } finally {
-        NProgress.done();
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem('sb_token');
-      localStorage.removeItem('sb_user');
-      currentUser = null;
-      updateSidebarAuth(false);
-      showToast('로그아웃되었습니다.');
-      loadPosts();
-    }
-
-    // 글쓰기 관련 제어
-    function openCreateModal() {
-      if(!currentUser) { openAuthModal('login'); return; }
-      const modal = document.getElementById('createModal');
-      if(modal) modal.classList.add('active');
-      validatePostForm();
-    }
-    function closeCreateModal() {
-      const modal = document.getElementById('createModal');
-      if(modal) modal.classList.remove('active');
-      document.getElementById('createPostForm').reset();
-      selectedFiles = [];
-      document.getElementById('mediaPreviewContainer').innerHTML = '';
-    }
-
-    function handleMediaSelect(e) {
-      const files = Array.from(e.target.files);
-      if(selectedFiles.length + files.length > 10) { alert('이미지는 최대 10장까지 업로드 가능합니다.'); return; }
-      
-      files.forEach(file => {
-        if(!file.type.startsWith('image/')) return;
-        selectedFiles.push(file);
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const container = document.getElementById('mediaPreviewContainer');
-          const item = document.createElement('div');
-          item.className = 'media-preview-item';
-          item.innerHTML = `<img src="${event.target.result}"><button type="button" class="media-remove-btn">✕</button>`;
-          item.querySelector('.media-remove-btn').onclick = () => {
-            const idx = selectedFiles.indexOf(file);
-            if(idx > -1) selectedFiles.splice(idx, 1);
-            item.remove();
-            validatePostForm();
-          };
-          container.appendChild(item);
-        };
-        reader.readAsDataURL(file);
+async function fetchRecentStories() {
+  try {
+    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    const posts = await api(`/posts?created_at=gte.${twoDaysAgo}&select=author_id`);
+    if (posts) {
+      posts.forEach(p => {
+        if (p.author_id) recentStoryAuthors.add(p.author_id);
       });
-      setTimeout(validatePostForm, 100);
     }
+  } catch (e) {
+    console.error("스토리 상태 확인 실패", e);
+  }
+}
 
-    document.getElementById('postText').oninput = validatePostForm;
-    function validatePostForm() {
-      const txt = document.getElementById('postText').value.trim();
-      const btn = document.getElementById('submitPostBtn');
-      if(!btn) return;
-      btn.disabled = !(txt.length > 0 || selectedFiles.length > 0);
+async function createNotification(targetUserId, detail, link) {
+  if (!targetUserId || targetUserId === currentUser?.id) return;
+  try {
+    await api("/notification", {
+      method: "POST",
+      body: JSON.stringify({
+        user: targetUserId,
+        detail,
+        link,
+        isread: 0,
+        created_at: new Date().toISOString()
+      })
+    });
+  } catch (e) {}
+}
+
+function initCurrentUser() {
+  const savedUser = localStorage.getItem('snsUser');
+  if (savedUser) { currentUser = JSON.parse(savedUser); updateSidebar(); }
+}
+
+function applyFadeEffect() {
+  const elements = document.querySelectorAll('.post-content');
+  elements.forEach(el => {
+    const style = getComputedStyle(el);
+    const lineHeight = parseFloat(style.lineHeight);
+    const visualLines = el.scrollHeight / lineHeight;
+    const html = el.innerHTML || "";
+    const brLines = html.split('<br').length;
+    const totalLines = Math.max(visualLines, brLines);
+    if (totalLines >= 7) {
+      el.classList.add('fade');
+    } else {
+      el.classList.remove('fade');
     }
+  });
+}
 
-    async function handlePostSubmit(e) {
-      e.preventDefault();
-      const text = document.getElementById('postText').value;
-      const btn = document.getElementById('submitPostBtn');
-      btn.disabled = true;
+function updateSidebar() {
+  const iframe = document.getElementById('sidebarFrame');
+  if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
+}
 
-      try {
-        NProgress.start();
-        let imageUrls = [];
-        if(selectedFiles.length > 0) {
-          for(const file of selectedFiles) {
-            const formData = new FormData();
-            formData.append('file', file);
-            const token = localStorage.getItem("sb_token");
-            const res = await fetch(`${API_BASE}/storage/upload`, {
-              method: 'POST',
-              headers: { 'Authorization': `Bearer ${token}` },
-              body: formData
-            });
-            if(!res.ok) throw new Error('이미지 업로드 실패');
-            const data = await res.json();
-            imageUrls.push(data.url);
-          }
-        }
+function updateSidebarMode() {
+  const iframe = document.getElementById('sidebarFrame');
+  const narrow = window.innerWidth <= 768;
+  if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+}
 
-        await api('/posts', {
-          method: 'POST',
-          body: JSON.stringify({ text, images: imageUrls })
-        });
+window.addEventListener('message', (event) => {
+  const { type, page } = event.data || {};
+  if (type === 'navigate') {
+    if (page === 'home') location.href = 'index.html';
+    if (page === 'explore') location.href = 'explore.html';
+    if (page === 'chat') location.href = 'chat.html';
+  }
+  if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; location.reload(); }
+  if (type === 'requestUserInfo') updateSidebar();
+});
 
-        showToast('게시물이 성공적으로 공유되었습니다.');
-        closeCreateModal();
-        loadPosts();
-        loadRecommendProfiles(); // 내가 작성하여 2일 이내 조건이 생겼을 수 있으므로 갱신
-      } catch(err) {
-        alert(err.message);
-        btn.disabled = false;
-      } finally {
-        NProgress.done();
+window.onSharerProfileLogout = function () {
+  localStorage.removeItem('snsUser');
+  currentUser = null;
+  location.reload();
+};
+
+initCurrentUser();
+updateSidebarMode();
+window.addEventListener('resize', updateSidebarMode);
+
+window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
+window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
+window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
+window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
+
+function handleCreatePost() {
+  if (!currentUser) { document.getElementById('loginModal').classList.add('active'); return; }
+  document.getElementById('createModal').classList.add('active');
+  document.getElementById('postContent').value = '';
+  document.getElementById('imagePreview').classList.remove('show');
+  selectedImage = null;
+}
+
+document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
+document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
+document.getElementById('imageInput').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  selectedImage = file;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const preview = document.getElementById('imagePreview');
+    preview.src = ev.target.result;
+    preview.classList.add('show');
+  };
+  reader.readAsDataURL(file);
+};
+
+async function uploadImageToCloudinary(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', uploadPreset);
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
+  if (!response.ok) throw new Error('이미지 업로드 실패');
+  const data = await response.json();
+  return data.secure_url;
+}
+
+document.getElementById('modalPostBtn').onclick = async () => {
+  const content = document.getElementById('postContent').value.trim();
+  const messageDiv = document.getElementById('postMessage');
+  const postButton = document.getElementById('modalPostBtn');
+  if (!content && !selectedImage) { messageDiv.innerHTML = '<span style="color:var(--pink);">내용 또는 이미지를 추가해주세요.</span>'; return; }
+  postButton.disabled = true;
+  messageDiv.innerHTML = '<span style="color:var(--t2);">게시 중...</span>';
+  try {
+    let imageUrl = null;
+    if (selectedImage) {
+      messageDiv.innerHTML = '<span style="color:var(--t2);">이미지 업로드 중...</span>';
+      imageUrl = await uploadImageToCloudinary(selectedImage);
+    }
+    await api("/posts", {
+      method: "POST",
+      body: JSON.stringify({ author: currentUser.nickname, author_id: currentUser.id, content, image_url: imageUrl, created_at: new Date().toISOString() })
+    });
+    messageDiv.innerHTML = '<span style="color:var(--green);">게시글이 작성되었습니다!</span>';
+    setTimeout(() => { document.getElementById('createModal').classList.remove('active'); messageDiv.innerHTML = ''; loadPosts(); }, 1200);
+  } catch (err) {
+    console.error('게시 오류:', err);
+    messageDiv.innerHTML = '<span style="color:var(--pink);">게시에 실패했습니다.</span>';
+  } finally { postButton.disabled = false; }
+};
+
+function formatPostTime(dateString) {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now - date;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHour = Math.floor(diffMin / 60);
+  const isToday = now.toDateString() === date.toDateString();
+  if (isToday) {
+    if (diffMin < 1) return '방금 전';
+    if (diffMin < 60) return diffMin + '분 전';
+    return diffHour + '시간 전';
+  }
+  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
+
+async function toggleLike(postId, button) {
+  if (!currentUser) {
+    document.getElementById('loginModal').classList.add('active');
+    return;
+  }
+  const countEl = button.querySelector('.like-count');
+  try {
+    const [likeRecords, likeCountResult] = await Promise.all([
+      api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+      api(`/likes?post_id=eq.${postId}&select=count`)
+    ]);
+    const currentlyLiked = likeRecords?.length > 0;
+    const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
+    const uiLiked = button.classList.contains('liked');
+    const uiCount = parseInt(countEl.textContent, 10) || 0;
+    if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
+      button.classList.toggle('liked', currentlyLiked);
+      countEl.textContent = currentServerCount;
+    }
+    if (currentlyLiked) {
+      if (likeRecords?.[0]?.id) {
+        await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
       }
+      button.classList.remove('liked');
+      countEl.textContent = currentServerCount - 1;
+    } else {
+      await api("/likes", {
+        method: "POST",
+        body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
+      });
+      button.classList.add('liked');
+      countEl.textContent = currentServerCount + 1;
+      createNotification(postAuthorIdMap[postId], `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
     }
-
-    // 마크다운 파싱 헬퍼 함수
-    function parseMarkdown(text) {
-      if (!text) return '';
-      let html = text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      
-      html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-      html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-      html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-      html = html.replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
-      html = html.replace(/\*(.*)\*/gim, '<em>$1</em>');
-      html = html.replace(/`([^`]+)`/gim, '<code>$1</code>');
-      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank">$1</a>');
-      return html.replace(/\n/g, '<br>');
+    const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`).then(r => Math.max(0, r?.[0]?.count || 0));
+    countEl.textContent = finalCount;
+  } catch (err) {
+    console.error("좋아요 처리 중 오류:", err);
+    try {
+      const [records, countRes] = await Promise.all([
+        api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
+        api(`/likes?post_id=eq.${postId}&select=count`)
+      ]);
+      button.classList.toggle('liked', records?.length > 0);
+      countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
+    } catch (recoveryErr) {
+      console.error("복구 실패:", recoveryErr);
     }
+  }
+}
 
-    function escapeHtml(text) {
-      if(!text) return '';
-      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+function renderPostImages(imageUrl) {
+  if (!imageUrl) return '';
+  const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
+  if (urls.length === 0) return '';
+
+  let html = `<div class="post-image-container">`;
+  html += `<div class="post-image-carousel">`;
+
+  urls.forEach(url => {
+    html += `
+      <div class="post-image-slide">
+        <img src="${escapeHtml(url)}" alt="게시글 이미지" loading="lazy">
+      </div>`;
+  });
+
+  html += `</div>`;
+
+  if (urls.length > 1) {
+    html += `
+      <button class="post-image-nav prev" onclick="event.stopPropagation(); prevFeedSlide(this)">‹</button>
+      <button class="post-image-nav next" onclick="event.stopPropagation(); nextFeedSlide(this)">›</button>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+window.prevFeedSlide = function(btn) {
+  const carousel = btn.parentElement.querySelector('.post-image-carousel');
+  if (!carousel) return;
+  carousel.scrollBy({ left: -carousel.clientWidth, behavior: 'smooth' });
+};
+
+window.nextFeedSlide = function(btn) {
+  const carousel = btn.parentElement.querySelector('.post-image-carousel');
+  if (!carousel) return;
+  carousel.scrollBy({ left: carousel.clientWidth, behavior: 'smooth' });
+};
+
+async function loadPosts() {
+  const feedDiv = document.getElementById('postsFeed');
+  try {
+    const posts = await api("/posts?select=*&access=not.in.(private,link)&order=created_at.desc");
+    if (!posts?.length) {
+      feedDiv.innerHTML = '<div class="no-posts"><div class="no-posts-icon">🍃</div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div></div>';
+      return;
     }
+    posts.forEach(p => { postAuthorIdMap[p.id] = p.author_id; });
 
-    // 캐러셀 조작 바인딩
-    window.moveCarousel = (btn, direction) => {
-      event.stopPropagation();
-      const carousel = btn.parentElement.querySelector('.post-image-carousel');
-      if(!carousel) return;
-      const width = carousel.offsetWidth;
-      carousel.scrollBy({ left: direction * width, behavior: 'smooth' });
-    };
-
-    // 2일 이내 게시글 확인 도우미 함수 (움직이는 그라데이션 스토리 표시 기준)
-    function checkRecentPost(latestPostCreatedAt) {
-      if (!latestPostCreatedAt) return false;
-      const postDate = new Date(latestPostCreatedAt);
-      const now = new Date();
-      const diffTime = Math.abs(now - postDate);
-      const diffDays = diffTime / (1000 * 60 * 60 * 24);
-      return diffDays <= 2;
-    }
-
-    // 추천 프로필 로드 및 2일 이내 스토리 링 추가
-    async function loadRecommendProfiles() {
-      const container = document.getElementById('recommendList');
-      const skeleton = document.getElementById('recommendSkeleton');
-      if(!container) return;
+    const authorIds = [...new Set(posts.map(p => p.author_id).filter(Boolean))];
+    const usersMap = {};
+    if (authorIds.length) {
       try {
-        // 유저 정보 가져오기 시 최근 포스트 생성일을 함께 조회 가능하도록 구성되어 있다고 가정하거나 
-        // 기존 api가 최신 글 정보를 담고 있는 구조를 매핑합니다.
-        const users = await api('/users/recommend');
-        if(skeleton) skeleton.remove();
+        const inFilter = authorIds.join(',');
+        const users = await api(`/users?id=in.(${inFilter})&select=id,nickname,profile_image`);
+        (users || []).forEach(u => { usersMap[u.id] = u; });
+      } catch (e) { console.warn("유저 일괄 로드 실패:", e); }
+    }
+
+    const postIds = posts.map(p => p.id);
+    const postIdFilter = postIds.join(',');
+
+    const [allLikes, myLikes] = await Promise.all([
+      api(`/likes?post_id=in.(${postIdFilter})&select=post_id`).catch(() => []),
+      currentUser ? api(`/likes?post_id=in.(${postIdFilter})&user_id=eq.${currentUser.id}&select=post_id`).catch(() => []) : Promise.resolve([])
+    ]);
+
+    const likeCountMap = {};
+    (allLikes || []).forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
+    const myLikeSet = new Set((myLikes || []).map(l => l.post_id));
+
+    feedDiv.innerHTML = '';
+    posts.forEach((post, idx) => {
+      const userInfo = usersMap[post.author_id] || null;
+      const authorNickname = userInfo?.nickname || post.author || '알 수 없음';
+      const authorAvatar = userInfo?.profile_image || null;
+      const isVerified = authorNickname === "JB777";
+      const timeStr = formatPostTime(post.created_at);
+      const canDelete = currentUser?.nickname === "JB777";
+      const likeCount = likeCountMap[post.id] || 0;
+      const liked = myLikeSet.has(post.id);
+      
+      const hasStory = recentStoryAuthors.has(post.author_id);
+
+      const avatarInnerHtml = authorAvatar
+        ? `<img src="${escapeHtml(authorAvatar)}" class="post-author-avatar" style="object-fit:cover;" alt="${escapeHtml(authorNickname)}">`
+        : `<div class="post-author-avatar">${(authorNickname[0] || '?').toUpperCase()}</div>`;
         
-        // 기존 데이터를 안전하게 비우고 새로 채움
-        const existingItems = container.querySelectorAll('.profile-item');
-        existingItems.forEach(el => el.remove());
+      const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}">${avatarInnerHtml}</div>`;
 
-        users.slice(0, 5).forEach((user, idx) => {
-          const item = document.createElement('div');
-          item.className = 'profile-item';
-          
-          const badgeHTML = user.verified ? '<span class="verification-badge"></span>' : '';
-          const initial = user.nickname ? user.nickname.charAt(0).toUpperCase() : '?';
-          
-          let avatarContent = `<div class="profile-avatar">${initial}</div>`;
-          if (user.avatar_url) {
-            avatarContent = `<div class="profile-avatar"><img src="${user.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`;
-          }
+      const authorDisplay = isVerified
+        ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
+        : escapeHtml(authorNickname);
 
-          // 2일 이내 게시물이 있을 경우 그라데이션 링 (.has-story) 적용
-          const hasStory = checkRecentPost(user.latest_post_created_at || user.updated_at);
-          const avatarHTML = `
-            <div class="profile-avatar-wrapper ${hasStory ? 'has-story' : ''}">
-              ${avatarContent}
-            </div>
-          `;
+      const deleteButton = canDelete
+        ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
+        : '';
 
-          item.style.opacity = '0';
-          item.style.transform = 'translateX(8px)';
-          item.style.transition = `opacity 0.4s cubic-bezier(0.22,1,0.36,1) ${idx * 0.05}s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);`;
-          item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}${badgeHTML}</span>`;
-          item.onclick = () => { window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`; };
-          container.appendChild(item);
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            item.style.opacity = '1';
-            item.style.transform = 'translateX(0)';
-          }));
-        });
-      } catch (err) {
-        console.error('추천 프로필 로드 오류:', err);
-        if (skeleton) skeleton.innerHTML = '<div style=\"text-align:center; color:var(--t3); padding:12px 0; font-size:13px;\">로드 실패</div>';
+      let contentHTML = '';
+      if (post.content) {
+        contentHTML = `<div class="post-content">${parseMarkdown(post.content)}</div>`;
       }
-    }
 
-    // 메인 피드 로드 및 각 게시글 상단 프사에 2일 이내 스토리 링 추가
-    async function loadPosts() {
-      const container = document.getElementById('postsContainer');
-      const skeleton = document.getElementById('feedSkeleton');
-      if(!container) return;
-      try {
-        NProgress.start();
-        const posts = await api('/posts');
-        if(skeleton) skeleton.remove();
-
-        // 기존 게시물 카드 초기화
-        const existingCards = container.querySelectorAll('.post-card, .no-posts');
-        existingCards.forEach(el => el.remove());
-
-        if(posts.length === 0) {
-          container.innerHTML += `
-            <div class="no-posts">
-              <div class="no-posts-icon">✨</div>
-              정적 피드가 비어있습니다.<br>첫 번째 이야기를 세상에 공유해보세요!
-            </div>
-          `;
-          return;
+      const postCard = document.createElement('div');
+      postCard.className = 'post-card';
+      postCard.style.animationDelay = `${Math.min(idx, 7) * 0.07}s`;
+      postCard.innerHTML = `
+        <div class="post-header">
+          <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(authorNickname)}')">
+            ${avatarHTML}
+            <div class="post-author-name">${authorDisplay}</div>
+          </div>
+          ${deleteButton}
+        </div>
+        ${renderPostImages(post.image_url)}
+        ${contentHTML}
+        <div class="post-actions">
+          <button class="like-button ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
+            <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
+              <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
+            </svg>
+            <span class="like-count">${likeCount}</span>
+          </button>
+        </div>
+        <div class="post-time">${timeStr}</div>
+      `;
+      postCard.onclick = (e) => {
+        if (!e.target.closest('.like-button') && !e.target.closest('.delete-btn') && !e.target.closest('.post-author-info') && !e.target.closest('.post-image-nav')) {
+          window.location.href = `view.html?id=${post.id}`;
         }
+      };
+      feedDiv.appendChild(postCard);
+    });
 
-        posts.forEach(post => {
-          const card = document.createElement('article');
-          card.className = 'post-card';
-          
-          // 피드 상세 이동 페이지로 라우팅 처리 바인딩
-          card.onclick = () => { window.location.href = `post.html?id=${post.id}`; };
+  } catch (err) {
+    console.error('게시물 로드 오류:', err);
+    feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+  }
+}
 
-          const badgeHTML = post.user_verified ? '<span class="verification-badge"></span>' : '';
-          const initial = post.user_nickname ? post.user_nickname.charAt(0).toUpperCase() : '?';
-          
-          let avatarInner = `<div class="post-author-avatar">${initial}</div>`;
-          if (post.user_avatar_url) {
-            avatarInner = `<div class="post-author-avatar"><img src="${post.user_avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`;
-          }
-
-          // 작성자의 2일 이내 게시글 보유 상태에 따라 그라데이션 스토리 표시 처리
-          const authorHasStory = checkRecentPost(post.user_latest_post_created_at || post.created_at);
-          const avatarHTML = `
-            <div class="post-author-avatar-wrapper ${authorHasStory ? 'has-story' : ''}">
-              ${avatarInner}
-            </div>
-          `;
-
-          // 이미지 캐러셀 구성
-          let mediaHTML = '';
-          if (post.images && post.images.length > 0) {
-            let slides = post.images.map(img => `<div class="post-image-slide"><img src="${img}" alt="Post image"></div>`).join('');
-            let navButtons = post.images.length > 1 ? `
-              <button class="post-image-nav prev" onclick="moveCarousel(this, -1)">‹</button>
-              <button class="post-image-nav next" onclick="moveCarousel(this, 1)">›</button>
-            ` : '';
-            mediaHTML = `
-              <div class="post-image-container">
-                <div class="post-image-carousel">${slides}</div>
-                ${navButtons}
-              </div>
-            `;
-          }
-
-          // 좋아요 상태 및 버튼 바인딩 클래스
-          const isLiked = post.liked_by_me ? 'liked' : '';
-          const likeHeartFill = post.liked_by_me ? '#ff6b6b' : 'none';
-          
-          // 삭제 버튼 권한 식별
-          let deleteBtnHTML = '';
-          if (currentUser && (currentUser.id === post.user_id || currentUser.role === 'admin')) {
-            deleteBtnHTML = `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`;
-          }
-
-          // 상대 시간 계산 포맷터
-          const timeLabel = formatRelativeTime(post.created_at);
-
-          card.innerHTML = `
-            <div class="post-header">
-              <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.user_id}', '${escapeHtml(post.user_nickname)}')">
-                ${avatarHTML}
-                <div class="post-author-name">${escapeHtml(post.user_nickname)}${badgeHTML}</div>
-              </div>
-              ${deleteBtnHTML}
-            </div>
-            <div class="post-content">${parseMarkdown(post.text)}</div>
-            ${mediaHTML}
-            <div class="post-time">${timeLabel}</div>
-            <div class="post-actions">
-              <button class="like-button ${isLiked}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
-                <svg class="like-heart" viewBox="0 0 24 24" fill="${likeHeartFill}" stroke="currentColor" stroke-width="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                <span class="like-count">${post.likes_count || 0}</span>
-              </button>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-      } catch(err) {
-        console.error('게시물 피드 로드 오류:', err);
-        container.innerHTML += `<div class="no-posts">피드를 불러오는 도중 오류가 발생했습니다.</div>`;
-      } finally {
-        NProgress.done();
-      }
+async function loadRecommendedProfiles() {
+  const container = document.getElementById('recommendProfiles');
+  const skeleton = document.getElementById('recommendSkeleton');
+  try {
+    let users = await api("/users?select=id,nickname,profile_image");
+    if (!users?.length) {
+      skeleton?.remove();
+      container.innerHTML += '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">사용자 없음</div>';
+      return;
     }
-
-    function formatRelativeTime(dateStr) {
-      const created = new Date(dateStr);
-      const now = new Date();
-      const diff = Math.floor((now - created) / 1000);
-      if (diff < 60) return '방금 전';
-      const mins = Math.floor(diff / 60);
-      if (mins < 60) return `${mins}분 전`;
-      const hours = Math.floor(mins / 60);
-      if (hours < 24) return `${hours}시간 전`;
-      const days = Math.floor(hours / 24);
-      if (days < 7) return `${days}일 전`;
-      return created.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+    for (let i = users.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [users[i], users[j]] = [users[j], users[i]];
     }
-
-    window.goToProfile = (userId, nickname) => {
-      if (userId && nickname) window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
-    };
-
-    window.deletePost = async (postId) => {
-      if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
-      try {
-        await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
-        loadPosts();
-        loadRecommendProfiles();
-      } catch (err) {
-        console.error('삭제 오류:', err);
-        alert('삭제에 실패했습니다.');
-      }
-    };
-
-    window.toggleLike = async (postId, btn) => {
-      if (!currentUser) { openAuthModal('login'); return; }
-      const heart = btn.querySelector('.like-heart');
-      const countEl = btn.querySelector('.like-count');
-      let currentCount = parseInt(countEl.innerText) || 0;
+    users = users.slice(0, 7);
+    skeleton?.remove();
+    users.forEach((user, idx) => {
+      const hasStory = recentStoryAuthors.has(user.id);
       
-      try {
-        if (btn.classList.contains('liked')) {
-          // 좋아요 취소 조작
-          btn.classList.remove('liked');
-          heart.setAttribute('fill', 'none');
-          countEl.innerText = Math.max(0, currentCount - 1);
-          await api(`/posts/like?postId=${postId}`, { method: 'DELETE' });
-        } else {
-          // 좋아요 처리 조작
-          btn.classList.add('liked');
-          heart.setAttribute('fill', '#ff6b6b');
-          countEl.innerText = currentCount + 1;
-          await api(`/posts/like?postId=${postId}`, { method: 'POST' });
-        }
-      } catch(err) {
-        // 에러 발생 시 UI 상태 롤백 복원
-        if (btn.classList.contains('liked')) {
-          btn.classList.remove('liked'); heart.setAttribute('fill', 'none'); countEl.innerText = currentCount;
-        } else {
-          btn.classList.add('liked'); heart.setAttribute('fill', '#ff6b6b'); countEl.innerText = currentCount;
-        }
-        showToast('좋아요 처리에 실패했습니다.');
-      }
-    };
-  </script>
+      const avatarInnerHtml = user.profile_image
+        ? `<img src="${escapeHtml(user.profile_image)}" class="profile-avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt="${escapeHtml(user.nickname)}">`
+        : `<div class="profile-avatar">${(user.nickname?.[0] || '?').toUpperCase()}</div>`;
+        
+      const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}">${avatarInnerHtml}</div>`;
+
+      const item = document.createElement('div');
+      item.className = 'profile-item';
+      item.style.cssText = `opacity:0; transform:translateX(8px); transition: opacity 0.3s ease ${idx * 0.05}s, transform 0.3s cubic-bezier(0.22,1,0.36,1) ${idx * 0.05}s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);`;
+      item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}</span>`;
+      item.onclick = () => { window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`; };
+      container.appendChild(item);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        item.style.opacity = '1';
+        item.style.transform = 'translateX(0)';
+      }));
+    });
+  } catch (err) {
+    console.error('추천 프로필 로드 오류:', err);
+    if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">로드 실패</div>';
+  }
+}
+
+window.goToProfile = (userId, nickname) => {
+  if (userId && nickname) window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
+};
+
+window.deletePost = async (postId) => {
+  if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
+  try {
+    await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
+    loadPosts();
+  } catch (err) {
+    console.error('삭제 오류:', err);
+    alert('삭제에 실패했습니다.');
+  }
+};
+
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// ─── 초기 로드 실행 흐름 (최근 스토리 데이터 먼저 확보) ───
+fetchRecentStories().then(() => {
+  loadPosts().then(() => {
+    applyFadeEffect();
+  });
+  loadRecommendedProfiles();
+});
+</script>
+<script src="sharer-profile-sheet-host.js"></script>
 </body>
 </html>
