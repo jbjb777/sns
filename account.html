@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계정 복구 : Sharer</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #000; --bg2: #111; --bg3: #1a1a1a; --bg4: #222;
+      --border: #1e1e1e; --border2: #2a2a2a; --border3: #333;
+      --t1: #fff; --t2: #888; --t3: #444;
+      --pink: #ff6b6b; --green: #4ade80;
+      --r2: 14px; --r4: 28px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg); color: var(--t1);
+      display: flex; flex-direction: column; min-height: 100vh;
+      opacity: 0; animation: fadeIn 0.4s ease forwards;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+    
+    .header { background: var(--bg); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .logo-svg { width: 32px; height: 32px; }
+    .logo-text { font-size: 18px; font-weight: 600; }
+    
+    .main-content { flex: 1; display: flex; justify-content: center; align-items: center; padding: 48px 20px; }
+    .auth-container { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--r4); padding: 40px; width: 100%; max-width: 440px; overflow: hidden; }
+    
+    .slider-wrap { width: 100%; overflow: hidden; position: relative; }
+    .slider-track { display: flex; width: 400%; transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .slider-step { width: 25%; flex-shrink: 0; display: flex; flex-direction: column; }
+    
+    .step-icon { width: 48px; height: 48px; margin: 0 auto 16px auto; display: block; opacity: 0.9; }
+    h2 { text-align: center; margin-bottom: 24px; font-size: 20px; }
+    .intro-desc { color: var(--t2); margin-bottom: 24px; line-height: 1.6; font-size: 13px; text-align: center; }
+    
+    input { width: 100%; padding: 12px 16px; border-radius: var(--r2); border: 1px solid var(--border2); font-size: 14px; margin-bottom: 10px; background: var(--bg3); color: var(--t1); outline: none; }
+    button { width: 100%; padding: 12px 20px; border-radius: var(--r2); border: none; font-size: 14px; font-weight: 600; cursor: pointer; background: #fff; color: #000; margin-bottom: 8px; transition: 0.2s; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: var(--bg3); color: var(--t1); border: 1px solid var(--border2); }
+    
+    .error-message { color: var(--pink); font-size: 12px; margin-bottom: 8px; text-align: center; font-weight: 500; min-height: 14px; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.2); border-radius: 50%; border-top-color: #000; animation: spin 0.7s linear infinite; margin-right: 6px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .footer { text-align: center; padding: 30px 20px; color: var(--t3); font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container" onclick="location.href='index.html'">
+      <img src="logo.svg" alt="Sharer" class="logo-svg">
+      <span class="logo-text">Sharer</span>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="auth-container">
+      <div class="slider-wrap">
+        <div class="slider-track" id="sliderTrack">
+          
+          <div class="slider-step">
+            <img src="service.svg" class="step-icon" alt="복구">
+            <h2>복구 옵션 선택</h2>
+            <p class="intro-desc">계정을 찾기 위한 방법을 선택해주세요.</p>
+            <button onclick="selectType('ID')">
+              <img src="id.svg" style="width:16px; height:16px; vertical-align:middle; margin-right:8px;">
+              아이디를 통해 복구
+            </button>
+            <button onclick="selectType('PW')">
+              <img src="key.svg" style="width:16px; height:16px; vertical-align:middle; margin-right:8px;">
+              비밀번호를 통해 복구
+            </button>
+          </div>
+
+          <div class="slider-step">
+            <img src="id.svg" class="step-icon" id="inputIcon" alt="입력">
+            <h2 id="step1Title">정보 입력</h2>
+            <p class="intro-desc" id="inputDesc">정보를 입력하면 이메일로 인증코드가 발송됩니다.</p>
+            <input type="text" id="userInput" placeholder="">
+            <div class="error-message" id="inputError"></div>
+            <button onclick="handleRequest()">인증 메일 받기</button>
+            <button class="btn-secondary" onclick="moveStep(0)">이전</button>
+          </div>
+
+          <div class="slider-step">
+            <img src="mail.svg" class="step-icon" alt="인증">
+            <h2>이메일 인증</h2>
+            <p class="intro-desc">전송된 인증번호 6자리를 입력해주세요.</p>
+            <input type="text" id="verifyCode" placeholder="인증번호">
+            <div class="error-message" id="verifyError"></div>
+            <button onclick="handleVerify()">인증 확인</button>
+          </div>
+
+          <div class="slider-step">
+            <img src="shield.svg" class="step-icon" alt="완료">
+            <h2 id="resultTitle">복구 완료</h2>
+            <div style="background:var(--bg3); padding:20px; border-radius:var(--r2); text-align:center; margin-bottom:20px;">
+              <p style="font-size:12px; color:var(--t2);">확인된 정보입니다.</p>
+              <h3 id="resultValue" style="margin-top:10px; font-size:24px; color:var(--green);">--</h3>
+            </div>
+            <button onclick="location.href='login.html'">로그인하러 가기</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Sharer Account Recovery Service</div>
+
+<script>
+  const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+  const EMAIL_WORKER_URL = "https://white-salad-5eb7.alexeom97.workers.dev/";
+
+  let recoveryType = ''; // 'ID' or 'PW'
+  let foundUser = null; // 인증 성공 전까지는 절대 노출 금지
+
+  function moveStep(step) {
+    document.getElementById('sliderTrack').style.transform = `translateX(-${step * 25}%)`;
+  }
+
+  function selectType(type) {
+    recoveryType = type;
+    const input = document.getElementById('userInput');
+    const title = document.getElementById('step1Title');
+    const icon = document.getElementById('inputIcon');
+    
+    if (type === 'ID') {
+      input.placeholder = "아이디를 입력하세요";
+      title.textContent = "아이디로 찾기";
+      icon.src = "id.svg";
+    } else {
+      input.placeholder = "비밀번호를 입력하세요";
+      title.textContent = "비밀번호로 찾기";
+      icon.src = "key.svg";
+    }
+    moveStep(1);
+  }
+
+  async function handleRequest() {
+    const val = document.getElementById('userInput').value.trim();
+    const err = document.getElementById('inputError');
+    if (!val) { err.textContent = "정보를 입력해주세요."; return; }
+
+    try {
+      // 1. 유저 찾기
+      const query = recoveryType === 'ID' ? `id=eq.${encodeURIComponent(val)}` : `password=eq.${encodeURIComponent(val)}`;
+      const res = await fetch(`${API_BASE}/users?${query}&select=*`);
+      const users = await res.json();
+
+      if (!users || users.length === 0) {
+        err.textContent = "해당 정보를 가진 계정을 찾을 수 없습니다.";
+        return;
+      }
+
+      foundUser = users[0]; // 메모리에 저장 (인증 성공 시 노출 예정)
+      
+      if (!foundUser.email) {
+        err.textContent = "이 계정은 등록된 이메일이 없습니다.";
+        return;
+      }
+
+      // 2. 인증 메일 발송
+      const emailRes = await fetch(EMAIL_WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: foundUser.email })
+      });
+
+      if (!emailRes.ok) throw new Error("메일 발송 실패");
+      
+      moveStep(2);
+    } catch (e) {
+      err.textContent = "서버 오류가 발생했습니다.";
+      console.error(e);
+    }
+  }
+
+  async function handleVerify() {
+    const code = document.getElementById('verifyCode').value.trim();
+    const err = document.getElementById('verifyError');
+    if (!code) { err.textContent = "인증번호를 입력하세요."; return; }
+
+    try {
+      const res = await fetch(EMAIL_WORKER_URL + 'verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: foundUser.email, code: code })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        // 성공시 최종 결과 노출
+        const secret = recoveryType === 'ID' ? foundUser.id : foundUser.password;
+        document.getElementById('resultTitle').textContent = recoveryType === 'ID' ? "아이디 복구 완료" : "비밀번호 복구 완료";
+        document.getElementById('resultValue').textContent = secret;
+        moveStep(3);
+      } else {
+        err.textContent = "인증번호가 일치하지 않습니다.";
+      }
+    } catch (e) {
+      err.textContent = "인증 오류 발생";
+    }
+  }
+</script>
+</body>
+</html>
