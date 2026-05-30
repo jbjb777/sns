@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
-
-
   <title>게시물 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
@@ -116,6 +113,32 @@
       animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.2s forwards;
     }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+    
+    /* ─── STORY RING (스토리 프로필 테두리 그라데이션) ─── */
+    .story-ring-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+    .story-ring-wrapper.has-story {
+      padding: 2.5px;
+      background: linear-gradient(270deg, #0740ba, #651fff, #29b1ff, #0740ba);
+      background-size: 200% 200%;
+      animation: storyRing 3s linear infinite;
+    }
+    @keyframes storyRing {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .story-ring-wrapper.has-story .author-avatar,
+    .story-ring-wrapper.has-story .comment-avatar {
+      border: 3px solid var(--bg) !important;
+    }
+
     /* ─── POST DETAIL CARD ─── */
     .post-detail-card { margin-bottom: 48px; }
     .post-detail-header {
@@ -778,7 +801,7 @@
       -webkit-user-select: none;
     }
     .sharer-profile-sheet-host .sps-drag-area:active {
-      cursor grabbing;
+      cursor: grabbing;
     }
     .sharer-profile-sheet-host .sps-grab {
       width: 40px;
@@ -966,6 +989,23 @@
   let currentLightboxImages = [];
   let currentLightboxIndex = 0;
 
+  // ─── 48시간 내 게시물 작성 유저 추적 ───
+  let recentStoryAuthors = new Set();
+
+  async function fetchRecentStories() {
+    try {
+      const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+      const posts = await api(`/posts?created_at=gte.${twoDaysAgo}&select=author_id`);
+      if (posts) {
+        posts.forEach(p => {
+          if (p.author_id) recentStoryAuthors.add(p.author_id);
+        });
+      }
+    } catch (e) {
+      console.error("스토리 상태 확인 실패", e);
+    }
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   const postId = urlParams.get('id');
 
@@ -1052,8 +1092,11 @@
   if (!postId) {
     showError('게시물 ID가 없습니다.');
   } else {
-    loadPost(postId);
-    listenComments(postId);
+    // 렌더링 전 최신 스토리 유저 목록부터 가져오기
+    fetchRecentStories().then(() => {
+      loadPost(postId);
+      listenComments(postId);
+    });
   }
 
   async function getProfileImage(userId) {
@@ -1207,13 +1250,18 @@
       (currentUser.nickname === "JB777" && currentUser.isVerified)
     );
 
-    let avatarContent = post.author ? post.author[0].toUpperCase() : '?';
+    // 작성자 스토리 상태 확인 후 HTML 구성
+    const hasStory = recentStoryAuthors.has(post.author_id);
+    let avatarInnerHtml = post.author ? post.author[0].toUpperCase() : '?';
+    
     if (post.author_profile_image) {
       const url = post.author_profile_image.includes('?')
         ? `${post.author_profile_image}&v=${Date.now()}`
         : `${post.author_profile_image}?v=${Date.now()}`;
-      avatarContent = `<img src="${url}" alt="${escapeHtml(post.author)}">`;
+      avatarInnerHtml = `<img src="${url}" alt="${escapeHtml(post.author)}">`;
     }
+    
+    const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="author-avatar">${avatarInnerHtml}</div></div>`;
 
     const linkedContent = parseMarkdown(post.content || '');
 
@@ -1236,7 +1284,7 @@
       <div class="post-detail-card">
         <div class="post-detail-header">
           <div class="author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
-            <div class="author-avatar">${avatarContent}</div>
+            ${avatarHTML}
             <div class="author-details">
               <div class="author-name">
                 ${escapeHtml(post.author)}
@@ -1430,15 +1478,17 @@
       arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     });
 
+    // 댓글 및 답글 프로필에 렌더링 시 스토리 테두리 링을 포함시킵니다.
     function renderAvatar(userName, userId) {
-      let avatar = userName ? userName[0].toUpperCase() : '?';
+      let avatarInner = userName ? userName[0].toUpperCase() : '?';
       if (profileImages[userId]) {
         const url = profileImages[userId].includes('?')
           ? `${profileImages[userId]}&v=${Date.now()}`
           : `${profileImages[userId]}?v=${Date.now()}`;
-        avatar = `<img src="${url}" alt="${escapeHtml(userName)}">`;
+        avatarInner = `<img src="${url}" alt="${escapeHtml(userName)}">`;
       }
-      return avatar;
+      const hasStory = recentStoryAuthors.has(userId);
+      return `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="comment-avatar">${avatarInner}</div></div>`;
     }
 
     function renderOneComment(c, { showReplyButton }) {
@@ -1487,7 +1537,7 @@
               <div class="reply-item">
                 <div class="comment-header">
                   <div class="comment-author-wrapper" onclick="goToProfile('${r.user_id}', '${escapeHtml(r.user_name)}')">
-                    <div class="comment-avatar">${rAvatarContent}</div>
+                    ${rAvatarContent}
                     <span class="comment-author">
                       ${escapeHtml(r.user_name)}
                       ${rIsVerified ? '<span class="verification-badge" style="width:12px;height:12px;"></span>' : ''}
@@ -1506,7 +1556,7 @@
       return `
         <div class="comment-header">
           <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
-            <div class="comment-avatar">${avatarContent}</div>
+            ${avatarContent}
             <span class="comment-author">
               ${escapeHtml(c.user_name)}
               ${isVerified ? '<span class="verification-badge" style="width:13px;height:13px;"></span>' : ''}
