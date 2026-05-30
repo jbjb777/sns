@@ -140,31 +140,32 @@
     }
 
     /* 스토리 소유 시 파란 그라데이션 테두리 래퍼 */
+/* 스토리 소유 시 파란 그라데이션 테두리 래퍼 */
     .profile-avatar-wrapper {
       position: relative;
-      width: 96px; height: 96px;
+      width: 104px; height: 104px; /* 여백 확보를 위해 전체 크기를 살짝 키움 */
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
     .profile-avatar-wrapper.has-story {
-      padding: 4px;
+      padding: 8px; /* 프사와 테두리 사이의 빈 공간을 4px -> 8px로 넓힘 */
       border-radius: 50%;
       background: linear-gradient(
         270deg,
         #0740ba,
-        #0740ba,
         #651fff,
-        #29b1ff
+        #29b1ff,
+        #0740ba /* 시작 색상과 끝 색상을 일치시켜 끊김 현상 제거 */
       );
-      background-size: 300% 300%;
-      animation: storyRing 4s linear infinite;
+      background-size: 200% 200%;
+      animation: storyRing 3s linear infinite; /* 회전 속도를 조금 더 직관적이고 부드럽게 수정 */
     }
 
     @keyframes storyRing {
       0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
+      100% { background-position: 200% 50%; } /* 100% 이동 시 자연스럽게 처음 위치와 맞물림 */
     }
 
     .profile-avatar {
