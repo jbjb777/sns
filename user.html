@@ -149,10 +149,22 @@
       flex-shrink: 0;
     }
     .profile-avatar-wrapper.has-story {
-      padding: 4px;
+      padding: 8px;
       border-radius: 50%;
-      background: linear-gradient(45deg, #0095f6, #00c6ff, #0072ff);
-      cursor: pointer;
+      background: linear-gradient(
+        270deg,
+        #0740ba,
+        #29b1ff,
+        #651fff,
+        #0740ba
+      );
+      background-size: 300% 300%;
+      animation: storyRing 4s linear infinite;
+    }
+
+    @keyframes storyRing {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
     }
 
     .profile-avatar {
