@@ -480,10 +480,7 @@
         <div class="success-message" id="loginSuccess"></div>
         <button id="loginBtn" onclick="handleLogin()">로그인</button>
         
-        <div style="text-align: center; margin-bottom: 20px; font-size: 13px; color: var(--t2);">
-          계정을 잊으셨나요?
-          <button type="button" onclick="location.href='account.html'" style="background:none; border:none; color:var(--t1); text-decoration:underline; cursor:pointer; font-size:13px; padding:0 0 0 5px;">계정 복구</button>
-        </div>
+
 
         <div class="or-divider"><span>또는</span></div>
         <button class="google-btn" id="googleLoginBtn" onclick="showGoogleModal('login')">
@@ -491,6 +488,16 @@
           구글로 로그인
         </button>
       </div>
+
+
+
+
+        <div class="or-divider"><span>계정을 잊으셨나요?</span></div>
+        <button class="google-btn" id="accountBtn" onclick="{ window.location.href = 'account.html'; }">
+          <img src="https://sharer.r-e.kr/id.svg" alt="account">
+          계정 복구
+        </button>
+
 
       <div class="form-section" id="signupForm">
         <div class="progress-container">
