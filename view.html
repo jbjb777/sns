@@ -35,8 +35,7 @@
     #nprogress .spinner { display: none !important; }
     /* ─── SPLASH ─── */
     #splash {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: var(--bg);
       display: flex;
       justify-content: center;
@@ -205,7 +204,11 @@
       padding: 9px 18px;
       border-radius: 22px;
       font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.15s ease;
     }
+    .access-badge:hover { transform: scale(1.05); }
+    .access-badge:active { transform: scale(0.95); }
     .access-badge img {
       width: 16px;
       height: 16px;
@@ -858,6 +861,118 @@
       cursor: pointer;
       font-family: inherit;
     }
+
+    /* ─── MODAL (POPUP) STYLE ─── */
+    .modal {
+      display: flex;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0);
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      pointer-events: none;
+      visibility: hidden;
+      transition: background-color 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease, visibility 0.3s;
+    }
+    .modal.open { 
+      pointer-events: auto;
+      visibility: visible;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .modal-content {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      width: 90%;
+      max-width: 440px;
+      border-radius: var(--r4);
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      opacity: 0;
+      transform: scale(0.85) translateY(30px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    }
+    .modal.open .modal-content { 
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 22px; right: 22px;
+      background: none;
+      border: none;
+      color: var(--t2);
+      cursor: pointer;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s, transform 0.1s ease;
+    }
+    .modal-close-btn:hover { background: var(--bg3); color: var(--t1); }
+    .modal-close-btn:active { transform: scale(0.88); }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .modal-header img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--t1);
+    }
+    .info-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .info-icon-box {
+      width: 32px; height: 32px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: var(--r1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .info-icon-box img {
+      width: 16px; height: 16px;
+      object-fit: contain;
+    }
+    .info-text-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .info-row-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--t1);
+    }
+    .info-row-desc {
+      font-size: 12px;
+      color: var(--t2);
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -876,6 +991,43 @@
       <div class="delete-modal-buttons">
         <button class="delete-modal-btn cancel" onclick="closeDeleteModal()">취소</button>
         <button class="delete-modal-btn delete" id="confirmDeleteBtn">삭제</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="accessInfoModal">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closeInfoModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="modal-header">
+        <img src="set.svg" alt="set">
+        <div class="modal-title">공개 범위 설정</div>
+      </div>
+      <div class="info-section">
+        <div class="info-row">
+          <div class="info-icon-box"><img src="earth.svg" alt="public"></div>
+          <div class="info-text-box">
+            <div class="info-row-title">공개</div>
+            <div class="info-row-desc">Sharer 를 방문하는 모든 사용자가 게시물을 볼수 있어요</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon-box"><img src="link.svg" alt="link"></div>
+          <div class="info-text-box">
+            <div class="info-row-title">일부 공개</div>
+            <div class="info-row-desc">작성자(본인)과 링크를 통해서만 접근할수 있어요</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon-box"><img src="service.svg" alt="private"></div>
+          <div class="info-text-box">
+            <div class="info-row-title">비공개</div>
+            <div class="info-row-desc">작성자(본인) 만이 접근할수 있어요</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -988,10 +1140,9 @@
   const openReplyThreads = new Set();
   let currentLightboxImages = [];
   let currentLightboxIndex = 0;
-
+  
   // ─── 48시간 내 게시물 작성 유저 추적 ───
   let recentStoryAuthors = new Set();
-
   async function fetchRecentStories() {
     try {
       const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
@@ -1008,7 +1159,7 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const postId = urlParams.get('id');
-
+  
   async function createNotification(targetUserId, detail, link) {
     if (!targetUserId || targetUserId === currentUser?.id) return;
     try {
@@ -1046,7 +1197,7 @@
     const saved = localStorage.getItem('snsUser');
     if (saved) { 
       currentUser = JSON.parse(saved); 
-      updateSidebar(); 
+      updateSidebar();
     }
   }
 
@@ -1080,7 +1231,7 @@
     currentUser = null;
     location.href = 'index.html';
   };
-
+  
   document.getElementById('commentInput')?.addEventListener('focus', function() {
     if (!currentUser) { this.blur(); showLoginAlert(); }
   });
@@ -1088,7 +1239,7 @@
   initCurrentUser();
   updateSidebarMode();
   window.addEventListener('resize', updateSidebarMode);
-
+  
   if (!postId) {
     showError('게시물 ID가 없습니다.');
   } else {
@@ -1122,7 +1273,6 @@
           <img src="${url}" alt="게시물 이미지 ${index + 1}" loading="lazy" onclick="openLightbox(${index})">
         </div>`;
     });
-    
     html += `</div>`;
 
     if (urls.length > 1) {
@@ -1141,7 +1291,7 @@
     const scrollAmount = carousel.clientWidth;
     carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
   };
-
+  
   window.nextSlide = function(postIdStr) {
     const carousel = document.getElementById(`carousel-${postIdStr}`);
     if (!carousel) return;
@@ -1158,19 +1308,18 @@
     const lightbox = document.getElementById('imageLightbox');
     const imgEl = document.getElementById('lightboxImage');
     const counter = document.getElementById('lightboxCounter');
-    
     imgEl.src = currentLightboxImages[currentLightboxIndex];
     counter.textContent = `${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
     lightbox.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   };
-
+  
   window.closeLightbox = function() {
     const lightbox = document.getElementById('imageLightbox');
     lightbox.style.display = 'none';
     document.body.style.overflow = '';
   };
-
+  
   window.prevLightboxImage = function() {
     if (currentLightboxImages.length <= 1) return;
     currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxImages.length) % currentLightboxImages.length;
@@ -1197,7 +1346,7 @@
       }
     }
   });
-
+  
   async function loadPost(postId) {
     try {
       const posts = await api(`/posts?id=eq.${postId}&select=*`);
@@ -1210,7 +1359,7 @@
       // 최신 currentUser 상태(로그인 유저 정보)를 완벽히 동기화한 뒤 비교합니다.
       const savedUser = localStorage.getItem('snsUser');
       const activeUser = savedUser ? JSON.parse(savedUser) : null;
-
+      
       // access 값이 private 일 때 권한 확인 처리 코드
       if (post.access === 'private') {
         if (!activeUser) {
@@ -1249,7 +1398,7 @@
       currentUser.id === post.author_id ||
       (currentUser.nickname === "JB777" && currentUser.isVerified)
     );
-
+    
     // 작성자 스토리 상태 확인 후 HTML 구성
     const hasStory = recentStoryAuthors.has(post.author_id);
     let avatarInnerHtml = post.author ? post.author[0].toUpperCase() : '?';
@@ -1262,7 +1411,6 @@
     }
     
     const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="author-avatar">${avatarInnerHtml}</div></div>`;
-
     const linkedContent = parseMarkdown(post.content || '');
 
     // 공개 범위(access)에 따른 아이콘, 텍스트, 스타일 분기 처리
@@ -1294,7 +1442,7 @@
             </div>
           </div>
           <div class="header-actions">
-            <div class="access-badge ${accessClass}">
+            <div class="access-badge ${accessClass}" onclick="openInfoModal()">
               <img src="${accessIcon}" alt="${accessText}">
               <span>${accessText}</span>
             </div>
@@ -1326,7 +1474,7 @@
         </div>
       </div>
     `;
-
+    
     // 캐러셀 인디케이터 초기화
     if (post.image_url) {
       const urls = post.image_url.split(',').map(u => u.trim()).filter(Boolean);
@@ -1392,13 +1540,13 @@
 
     const btn = document.getElementById('likeBtn');
     const countEl = document.getElementById('likeCount');
-
+    
     try {
       const [likeRecords, likeCountResult] = await Promise.all([
         api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
         api(`/likes?post_id=eq.${postId}&select=count`)
       ]);
-
+      
       const currentlyLiked = likeRecords?.length > 0;
       const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
       const uiLiked = btn.classList.contains('liked');
@@ -1445,10 +1593,12 @@
       const comments = await api(`/comments?post_id=eq.${postId}&select=*&order=created_at.desc`);
       const userIds = [...new Set(comments.map(c => c.user_id))];
       const profileImages = {};
+      
       await Promise.all(userIds.map(async (uid) => {
         const img = await getProfileImage(uid);
         if (img) profileImages[uid] = img;
       }));
+      
       displayComments(comments || [], profileImages);
     } catch (e) { console.error('댓글 로드 오류:', e); }
   }
@@ -1456,7 +1606,7 @@
   function displayComments(comments, profileImages = {}) {
     const list = document.getElementById('commentList');
     list.innerHTML = '';
-
+    
     if (comments.length === 0) {
       list.innerHTML = '<div style="text-align:center; color:var(--t3); padding:48px 20px; font-size:14px;">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>';
       return;
@@ -1464,7 +1614,7 @@
 
     const roots = [];
     const repliesByParent = {};
-
+    
     comments.forEach(c => {
       const parentId = c.parent_id || null;
       if (!parentId) roots.push(c);
@@ -1473,11 +1623,11 @@
         repliesByParent[parentId].push(c);
       }
     });
-
+    
     Object.values(repliesByParent).forEach(arr => {
       arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     });
-
+    
     // 댓글 및 답글 프로필에 렌더링 시 스토리 테두리 링을 포함시킵니다.
     function renderAvatar(userName, userId) {
       let avatarInner = userName ? userName[0].toUpperCase() : '?';
@@ -1502,16 +1652,17 @@
       const replyCount = (repliesByParent[c.id] || []).length;
       const hasReplies = replyCount > 0;
       const isOpen = openReplyThreads.has(c.id);
-
+      
       const replyBtnHtml = showReplyButton
         ? `<button class="reply-btn" onclick="openReplyComposer('${c.id}')">답글 달기</button>`
         : '';
-
+        
       const toggleBtnHtml = hasReplies
         ? `<button class="replies-toggle-btn" id="toggleReplies-${c.id}" data-count="${replyCount}" onclick="toggleReplies('${c.id}')">${isOpen ? '답글 접기' : `답글 ${replyCount}개 보기`}</button>`
         : '';
 
-      const replyComposeHtml = showReplyButton ? `
+      const replyComposeHtml = showReplyButton ?
+      `
         <div class="reply-compose" id="replyCompose-${c.id}" style="display:none;">
           <textarea id="replyInput-${c.id}" class="reply-input" placeholder="답글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
           <div class="reply-compose-actions">
@@ -1520,9 +1671,10 @@
           </div>
         </div>
       ` : '';
-
+      
       const replies = repliesByParent[c.id] || [];
-      const repliesHtml = replies.length ? `
+      const repliesHtml = replies.length ?
+      `
         <div class="reply-list" id="replyList-${c.id}" style="display: ${isOpen ? 'flex' : 'none'};">
           ${replies.map(r => {
             const rIsMine = currentUser?.id === r.user_id;
@@ -1552,7 +1704,7 @@
           }).join('')}
         </div>
       ` : '';
-
+      
       return `
         <div class="comment-header">
           <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
@@ -1566,7 +1718,8 @@
         </div>
         <div class="comment-content">${linkedText}</div>
         <div class="comment-date">${date}</div>
-        ${showReplyButton ? `
+        ${showReplyButton ?
+        `
           <div class="comment-actions">
             ${replyBtnHtml}
             ${toggleBtnHtml}
@@ -1594,22 +1747,39 @@
     `;
   }
 
+  // ─── INFO MODAL 추가 로직 ───
+  window.openInfoModal = function() {
+    document.getElementById('accessInfoModal').classList.add('open');
+  };
+
+  window.closeInfoModal = function() {
+    document.getElementById('accessInfoModal').classList.remove('open');
+  };
+
+  // 모달 영역 밖 클릭 시 닫기
+  window.addEventListener('click', (e) => {
+    const infoModal = document.getElementById('accessInfoModal');
+    if (e.target === infoModal) {
+      closeInfoModal();
+    }
+  });
+
   window.openDeleteModal = function(id) {
     pendingDeletePostId = id;
     document.getElementById('deleteModal').classList.add('show');
     document.body.style.overflow = 'hidden';
   };
-
+  
   window.closeDeleteModal = function() {
     document.getElementById('deleteModal').classList.remove('show');
     document.body.style.overflow = '';
     pendingDeletePostId = null;
   };
-
+  
   window.goToProfile = function(userId, nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   };
-
+  
   window.addComment = async function() {
     const input = document.getElementById('commentInput');
     const text = input.value.trim();
@@ -1633,7 +1803,7 @@
       listenComments(postId);
     } catch (e) { alert('댓글 작성 실패'); }
   };
-
+  
   window.openReplyComposer = function(commentId) {
     if (!currentUser) return showLoginAlert();
     const compose = document.getElementById(`replyCompose-${commentId}`);
@@ -1642,7 +1812,7 @@
     const input = document.getElementById(`replyInput-${commentId}`);
     if (input) input.focus();
   };
-
+  
   window.cancelReply = function(commentId) {
     const compose = document.getElementById(`replyCompose-${commentId}`);
     const input = document.getElementById(`replyInput-${commentId}`);
@@ -1655,7 +1825,7 @@
     const text = input?.value?.trim() || '';
     if (!currentUser) return showLoginAlert();
     if (!text || !currentPost) return;
-
+    
     try {
       await api("/comments", {
         method: "POST",
@@ -1679,12 +1849,12 @@
       listenComments(postId);
     } catch (e) { alert('답글 작성 실패'); }
   };
-
+  
   window.toggleReplies = function(commentId) {
     const listEl = document.getElementById(`replyList-${commentId}`);
     const btn = document.getElementById(`toggleReplies-${commentId}`);
     if (!listEl || !btn) return;
-
+    
     const opening = listEl.style.display === 'none' || !listEl.style.display;
 
     if (opening) {
@@ -1698,7 +1868,7 @@
       openReplyThreads.delete(commentId);
     }
   };
-
+  
   window.deleteComment = async function(commentId) {
     if (!confirm('댓글을 삭제하시겠습니까?')) return;
     try {
@@ -1706,7 +1876,7 @@
       listenComments(postId);
     } catch (e) { alert('댓글 삭제 실패'); }
   };
-
+  
   window.copyShareLink = function() {
     navigator.clipboard.writeText(window.location.href).then(() => {
       const btn = document.getElementById('copyBtn');
@@ -1728,7 +1898,7 @@
       window.location.href = 'index.html';
     } catch (e) { alert('게시물 삭제 실패'); }
   };
-
+  
   function escapeHtml(unsafe) {
     return unsafe
       .replace(/&/g, "&amp;")
