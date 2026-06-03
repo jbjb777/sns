@@ -311,6 +311,48 @@
       object-fit: contain;
     }
 
+
+
+
+
+
+
+
+    .mobile-profile-sheet-inner .sheet-set {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
+      padding: 14px 16px;
+      border: 1px solid rgba(145, 145, 145, 0.9);
+      border-radius: 14px;
+      background: transparent;
+      color: #a5a5a5;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .mobile-profile-sheet-inner .sheet-set img {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
+
+
+
+
+
+
+
+
+
+
     /* 데스크톱 iframe(좁음): 시트 숨김 — 뷰포트 min-width는 iframe 너비 기준이라 72px에서는 아래 블록 미적용 */
     .mobile-sheet-backdrop,
     .mobile-profile-sheet {
@@ -517,6 +559,19 @@
         <button type="button" class="sheet-discord-join" id="sheetDiscordJoinBtn">
           <img src="discord.png" alt="">
           <span>디스코드 참여</span>
+        
+        
+        
+        
+        <button type="button" class="sheet-set" id="sheetSetBtn">
+          <img src="set.png" alt="">
+          <span>설정</span>
+        </button>
+        
+        
+        
+        
+        
         </button>
       </div>
     </div>
@@ -542,7 +597,7 @@
     const sheetDiscordJoinBtn = document.getElementById('sheetDiscordJoinBtn');
     const userAvatar = document.getElementById('userAvatar');
     const sidebarBar = document.querySelector('.sidebar');
-
+    const sheetSetBtn = document.getElementById('sheetSetBtn');
     function isMobileBottomLayout() {
       return window.matchMedia('(min-width: 200px)').matches;
     }
@@ -692,8 +747,22 @@
       e.stopPropagation();
       if (isMobileBottomLayout()) return;
       closeProfileSheet();
-      window.open('https://discord.gg/8s6XuWkfQb', '_blank');
+      window.location.href('https://discord.gg/8s6XuWkfQb', '_blank');
     };
+
+
+
+
+    sheetSetBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (isMobileBottomLayout()) return;
+      closeProfileSheet();
+      window.open('https://sharer.r-e.kr/set.html', '_blank');
+    };
+
+
+
+
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeProfileSheet();
