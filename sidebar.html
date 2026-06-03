@@ -559,17 +559,12 @@
         <button type="button" class="sheet-discord-join" id="sheetDiscordJoinBtn">
           <img src="discord.png" alt="">
           <span>디스코드 참여</span>
-        
-        
+        </button>
         
         
         <button type="button" class="sheet-set" id="sheetSetBtn">
           <img src="set.png" alt="">
           <span>설정</span>
-        </button>
-        
-        
-        
         
         
         </button>
@@ -755,9 +750,8 @@
 
     sheetSetBtn.onclick = (e) => {
       e.stopPropagation();
-      if (isMobileBottomLayout()) return;
       closeProfileSheet();
-      window.open('https://sharer.r-e.kr/set.html', '_blank');
+      window.top.location.href = 'https://sharer.r-e.kr/set.html';
     };
 
 
