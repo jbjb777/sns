@@ -40,8 +40,12 @@
   }
   </script>
 
-
-
+  <script>
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  </script>
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
@@ -56,11 +60,11 @@
       font-size: 20px;
       font-weight: 700;
       letter-spacing: 0.05em;
-      color: #fff;
+      color: var(--t1); /* 테마 변수로 수정 */
     }
     .splash-sub {
       font-size: 12px;
-      color: #666;
+      color: var(--t2); /* 테마 변수로 수정 */
       margin-top: 4px;
       letter-spacing: 0.08em;
     }
@@ -88,6 +92,20 @@
       --r2: 14px;
       --r3: 20px;
       --r4: 28px;
+    }
+
+    /* 라이트 모드 변수 정의 추가 */
+    html[data-theme="light"] {
+      --bg: #fafafa;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e4e4e4;
+      --border: #dbdbdb;
+      --border2: #cccccc;
+      --border3: #a3a3a3;
+      --t1: #000000;
+      --t2: #737373;
+      --t3: #a8a8a8;
     }
 
     html { scroll-behavior: smooth; }
@@ -138,7 +156,7 @@
       to   { opacity: 1; transform: scale(1); }
     }
 
-    #nprogress .bar { background: #fff !important; height: 2px !important; }
+    #nprogress .bar { background: var(--t1) !important; height: 2px !important; } /* 테마 변수로 수정 */
     #nprogress .peg { display: none !important; }
     #nprogress .spinner { display: none !important; }
 
@@ -225,7 +243,7 @@
       font-weight: 600;
       flex-shrink: 0;
       object-fit: cover;
-      color: #666;
+      color: var(--t2); /* 테마 변수로 수정 */
     }
 
     /* 스토리 프로필 테두리 그라데이션 */
@@ -301,7 +319,7 @@
       position: relative;
     }
     @keyframes postIn { to { opacity: 1; transform: translateY(0); } }
-    .post-card:hover { background: #080808; }
+    .post-card:hover { background: var(--bg2); } /* 테마 변수로 수정 */
     .post-card:last-child { border-bottom: none; }
 
     .post-header {
@@ -327,7 +345,7 @@
       font-weight: 600;
       flex-shrink: 0;
       transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      color: #666;
+      color: var(--t2); /* 테마 변수로 수정 */
     }
     .post-author-info:hover .post-author-avatar {
       border-color: var(--border3);
@@ -401,6 +419,7 @@
       overflow: hidden;
       position: relative;
     }
+    /* 라이트 모드 대응을 위해 투명 그라데이션의 끝 색상을 각 모드의 배경색 변수(--bg)로 매핑 */
     .post-content.fade::after {
       display: block;
       content: "";
@@ -408,8 +427,13 @@
       left: 0; right: 0;
       top: calc(1.6em * 6);
       height: calc(1.6em * 4);
-      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0.7) 75%, #ffffff 100%);
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.05) 75%, var(--bg) 100%);
       pointer-events: none;
+    }
+
+    /* 만약 라이트 모드일 때 조금 더 또렷하고 깔끔한 그라데이션 처리를 원할 경우 대비 */
+    html[data-theme="light"] .post-content.fade::after {
+      background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.4) 40%, rgba(250,250,250,0.8) 75%, var(--bg) 100%);
     }
 
     .post-time { padding: 8px 2px 10px; font-size: 11px; color: var(--t3); letter-spacing: 0.02em; }
@@ -466,7 +490,7 @@
 
     .delete-btn {
       background: transparent;
-      border: 1px solid #2a1a1a;
+      border: 1px solid var(--border2); /* 테마 변수로 수정 */
       color: var(--pink);
       cursor: pointer;
       font-size: 11px;
@@ -582,20 +606,20 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      background: #fff;
-      color: #000;
+      background: var(--t1); /* 테마 변수로 수정 */
+      color: var(--bg); /* 테마 변수로 수정 */
       margin-bottom: 8px;
       font-family: inherit;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      transition: opacity 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .auth-box button:hover { background: #e8e8e8; transform: scale(1.02); }
+    .auth-box button:hover { opacity: 0.85; transform: scale(1.02); } /* 테마 변수로 수정 */
     .auth-box button:active { transform: scale(0.97); }
     .auth-box button.secondary {
       background: var(--bg3);
       border: 1px solid var(--border2);
       color: var(--t2);
     }
-    .auth-box button.secondary:hover { background: var(--bg4); color: var(--t1); }
+    .auth-box button.secondary:hover { background: var(--bg4); color: var(--t1); opacity: 1; }
 
     .error-message, .success-message {
       font-size: 12px;
@@ -616,18 +640,18 @@
     }
 
     .post-btn {
-      background: #fff;
+      background: var(--t1); /* 테마 변수로 수정 */
+      color: var(--bg); /* 테마 변수로 수정 */
       border: none;
-      color: #000;
       cursor: pointer;
       font-size: 13px;
       font-weight: 600;
       padding: 8px 20px;
       border-radius: 22px;
       font-family: inherit;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      transition: opacity 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .post-btn:hover { background: #e8e8e8; transform: scale(1.04); }
+    .post-btn:hover { opacity: 0.85; transform: scale(1.04); } /* 테마 변수로 수정 */
     .post-btn:active { transform: scale(0.94); }
     .post-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
@@ -682,8 +706,8 @@
 
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 2px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; } /* 테마 변수로 수정 */
+    ::-webkit-scrollbar-thumb:hover { background: var(--border3); }
 
     .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
@@ -708,8 +732,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: #141414;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--bg); /* 테마 변수로 수정 */
+      border: 1px solid var(--border); /* 테마 변수로 수정 */
       border-bottom: none;
       border-radius: 20px 20px 0 0;
       padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
@@ -751,7 +775,7 @@
       width: 40px;
       height: 5px;
       border-radius: 5px;
-      background: rgba(255, 255, 255, 0.28);
+      background: var(--border3); /* 테마 변수로 수정 */
       flex-shrink: 0;
     }
     .sharer-profile-sheet-host .sps-profile {
@@ -760,7 +784,7 @@
       gap: 12px;
       padding: 12px 14px;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--bg2); /* 테마 변수로 수정 */
       cursor: pointer;
       margin-bottom: 12px;
     }
@@ -785,7 +809,7 @@
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
-      color: #fff;
+      color: var(--t1); /* 테마 변수로 수정 */
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
