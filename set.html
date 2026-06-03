@@ -376,6 +376,125 @@
     .theme-label-content { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; color: var(--t1); }
     .theme-label-content svg { width: 22px; height: 22px; stroke: var(--t2); fill: none; stroke-width: 2; }
 
+    /* ─── Profile Sheet (Mobile) ─── */
+    .sharer-profile-sheet-host[hidden] { display: none !important; }
+    .sharer-profile-sheet-host {
+      position: fixed;
+      inset: 0;
+      z-index: 960;
+    }
+    .sharer-profile-sheet-host .sps-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sharer-profile-sheet-host .sps-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+      max-height: 44vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      will-change: transform;
+      transform: translateY(100%);
+      transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-panel {
+      transform: translateY(0);
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
+      max-height: 88vh;
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
+      transition: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area {
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 6px 16px 14px;
+      margin: -2px -16px 0 -16px;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area:active {
+      cursor: grabbing;
+    }
+    .sharer-profile-sheet-host .sps-grab {
+      width: 40px;
+      height: 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.28);
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .sharer-profile-sheet-host .sps-av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-av img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sharer-profile-sheet-host .sps-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sharer-profile-sheet-host .sps-logout {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
     /* ─── RESPONSIVE (MOBILE VIEW) ─── */
     @media (max-width: 768px) {
       .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
@@ -419,6 +538,7 @@
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" frameborder="0"></iframe>
   </div>
+  <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
 
   <div class="main-wrapper">
     <div class="header">
@@ -483,7 +603,7 @@
           <div class="form-group">
             <label>이름 (닉네임)</label>
             <input type="text" id="userNicknameInput" disabled>
-            <div class="input-hint">닉네임은 변경할 수 없습니다.</div>
+            <div class="input-hint">닉네임은 보안상 변경할 수 없습니다.</div>
           </div>
           
           <div style="display:flex; justify-content:flex-end; margin-top:32px;">
@@ -611,25 +731,22 @@
     return JSON.parse(text);
   }
 
-  // ─── 1. 사용자 세션 및 사이드바 동기화 로직 ───
+  // ─── 1. 사용자 세션 및 데이터 로드 연동 ───
   let loggedInUser = null;
 
+  // 사이드바 연동 함수 추가
   function updateSidebar() {
     const iframe = document.getElementById('sidebarFrame');
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'updateUser', user: loggedInUser }, '*');
-    }
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: loggedInUser }, '*');
   }
 
   function updateSidebarMode() {
     const iframe = document.getElementById('sidebarFrame');
     const narrow = window.innerWidth <= 768;
-    if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-    }
+    if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
   }
 
-  // iframe(사이드바)으로부터 오는 메시지(페이지 이동 및 로그아웃) 수신
+  // 메시지 이벤트 리스너 추가 (모바일 프로필 시트 등 다른 창과의 통신을 위해)
   window.addEventListener('message', (event) => {
     const { type, page } = event.data || {};
     if (type === 'navigate') {
@@ -645,7 +762,6 @@
     if (type === 'requestUserInfo') updateSidebar();
   });
 
-  // 하단 프로필 시트 등을 통한 로그아웃 이벤트 지원
   window.onSharerProfileLogout = function () {
     localStorage.removeItem('snsUser');
     loggedInUser = null;
@@ -655,20 +771,15 @@
 
   window.addEventListener('resize', updateSidebarMode);
 
-  // ─── 2. 초기 데이터 연동 ───
   async function initPageData() {
     const sessionData = localStorage.getItem('snsUser');
     if (!sessionData) {
       alert("로그인이 필요합니다.");
-      window.location.href = "index.html";
+      window.location.href = "login.html";
       return;
     }
 
     loggedInUser = JSON.parse(sessionData);
-    
-    // 사이드바에 즉시 초기 상태 전송
-    updateSidebar();
-    updateSidebarMode();
 
     // 실제 백엔드(DB)에서 최신 정보를 가져옵니다.
     try {
@@ -677,9 +788,6 @@
         loggedInUser = users[0];
         // 로컬스토리지 최신화
         localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
-        
-        // 데이터베이스를 기반으로 최신화된 정보를 사이드바에 재전송
-        updateSidebar();
       }
     } catch (e) {
       console.error("사용자 정보 로드 오류:", e);
@@ -702,6 +810,9 @@
 
     updateAvatarPreview(loggedInUser.profile_image, loggedInUser.nickname || loggedInUser.id);
 
+    // 사이드바 상태 업데이트 실행
+    updateSidebar();
+
     // 테마 상태 바인딩
     const currentTheme = localStorage.getItem('theme') || 'dark';
     const activeRadio = document.querySelector(`input[name="themeSelector"][value="${currentTheme}"]`);
@@ -718,7 +829,7 @@
     }
   }
 
-  // ─── 3. 프로필 사진 Cloudinary 업로드 및 변경 ───
+  // ─── 2. 프로필 사진 Cloudinary 업로드 및 변경 ───
   document.getElementById('profilePicInput').addEventListener('change', async function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -754,10 +865,7 @@
       loggedInUser.profile_image = imageUrl;
       localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
       updateAvatarPreview(imageUrl, loggedInUser.nickname);
-      
-      // 사이드바 프로필 사진 동기화 업데이트
-      updateSidebar();
-      
+      updateSidebar(); // 사이드바에도 프로필 변경 즉시 반영
       alert('프로필 사진이 성공적으로 변경되었습니다.');
 
     } catch (err) {
@@ -771,7 +879,7 @@
     }
   });
 
-  // ─── 4. 실제 DB 비밀번호 변경 구현 ───
+  // ─── 3. 실제 DB 비밀번호 변경 구현 ───
   async function changePassword() {
     const curPwd = document.getElementById('currentPasswordInput').value;
     const newPwd = document.getElementById('newPasswordInput').value;
@@ -840,7 +948,7 @@
     }
   }
 
-  // ─── 5. 이메일 인증 및 실제 변경 (다중 단계) ───
+  // ─── 4. 이메일 인증 및 실제 변경 (다중 단계) ───
   let pendingEmail = "";
 
   function toggleEmailEdit() {
@@ -931,9 +1039,6 @@
         loggedInUser.email = pendingEmail;
         localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
         
-        // 이메일 변경사항 사이드바 동기화 업데이트
-        updateSidebar();
-
         // UI 변경 적용
         document.getElementById('userEmailInput').value = pendingEmail;
         document.getElementById('emailStatusHint').textContent = "✓ 인증된 이메일입니다.";
@@ -958,7 +1063,7 @@
     }
   }
 
-  // ─── 6. 독립 테마 사이트데이터 제어 ───
+  // ─── 5. 독립 테마 사이트데이터 제어 ───
   function changeTheme(themeValue) {
     localStorage.setItem('theme', themeValue);
     if (themeValue === 'light') {
@@ -968,7 +1073,7 @@
     }
   }
 
-  // ─── 7. 인스타그램형 마스터-디테일 UI 인터랙션 스크립트 ───
+  // ─── 6. 인스타그램형 마스터-디테일 UI 인터랙션 스크립트 ───
   const menuItems = document.querySelectorAll('.menu-item');
   const sections = document.querySelectorAll('.settings-section');
   const settingsContainer = document.getElementById('settingsContainer');
@@ -994,8 +1099,9 @@
     settingsContainer.classList.remove('show-detail');
   }
 
-  // ─── 8. 생명 주기 로딩 통합 실행 ───
+  // ─── 7. 생명 주기 로딩 통합 실행 ───
   NProgress.start();
+  updateSidebarMode(); // 화면 로딩 시 사이드바 모드 초기화
   window.addEventListener('DOMContentLoaded', () => {
     initPageData().then(() => {
       // 로딩 완료 후 스플래시 페이드아웃 구동
@@ -1010,5 +1116,6 @@
     });
   });
 </script>
+<script src="sharer-profile-sheet-host.js"></script>
 </body>
 </html>
