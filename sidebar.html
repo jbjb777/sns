@@ -3,18 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-  
-  
   <style>
+    /* 기본 다크 모드(기존 스타일 유지) 변수 정의 */
+    :root {
+      --bg: transparent;
+      --sidebar-bg: rgba(10, 10, 10, 0.92);
+      --border: rgba(255, 255, 255, 0.08);
+      --border2: #444;
+      --border3: rgba(255, 255, 255, 0.1);
+      --t1: #ffffff;
+      --t2: #a5a5a5;
+      --tooltip-bg: rgba(15, 15, 15, 0.95);
+    }
+
+    /* 라이트 모드 변수 정의 */
+    html[data-theme="light"] {
+      --sidebar-bg: rgba(250, 250, 250, 0.94);
+      --border: rgba(0, 0, 0, 0.08);
+      --border2: #ccc;
+      --border3: rgba(0, 0, 0, 0.1);
+      --t1: #000000;
+      --t2: #555555;
+      --tooltip-bg: rgba(240, 240, 240, 0.98);
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       background: transparent !important;
       height: 100vh;
       overflow: hidden;
+      color: var(--t1);
     }
     .sidebar-root {
       min-height: 100vh;
@@ -38,7 +57,7 @@
       box-sizing: border-box;
       position: relative;
       scrollbar-width: thin;
-      scrollbar-color: #444 transparent;
+      scrollbar-color: var(--border2) transparent;
     }
     .logo-container {
       margin: 0 auto 32px;
@@ -50,6 +69,11 @@
       width: 40px;
       height: 40px;
     }
+    /* 라이트 모드일 때 로고가 다크용 흰색 기반이면 반전 효과를 줄 수 있도록 설정 */
+    html[data-theme="light"] .logo-svg {
+      filter: invert(1);
+    }
+    
     .logo-text { display: none; }
     .mob-nav-left,
     .mob-nav-right {
@@ -72,10 +96,7 @@
       transform: scale(1.08);
     }
     .nav-item.active {
-      /* 배경 그라데이션 및 그림자 제거 (필요시 다시 추가 가능) */
-      /* background와 box-shadow 주석 처리 또는 삭제 */
-      /* background: linear-gradient(135deg, rgba(54,99,255,0.3), rgba(87,34,179,0.2)); */
-      /* box-shadow: 0 4px 12px rgba(54,99,255,0.25); */
+      /* 활성화 디자인 제거 유지 */
     }
     /* 비활성 상태일 때 아이콘 밝기 낮춤 */
     .nav-item:not(.active) .nav-icon-img,
@@ -91,7 +112,7 @@
     }
     .nav-text { display: none; }
     
-    /* ─── 만들기 버튼용 컨테이너 및 텍스처 시스템 ─── */
+    /* 만들기 버튼용 컨테이너 및 텍스처 시스템 */
     .create-btn-container {
       position: relative;
       display: inline-block;
@@ -131,7 +152,7 @@
     }
     .btn-text { display: none; }
 
-    /* ─── 버튼 외곽 라인 패널 (흐름 효과 애니메이션) ─── */
+    /* 버튼 외곽 라인 패널 */
     .btn-material-spinner {
       position: absolute;
       top: -3px;
@@ -142,28 +163,19 @@
       pointer-events: none;
       display: none;
     }
-    /* .animate 클래스가 활성화될 때만 표시 */
     .btn-material-spinner.animate {
       display: block;
     }
 
     .btn-spinner-path {
-      /* 모서리가 둥근 사각형(rx/ry=20) 둘레 기준 */
       stroke-dasharray: 230;
-      /* 정확히 3번 반복 후 멈추도록 유한 루프 적용 (2초 * 3회 = 6초) */
       animation: btn-line-flow 2s cubic-bezier(0.4, 0, 0.2, 1) 2;
     }
 
     @keyframes btn-line-flow {
-      0% {
-        stroke-dashoffset: 230;
-      }
-      50% {
-        stroke-dashoffset: 115;
-      }
-      100% {
-        stroke-dashoffset: -230;
-      }
+      0% { stroke-dashoffset: 230; }
+      50% { stroke-dashoffset: 115; }
+      100% { stroke-dashoffset: -230; }
     }
 
     .user-info {
@@ -218,7 +230,7 @@
       width: 3px;
     }
     .sidebar::-webkit-scrollbar-thumb {
-      background: #555;
+      background: var(--border2);
       border-radius: 10px;
     }
 
@@ -232,8 +244,8 @@
       left: 100%;
       top: 50%;
       transform: translateY(-50%) translateX(8px);
-      background: rgba(15, 15, 15, 0.95);
-      color: #fff;
+      background: var(--tooltip-bg);
+      color: var(--t1);
       padding: 6px 12px;
       border-radius: 8px;
       font-size: 13px;
@@ -244,8 +256,8 @@
       visibility: hidden;
       transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 1000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border: 1px solid var(--border3);
       letter-spacing: 0.02em;
     }
     .nav-item[data-tooltip]:hover::after, .create-btn-container[data-tooltip]:hover::after, .user-info[data-tooltip]:hover::after {
@@ -260,7 +272,7 @@
       top: 50%;
       transform: translateY(-50%) translateX(2px);
       border: 6px solid transparent;
-      border-right-color: rgba(15, 15, 15, 0.95);
+      border-right-color: var(--tooltip-bg);
       opacity: 0;
       visibility: hidden;
       transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -319,7 +331,7 @@
       border: 1px solid rgba(145, 145, 145, 0.9);
       border-radius: 14px;
       background: transparent;
-      color: #a5a5a5;
+      color: var(--t2);
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
@@ -336,16 +348,11 @@
       object-fit: contain;
     }
 
-    /* 데스크톱 iframe(좁음): 시트 숨김 — 뷰포트 min-width는 iframe 너비 기준이라 72px에서는 아래 블록 미적용 */
     .mobile-sheet-backdrop,
     .mobile-profile-sheet {
       display: none;
     }
 
-    /*
-      모바일: 부모가 iframe을 화면 너비로 둠 → 뷰포트가 넓어짐(200px 이상).
-      max-width:768px는 iframe 안에서도 참이 되어 데스크톱 사이드바가 깨지므로 쓰지 않음.
-    */
     @media (min-width: 200px) {
       html, body {
         height: 100% !important;
@@ -371,10 +378,10 @@
         box-sizing: border-box;
         overflow: visible;
         border-right: none;
-        background: rgba(10, 10, 10, 0.92);
+        background: var(--sidebar-bg);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-top: 1px solid var(--border);
         position: fixed;
         left: 0;
         right: 0;
@@ -460,7 +467,6 @@
         box-sizing: border-box;
       }
 
-      /* 프로필 시트는 부모 페이지에서 표시 (iframe은 하단만이라 시트가 가려지지 않음) */
       .mobile-sheet-backdrop,
       .mobile-profile-sheet {
         display: none !important;
@@ -573,21 +579,30 @@
     const sidebarBar = document.querySelector('.sidebar');
     const sheetSetBtn = document.getElementById('sheetSetBtn');
 
+    // 부모창의 다크/라이트 모드를 동적으로 감지하는 기능 추가
+    function checkCurrentTheme() {
+      try {
+        // 부모 창의 테마 속성을 확인하여 iframe 에도 똑같이 부여합니다.
+        const currentTheme = parent.document.documentElement.getAttribute('data-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+      } catch (e) {
+        // 로컬 테스트 등 크로스 도메인 예외 처리용 차선책
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    }
+
     function isMobileBottomLayout() {
       return window.matchMedia('(min-width: 200px)').matches;
     }
 
-    // 3번 애니메이션을 실행시키고 깔끔하게 제거하는 공통 제어 함수
     function triggerBorderFlow() {
-      // sessionStorage를 확인하여 이번 탭 세션에서 이미 실행된 적이 있다면 작동하지 않음
       if (sessionStorage.getItem('sharerAnimationPlayed')) return;
       createBtnSpinner.classList.remove('animate');
-      void createBtnSpinner.offsetWidth; // 브라우저 리플로우 트리거로 애니메이션 초기화
+      void createBtnSpinner.offsetWidth;
       createBtnSpinner.classList.add('animate');
-      // 애니메이션 사이클 종료(2초 * 3 = 6초) 후 DOM 성능을 위해 제거 처리
       setTimeout(() => {
         createBtnSpinner.classList.remove('animate');
-        // 애니메이션이 성공적으로 끝까지 실행되었음을 세션에 기록
         sessionStorage.setItem('sharerAnimationPlayed', 'true');
       }, 4000);
     }
@@ -632,21 +647,30 @@
     let currentUserNickname = null;
     let currentUserProfileImage = null;
 
+    // 라이트 모드와 다크 모드 구분을 적용한 아이콘 업데이트 시스템 함수
     function updateIcons() {
+      checkCurrentTheme(); // 테마 재확인
+      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
+
+      // 1. 홈 아이콘 제어
       if (homeNav.classList.contains('active')) {
-        homeIcon.src = 'home.png';
+        homeIcon.src = isLightMode ? 'homeO.png' : 'home.png';
       } else {
-        homeIcon.src = 'homeX.png';
+        homeIcon.src = 'homeX.png'; // 비활성 상태 공통
       }
+
+      // 2. 탐색 아이콘 제어
       if (exploreNav.classList.contains('active')) {
-        exploreIcon.src = 'explore.png';
+        exploreIcon.src = isLightMode ? 'exploreO.png' : 'explore.png';
       } else {
-        exploreIcon.src = 'exploreX.png';
+        exploreIcon.src = 'exploreX.png'; // 비활성 상태 공통
       }
+
+      // 3. 채팅/설정 아이콘 제어
       if (setNav.classList.contains('active')) {
-        setIcon.src = 'set.svg';
+        setIcon.src = isLightMode ? 'setO.svg' : 'set.svg';
       } else {
-        setIcon.src = 'setX.svg';
+        setIcon.src = 'setX.svg'; // 비활성 상태 공통
       }
     }
 
@@ -720,7 +744,7 @@
       e.stopPropagation();
       if (isMobileBottomLayout()) return;
       closeProfileSheet();
-      window.location.href('https://discord.gg/8s6XuWkfQb', '_blank');
+      window.open('https://discord.gg/8s6XuWkfQb', '_blank');
     };
     sheetSetBtn.onclick = (e) => {
       e.stopPropagation();
@@ -744,6 +768,7 @@
 
       if (data.type === 'activateHome' || data.type === 'default') {
         homeNav.classList.add('active');
+        exploreNav.classList.remove('remove'); // 클래스 정돈
         exploreNav.classList.remove('active');
         setNav.classList.remove('active');
         updateIcons();
@@ -785,8 +810,6 @@
           userInfo.style.display = 'flex';
           sidebarBar.classList.add('has-profile');
           syncSheetProfileFromUser();
-          
-          // 유저 데이터가 성공적으로 업데이트 및 동기화되었을 때 라인 흐름 효과 작동 조건 처리
           triggerBorderFlow();
         } else {
           isLoggedIn = false;
@@ -797,6 +820,7 @@
           sidebarBar.classList.remove('has-profile');
           closeProfileSheet();
         }
+        updateIcons(); // 유저 상태 바뀔 때 아이콘 한번 더 동기화
       }
       if (data.type === 'setNarrowMode') {
         const sidebar = document.querySelector('.sidebar');
@@ -806,12 +830,18 @@
           sidebar.classList.remove('narrow');
         }
       }
+      // 혹시 메인 창에서 실시간 테마 변경 알림을 줄 경우 유연하게 대응하도록 지원
+      if (data.type === 'themeChanged') {
+        updateIcons();
+      }
     });
+
+    // 초기 테마 확인 및 실행구조 배치
+    checkCurrentTheme();
     homeNav.classList.add('active');
     updateIcons();
     parent.postMessage({ type: 'requestUserInfo' }, '*');
 
-    // 페이지 첫 진입 시 최초 작동 조건 처리
     triggerBorderFlow();
   </script>
 </body>
