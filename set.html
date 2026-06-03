@@ -483,7 +483,7 @@
           <div class="form-group">
             <label>이름 (닉네임)</label>
             <input type="text" id="userNicknameInput" disabled>
-            <div class="input-hint">닉네임은 보안상 변경할 수 없습니다.</div>
+            <div class="input-hint">닉네임은 변경할 수 없습니다.</div>
           </div>
           
           <div style="display:flex; justify-content:flex-end; margin-top:32px;">
@@ -611,18 +611,64 @@
     return JSON.parse(text);
   }
 
-  // ─── 1. 사용자 세션 및 데이터 로드 연동 ───
+  // ─── 1. 사용자 세션 및 사이드바 동기화 로직 ───
   let loggedInUser = null;
 
+  function updateSidebar() {
+    const iframe = document.getElementById('sidebarFrame');
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'updateUser', user: loggedInUser }, '*');
+    }
+  }
+
+  function updateSidebarMode() {
+    const iframe = document.getElementById('sidebarFrame');
+    const narrow = window.innerWidth <= 768;
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
+    }
+  }
+
+  // iframe(사이드바)으로부터 오는 메시지(페이지 이동 및 로그아웃) 수신
+  window.addEventListener('message', (event) => {
+    const { type, page } = event.data || {};
+    if (type === 'navigate') {
+      if (page === 'home') { NProgress.start(); location.href = 'index.html'; }
+      if (page === 'explore') { NProgress.start(); location.href = 'explore.html'; }
+    }
+    if (type === 'logout') {
+      localStorage.removeItem('snsUser');
+      loggedInUser = null;
+      NProgress.start();
+      location.href = 'index.html';
+    }
+    if (type === 'requestUserInfo') updateSidebar();
+  });
+
+  // 하단 프로필 시트 등을 통한 로그아웃 이벤트 지원
+  window.onSharerProfileLogout = function () {
+    localStorage.removeItem('snsUser');
+    loggedInUser = null;
+    NProgress.start();
+    location.href = 'index.html';
+  };
+
+  window.addEventListener('resize', updateSidebarMode);
+
+  // ─── 2. 초기 데이터 연동 ───
   async function initPageData() {
     const sessionData = localStorage.getItem('snsUser');
     if (!sessionData) {
       alert("로그인이 필요합니다.");
-      window.location.href = "login.html";
+      window.location.href = "index.html";
       return;
     }
 
     loggedInUser = JSON.parse(sessionData);
+    
+    // 사이드바에 즉시 초기 상태 전송
+    updateSidebar();
+    updateSidebarMode();
 
     // 실제 백엔드(DB)에서 최신 정보를 가져옵니다.
     try {
@@ -631,6 +677,9 @@
         loggedInUser = users[0];
         // 로컬스토리지 최신화
         localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
+        
+        // 데이터베이스를 기반으로 최신화된 정보를 사이드바에 재전송
+        updateSidebar();
       }
     } catch (e) {
       console.error("사용자 정보 로드 오류:", e);
@@ -669,7 +718,7 @@
     }
   }
 
-  // ─── 2. 프로필 사진 Cloudinary 업로드 및 변경 ───
+  // ─── 3. 프로필 사진 Cloudinary 업로드 및 변경 ───
   document.getElementById('profilePicInput').addEventListener('change', async function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -705,6 +754,10 @@
       loggedInUser.profile_image = imageUrl;
       localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
       updateAvatarPreview(imageUrl, loggedInUser.nickname);
+      
+      // 사이드바 프로필 사진 동기화 업데이트
+      updateSidebar();
+      
       alert('프로필 사진이 성공적으로 변경되었습니다.');
 
     } catch (err) {
@@ -718,7 +771,7 @@
     }
   });
 
-  // ─── 3. 실제 DB 비밀번호 변경 구현 ───
+  // ─── 4. 실제 DB 비밀번호 변경 구현 ───
   async function changePassword() {
     const curPwd = document.getElementById('currentPasswordInput').value;
     const newPwd = document.getElementById('newPasswordInput').value;
@@ -787,7 +840,7 @@
     }
   }
 
-  // ─── 4. 이메일 인증 및 실제 변경 (다중 단계) ───
+  // ─── 5. 이메일 인증 및 실제 변경 (다중 단계) ───
   let pendingEmail = "";
 
   function toggleEmailEdit() {
@@ -878,6 +931,9 @@
         loggedInUser.email = pendingEmail;
         localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
         
+        // 이메일 변경사항 사이드바 동기화 업데이트
+        updateSidebar();
+
         // UI 변경 적용
         document.getElementById('userEmailInput').value = pendingEmail;
         document.getElementById('emailStatusHint').textContent = "✓ 인증된 이메일입니다.";
@@ -902,7 +958,7 @@
     }
   }
 
-  // ─── 5. 독립 테마 사이트데이터 제어 ───
+  // ─── 6. 독립 테마 사이트데이터 제어 ───
   function changeTheme(themeValue) {
     localStorage.setItem('theme', themeValue);
     if (themeValue === 'light') {
@@ -912,7 +968,7 @@
     }
   }
 
-  // ─── 6. 인스타그램형 마스터-디테일 UI 인터랙션 스크립트 ───
+  // ─── 7. 인스타그램형 마스터-디테일 UI 인터랙션 스크립트 ───
   const menuItems = document.querySelectorAll('.menu-item');
   const sections = document.querySelectorAll('.settings-section');
   const settingsContainer = document.getElementById('settingsContainer');
@@ -938,7 +994,7 @@
     settingsContainer.classList.remove('show-detail');
   }
 
-  // ─── 7. 생명 주기 로딩 통합 실행 ───
+  // ─── 8. 생명 주기 로딩 통합 실행 ───
   NProgress.start();
   window.addEventListener('DOMContentLoaded', () => {
     initPageData().then(() => {
