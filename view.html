@@ -8,13 +8,6 @@
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
-  <script>
-    // 화면 깜빡임(FOUC) 방지를 위해 HTML 렌더링 전 테마를 즉시 적용합니다.
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  </script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -36,21 +29,6 @@
       --r3: 20px;
       --r4: 28px;
     }
-
-    /* 라이트 모드 변수 정의 */
-    html[data-theme="light"] {
-      --bg: #fafafa;
-      --bg2: #ffffff;
-      --bg3: #f0f0f0;
-      --bg4: #e4e4e4;
-      --border: #dbdbdb;
-      --border2: #cccccc;
-      --border3: #a3a3a3;
-      --t1: #000000;
-      --t2: #737373;
-      --t3: #a8a8a8;
-    }
-
     /* NProgress 커스텀 */
     #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
     #nprogress .peg { display: none !important; }
@@ -280,7 +258,7 @@
     /* ─── DELETE BTN ─── */
     .delete-btn {
       background: transparent;
-      border: 1px solid #2a1a1a;
+      border: 1px solid var(--border2);
       color: var(--pink);
       cursor: pointer;
       font-size: 12px;
@@ -298,7 +276,7 @@
       position: relative;
       border-radius: var(--r3);
       overflow: hidden;
-      background: #000;
+      background: var(--bg);
     }
     .image-carousel {
       display: flex;
@@ -361,12 +339,12 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.5);
+      background: var(--t3);
       cursor: pointer;
       transition: all 0.2s;
     }
     .indicator.active {
-      background: #fff;
+      background: var(--t1);
       transform: scale(1.4);
     }
     /* ─── POST CONTENT ─── */
@@ -737,9 +715,9 @@
       bottom: -40px;
       left: 50%;
       transform: translateX(-50%);
-      color: #aaa;
+      color: var(--t1);
       font-size: 14px;
-      background: rgba(0,0,0,0.6);
+      background: var(--bg2);
       padding: 4px 14px;
       border-radius: 20px;
     }
@@ -789,8 +767,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: #141414;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-bottom: none;
       border-radius: 20px 20px 0 0;
       padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
@@ -832,7 +810,7 @@
       width: 40px;
       height: 5px;
       border-radius: 5px;
-      background: rgba(255, 255, 255, 0.28);
+      background: var(--border3);
       flex-shrink: 0;
     }
     .sharer-profile-sheet-host .sps-profile {
@@ -841,7 +819,7 @@
       gap: 12px;
       padding: 12px 14px;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--bg2);
       cursor: pointer;
       margin-bottom: 12px;
     }
@@ -866,7 +844,7 @@
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
-      color: #fff;
+      color: var(--t1);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -994,6 +972,27 @@
       font-size: 12px;
       color: var(--t2);
       line-height: 1.5;
+    }
+
+    /* 라이트 모드 변수 정의 */
+    html[data-theme="light"] {
+      --bg: #fafafa;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e4e4e4;
+      --border: #dbdbdb;
+      --border2: #cccccc;
+      --border3: #a3a3a3;
+      --t1: #000000;
+      --t2: #737373;
+      --t3: #a8a8a8;
+    }
+
+    /* 라이트 모드에서 외부 SVG 아이콘 색상을 검은색으로 변경 */
+    html[data-theme="light"] .access-badge img,
+    html[data-theme="light"] .modal-header img,
+    html[data-theme="light"] .info-icon-box img {
+      filter: brightness(0);
     }
   </style>
 </head>
