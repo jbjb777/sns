@@ -311,13 +311,6 @@
       object-fit: contain;
     }
 
-
-
-
-
-
-
-
     .mobile-profile-sheet-inner .sheet-set {
       width: 100%;
       box-sizing: border-box;
@@ -342,16 +335,6 @@
       flex-shrink: 0;
       object-fit: contain;
     }
-
-
-
-
-
-
-
-
-
-
 
     /* 데스크톱 iframe(좁음): 시트 숨김 — 뷰포트 min-width는 iframe 너비 기준이라 72px에서는 아래 블록 미적용 */
     .mobile-sheet-backdrop,
@@ -560,13 +543,9 @@
           <img src="discord.png" alt="">
           <span>디스코드 참여</span>
         </button>
-        
-        
         <button type="button" class="sheet-set" id="sheetSetBtn">
           <img src="set.png" alt="">
           <span>설정</span>
-        
-        
         </button>
       </div>
     </div>
@@ -593,6 +572,7 @@
     const userAvatar = document.getElementById('userAvatar');
     const sidebarBar = document.querySelector('.sidebar');
     const sheetSetBtn = document.getElementById('sheetSetBtn');
+
     function isMobileBottomLayout() {
       return window.matchMedia('(min-width: 200px)').matches;
     }
@@ -601,11 +581,9 @@
     function triggerBorderFlow() {
       // sessionStorage를 확인하여 이번 탭 세션에서 이미 실행된 적이 있다면 작동하지 않음
       if (sessionStorage.getItem('sharerAnimationPlayed')) return;
-
       createBtnSpinner.classList.remove('animate');
       void createBtnSpinner.offsetWidth; // 브라우저 리플로우 트리거로 애니메이션 초기화
       createBtnSpinner.classList.add('animate');
-      
       // 애니메이션 사이클 종료(2초 * 3 = 6초) 후 DOM 성능을 위해 제거 처리
       setTimeout(() => {
         createBtnSpinner.classList.remove('animate');
@@ -744,19 +722,12 @@
       closeProfileSheet();
       window.location.href('https://discord.gg/8s6XuWkfQb', '_blank');
     };
-
-
-
-
     sheetSetBtn.onclick = (e) => {
       e.stopPropagation();
+      if (isMobileBottomLayout()) return;
       closeProfileSheet();
-      window.top.location.href = 'https://sharer.r-e.kr/set.html';
+      window.open('https://sharer.r-e.kr/set.html', '_blank');
     };
-
-
-
-
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeProfileSheet();
@@ -766,9 +737,11 @@
       event.stopPropagation();
       parent.postMessage({ type: 'logout' }, '*');
     };
+
     window.addEventListener('message', (event) => {
       const data = event.data;
       if (!data?.type) return;
+
       if (data.type === 'activateHome' || data.type === 'default') {
         homeNav.classList.add('active');
         exploreNav.classList.remove('active');
