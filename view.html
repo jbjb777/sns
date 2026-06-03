@@ -8,6 +8,13 @@
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <script>
+    // 화면 깜빡임(FOUC) 방지를 위해 HTML 렌더링 전 테마를 즉시 적용합니다.
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  </script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -29,8 +36,23 @@
       --r3: 20px;
       --r4: 28px;
     }
+
+    /* 라이트 모드 변수 정의 */
+    html[data-theme="light"] {
+      --bg: #fafafa;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e4e4e4;
+      --border: #dbdbdb;
+      --border2: #cccccc;
+      --border3: #a3a3a3;
+      --t1: #000000;
+      --t2: #737373;
+      --t3: #a8a8a8;
+    }
+
     /* NProgress 커스텀 */
-    #nprogress .bar { background: #fff !important; height: 2px !important; }
+    #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
     #nprogress .peg { display: none !important; }
     #nprogress .spinner { display: none !important; }
     /* ─── SPLASH ─── */
@@ -168,7 +190,7 @@
       font-weight: 700;
       overflow: hidden;
       flex-shrink: 0;
-      color: #666;
+      color: var(--t2);
       transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
     .author-info:hover .author-avatar { border-color: var(--border3); transform: scale(1.05); }
@@ -220,9 +242,9 @@
       background: rgba(74,222,128,0.06);
     }
     .access-badge.private {
-      border: 1px solid #333;
-      color: #888;
-      background: rgba(26,26,26,0.5);
+      border: 1px solid var(--border3);
+      color: var(--t2);
+      background: var(--bg3);
     }
     .access-badge.protected {
       border: 1px solid var(--blue);
@@ -356,7 +378,7 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
-    .post-text a { color: #888; text-decoration: underline; text-underline-offset: 3px; }
+    .post-text a { color: var(--t2); text-decoration: underline; text-underline-offset: 3px; }
     .post-text a:hover { color: var(--t1); }
     /* ─── SHARE ─── */
     .share-container {
@@ -421,9 +443,9 @@
     .comment-input:focus { outline: none; border-color: var(--border3); background: var(--bg3); }
     .comment-input::placeholder { color: var(--t3); }
     .comment-submit-btn {
-      background: #fff;
+      background: var(--t1);
       border: none;
-      color: #000;
+      color: var(--bg);
       padding: 0 20px;
       border-radius: var(--r2);
       font-weight: 600;
@@ -431,10 +453,10 @@
       cursor: pointer;
       font-family: inherit;
       flex-shrink: 0;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      transition: opacity 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       white-space: nowrap;
     }
-    .comment-submit-btn:hover { background: #e8e8e8; transform: scale(1.04); }
+    .comment-submit-btn:hover { opacity: 0.85; transform: scale(1.04); }
     .comment-submit-btn:active { transform: scale(0.94); }
     .comment-list { display: flex; flex-direction: column; gap: 0; }
     .comment-item {
@@ -466,7 +488,7 @@
       font-weight: 600;
       overflow: hidden;
       flex-shrink: 0;
-      color: #666;
+      color: var(--t2);
       transition: border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
     .comment-author-wrapper:hover .comment-avatar { border-color: var(--border3); transform: scale(1.06); }
@@ -481,7 +503,7 @@
     }
     .comment-content {
       font-size: 14px;
-      color: #ccc;
+      color: var(--t1);
       line-height: 1.7;
       white-space: pre-wrap;
       padding-left: 2px;
@@ -561,8 +583,8 @@
       font-family: inherit;
       transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .reply-submit-btn { background: #fff; color: #000; border-color: transparent; }
-    .reply-submit-btn:hover { background: #e8e8e8; transform: scale(1.02); }
+    .reply-submit-btn { background: var(--t1); color: var(--bg); border-color: transparent; }
+    .reply-submit-btn:hover { opacity: 0.85; transform: scale(1.02); }
     .reply-cancel-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--border3); }
     .reply-submit-btn:active, .reply-cancel-btn:active { transform: scale(0.96); }
     .reply-list {
@@ -580,7 +602,7 @@
     }
     .reply-item .comment-avatar { width: 28px; height: 28px; font-size: 12px; }
     .reply-item .comment-author { font-size: 13px; }
-    .reply-item .comment-content { font-size: 13px; color: #cfcfcf; }
+    .reply-item .comment-content { font-size: 13px; color: var(--t1); }
     .reply-item .comment-date { font-size: 10px; }
     /* ─── LOGIN ALERT ─── */
     .login-alert {
@@ -972,27 +994,6 @@
       font-size: 12px;
       color: var(--t2);
       line-height: 1.5;
-    }
-
-    /* 라이트 모드 변수 정의 */
-    html[data-theme="light"] {
-      --bg: #fafafa;
-      --bg2: #ffffff;
-      --bg3: #f0f0f0;
-      --bg4: #e4e4e4;
-      --border: #dbdbdb;
-      --border2: #cccccc;
-      --border3: #a3a3a3;
-      --t1: #000000;
-      --t2: #737373;
-      --t3: #a8a8a8;
-    }
-
-    /* 라이트 모드에서 외부 SVG 아이콘 색상을 검은색으로 변경 */
-    html[data-theme="light"] .access-badge img,
-    html[data-theme="light"] .modal-header img,
-    html[data-theme="light"] .info-icon-box img {
-      filter: brightness(0);
     }
   </style>
 </head>
@@ -1763,7 +1764,7 @@
     document.getElementById('postContent').innerHTML = `
       <div style="padding:80px 20px; text-align:center;">
         <div style="color:var(--pink); font-size:15px; margin-bottom:20px;">${msg}</div>
-        <button onclick="window.history.back()" style="background:#fff; color:#000; border:none; padding:12px 28px; border-radius:var(--r2); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s;" onmouseover="this.style.background='#e8e8e8'" onmouseout="this.style.background='#fff'">돌아가기</button>
+        <button onclick="window.history.back()" style="background:var(--t1); color:var(--bg); border:none; padding:12px 28px; border-radius:var(--r2); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.15s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">돌아가기</button>
       </div>
     `;
   }
