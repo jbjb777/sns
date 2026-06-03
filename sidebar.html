@@ -362,7 +362,7 @@
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
       .logo-container { display: none; }
-      #chatNav,
+      #setNav,
       #discordNav {
         display: none !important;
       }
@@ -462,8 +462,8 @@
           <img src="exploreX.png" alt="탐색" class="nav-icon-img-explore" id="exploreIcon">
         </div>
       </div>
-      <div class="nav-item" id="chatNav" data-tooltip="채팅">
-        <img src="chatX.png" alt="채팅" class="nav-icon-img" id="chatIcon">
+      <div class="nav-item" id="setNav" data-tooltip="채팅">
+        <img src="setX.png" alt="채팅" class="nav-icon-img" id="setIcon">
       </div>
       <div class="nav-item" id="discordNav" data-tooltip="Discord 커뮤니티">
         <img src="discord.png" alt="Discord" class="nav-icon-img">
@@ -524,7 +524,7 @@
   <script>
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
-    const chatNav = document.getElementById('chatNav');
+    const setNav = document.getElementById('setNav');
     const discordNav = document.getElementById('discordNav');
     const createBtn = document.getElementById('createBtn');
     const createBtnSpinner = document.getElementById('createBtnSpinner');
@@ -532,7 +532,7 @@
     const userInfo = document.getElementById('userInfo');
     const homeIcon = document.getElementById('homeIcon');
     const exploreIcon = document.getElementById('exploreIcon');
-    const chatIcon = document.getElementById('chatIcon');
+    const setIcon = document.getElementById('setIcon');
     const profileSheetBackdrop = document.getElementById('profileSheetBackdrop');
     const profileSheet = document.getElementById('profileSheet');
     const sheetProfileRow = document.getElementById('sheetProfileRow');
@@ -615,10 +615,10 @@
       } else {
         exploreIcon.src = 'exploreX.png';
       }
-      if (chatNav.classList.contains('active')) {
-        chatIcon.src = 'chat.png';
+      if (setNav.classList.contains('active')) {
+        setIcon.src = 'set.png';
       } else {
-        chatIcon.src = 'chatX.png';
+        setIcon.src = 'setX.png';
       }
     }
 
@@ -648,8 +648,8 @@
     exploreNav.onclick = () => {
       window.top.location.href = 'https://sharer.r-e.kr/explore.html';
     };
-    chatNav.onclick = () => {
-      window.top.location.href = 'https://sharer.r-e.kr/chat.html';
+    setNav.onclick = () => {
+      window.top.location.href = 'https://sharer.r-e.kr/set.html';
     };
     discordNav.onclick = () => {
       window.open('https://discord.gg/8s6XuWkfQb', '_blank');
@@ -709,19 +709,19 @@
       if (data.type === 'activateHome' || data.type === 'default') {
         homeNav.classList.add('active');
         exploreNav.classList.remove('active');
-        chatNav.classList.remove('active');
+        setNav.classList.remove('active');
         updateIcons();
       }
       if (data.type === 'activateExplore') {
         homeNav.classList.remove('active');
         exploreNav.classList.add('active');
-        chatNav.classList.remove('active');
+        setNav.classList.remove('active');
         updateIcons();
       }
-      if (data.type === 'activateChat') {
+      if (data.type === 'activateSet') {
         homeNav.classList.remove('active');
         exploreNav.classList.remove('active');
-        chatNav.classList.add('active');
+        setNav.classList.add('active');
         updateIcons();
       }
       if (data.type === 'updateUser') {

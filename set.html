@@ -555,7 +555,7 @@
       <div class="settings-menu" id="settingsMenu">
         <div class="menu-item active" data-target="profile">
           <svg class="menu-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          프로필 편집
+          프로필 정보
         </div>
         <div class="menu-item" data-target="password">
           <svg class="menu-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -563,11 +563,11 @@
         </div>
         <div class="menu-item" data-target="personal">
           <svg class="menu-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-          개인 정보
+          이메일 인증
         </div>
         <div class="menu-item" data-target="accessibility">
           <svg class="menu-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-          접근성 (테마)
+          접근성 (실험중)
         </div>
       </div>
 
@@ -1117,5 +1117,19 @@
   });
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
+
+
+
+<script>
+  window.addEventListener('load', () => {
+    const iframe = document.getElementById('sidebarFrame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'activateSet' }, '*');
+    }
+  });
+</script>
+
+
+
 </body>
 </html>

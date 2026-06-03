@@ -1084,7 +1084,7 @@ window.addEventListener('message', (event) => {
   if (type === 'navigate') {
     if (page === 'home') location.href = 'index.html';
     if (page === 'explore') location.href = 'explore.html';
-    if (page === 'chat') location.href = 'chat.html';
+    if (page === 'set') location.href = 'set.html';
   }
   if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; location.reload(); }
   if (type === 'requestUserInfo') updateSidebar();
