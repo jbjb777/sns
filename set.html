@@ -774,7 +774,7 @@
   async function initPageData() {
     const sessionData = localStorage.getItem('snsUser');
     if (!sessionData) {
-      alert("로그인이 필요합니다.");
+
       window.location.href = "login.html";
       return;
     }
@@ -866,7 +866,7 @@
       localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
       updateAvatarPreview(imageUrl, loggedInUser.nickname);
       updateSidebar(); // 사이드바에도 프로필 변경 즉시 반영
-      alert('프로필 사진이 성공적으로 변경되었습니다.');
+
 
     } catch (err) {
       console.error(err);
@@ -936,7 +936,7 @@
       document.getElementById('newPasswordInput').value = '';
       document.getElementById('confirmPasswordInput').value = '';
       
-      alert('비밀번호가 안전하게 변경되었습니다.');
+
 
     } catch (e) {
       console.error(e);
@@ -994,7 +994,7 @@
       document.getElementById('emailStep1').style.display = 'none';
       document.getElementById('emailStep2').style.display = 'block';
       
-      alert("해당 이메일로 인증번호가 발송되었습니다. 수신된 6자리 번호를 입력해주세요.");
+
     } catch(e) {
       console.error(e);
       alert("인증 메일 발송에 실패했습니다. 이메일 주소를 다시 확인해주세요.");
