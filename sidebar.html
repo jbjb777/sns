@@ -4,36 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* 기본 다크 모드(기존 스타일 유지) 변수 정의 */
-    :root {
-      --bg: transparent;
-      --sidebar-bg: rgba(10, 10, 10, 0.92);
-      --border: rgba(255, 255, 255, 0.08);
-      --border2: #444;
-      --border3: rgba(255, 255, 255, 0.1);
-      --t1: #ffffff;
-      --t2: #a5a5a5;
-      --tooltip-bg: rgba(15, 15, 15, 0.95);
-    }
-
-    /* 라이트 모드 변수 정의 */
-    html[data-theme="light"] {
-      --sidebar-bg: rgba(250, 250, 250, 0.94);
-      --border: rgba(0, 0, 0, 0.08);
-      --border2: #ccc;
-      --border3: rgba(0, 0, 0, 0.1);
-      --t1: #000000;
-      --t2: #555555;
-      --tooltip-bg: rgba(240, 240, 240, 0.98);
-    }
-
     html, body {
       margin: 0;
       padding: 0;
       background: transparent !important;
       height: 100vh;
       overflow: hidden;
-      color: var(--t1);
     }
     .sidebar-root {
       min-height: 100vh;
@@ -57,7 +33,7 @@
       box-sizing: border-box;
       position: relative;
       scrollbar-width: thin;
-      scrollbar-color: var(--border2) transparent;
+      scrollbar-color: #444 transparent;
     }
     .logo-container {
       margin: 0 auto 32px;
@@ -69,11 +45,6 @@
       width: 40px;
       height: 40px;
     }
-    /* 라이트 모드일 때 로고가 다크용 흰색 기반이면 반전 효과를 줄 수 있도록 설정 */
-    html[data-theme="light"] .logo-svg {
-      filter: invert(1);
-    }
-    
     .logo-text { display: none; }
     .mob-nav-left,
     .mob-nav-right {
@@ -96,7 +67,10 @@
       transform: scale(1.08);
     }
     .nav-item.active {
-      /* 활성화 디자인 제거 유지 */
+      /* 배경 그라데이션 및 그림자 제거 (필요시 다시 추가 가능) */
+      /* background와 box-shadow 주석 처리 또는 삭제 */
+      /* background: linear-gradient(135deg, rgba(54,99,255,0.3), rgba(87,34,179,0.2)); */
+      /* box-shadow: 0 4px 12px rgba(54,99,255,0.25); */
     }
     /* 비활성 상태일 때 아이콘 밝기 낮춤 */
     .nav-item:not(.active) .nav-icon-img,
@@ -112,7 +86,7 @@
     }
     .nav-text { display: none; }
     
-    /* 만들기 버튼용 컨테이너 및 텍스처 시스템 */
+    /* ─── 만들기 버튼용 컨테이너 및 텍스처 시스템 ─── */
     .create-btn-container {
       position: relative;
       display: inline-block;
@@ -152,7 +126,7 @@
     }
     .btn-text { display: none; }
 
-    /* 버튼 외곽 라인 패널 */
+    /* ─── 버튼 외곽 라인 패널 (흐름 효과 애니메이션) ─── */
     .btn-material-spinner {
       position: absolute;
       top: -3px;
@@ -163,19 +137,28 @@
       pointer-events: none;
       display: none;
     }
+    /* .animate 클래스가 활성화될 때만 표시 */
     .btn-material-spinner.animate {
       display: block;
     }
 
     .btn-spinner-path {
+      /* 모서리가 둥근 사각형(rx/ry=20) 둘레 기준 */
       stroke-dasharray: 230;
+      /* 정확히 3번 반복 후 멈추도록 유한 루프 적용 (2초 * 3회 = 6초) */
       animation: btn-line-flow 2s cubic-bezier(0.4, 0, 0.2, 1) 2;
     }
 
     @keyframes btn-line-flow {
-      0% { stroke-dashoffset: 230; }
-      50% { stroke-dashoffset: 115; }
-      100% { stroke-dashoffset: -230; }
+      0% {
+        stroke-dashoffset: 230;
+      }
+      50% {
+        stroke-dashoffset: 115;
+      }
+      100% {
+        stroke-dashoffset: -230;
+      }
     }
 
     .user-info {
@@ -230,7 +213,7 @@
       width: 3px;
     }
     .sidebar::-webkit-scrollbar-thumb {
-      background: var(--border2);
+      background: #555;
       border-radius: 10px;
     }
 
@@ -244,8 +227,8 @@
       left: 100%;
       top: 50%;
       transform: translateY(-50%) translateX(8px);
-      background: var(--tooltip-bg);
-      color: var(--t1);
+      background: rgba(15, 15, 15, 0.95);
+      color: #fff;
       padding: 6px 12px;
       border-radius: 8px;
       font-size: 13px;
@@ -256,8 +239,8 @@
       visibility: hidden;
       transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 1000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border: 1px solid var(--border3);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
       letter-spacing: 0.02em;
     }
     .nav-item[data-tooltip]:hover::after, .create-btn-container[data-tooltip]:hover::after, .user-info[data-tooltip]:hover::after {
@@ -272,7 +255,7 @@
       top: 50%;
       transform: translateY(-50%) translateX(2px);
       border: 6px solid transparent;
-      border-right-color: var(--tooltip-bg);
+      border-right-color: rgba(15, 15, 15, 0.95);
       opacity: 0;
       visibility: hidden;
       transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -331,7 +314,7 @@
       border: 1px solid rgba(145, 145, 145, 0.9);
       border-radius: 14px;
       background: transparent;
-      color: var(--t2);
+      color: #a5a5a5;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
@@ -348,11 +331,16 @@
       object-fit: contain;
     }
 
+    /* 데스크톱 iframe(좁음): 시트 숨김 — 뷰포트 min-width는 iframe 너비 기준이라 72px에서는 아래 블록 미적용 */
     .mobile-sheet-backdrop,
     .mobile-profile-sheet {
       display: none;
     }
 
+    /*
+      모바일: 부모가 iframe을 화면 너비로 둠 → 뷰포트가 넓어짐(200px 이상).
+      max-width:768px는 iframe 안에서도 참이 되어 데스크톱 사이드바가 깨지므로 쓰지 않음.
+    */
     @media (min-width: 200px) {
       html, body {
         height: 100% !important;
@@ -378,10 +366,10 @@
         box-sizing: border-box;
         overflow: visible;
         border-right: none;
-        background: var(--sidebar-bg);
+        background: rgba(10, 10, 10, 0.92);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border-top: 1px solid var(--border);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
         position: fixed;
         left: 0;
         right: 0;
@@ -467,6 +455,7 @@
         box-sizing: border-box;
       }
 
+      /* 프로필 시트는 부모 페이지에서 표시 (iframe은 하단만이라 시트가 가려지지 않음) */
       .mobile-sheet-backdrop,
       .mobile-profile-sheet {
         display: none !important;
@@ -476,6 +465,33 @@
       .nav-item[data-tooltip]::before, .create-btn-container[data-tooltip]::before, .user-info[data-tooltip]::before {
         display: none !important;
       }
+    }
+
+    /* ─── 라이트 모드 전용 통합 테마 정의 스타일 ─── */
+    body.light-mode .sidebar {
+      scrollbar-color: #bbb transparent;
+    }
+    body.light-mode .sidebar::-webkit-scrollbar-thumb {
+      background: #bbb;
+    }
+    @media (min-width: 200px) {
+      body.light-mode .sidebar {
+        background: rgba(255, 255, 255, 0.94);
+        border-top: 1px solid rgba(0, 0, 0, 0.09);
+      }
+    }
+    body.light-mode .nav-item[data-tooltip]::after,
+    body.light-mode .create-btn-container[data-tooltip]::after,
+    body.light-mode .user-info[data-tooltip]::after {
+      background: rgba(246, 246, 246, 0.98);
+      color: #111;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    body.light-mode .nav-item[data-tooltip]::before,
+    body.light-mode .create-btn-container[data-tooltip]::before,
+    body.light-mode .user-info[data-tooltip]::before {
+      border-right-color: rgba(246, 246, 246, 0.98);
     }
   </style>
 </head>
@@ -579,27 +595,15 @@
     const sidebarBar = document.querySelector('.sidebar');
     const sheetSetBtn = document.getElementById('sheetSetBtn');
 
-    // 부모창의 다크/라이트 모드를 동적으로 감지하는 기능 추가
-    function checkCurrentTheme() {
-      try {
-        // 부모 창의 테마 속성을 확인하여 iframe 에도 똑같이 부여합니다.
-        const currentTheme = parent.document.documentElement.getAttribute('data-theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', currentTheme);
-      } catch (e) {
-        // 로컬 테스트 등 크로스 도메인 예외 처리용 차선책
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-      }
-    }
-
     function isMobileBottomLayout() {
       return window.matchMedia('(min-width: 200px)').matches;
     }
 
+    // 3번 애니메이션을 실행시키고 깔끔하게 제거하는 공통 제어 함수
     function triggerBorderFlow() {
       if (sessionStorage.getItem('sharerAnimationPlayed')) return;
       createBtnSpinner.classList.remove('animate');
-      void createBtnSpinner.offsetWidth;
+      void createBtnSpinner.offsetWidth; // 브라우저 리플로우 트리거로 애니메이션 초기화
       createBtnSpinner.classList.add('animate');
       setTimeout(() => {
         createBtnSpinner.classList.remove('animate');
@@ -647,30 +651,34 @@
     let currentUserNickname = null;
     let currentUserProfileImage = null;
 
-    // 라이트 모드와 다크 모드 구분을 적용한 아이콘 업데이트 시스템 함수
+    // ─── 테마 통합 제어 변수 및 시스템 구현 ───
+    let currentTheme = localStorage.getItem('theme') || 'dark';
+    
+    function applyThemeStyle() {
+      if (currentTheme === 'light') {
+        document.body.classList.add('light-mode');
+      } else {
+        document.body.classList.remove('light-mode');
+      }
+    }
+
     function updateIcons() {
-      checkCurrentTheme(); // 테마 재확인
-      const isLightMode = document.documentElement.getAttribute('data-theme') === 'light';
+      const isLight = (currentTheme === 'light');
 
-      // 1. 홈 아이콘 제어
       if (homeNav.classList.contains('active')) {
-        homeIcon.src = isLightMode ? 'homeO.png' : 'home.png';
+        homeIcon.src = isLight ? 'homeO.png' : 'home.png';
       } else {
-        homeIcon.src = 'homeX.png'; // 비활성 상태 공통
+        homeIcon.src = 'homeX.png';
       }
-
-      // 2. 탐색 아이콘 제어
       if (exploreNav.classList.contains('active')) {
-        exploreIcon.src = isLightMode ? 'exploreO.png' : 'explore.png';
+        exploreIcon.src = isLight ? 'exploreO.png' : 'explore.png';
       } else {
-        exploreIcon.src = 'exploreX.png'; // 비활성 상태 공통
+        exploreIcon.src = 'exploreX.png';
       }
-
-      // 3. 채팅/설정 아이콘 제어
       if (setNav.classList.contains('active')) {
-        setIcon.src = isLightMode ? 'setO.svg' : 'set.svg';
+        setIcon.src = isLight ? 'setO.svg' : 'set.svg';
       } else {
-        setIcon.src = 'setX.svg'; // 비활성 상태 공통
+        setIcon.src = 'setX.svg';
       }
     }
 
@@ -744,7 +752,7 @@
       e.stopPropagation();
       if (isMobileBottomLayout()) return;
       closeProfileSheet();
-      window.open('https://discord.gg/8s6XuWkfQb', '_blank');
+      window.location.href('https://discord.gg/8s6XuWkfQb', '_blank');
     };
     sheetSetBtn.onclick = (e) => {
       e.stopPropagation();
@@ -766,9 +774,19 @@
       const data = event.data;
       if (!data?.type) return;
 
+      // 테마 변경 관련 포스트 메시지 감지 및 동기화 처리
+      if (data.type === 'updateTheme' || data.type === 'setTheme' || data.type === 'theme' || data.theme) {
+        const theme = data.theme || data.value || data.themeMode;
+        if (theme === 'light' || theme === 'dark') {
+          currentTheme = theme;
+          localStorage.setItem('theme', currentTheme);
+          applyThemeStyle();
+          updateIcons();
+        }
+      }
+
       if (data.type === 'activateHome' || data.type === 'default') {
         homeNav.classList.add('active');
-        exploreNav.classList.remove('remove'); // 클래스 정돈
         exploreNav.classList.remove('active');
         setNav.classList.remove('active');
         updateIcons();
@@ -810,6 +828,7 @@
           userInfo.style.display = 'flex';
           sidebarBar.classList.add('has-profile');
           syncSheetProfileFromUser();
+          
           triggerBorderFlow();
         } else {
           isLoggedIn = false;
@@ -820,7 +839,6 @@
           sidebarBar.classList.remove('has-profile');
           closeProfileSheet();
         }
-        updateIcons(); // 유저 상태 바뀔 때 아이콘 한번 더 동기화
       }
       if (data.type === 'setNarrowMode') {
         const sidebar = document.querySelector('.sidebar');
@@ -830,14 +848,29 @@
           sidebar.classList.remove('narrow');
         }
       }
-      // 혹시 메인 창에서 실시간 테마 변경 알림을 줄 경우 유연하게 대응하도록 지원
-      if (data.type === 'themeChanged') {
+    });
+
+    // 타 페이지간의 로컬스토리지 실시간 감지 연동 처리
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'theme') {
+        currentTheme = e.newValue || 'dark';
+        applyThemeStyle();
         updateIcons();
       }
     });
 
-    // 초기 테마 확인 및 실행구조 배치
-    checkCurrentTheme();
+    // 주기적인 동기화 보완 검사 루프 추가 (500ms 간격)
+    setInterval(() => {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      if (savedTheme !== currentTheme) {
+        currentTheme = savedTheme;
+        applyThemeStyle();
+        updateIcons();
+      }
+    }, 500);
+
+    // 초기 실행부
+    applyThemeStyle();
     homeNav.classList.add('active');
     updateIcons();
     parent.postMessage({ type: 'requestUserInfo' }, '*');
