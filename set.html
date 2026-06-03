@@ -482,11 +482,12 @@
           
           <div class="form-group">
             <label>이름 (닉네임)</label>
-            <input type="text" id="userNicknameInput" placeholder="새로운 닉네임 입력">
+            <input type="text" id="userNicknameInput" disabled>
+            <div class="input-hint">닉네임은 보안상 변경할 수 없습니다.</div>
           </div>
           
           <div style="display:flex; justify-content:flex-end; margin-top:32px;">
-            <button class="save-btn" id="profileSaveBtn" onclick="saveProfile()">제출</button>
+            <button class="save-btn" id="profileSaveBtn" disabled style="opacity: 0.5; cursor: not-allowed;">변경 불가</button>
           </div>
         </div>
 
@@ -717,42 +718,7 @@
     }
   });
 
-  // ─── 3. 프로필 정보(닉네임) 변경 ───
-  async function saveProfile() {
-    const inputNick = document.getElementById('userNicknameInput').value.trim();
-    if (!inputNick) {
-      alert('닉네임을 입력해주세요.');
-      return;
-    }
-
-    const btn = document.getElementById('profileSaveBtn');
-    btn.disabled = true;
-    btn.textContent = "저장 중...";
-    NProgress.start();
-
-    try {
-      await api(`/users?id=eq.${encodeURIComponent(loggedInUser.id)}`, {
-        method: "PATCH",
-        body: JSON.stringify({ nickname: inputNick }),
-        headers: { "Prefer": "return=minimal" }
-      });
-      
-      loggedInUser.nickname = inputNick;
-      localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
-      document.getElementById('displayUsername').textContent = inputNick;
-      
-      alert('프로필 정보가 성공적으로 저장되었습니다.');
-    } catch(e) {
-      console.error(e);
-      alert('프로필 정보를 저장하는데 실패했습니다.');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "제출";
-      NProgress.done();
-    }
-  }
-
-  // ─── 4. 실제 DB 비밀번호 변경 구현 ───
+  // ─── 3. 실제 DB 비밀번호 변경 구현 ───
   async function changePassword() {
     const curPwd = document.getElementById('currentPasswordInput').value;
     const newPwd = document.getElementById('newPasswordInput').value;
@@ -821,7 +787,7 @@
     }
   }
 
-  // ─── 5. 이메일 인증 및 실제 변경 (다중 단계) ───
+  // ─── 4. 이메일 인증 및 실제 변경 (다중 단계) ───
   let pendingEmail = "";
 
   function toggleEmailEdit() {
@@ -936,7 +902,7 @@
     }
   }
 
-  // ─── 6. 독립 테마 사이트데이터 제어 ───
+  // ─── 5. 독립 테마 사이트데이터 제어 ───
   function changeTheme(themeValue) {
     localStorage.setItem('theme', themeValue);
     if (themeValue === 'light') {
@@ -946,7 +912,7 @@
     }
   }
 
-  // ─── 7. 인스타그램형 마스터-디테일 UI 인터랙션 스크립트 ───
+  // ─── 6. 인스타그램형 마스터-디테일 UI 인터랙션 스크립트 ───
   const menuItems = document.querySelectorAll('.menu-item');
   const sections = document.querySelectorAll('.settings-section');
   const settingsContainer = document.getElementById('settingsContainer');
@@ -972,7 +938,7 @@
     settingsContainer.classList.remove('show-detail');
   }
 
-  // ─── 8. 생명 주기 로딩 통합 실행 ───
+  // ─── 7. 생명 주기 로딩 통합 실행 ───
   NProgress.start();
   window.addEventListener('DOMContentLoaded', () => {
     initPageData().then(() => {
