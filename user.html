@@ -8,15 +8,6 @@
   <link rel="icon" type="image/svg+xml" href="./logo.svg" />
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
-  
-  <script>
-    // 화면 깜빡임(FOUC) 방지를 위해 HTML 렌더링 전 테마를 즉시 적용합니다.
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    if (savedTheme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  </script>
-
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -39,22 +30,8 @@
       --r4: 28px;
     }
 
-    /* 라이트 모드 변수 정의 */
-    html[data-theme="light"] {
-      --bg: #fafafa;
-      --bg2: #ffffff;
-      --bg3: #f0f0f0;
-      --bg4: #e4e4e4;
-      --border: #dbdbdb;
-      --border2: #cccccc;
-      --border3: #a3a3a3;
-      --t1: #000000;
-      --t2: #737373;
-      --t3: #a8a8a8;
-    }
-
     /* NProgress 커스텀 */
-    #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
+    #nprogress .bar { background: #fff !important; height: 2px !important; }
     #nprogress .peg { display: none !important; }
     #nprogress .spinner { display: none !important; }
 
@@ -162,7 +139,7 @@
       margin-bottom: 24px;
     }
 
-    /* 스토리 소유 시 파란 그라데이션 테두리 래퍼 */
+/* 스토리 소유 시 파란 그라데이션 테두리 래퍼 */
     .profile-avatar-wrapper {
       position: relative;
       width: 96px; height: 96px;
@@ -172,36 +149,39 @@
       flex-shrink: 0;
     }
     .profile-avatar-wrapper.has-story {
-      padding: 3px;
+      padding: 3px; /* 그라데이션 링의 두께가 됩니다 */
       border-radius: 50%;
       background: linear-gradient(
         270deg,
         #0740ba,
         #651fff,
         #29b1ff,
-        #0740ba
+        #0740ba /* 시작과 끝 색상을 맞춰서 뚝 끊기는 현상 해결 */
       );
       background-size: 200% 200%;
-      animation: storyRing 3s linear infinite;
+      animation: storyRing 3s linear infinite; /* 부러운 무한 회전 */
     }
 
     @keyframes storyRing {
       0% { background-position: 0% 50%; }
-      100% { background-position: 200% 50%; }
+      100% { background-position: 200% 50%; } /* 끊김 없이 자연스럽게 이어지도록 복원 */
     }
 
     .profile-avatar {
-      width: 100%; height: 100%;
+      width: 100%; height: 100%; /* 부모 크기에 맞춤 */
       border-radius: 50%;
       background: var(--bg3);
-      border: 6px solid var(--bg); 
+      
+      /* [핵심 수정] 배경색(#000)과 똑같은 두꺼운 테두리를 주어 링과의 사이에 빈 공간(Gap)을 만듭니다 */
+      border: 6px solid #000; 
+      
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 36px;
       font-weight: 700;
       flex-shrink: 0;
-      color: var(--t2);
+      color: #666;
       transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
       position: relative;
       overflow: hidden;
@@ -407,7 +387,7 @@
       font-size: 18px;
       cursor: pointer;
       z-index: 10;
-      opacity: 1;
+      opacity: 1; /* 항상 표시 */
       transition: background 0.2s;
     }
     .post-item-image-nav:hover {
@@ -1136,16 +1116,19 @@
       </div>
     `;
 
+    // 본인 프로필일 때는 항상 아바타를 누르면 업로드창 실행되도록 바인딩
     if (isOwnProfile) {
       const avatarElement = contentDiv.querySelector('.profile-avatar.editable');
       if (avatarElement) {
         avatarElement.onclick = (e) => {
           e.stopPropagation();
+          // 스토리가 있든 없든 이미지 업로드 동작 유도
           document.getElementById('profileFileInput').click();
         };
       }
     }
 
+    // 캐시 데이터가 먼저 로드된 후 프로필이 그려졌을 수 있으므로 다시 체크
     updateProfileStoryBorder();
   }
 
@@ -1159,7 +1142,7 @@
         return;
       }
 
-      rawPostsCached = posts;
+      rawPostsCached = posts; // 전역 캐시에 저장
       const isOwnProfile = currentUser && currentUser.nickname === userNickname;
 
       const filteredPosts = posts.filter(post => {
@@ -1193,6 +1176,7 @@
     }
   }
 
+  // 프로필의 스토리 존재 여부에 따른 테두리 활성화 및 재클릭 이벤트 처리
   function updateProfileStoryBorder() {
     const wrapper = document.getElementById('profileAvatarWrapper');
     if (!wrapper) return;
@@ -1202,13 +1186,14 @@
 
     if (items.length > 0) {
       wrapper.classList.add('has-story');
+      // 본인 프로필이 아닐 때만 래퍼 클릭 시 스토리 재생
       if (!isOwnProfile) {
         wrapper.onclick = (e) => {
           e.stopPropagation();
           startStories(rawPostsCached);
         };
       } else {
-        wrapper.onclick = null;
+        wrapper.onclick = null; // 본인일 땐 래퍼에서 스토리 이벤트 막기
       }
     } else {
       wrapper.classList.remove('has-story');
@@ -1266,7 +1251,7 @@
 
       postItem.innerHTML = `
         ${renderPostImages(post.image_url)}
-        \( {post.content ? `<div class="post-item-content"><div class="post-item-text"> \){parseMarkdown(post.content)}</div></div>` : ''}
+        ${post.content ? `<div class="post-item-content"><div class="post-item-text">${parseMarkdown(post.content)}</div></div>` : ''}
         <div class="post-item-footer">
           <div class="post-item-date">${timeStr}</div>
           <div class="post-item-likes">
@@ -1354,7 +1339,7 @@
       btn.classList.add('success');
       setTimeout(() => btn.classList.remove('success'), 1500);
     }).catch(err => {
-      console.error('링크 복사 실패:', err);
+      console.error('링크 복 복사 실패:', err);
     });
   };
 
@@ -1423,7 +1408,7 @@
       }
     });
     
-    return items.reverse();
+    return items.reverse(); // 과거에서 현재 순으로
   }
 
   function startStories(posts) {
