@@ -6,6 +6,15 @@
 
   <title>프로필 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg" />
+  
+  <script>
+    // 화면 깜빡임(FOUC) 방지를 위해 HTML 렌더링 전 테마를 즉시 적용합니다.
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  </script>
+
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <style>
@@ -30,8 +39,22 @@
       --r4: 28px;
     }
 
+    /* 라이트 모드 변수 정의 */
+    html[data-theme="light"] {
+      --bg: #fafafa;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e4e4e4;
+      --border: #dbdbdb;
+      --border2: #cccccc;
+      --border3: #a3a3a3;
+      --t1: #000000;
+      --t2: #737373;
+      --t3: #a8a8a8;
+    }
+
     /* NProgress 커스텀 */
-    #nprogress .bar { background: #fff !important; height: 2px !important; }
+    #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
     #nprogress .peg { display: none !important; }
     #nprogress .spinner { display: none !important; }
 
@@ -149,7 +172,8 @@
       flex-shrink: 0;
     }
     .profile-avatar-wrapper.has-story {
-      padding: 3px; /* 그라데이션 링의 두께가 됩니다 */
+      padding: 3px;
+      /* 그라데이션 링의 두께가 됩니다 */
       border-radius: 50%;
       background: linear-gradient(
         270deg,
@@ -168,13 +192,12 @@
     }
 
     .profile-avatar {
-      width: 100%; height: 100%; /* 부모 크기에 맞춤 */
+      width: 100%;
+      height: 100%; /* 부모 크기에 맞춤 */
       border-radius: 50%;
       background: var(--bg3);
-      
-      /* [핵심 수정] 배경색(#000)과 똑같은 두꺼운 테두리를 주어 링과의 사이에 빈 공간(Gap)을 만듭니다 */
-      border: 6px solid #000; 
-      
+      /* [핵심 수정] 배경색(--bg)과 똑같은 두꺼운 테두리를 주어 링과의 사이에 빈 공간(Gap)을 만듭니다 */
+      border: 6px solid var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -191,7 +214,8 @@
     .profile-avatar.editable:active { transform: scale(0.96); }
 
     .profile-avatar img {
-      width: 100%; height: 100%;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       border-radius: 50%;
     }
@@ -508,8 +532,8 @@
     .modal-btn:active { transform: scale(0.94); }
     .modal-btn-cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
     .modal-btn-cancel:hover { background: var(--bg4); color: var(--t1); }
-    .modal-btn-confirm { background: #fff; color: #000; }
-    .modal-btn-confirm:hover { background: #e8e8e8; }
+    .modal-btn-confirm { background: var(--t1); color: var(--bg); }
+    .modal-btn-confirm:hover { opacity: 0.85; }
 
     .upload-toast {
       position: fixed;
@@ -663,65 +687,97 @@
 
     /* ─── STORY OVERLAY ─── */
     #storyOverlay {
-      position: fixed; inset: 0; background: #121212; z-index: 100000;
+      position: fixed;
+      inset: 0; background: #121212; z-index: 100000;
       display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s;
     }
     #storyOverlay.active { display: flex; opacity: 1; }
-    .story-header { position: absolute; top: 0; left: 0; right: 0; padding: 16px 12px 20px; z-index: 20; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+    .story-header { position: absolute; top: 0;
+      left: 0; right: 0; padding: 16px 12px 20px; z-index: 20; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    }
     .story-progress-container { display: flex; gap: 4px; margin-bottom: 12px; }
-    .story-progress-segment { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
-    .story-progress-fill { height: 100%; background: #fff; width: 0%; transform-origin: left; }
-    .story-info-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
+    .story-progress-segment { flex: 1;
+      height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
+    .story-progress-fill { height: 100%; background: #fff; width: 0%;
+      transform-origin: left; }
+    .story-info-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 4px;
+    }
     .story-user-info { display: flex; align-items: center; gap: 10px; }
-    .story-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #333; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; overflow: hidden; }
-    .story-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .story-username { color: #fff; font-size: 14px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-    .story-time { color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 400; margin-left: 6px; }
-    .story-close-btn { color: #fff; font-size: 24px; cursor: pointer; padding: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); background: none; border: none; }
+    .story-avatar { width: 32px;
+      height: 32px; border-radius: 50%; object-fit: cover; background: #333; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; overflow: hidden;
+    }
+    .story-avatar img { width: 100%; height: 100%; object-fit: cover;
+    }
+    .story-username { color: #fff; font-size: 14px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+    .story-time { color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 400; margin-left: 6px;
+    }
+    .story-close-btn { color: #fff; font-size: 24px; cursor: pointer; padding: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      background: none; border: none; }
     
-    .story-content-area { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: #121212; padding-bottom: env(safe-area-inset-bottom); overflow: hidden; }
+    .story-content-area { flex: 1; position: relative; display: flex;
+      justify-content: center; align-items: center; background: #121212; padding-bottom: env(safe-area-inset-bottom); overflow: hidden;
+    }
     
-    .story-tap-left { position: absolute; left: 0; top: 0; bottom: 0; width: 30%; z-index: 5; }
-    .story-tap-right { position: absolute; right: 0; top: 0; bottom: 0; width: 70%; z-index: 5; }
+    .story-tap-left { position: absolute; left: 0; top: 0; bottom: 0; width: 30%;
+      z-index: 5; }
+    .story-tap-right { position: absolute; right: 0; top: 0; bottom: 0; width: 70%; z-index: 5;
+    }
 
     .story-dynamic-content {
-      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 10;
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; pointer-events: none; z-index: 10;
     }
     .story-dynamic-content .short-content {
-      max-width: 500px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px;
+      max-width: 500px;
+      width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px;
     }
     .story-dynamic-content img.short-image {
-      max-height: 70vh; max-width: 100%; width: auto; height: auto; border-radius: 16px; object-fit: contain; box-shadow: 0 8px 24px rgba(0,0,0,0.6); pointer-events: auto;
+      max-height: 70vh; max-width: 100%; width: auto; height: auto;
+      border-radius: 16px; object-fit: contain; box-shadow: 0 8px 24px rgba(0,0,0,0.6); pointer-events: auto;
     }
     .story-dynamic-content .short-text-only {
-      background: linear-gradient(135deg, #1e1e1e, #2a2a2a); border: 1px solid #333; border-radius: 16px; padding: 40px; max-width: 500px; width: 100%; max-height: 70vh; overflow-y: auto; text-align: center; font-size: 20px; line-height: 1.6; color: #fff; word-break: break-word; box-shadow: 0 8px 24px rgba(0,0,0,0.6); pointer-events: auto;
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a); border: 1px solid #333;
+      border-radius: 16px; padding: 40px; max-width: 500px; width: 100%; max-height: 70vh; overflow-y: auto; text-align: center; font-size: 20px; line-height: 1.6; color: #fff;
+      word-break: break-word; box-shadow: 0 8px 24px rgba(0,0,0,0.6); pointer-events: auto;
     }
     .story-dynamic-content .short-caption {
-      padding: 16px 20px; background: rgba(30,30,30,0.9); border-radius: 12px; max-width: 500px; width: 100%; backdrop-filter: blur(10px); border: 1px solid #333; color: #fff; font-size: 15px; line-height: 1.5; word-break: break-word; pointer-events: auto;
+      padding: 16px 20px;
+      background: rgba(30,30,30,0.9); border-radius: 12px; max-width: 500px; width: 100%; backdrop-filter: blur(10px); border: 1px solid #333; color: #fff; font-size: 15px; line-height: 1.5;
+      word-break: break-word; pointer-events: auto;
     }
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       .sidebar-container {
-        left: 0; right: 0; top: auto; bottom: 0;
+        left: 0;
+        right: 0; top: auto; bottom: 0;
         width: 100%; min-width: 0;
         height: calc(64px + env(safe-area-inset-bottom, 0px));
       }
       .sidebar-container iframe {
-        width: 100% !important; height: 100% !important;
+        width: 100% !important;
+        height: 100% !important;
       }
       .main-wrapper {
-        margin-left: 0; width: 100%;
+        margin-left: 0;
+        width: 100%;
         padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
       }
-      .container { padding: 20px 16px; }
-      .post-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+      .container { padding: 20px 16px;
+      }
+      .post-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;
+      }
       .post-item-image-container { height: 160px; }
-      .profile-header { flex-direction: column; text-align: center; gap: 18px; }
-      .profile-stats { justify-content: center; }
-      .profile-name { font-size: 20px; justify-content: center; }
+      .profile-header { flex-direction: column;
+        text-align: center; gap: 18px; }
+      .profile-stats { justify-content: center;
+      }
+      .profile-name { font-size: 20px; justify-content: center;
+      }
       .post-item-image-nav {
-        width: 30px; height: 30px; font-size: 16px;
+        width: 30px; height: 30px;
+        font-size: 16px;
       }
     }
   </style>
@@ -856,7 +912,6 @@
     if (!sessionStorage.getItem('splashShown')) {
       sessionStorage.setItem('splashShown', 'true');
       splash.style.display = 'flex';
-
       function finishSplash() {
         splash.classList.add('fade-out');
         setTimeout(() => { splash.style.display = 'none'; }, 460);
@@ -864,7 +919,6 @@
 
       const splashStart = Date.now();
       const MIN_SPLASH = 2000;
-
       window.addEventListener('load', () => {
         const elapsed = Date.now() - splashStart;
         const remaining = Math.max(0, MIN_SPLASH - elapsed);
@@ -878,7 +932,6 @@
 
   const CLOUDINARY_CLOUD = 'dretlhsrk';
   const CLOUDINARY_PRESET = 'unsigned_preset';
-
   async function api(endpoint, options = {}) {
     const url = API_BASE + endpoint;
     const res = await fetch(url, {
@@ -890,13 +943,15 @@
     });
     if (!res.ok) {
       let errorText;
-      try { errorText = await res.text(); } catch { errorText = "Unknown error"; }
+      try { errorText = await res.text();
+      } catch { errorText = "Unknown error"; }
       throw new Error(`API 오류 (${res.status}): ${errorText}`);
     }
     if (res.status === 204) return null;
     const text = await res.text();
     if (!text) return null;
-    try { return JSON.parse(text); } catch (e) { console.error("JSON 파싱 오류:", e); return null; }
+    try { return JSON.parse(text); } catch (e) { console.error("JSON 파싱 오류:", e); return null;
+    }
   }
 
   async function uploadImageToCloudinary(file) {
@@ -925,7 +980,8 @@
   const userNickname = urlParams.get('nickname');
   let currentUser = null;
   let viewingUser = null;
-  let rawPostsCached = []; // 스토리 재실행을 위한 원본 게시물 임시 저장소
+  let rawPostsCached = [];
+  // 스토리 재실행을 위한 원본 게시물 임시 저장소
 
   function initCurrentUser() {
     const savedUser = localStorage.getItem('snsUser');
@@ -952,7 +1008,6 @@
     if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; NProgress.start(); location.href = 'index.html'; }
     if (type === 'requestUserInfo') updateSidebar();
   });
-
   window.onSharerProfileLogout = function () {
     localStorage.removeItem('snsUser');
     currentUser = null;
@@ -977,6 +1032,7 @@
         headers: { "Prefer": "return=minimal" }
       });
       currentUser.profile_image = imageUrl;
+   
       localStorage.setItem('snsUser', JSON.stringify(currentUser));
       viewingUser.profile_image = imageUrl;
       await displayProfile(viewingUser);
@@ -1003,7 +1059,6 @@
   async function loadUserProfile() {
     try {
       let users = await api(`/users?nickname=eq.${encodeURIComponent(userNickname)}&select=*`);
-
       if (users?.length === 0) {
         if (userNickname === "JB777" || userNickname === "진정오") {
           users = [{ nickname: userNickname, isVerified: true, message: null, profile_image: null }];
@@ -1015,7 +1070,6 @@
 
       viewingUser = users[0];
       await displayProfile(viewingUser);
-      
       if (urlParams.get('u') === 'new' && currentUser && currentUser.nickname === viewingUser.nickname) {
         document.getElementById('profilePicModal').classList.add('active');
       }
@@ -1029,10 +1083,10 @@
     const contentDiv = document.getElementById('profileContent');
     const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
     const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
-
     const userPosts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id,access`);
     
-    const visibleUserPosts = userPosts ? userPosts.filter(p => {
+    const visibleUserPosts = userPosts ?
+    userPosts.filter(p => {
       if (isOwnProfile) return true;
       return p.access !== 'private' && p.access !== 'link';
     }) : [];
@@ -1051,7 +1105,6 @@
     const statusDisplay = statusMessage
       ? `<div class="status-message-text">${escapeHtml(statusMessage)}</div>`
       : `<div class="status-message-text status-message-empty">상태메시지가 없습니다.</div>`;
-
     const editButton = isOwnProfile
       ? `<button class="edit-status-btn" onclick="openStatusModal()" title="상태메시지 수정">
            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -1060,7 +1113,6 @@
            </svg>
          </button>`
       : '';
-
     const avatarOverlay = isOwnProfile
       ? `<div class="avatar-overlay">
            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -1079,7 +1131,6 @@
            ${(user.nickname?.[0] || '?').toUpperCase()}
            ${avatarOverlay}
          </div>`;
-
     contentDiv.innerHTML = `
       <div class="profile-card">
         <div class="profile-header">
@@ -1106,7 +1157,7 @@
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
               </button>
-            </div>
+             </div>
           </div>
         </div>
         <div class="status-message-container">
@@ -1115,7 +1166,6 @@
         </div>
       </div>
     `;
-
     // 본인 프로필일 때는 항상 아바타를 누르면 업로드창 실행되도록 바인딩
     if (isOwnProfile) {
       const avatarElement = contentDiv.querySelector('.profile-avatar.editable');
@@ -1136,7 +1186,6 @@
     const postsDiv = document.getElementById('userPosts');
     try {
       const posts = await api(`/posts?author=eq.${encodeURIComponent(userNickname)}&select=*&order=created_at.desc`);
-
       if (!posts?.length) {
         postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
         return;
@@ -1144,12 +1193,10 @@
 
       rawPostsCached = posts; // 전역 캐시에 저장
       const isOwnProfile = currentUser && currentUser.nickname === userNickname;
-
       const filteredPosts = posts.filter(post => {
         if (isOwnProfile) return true;
         return post.access !== 'private' && post.access !== 'link';
       });
-
       if (!filteredPosts.length) {
         postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
         return;
@@ -1163,13 +1210,11 @@
 
       const likeCountMap = {};
       allLikes.forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
-
       const postsWithLikes = filteredPosts.map(post => ({ ...post, likeCount: likeCountMap[post.id] || 0 }));
       displayPosts(postsWithLikes);
       
       startStories(filteredPosts);
       updateProfileStoryBorder();
-
     } catch (e) {
       console.error('게시물 로드 오류:', e);
       postsDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
@@ -1183,7 +1228,6 @@
 
     const isOwnProfile = currentUser && viewingUser && currentUser.nickname === viewingUser.nickname;
     const items = extractStoryItems(rawPostsCached);
-
     if (items.length > 0) {
       wrapper.classList.add('has-story');
       // 본인 프로필이 아닐 때만 래퍼 클릭 시 스토리 재생
@@ -1193,7 +1237,8 @@
           startStories(rawPostsCached);
         };
       } else {
-        wrapper.onclick = null; // 본인일 땐 래퍼에서 스토리 이벤트 막기
+        wrapper.onclick = null;
+        // 본인일 땐 래퍼에서 스토리 이벤트 막기
       }
     } else {
       wrapper.classList.remove('has-story');
@@ -1212,7 +1257,6 @@
     urls.forEach((url) => {
       html += `<div class="post-item-image-slide"><img src="${escapeHtml(url)}" alt="게시글 이미지" loading="lazy"></div>`;
     });
-
     html += `</div>`;
 
     if (urls.length > 1) {
@@ -1229,7 +1273,6 @@
     const width = container.clientWidth;
     container.scrollBy({ left: -width, behavior: 'smooth' });
   };
-
   window.nextPreviewSlide = function(btn) {
     const container = btn.parentElement.querySelector('.post-item-image-carousel');
     if (!container) return;
@@ -1292,19 +1335,16 @@
   window.closeStatusModal = function() {
     document.getElementById('statusModal').classList.remove('active');
   };
-
   window.closeProfilePicModal = function() {
     document.getElementById('profilePicModal').classList.remove('active');
     const url = new URL(window.location);
     url.searchParams.delete('u');
     window.history.replaceState({}, '', url);
   };
-
   window.triggerProfilePicUpload = function() {
     closeProfilePicModal();
     document.getElementById('profileFileInput').click();
   };
-
   window.saveStatusMessage = async function() {
     const input = document.getElementById('statusInput');
     const newMessage = input.value.trim();
@@ -1327,11 +1367,9 @@
   document.getElementById('statusModal').addEventListener('click', function(e) {
     if (e.target === this) closeStatusModal();
   });
-
   window.goBack = () => { NProgress.start(); window.history.back(); };
   window.showPrivacyPolicy = () => { NProgress.start(); window.location.href = "privacy.html"; };
   window.showTerms = () => { NProgress.start(); window.location.href = "policy.html"; };
-
   window.copyProfileLink = function() {
     navigator.clipboard.writeText(window.location.href).then(() => {
       const btn = document.getElementById('shareBtn');
@@ -1339,7 +1377,7 @@
       btn.classList.add('success');
       setTimeout(() => btn.classList.remove('success'), 1500);
     }).catch(err => {
-      console.error('링크 복 복사 실패:', err);
+      console.error('링크 복사 실패:', err);
     });
   };
 
@@ -1381,7 +1419,6 @@
     
     let items = [];
     if (!posts) return items;
-    
     posts.forEach(post => {
       const postDate = new Date(post.created_at);
       if (now - postDate <= twoDaysMs) {
@@ -1407,7 +1444,6 @@
         }
       }
     });
-    
     return items.reverse(); // 과거에서 현재 순으로
   }
 
@@ -1423,7 +1459,6 @@
       seg.innerHTML = `<div class="story-progress-fill" id="story-fill-${idx}"></div>`;
       progressContainer.appendChild(seg);
     });
-
     const avatarContainer = document.getElementById('storyAvatar');
     if (viewingUser && viewingUser.profile_image) {
       avatarContainer.innerHTML = `<img src="${escapeHtml(viewingUser.profile_image)}" alt="avatar">`;
@@ -1443,8 +1478,6 @@
       return;
     }
     currentStoryIndex = index;
-    const item = storyItems[index];
-
     for (let i = 0; i < storyItems.length; i++) {
       const fill = document.getElementById(`story-fill-${i}`);
       if (fill) {
@@ -1463,7 +1496,6 @@
     dynamicDiv.className = 'story-dynamic-content';
 
     let contentHtml = `<div class="short-content">`;
-    
     if (item.type === 'image') {
       contentHtml += `<img src="${escapeHtml(item.url)}" class="short-image" alt="스토리 이미지">`;
       if (item.text && item.text.trim()) {
@@ -1507,7 +1539,6 @@
       closeStory();
     }
   };
-
   window.prevStory = function() {
     if (currentStoryIndex > 0) {
       showStory(currentStoryIndex - 1);
