@@ -18,6 +18,18 @@
       '}' +
       '.sharer-profile-sheet-host .sps-discord-join img{' +
       'width:22px;height:22px;flex-shrink:0;object-fit:contain;' +
+      '}'+'.sharer-profile-sheet-host .sps-set{' +
+      'width:100%;box-sizing:border-box;margin-top:10px;padding:14px 16px;' +
+      'border:1px solid rgba(145,145,145,0.4);border-radius:14px;background:transparent;' +
+      'color:#a5a5a5;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;' +
+      'display:flex;align-items:center;justify-content:center;gap:10px;' +
+      '}' +
+      '.sharer-profile-sheet-host .sps-set img{' +
+      'width:22px;height:22px;flex-shrink:0;object-fit:contain;' +
+      '}' +
+      // 라이트 모드일 때 설정 버튼 스타일 변경
+      'body.light-mode .sharer-profile-sheet-host .sps-set{' +
+      'border-color:rgba(0,0,0,0.15);color:#333;' +
       '}';
     document.head.appendChild(st);
   }
@@ -74,7 +86,7 @@
     const tid = setTimeout(cleanup, 520);
   }
 
-  function wireDragAndActions(host, panel, dragArea, prof, lo, discordJoin, id, nick) {
+  function wireDragAndActions(host, panel, dragArea, prof, lo, setBtn,discordJoin, id, nick) {
     const profileUrl =
       'https://sharer.r-e.kr/user.html?id=' +
       encodeURIComponent(id) +
@@ -168,6 +180,11 @@
         window.open('https://discord.gg/8s6XuWkfQb', '_blank');
       });
     };
+    setBtn.onclick = () => {
+      animateClose(host, () => {
+        window.location.href = 'https://sharer.r-e.kr/set.html';
+      };
+
   }
 
   window.addEventListener('message', (ev) => {
@@ -246,15 +263,35 @@
     dLabel.textContent = '디스코드 참여';
     discordJoin.appendChild(dIcon);
     discordJoin.appendChild(dLabel);
-
+// 설정 버튼 엘리먼트 생성
+    const setBtn = document.createElement('button');
+    setBtn.type = 'button';
+    setBtn.className = 'sps-set';
+    
+    const sIcon = document.createElement('img');
+    // 현재 접속한 테마 상태(라이트모드 여부)에 맞춰 이미지 분기 처리
+    const isLight = document.body.classList.contains('light-mode');
+    sIcon.src = isLight ? 'setX.svg' : 'set.svg';
+    sIcon.alt = '';
+    
+    const sLabel = document.createElement('span');
+    sLabel.textContent = '설정';
+    
+    setBtn.appendChild(sIcon);
+    setBtn.appendChild(sLabel);
     panel.appendChild(dragArea);
     panel.appendChild(prof);
-    panel.appendChild(lo);
+
     panel.appendChild(discordJoin);
+    panel.appendChild(setBtn);
+    panel.appendChild(lo);
+
+
+
     host.appendChild(bd);
     host.appendChild(panel);
 
-    wireDragAndActions(host, panel, dragArea, prof, lo, discordJoin, id, nick);
+    wireDragAndActions(host, panel, dragArea, prof, lo, discordJoin,setBtn, id, nick);
 
     escHandler = (e) => {
       if (e.key === 'Escape') animateClose(host, null);
