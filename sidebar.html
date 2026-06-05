@@ -68,9 +68,6 @@
     }
     .nav-item.active {
       /* 배경 그라데이션 및 그림자 제거 (필요시 다시 추가 가능) */
-      /* background와 box-shadow 주석 처리 또는 삭제 */
-      /* background: linear-gradient(135deg, rgba(54,99,255,0.3), rgba(87,34,179,0.2)); */
-      /* box-shadow: 0 4px 12px rgba(54,99,255,0.25); */
     }
     /* 비활성 상태일 때 아이콘 밝기 낮춤 */
     .nav-item:not(.active) .nav-icon-img,
@@ -271,6 +268,7 @@
     .mobile-profile-sheet-inner .sheet-logout {
       width: 100%;
       box-sizing: border-box;
+      margin-top: 10px;
       padding: 14px 16px;
       border: none;
       border-radius: 14px;
@@ -284,7 +282,6 @@
     .mobile-profile-sheet-inner .sheet-discord-join {
       width: 100%;
       box-sizing: border-box;
-      margin-top: 10px;
       padding: 14px 16px;
       border: 1px solid rgba(88, 101, 242, 0.9);
       border-radius: 14px;
@@ -337,10 +334,6 @@
       display: none;
     }
 
-    /*
-      모바일: 부모가 iframe을 화면 너비로 둠 → 뷰포트가 넓어짐(200px 이상).
-      max-width:768px는 iframe 안에서도 참이 되어 데스크톱 사이드바가 깨지므로 쓰지 않음.
-    */
     @media (min-width: 200px) {
       html, body {
         height: 100% !important;
@@ -493,6 +486,15 @@
     body.light-mode .user-info[data-tooltip]::before {
       border-right-color: rgba(246, 246, 246, 0.98);
     }
+    
+    body.light-mode .mobile-profile-sheet-inner .sheet-set {
+      border-color: rgba(0, 0, 0, 0.15);
+      color: #333;
+    }
+    body.light-mode .mobile-profile-sheet-inner .sheet-discord-join {
+      border-color: rgba(88, 101, 242, 0.5);
+      color: #5865F2;
+    }
   </style>
 </head>
 <body>
@@ -560,15 +562,18 @@
           <div class="sheet-avatar" id="sheetMenuAvatar"></div>
           <span class="sheet-nickname" id="sheetMenuNickname"></span>
         </div>
-        <button type="button" class="sheet-logout" id="sheetLogoutBtn">로그아웃</button>
+        
         <button type="button" class="sheet-discord-join" id="sheetDiscordJoinBtn">
           <img src="discord.png" alt="">
           <span>디스코드 참여</span>
         </button>
+        
         <button type="button" class="sheet-set" id="sheetSetBtn">
-          <img src="set.png" alt="">
+          <img src="set.svg" id="sheetSetIcon" alt="">
           <span>설정</span>
         </button>
+
+        <button type="button" class="sheet-logout" id="sheetLogoutBtn">로그아웃</button>
       </div>
     </div>
   </div>
@@ -680,6 +685,12 @@
       } else {
         setIcon.src = 'setX.svg';
       }
+      
+      // 모바일 시트용 설정 아이콘: 라이트/다크에 맞게 변경 (set.svg / setX.svg 사용)
+      const sheetSetIcon = document.getElementById('sheetSetIcon');
+      if (sheetSetIcon) {
+        sheetSetIcon.src = isLight ? 'setX.svg' : 'set.svg'; 
+      }
     }
 
     function syncSheetProfileFromUser() {
@@ -744,21 +755,19 @@
     };
     sheetLogoutBtn.onclick = (e) => {
       e.stopPropagation();
-      if (isMobileBottomLayout()) return;
       closeProfileSheet();
       parent.postMessage({ type: 'logout' }, '*');
     };
     sheetDiscordJoinBtn.onclick = (e) => {
       e.stopPropagation();
-      if (isMobileBottomLayout()) return;
       closeProfileSheet();
-      window.location.href('https://discord.gg/8s6XuWkfQb', '_blank');
+      window.open('https://discord.gg/8s6XuWkfQb', '_blank');
     };
     sheetSetBtn.onclick = (e) => {
       e.stopPropagation();
-      if (isMobileBottomLayout()) return;
       closeProfileSheet();
-      window.open('https://sharer.r-e.kr/set.html', '_blank');
+      // 요청에 따라 현재 창 최상단 윈도우에서 /set.html 로 이동
+      window.top.location.href = 'https://sharer.r-e.kr/set.html';
     };
 
     document.addEventListener('keydown', (e) => {
