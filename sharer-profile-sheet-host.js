@@ -302,7 +302,17 @@
     host.appendChild(bd);
     host.appendChild(panel);
 
-    wireDragAndActions(host, panel, dragArea, prof, lo, discordJoin,setBtn, id, nick);
+    wireDragAndActions(
+      host,
+      panel,
+      dragArea,
+      prof,
+      lo,
+      setBtn,
+      discordJoin,
+      id,
+      nick
+    );
 
     escHandler = (e) => {
       if (e.key === 'Escape') animateClose(host, null);
