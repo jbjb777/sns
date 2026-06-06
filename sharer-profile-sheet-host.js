@@ -86,7 +86,17 @@
     const tid = setTimeout(cleanup, 520);
   }
 
-  function wireDragAndActions(host, panel, dragArea, prof, lo, setBtn,discordJoin, id, nick) {
+  function wireDragAndActions(
+  host,
+  panel,
+  dragArea,
+  prof,
+  lo,
+  setBtn,
+  discordJoin,
+  id,
+  nick
+) {
     const profileUrl =
       'https://sharer.r-e.kr/user.html?id=' +
       encodeURIComponent(id) +
@@ -183,7 +193,8 @@
     setBtn.onclick = () => {
       animateClose(host, () => {
         window.location.href = 'https://sharer.r-e.kr/set.html';
-      };
+      });
+    };
 
   }
 
