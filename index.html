@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Sharer</title>
   <link rel="icon" type="image/png" href="./logo.png">
 
@@ -844,45 +844,40 @@
       }
     }
 
-    /* --- Pull To Refresh CSS 추가 시작 --- */
-    #pullRefresh{
+    /* --- Pull To Refresh CSS 설정 --- */
+    #pullRefresh {
       position: fixed;
-      top: -60px;
+      top: -65px;
       left: 50%;
       transform: translateX(-50%);
-      width: 50px;
-      height: 50px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       background: var(--bg2);
-      border: 1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:99999; /* 모달이나 로딩 화면 위에 뜨게 조정 */
-      transition: top .25s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      pointer-events: none; /* 드래그를 방해하지 않도록 처리 */
     }
 
-    #pullRefresh.show{
-      top: 15px; /* 헤더 여백에 알맞게 조금 조정 */
+    #pullIcon {
+      width: 22px;
+      height: 22px;
+      fill: var(--t1);
+      transform-origin: center;
     }
 
-    #pullIcon{
-      width:24px;
-      height:24px;
-      fill:var(--t1);
-      transition: transform .15s linear;
-    }
-
-    #pullRefresh.loading #pullIcon{
+    #pullRefresh.loading #pullIcon {
       animation: spin .8s linear infinite;
     }
 
-    @keyframes spin{
-      from{transform:rotate(0deg);}
-      to{transform:rotate(360deg);}
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
-    /* --- Pull To Refresh CSS 추가 끝 --- */
   </style>
 </head>
 <body>
@@ -892,6 +887,7 @@
     <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6a6 6 0 1 1-6-6z"/>
   </svg>
 </div>
+
 <div id="splash">
   <div class="splash-inner">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
@@ -1008,7 +1004,6 @@
 
 <script src="markdown.js"></script>
 <script>
-// 배너 부드럽게 닫기 함수 정의
 function closeNoticeBanner() {
   const banner = document.getElementById('topNoticeBanner');
   if (banner) {
@@ -1080,7 +1075,6 @@ const postAuthorIdMap = Object.create(null);
 const cloudName = 'dretlhsrk';
 const uploadPreset = 'unsigned_preset';
 
-// ─── 48시간 내 게시물 작성 유저 추적 ───
 let recentStoryAuthors = new Set();
 
 async function fetchRecentStories() {
@@ -1502,7 +1496,6 @@ function escapeHtml(unsafe) {
     .replace(/'/g, "&#039;");
 }
 
-// ─── 초기 로드 실행 흐름 (최근 스토리 데이터 먼저 확보) ───
 fetchRecentStories().then(() => {
   loadPosts().then(() => {
     applyFadeEffect();
@@ -1510,70 +1503,100 @@ fetchRecentStories().then(() => {
   loadRecommendedProfiles();
 });
 
-// --- Pull To Refresh 로직 추가 시작 ---
-const scroller = document.querySelector('.main-content');
+// ─── 완벽하게 작동하는 Pull To Refresh 스크립트 수정본 ───
+(function() {
+  const scroller = document.querySelector('.main-content');
+  const refreshEl = document.getElementById('pullRefresh');
+  const refreshIcon = document.getElementById('pullIcon');
 
-let startY = 0;
-let pulling = false;
+  let startY = 0;
+  let pulling = false;
+  let isLoading = false;
 
-const refreshEl = document.getElementById('pullRefresh');
-const refreshIcon = document.getElementById('pullIcon');
-
-// 모바일 기기 등에서 부드럽게 작동하도록 이벤트 최적화
-scroller.addEventListener('touchstart', e => {
-  // 스크롤이 맨 위에 있을 때만 인식
-  if (scroller.scrollTop <= 0) {
-    startY = e.touches[0].clientY;
-    pulling = true;
+  // 현재 스크롤이 최상단(0)에 있는지 정확히 체크하는 함수
+  function isScrollTop() {
+    // 데스크톱 모드에선 scroller 요소가 스크롤되지만, 모바일 반응형 상태에선 window(html/body)가 스크롤될 수 있음
+    return scroller.scrollTop <= 0 && window.scrollY <= 0;
   }
-}, { passive: true });
 
-scroller.addEventListener('touchmove', e => {
-  if (!pulling) return;
-
-  const currentY = e.touches[0].clientY;
-  const distance = currentY - startY;
-
-  // 스크롤이 가장 위쪽인 상태에서 아래로 당기는 경우
-  if (distance > 0 && scroller.scrollTop <= 0) {
-    if (e.cancelable) e.preventDefault(); // 기본 스크롤 동작 방지
-
-    refreshEl.classList.add('show');
-    const rotation = Math.min(distance * 2, 360);
-    refreshIcon.style.transform = `rotate(${rotation}deg)`;
-    refreshEl.style.top = `${Math.min(distance - 50, 20)}px`;
-  }
-}, { passive: false });
-
-scroller.addEventListener('touchend', async e => {
-  if (!pulling) return;
-
-  const distance = e.changedTouches[0].clientY - startY;
-
-  // 충분히 당겨졌을 때만 새로고침 트리거
-  if (distance > 80 && scroller.scrollTop <= 0) {
-    refreshEl.classList.add('loading');
-    refreshEl.style.top = '20px'; // 로딩 중 UI 고정
-
-    try {
-      await fetchRecentStories();
-      await loadPosts();
-      await loadRecommendedProfiles();
-    } finally {
-      setTimeout(() => {
-        refreshEl.classList.remove('loading');
-        refreshEl.classList.remove('show');
-        refreshEl.style.top = '-60px'; // 다시 원래 자리로 복귀
-      }, 500);
+  window.addEventListener('touchstart', e => {
+    if (isLoading) return;
+    
+    if (isScrollTop()) {
+      startY = e.touches[0].clientY;
+      pulling = true;
     }
-  } else {
-    refreshEl.classList.remove('show');
-    refreshEl.style.top = '-60px';
-  }
+  }, { passive: true });
 
-  pulling = false;
-});
-// --- Pull To Refresh 로직 추가 끝 ---
+  window.addEventListener('touchmove', e => {
+    if (!pulling || isLoading) return;
+
+    const currentY = e.touches[0].clientY;
+    const distance = currentY - startY;
+
+    // 아래로 당기면서 스크롤 위치가 최상단일 때
+    if (distance > 0 && isScrollTop()) {
+      // 모바일 기본 기능(오버스크롤/바운스) 방지
+      if (e.cancelable) e.preventDefault();
+
+      refreshEl.classList.add('show');
+      
+      // 당긴 거리에 비례해서 회전 및 위치 조정 (최대 노출 위치 고정)
+      const rotation = Math.min(distance * 2, 360);
+      const topPos = Math.min(distance - 65, 24); // top 최대 24px까지만 내려오도록 설정
+
+      refreshIcon.style.transform = `rotate(${rotation}deg)`;
+      refreshEl.style.top = `${topPos}px`;
+      refreshEl.style.transition = 'none'; // 드래그 중엔 부드러운 애니메이션 일시 해제
+    } else {
+      // 만약 위로 다시 올리면 원래대로 숨김
+      pulling = false;
+      refreshEl.style.top = '-65px';
+      refreshEl.style.transition = 'top .2s ease';
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchend', async e => {
+    if (!pulling || isLoading) return;
+    pulling = false;
+
+    const currentY = e.changedTouches[0].clientY;
+    const distance = currentY - startY;
+
+    refreshEl.style.transition = 'top .25s cubic-bezier(0.22, 1, 0.36, 1)';
+
+    // 80px 이상 충분히 당겼을 때 새로고침 트리거
+    if (distance > 80 && isScrollTop()) {
+      isLoading = true;
+      refreshEl.classList.add('loading');
+      refreshEl.style.top = '24px'; // 로딩 회전용 위치에 고정
+
+      try {
+        await fetchRecentStories();
+        await loadPosts();
+        await loadRecommendedProfiles();
+      } catch (err) {
+        console.error("새로고침 중 오류:", err);
+      } finally {
+        // 로딩 완료 후 부드럽게 원래 자리로 복귀
+        setTimeout(() => {
+          refreshEl.classList.remove('loading');
+          refreshEl.style.top = '-65px';
+          setTimeout(() => {
+            refreshEl.classList.remove('show');
+            isLoading = false;
+          }, 250);
+        }, 600);
+      }
+    } else {
+      // 기준 미달 시 취소하고 숨김
+      refreshEl.style.top = '-65px';
+      setTimeout(() => {
+        refreshEl.classList.remove('show');
+      }, 250);
+    }
+  });
+})();
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
 </body>
