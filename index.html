@@ -36,7 +36,6 @@
     "name": "Sharer",
     "url": "https://sharer.r-e.kr",
     "logo": "https://sharer.r-e.kr/logo_google.png"
-
   }
   </script>
 
@@ -124,9 +123,6 @@
       transition: padding-top 0.3s ease; /* 배너가 닫힐 때 여백도 부드럽게 사라짐 */
     }
     @keyframes bodyReveal { to { opacity: 1; } }
-
-
-
 
     #splash {
       position: fixed;
@@ -835,16 +831,15 @@
         height: calc(64px + env(safe-area-inset-bottom, 0px));
       }
       .sidebar-container iframe { width: 100% !important; height: 100% !important; }
-      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
-      .main-content { padding: 20px 16px; }
-      .post-image-nav {
-        width: 36px;
-        height: 36px;
-        font-size: 20px;
+      .main-wrapper {
+        margin-left: 0; width: 100%;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
       }
+      .main-content { padding: 20px 16px; }
+      .post-image-nav { width: 36px; height: 36px; font-size: 20px; }
     }
 
-    /* --- Pull To Refresh CSS 설정 --- */
+    /* --- Pull To Refresh 지메일/ChatGPT 얇은 원형 스피너 스타일 --- */
     #pullRefresh {
       position: fixed;
       top: -65px;
@@ -852,25 +847,24 @@
       transform: translateX(-50%);
       width: 48px;
       height: 48px;
-      border-radius: 50%;
-      background: var(--bg2);
-      border: 1px solid var(--border2);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 99999;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-      pointer-events: none; /* 드래그를 방해하지 않도록 처리 */
+      pointer-events: none; /* 드래그 방해 방지 */
     }
 
-    #pullIcon {
-      width: 22px;
-      height: 22px;
-      fill: var(--t1);
+    #pullSpinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border3);
+      border-top-color: #4a90ff;
+      border-radius: 50%;
       transform-origin: center;
+      transition: transform 0.1s linear;
     }
 
-    #pullRefresh.loading #pullIcon {
+    #pullRefresh.loading #pullSpinner {
       animation: spin .8s linear infinite;
     }
 
@@ -882,725 +876,744 @@
 </head>
 <body>
 
-<div id="pullRefresh">
-  <svg id="pullIcon" viewBox="0 0 24 24">
-    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-  </svg>
-</div>
-
-
-
-
-<div id="splash">
-  <div class="splash-inner">
-    <img src="logo.svg" class="splash-logo" alt="Sharer">
-    <div class="splash-text">
-      <div class="splash-title">Sharer</div>
-      <div class="splash-sub">By JBJB</div>
-    </div>
-  </div>
-</div>
-
-<div class="sidebar-container">
-  <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
-</div>
-<div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
-
-<div class="main-wrapper">
-
-  <div class="auth-modal" id="loginModal">
-    <div class="auth-box">
-      <button class="auth-close" onclick="closeLoginModal()">✕</button>
-      <h2>로그인</h2>
-      <input type="text" id="loginId" placeholder="아이디">
-      <input type="password" id="loginPassword" placeholder="비밀번호">
-      <div class="error-message" id="loginError"></div>
-      <div class="success-message" id="loginSuccess"></div>
-      <button onclick="handleLogin()">로그인</button>
-      <button class="secondary" onclick="showSignup()">회원가입</button>
-    </div>
+  <div id="pullRefresh">
+    <div id="pullSpinner"></div>
   </div>
 
-  <div class="auth-modal" id="signupModal">
-    <div class="auth-box">
-      <button class="auth-close" onclick="closeSignupModal()">✕</button>
-      <h2>회원가입</h2>
-      <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
-      <div class="error-message" id="nicknameError"></div>
-      <input type="text" id="signupId" placeholder="아이디">
-      <div class="error-message" id="idError"></div>
-      <input type="password" id="signupPassword" placeholder="비밀번호">
-      <div class="error-message" id="signupError"></div>
-      <div class="success-message" id="signupSuccess"></div>
-      <button onclick="handleSignup()">가입</button>
-      <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
-    </div>
-  </div>
-
-  <div class="create-modal" id="createModal">
-    <div class="create-modal-content">
-      <div class="create-modal-header">
-        <h3>새 게시물 만들기</h3>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <button class="post-btn" id="modalPostBtn">공유하기</button>
-          <button class="close-btn" id="closeModal">×</button>
-        </div>
-      </div>
-      <div class="create-modal-body">
-        <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
-        <div class="image-preview-container">
-          <img id="imagePreview" class="image-preview">
-        </div>
-        <input type="file" id="imageInput" accept="image/*" style="display: none;">
-        <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
-        <div id="postMessage" style="margin-top: 10px; font-size: 13px; font-weight: 500;"></div>
+  <div id="splash">
+    <div class="splash-inner">
+      <img src="logo.svg" class="splash-logo" alt="Sharer">
+      <div class="splash-text">
+        <div class="splash-title">Sharer</div>
+        <div class="splash-sub">By JBJB</div>
       </div>
     </div>
   </div>
 
-  <div class="main-content">
-    <div class="feed-container">
-      <div id="postsFeed">
-        <div class="skeleton-post">
-          <div class="skeleton-post-header">
-            <div class="skeleton skeleton-avatar"></div>
-            <div class="skeleton skeleton-username"></div>
+  <div class="sidebar-container">
+    <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
+  </div>
+
+  <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
+
+  <div class="main-wrapper">
+    <div class="auth-modal" id="loginModal">
+      <div class="auth-box">
+        <button class="auth-close" onclick="closeLoginModal()">✕</button>
+        <h2>로그인</h2>
+        <input type="text" id="loginId" placeholder="아이디">
+        <input type="password" id="loginPassword" placeholder="비밀번호">
+        <div class="error-message" id="loginError"></div>
+        <div class="success-message" id="loginSuccess"></div>
+        <button onclick="handleLogin()">로그인</button>
+        <button class="secondary" onclick="showSignup()">회원가입</button>
+      </div>
+    </div>
+
+    <div class="auth-modal" id="signupModal">
+      <div class="auth-box">
+        <button class="auth-close" onclick="closeSignupModal()">✕</button>
+        <h2>회원가입</h2>
+        <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
+        <div class="error-message" id="nicknameError"></div>
+        <input type="text" id="signupId" placeholder="아이디">
+        <div class="error-message" id="idError"></div>
+        <input type="password" id="signupPassword" placeholder="비밀번호">
+        <div class="error-message" id="signupError"></div>
+        <div class="success-message" id="signupSuccess"></div>
+        <button onclick="handleSignup()">가입</button>
+        <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
+      </div>
+    </div>
+
+    <div class="create-modal" id="createModal">
+      <div class="create-modal-content">
+        <div class="create-modal-header">
+          <h3>새 게시물 만들기</h3>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="post-btn" id="modalPostBtn">공유하기</button>
+            <button class="close-btn" id="closeModal">×</button>
           </div>
-          <div class="skeleton skeleton-post-image"></div>
-          <div class="skeleton skeleton-text text-long"></div>
-          <div class="skeleton skeleton-text text-medium"></div>
-          <div class="skeleton skeleton-text text-short"></div>
         </div>
-        <div class="skeleton-post">
-          <div class="skeleton-post-header">
-            <div class="skeleton skeleton-avatar"></div>
-            <div class="skeleton skeleton-username"></div>
+        <div class="create-modal-body">
+          <textarea id="postContent" placeholder="문구를 입력하세요..."></textarea>
+          <div class="image-preview-container">
+            <img id="imagePreview" class="image-preview">
           </div>
-          <div class="skeleton skeleton-post-image"></div>
-          <div class="skeleton skeleton-text text-long"></div>
-          <div class="skeleton skeleton-text text-long"></div>
+          <input type="file" id="imageInput" accept="image/*" style="display: none;">
+          <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
+          <div id="postMessage" style="margin-top: 10px; font-size: 13px; font-weight: 500;"></div>
         </div>
       </div>
     </div>
 
-    <div class="recommend-container" id="recommendProfiles">
-      <div class="recommend-title">프로필 추천</div>
-      <div id="recommendSkeleton">
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+    <div class="main-content">
+      <div class="feed-container">
+        <div id="postsFeed">
+          <div class="skeleton-post">
+            <div class="skeleton-post-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-username"></div>
+            </div>
+            <div class="skeleton skeleton-post-image"></div>
+            <div class="skeleton skeleton-text text-long"></div>
+            <div class="skeleton skeleton-text text-medium"></div>
+            <div class="skeleton skeleton-text text-short"></div>
+          </div>
+          <div class="skeleton-post">
+            <div class="skeleton-post-header">
+              <div class="skeleton skeleton-avatar"></div>
+              <div class="skeleton skeleton-username"></div>
+            </div>
+            <div class="skeleton skeleton-post-image"></div>
+            <div class="skeleton skeleton-text text-long"></div>
+            <div class="skeleton skeleton-text text-long"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recommend-container" id="recommendProfiles">
+        <div class="recommend-title">프로필 추천</div>
+        <div id="recommendSkeleton">
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+          <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
+        </div>
+        <div id="recommendList"></div>
       </div>
     </div>
+
+    <footer class="footer">
+      <div class="footer-links">
+        <a href="#">소개</a>
+        <a href="#">블로그</a>
+        <a href="#">채용 정보</a>
+        <a href="#">도움말</a>
+        <a href="#">API</a>
+        <a href="#">개인정보처리방침</a>
+        <a href="#">약관</a>
+      </div>
+      <div class="footer-text">© 2025 Sharer from JBJB</div>
+    </footer>
   </div>
 
-  <div class="footer">
-    <div class="footer-links">
-      <a href="/privacy.html">개인정보처리방침</a>
-      <a href="/policy.html">이용약관</a>
-      <a href="/cdn-cgi/l/email-protection#a0c1ccc5d8c5cfcd9997e0cfd5d4cccfcfcb8ec3cfcd">문의하기</a>
-    </div>
-    <div class="footer-text">본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
-  </div>
-</div>
+  <script type="module">
+    import { 
+      auth, db, 
+      collection, addDoc, getDocs, query, orderBy, limit, startAfter, deleteDoc, doc, getDoc, updateDoc, increment, arrayUnion, arrayRemove,
+      onAuthStateChanged, signOut,
+      storage, ref, uploadBytes, getDownloadURL
+    } from './firebase-config.js';
 
-<script src="markdown.js"></script>
-<script>
-function closeNoticeBanner() {
-  const banner = document.getElementById('topNoticeBanner');
-  if (banner) {
-    banner.classList.add('hide');
-    document.body.style.paddingTop = '0px';
-    setTimeout(() => {
-      banner.style.display = 'none';
-    }, 300);
-  }
-}
+    let currentUser = null;
+    let lastVisible = null;
+    let isFetching = false;
+    let hasMore = true;
 
-// ─── NPROGRESS 설정 ───
-NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
+    // --- 원본 초기 스켈레톤 디자인 상태 보존 변수 정의 ---
+    const defaultFeedSkeleton = document.getElementById('postsFeed').innerHTML;
+    const defaultRecommendSkeleton = document.getElementById('recommendSkeleton') ? document.getElementById('recommendProfiles').innerHTML : '';
 
-document.addEventListener('click', function(e) {
-  const link = e.target.closest('a');
-  if (link && link.href && !link.target && !link.hasAttribute('download')) {
-    NProgress.start();
-  }
-});
+    const postsFeed = document.getElementById('postsFeed');
+    const recommendList = document.getElementById('recommendList');
+    const recommendSkeleton = document.getElementById('recommendSkeleton');
 
-// ─── SPLASH ───
-(function () {
-  const splash = document.getElementById('splash');
+    const createModal = document.getElementById('createModal');
+    const postContent = document.getElementById('postContent');
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const modalPostBtn = document.getElementById('modalPostBtn');
+    const postMessage = document.getElementById('postMessage');
 
-  if (sessionStorage.getItem('splashShown')) {
-    splash.style.display = 'none';
-  } else {
-    sessionStorage.setItem('splashShown', 'true');
+    // UI elements for Auth state
+    let sidebarWindow = null;
 
-    function finishSplash() {
-      splash.classList.add('fade-out');
-      setTimeout(() => { splash.style.display = 'none'; }, 460);
-    }
-
-    const splashStart = Date.now();
-    const MIN_SPLASH = 2000;
-
-    window.addEventListener('load', () => {
-      NProgress.done();
-      const elapsed = Date.now() - splashStart;
-      const remaining = Math.max(0, MIN_SPLASH - elapsed);
-      setTimeout(finishSplash, remaining);
-    });
-    setTimeout(finishSplash, 5000);
-  }
-})();
-
-const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-
-async function api(endpoint, options = {}) {
-  const url = API_BASE + endpoint;
-  const res = await fetch(url, {
-    ...options,
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-  });
-  if (!res.ok) {
-    let errorText;
-    try { errorText = await res.text(); } catch { errorText = ""; }
-    throw new Error(`API 오류 (${res.status}): ${errorText}`);
-  }
-  if (res.status === 204) return null;
-  return res.json();
-}
-
-let currentUser = null;
-let selectedImage = null;
-const postAuthorIdMap = Object.create(null);
-const cloudName = 'dretlhsrk';
-const uploadPreset = 'unsigned_preset';
-
-let recentStoryAuthors = new Set();
-
-async function fetchRecentStories() {
-  try {
-    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    const posts = await api(`/posts?created_at=gte.${twoDaysAgo}&select=author_id`);
-    if (posts) {
-      posts.forEach(p => {
-        if (p.author_id) recentStoryAuthors.add(p.author_id);
-      });
-    }
-  } catch (e) {
-    console.error("스토리 상태 확인 실패", e);
-  }
-}
-
-async function createNotification(targetUserId, detail, link) {
-  if (!targetUserId || targetUserId === currentUser?.id) return;
-  try {
-    await api("/notification", {
-      method: "POST",
-      body: JSON.stringify({
-        user: targetUserId,
-        detail,
-        link,
-        isread: 0,
-        created_at: new Date().toISOString()
-      })
-    });
-  } catch (e) {}
-}
-
-function initCurrentUser() {
-  const savedUser = localStorage.getItem('snsUser');
-  if (savedUser) { currentUser = JSON.parse(savedUser); updateSidebar(); }
-}
-
-function applyFadeEffect() {
-  const elements = document.querySelectorAll('.post-content');
-  elements.forEach(el => {
-    const style = getComputedStyle(el);
-    const lineHeight = parseFloat(style.lineHeight);
-    const visualLines = el.scrollHeight / lineHeight;
-    const html = el.innerHTML || "";
-    const brLines = html.split('<br').length;
-    const totalLines = Math.max(visualLines, brLines);
-    if (totalLines >= 7) {
-      el.classList.add('fade');
-    } else {
-      el.classList.remove('fade');
-    }
-  });
-}
-
-function updateSidebar() {
-  const iframe = document.getElementById('sidebarFrame');
-  if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
-}
-
-function updateSidebarMode() {
-  const iframe = document.getElementById('sidebarFrame');
-  const narrow = window.innerWidth <= 768;
-  if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-}
-
-window.addEventListener('message', (event) => {
-  const { type, page } = event.data || {};
-  if (type === 'navigate') {
-    if (page === 'home') location.href = 'index.html';
-    if (page === 'explore') location.href = 'explore.html';
-    if (page === 'set') location.href = 'set.html';
-  }
-  if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; location.reload(); }
-  if (type === 'requestUserInfo') updateSidebar();
-});
-
-window.onSharerProfileLogout = function () {
-  localStorage.removeItem('snsUser');
-  currentUser = null;
-  location.reload();
-};
-
-initCurrentUser();
-updateSidebarMode();
-window.addEventListener('resize', updateSidebarMode);
-
-window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
-window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
-window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
-window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
-
-function handleCreatePost() {
-  if (!currentUser) { document.getElementById('loginModal').classList.add('active'); return; }
-  document.getElementById('createModal').classList.add('active');
-  document.getElementById('postContent').value = '';
-  document.getElementById('imagePreview').classList.remove('show');
-  selectedImage = null;
-}
-
-document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');
-document.getElementById('uploadBtn').onclick = () => document.getElementById('imageInput').click();
-document.getElementById('imageInput').onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  selectedImage = file;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const preview = document.getElementById('imagePreview');
-    preview.src = ev.target.result;
-    preview.classList.add('show');
-  };
-  reader.readAsDataURL(file);
-};
-
-async function uploadImageToCloudinary(file) {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', uploadPreset);
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData });
-  if (!response.ok) throw new Error('이미지 업로드 실패');
-  const data = await response.json();
-  return data.secure_url;
-}
-
-document.getElementById('modalPostBtn').onclick = async () => {
-  const content = document.getElementById('postContent').value.trim();
-  const messageDiv = document.getElementById('postMessage');
-  const postButton = document.getElementById('modalPostBtn');
-  if (!content && !selectedImage) { messageDiv.innerHTML = '<span style="color:var(--pink);">내용 또는 이미지를 추가해주세요.</span>'; return; }
-  postButton.disabled = true;
-  messageDiv.innerHTML = '<span style="color:var(--t2);">게시 중...</span>';
-  try {
-    let imageUrl = null;
-    if (selectedImage) {
-      messageDiv.innerHTML = '<span style="color:var(--t2);">이미지 업로드 중...</span>';
-      imageUrl = await uploadImageToCloudinary(selectedImage);
-    }
-    await api("/posts", {
-      method: "POST",
-      body: JSON.stringify({ author: currentUser.nickname, author_id: currentUser.id, content, image_url: imageUrl, created_at: new Date().toISOString() })
-    });
-    messageDiv.innerHTML = '<span style="color:var(--green);">게시글이 작성되었습니다!</span>';
-    setTimeout(() => { document.getElementById('createModal').classList.remove('active'); messageDiv.innerHTML = ''; loadPosts(); }, 1200);
-  } catch (err) {
-    console.error('게시 오류:', err);
-    messageDiv.innerHTML = '<span style="color:var(--pink);">게시에 실패했습니다.</span>';
-  } finally { postButton.disabled = false; }
-};
-
-function formatPostTime(dateString) {
-  const now = new Date();
-  const date = new Date(dateString);
-  const diffMs = now - date;
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHour = Math.floor(diffMin / 60);
-  const isToday = now.toDateString() === date.toDateString();
-  if (isToday) {
-    if (diffMin < 1) return '방금 전';
-    if (diffMin < 60) return diffMin + '분 전';
-    return diffHour + '시간 전';
-  }
-  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-}
-
-async function toggleLike(postId, button) {
-  if (!currentUser) {
-    document.getElementById('loginModal').classList.add('active');
-    return;
-  }
-  const countEl = button.querySelector('.like-count');
-  try {
-    const [likeRecords, likeCountResult] = await Promise.all([
-      api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
-      api(`/likes?post_id=eq.${postId}&select=count`)
-    ]);
-    const currentlyLiked = likeRecords?.length > 0;
-    const currentServerCount = Math.max(0, likeCountResult?.[0]?.count || 0);
-    const uiLiked = button.classList.contains('liked');
-    const uiCount = parseInt(countEl.textContent, 10) || 0;
-    if (uiLiked !== currentlyLiked || uiCount !== currentServerCount) {
-      button.classList.toggle('liked', currentlyLiked);
-      countEl.textContent = currentServerCount;
-    }
-    if (currentlyLiked) {
-      if (likeRecords?.[0]?.id) {
-        await api(`/likes?id=eq.${likeRecords[0].id}`, { method: "DELETE" });
+    window.addEventListener('message', (e) => {
+      if (e.data === 'sidebar-ready') {
+        sidebarWindow = document.getElementById('sidebarFrame').contentWindow;
+        updateSidebarAuthUI();
       }
-      button.classList.remove('liked');
-      countEl.textContent = currentServerCount - 1;
-    } else {
-      await api("/likes", {
-        method: "POST",
-        body: JSON.stringify({ post_id: postId, user_id: currentUser.id })
+      if (e.data === 'click-profile') {
+        if (currentUser) {
+          openProfileSheet();
+        } else {
+          showLoginModal();
+        }
+      }
+      if (e.data === 'click-create') {
+        if (currentUser) {
+          openCreateModal();
+        } else {
+          showLoginModal();
+        }
+      }
+      if (e.data === 'click-theme') {
+        toggleTheme();
+      }
+    });
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      if (sidebarWindow) {
+        sidebarWindow.postMessage({ type: 'theme-changed', theme: next }, '*');
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          currentUser = { uid: user.uid, ...userDoc.data() };
+        } else {
+          currentUser = { uid: user.uid, nickname: user.displayName || '익명 사용자', avatarText: (user.displayName || '익').substring(0,1) };
+        }
+      } else {
+        currentUser = null;
+      }
+      updateSidebarAuthUI();
+      closeProfileSheet();
+    });
+
+    function updateSidebarAuthUI() {
+      if (!sidebarWindow) return;
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      sidebarWindow.postMessage({ type: 'theme-changed', theme: currentTheme }, '*');
+      if (currentUser) {
+        sidebarWindow.postMessage({
+          type: 'auth-state',
+          isLoggedIn: true,
+          avatarText: currentUser.avatarText || currentUser.nickname.substring(0,1),
+          avatarUrl: currentUser.avatarUrl || ''
+        }, '*');
+      } else {
+        sidebarWindow.postMessage({
+          type: 'auth-state',
+          isLoggedIn: false
+        }, '*');
+      }
+    }
+
+    // Modal triggers exported to window
+    window.showLoginModal = () => { document.getElementById('loginModal').classList.add('active'); };
+    window.closeLoginModal = () => { document.getElementById('loginModal').classList.remove('active'); clearAuthFields(); };
+    window.showSignup = () => { document.getElementById('loginModal').classList.remove('active'); document.getElementById('signupModal').classList.add('active'); };
+    window.closeSignupModal = () => { document.getElementById('signupModal').classList.remove('active'); clearAuthFields(); };
+    window.backToLogin = () => { document.getElementById('signupModal').classList.remove('active'); document.getElementById('loginModal').classList.add('active'); };
+
+    function clearAuthFields() {
+      ['loginId','loginPassword','signupNickname','signupId','signupPassword'].forEach(id => {
+        const el = document.getElementById(id); if(el) el.value='';
       });
-      button.classList.add('liked');
-      countEl.textContent = currentServerCount + 1;
-      createNotification(postAuthorIdMap[postId], `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
+      ['loginError','loginSuccess','nicknameError','idError','signupError','signupSuccess'].forEach(id => {
+        const el = document.getElementById(id); if(el) el.innerHTML='';
+      });
     }
-    const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`).then(r => Math.max(0, r?.[0]?.count || 0));
-    countEl.textContent = finalCount;
-  } catch (err) {
-    console.error("좋아요 처리 중 오류:", err);
-    try {
-      const [records, countRes] = await Promise.all([
-        api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
-        api(`/likes?post_id=eq.${postId}&select=count`)
-      ]);
-      button.classList.toggle('liked', records?.length > 0);
-      countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
-    } catch (recoveryErr) {
-      console.error("복구 실패:", recoveryErr);
-    }
-  }
-}
 
-function renderPostImages(imageUrl) {
-  if (!imageUrl) return '';
-  const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean);
-  if (urls.length === 0) return '';
+    window.handleLogin = async () => {
+      const id = document.getElementById('loginId').value.trim();
+      const pw = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      const succEl = document.getElementById('loginSuccess');
+      errEl.innerHTML = ''; succEl.innerHTML = '';
 
-  let html = `<div class="post-image-container">`;
-  html += `<div class="post-image-carousel">`;
-
-  urls.forEach(url => {
-    html += `
-      <div class="post-image-slide">
-        <img src="${escapeHtml(url)}" alt="게시글 이미지" loading="lazy">
-      </div>`;
-  });
-
-  html += `</div>`;
-
-  if (urls.length > 1) {
-    html += `
-      <button class="post-image-nav prev" onclick="event.stopPropagation(); prevFeedSlide(this)">‹</button>
-      <button class="post-image-nav next" onclick="event.stopPropagation(); nextFeedSlide(this)">›</button>`;
-  }
-
-  html += `</div>`;
-  return html;
-}
-
-window.prevFeedSlide = function(btn) {
-  const carousel = btn.parentElement.querySelector('.post-image-carousel');
-  if (!carousel) return;
-  carousel.scrollBy({ left: -carousel.clientWidth, behavior: 'smooth' });
-};
-
-window.nextFeedSlide = function(btn) {
-  const carousel = btn.parentElement.querySelector('.post-image-carousel');
-  if (!carousel) return;
-  carousel.scrollBy({ left: carousel.clientWidth, behavior: 'smooth' });
-};
-
-async function loadPosts() {
-  const feedDiv = document.getElementById('postsFeed');
-  try {
-    const posts = await api("/posts?select=*&access=not.in.(private,link)&order=created_at.desc");
-    if (!posts?.length) {
-      feedDiv.innerHTML = '<div class="no-posts"><div class="no-posts-icon">🍃</div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div></div>';
-      return;
-    }
-    posts.forEach(p => { postAuthorIdMap[p.id] = p.author_id; });
-
-    const authorIds = [...new Set(posts.map(p => p.author_id).filter(Boolean))];
-    const usersMap = {};
-    if (authorIds.length) {
+      if(!id || !pw) { errEl.innerHTML = '아이디와 비밀번호를 모두 입력해 주세요.'; return; }
       try {
-        const inFilter = authorIds.join(',');
-        const users = await api(`/users?id=in.(${inFilter})&select=id,nickname,profile_image`);
-        (users || []).forEach(u => { usersMap[u.id] = u; });
-      } catch (e) { console.warn("유저 일괄 로드 실패:", e); }
+        const { signInWithEmailAndPassword } = await import('./firebase-config.js');
+        const email = id + "@sharer.internal";
+        await signInWithEmailAndPassword(auth, email, pw);
+        succEl.innerHTML = '로그인 성공!';
+        setTimeout(() => { closeLoginModal(); window.location.reload(); }, 600);
+      } catch (err) {
+        console.error(err);
+        errEl.innerHTML = '아이디 또는 비밀번호가 올바르지 않습니다.';
+      }
+    };
+
+    window.handleSignup = async () => {
+      const nickname = document.getElementById('signupNickname').value.trim();
+      const id = document.getElementById('signupId').value.trim();
+      const pw = document.getElementById('signupPassword').value;
+      
+      const nErr = document.getElementById('nicknameError');
+      const iErr = document.getElementById('idError');
+      const sErr = document.getElementById('signupError');
+      const sSucc = document.getElementById('signupSuccess');
+      
+      [nErr, iErr, sErr, sSucc].forEach(el => el.innerHTML = '');
+
+      if(!nickname) { nErr.innerHTML = '닉네임을 입력해 주세요.'; return; }
+      if(!id) { iErr.innerHTML = '아이디를 입력해 주세요.'; return; }
+      if(pw.length < 6) { sErr.innerHTML = '비밀번호는 6자리 이상이어야 합니다.'; return; }
+
+      try {
+        const idCheck = await getDoc(doc(db, "usernames", id.toLowerCase()));
+        if(idCheck.exists()) { iErr.innerHTML = '이미 존재하는 아이디입니다.'; return; }
+
+        const { createUserWithEmailAndPassword } = await import('./firebase-config.js');
+        const email = id + "@sharer.internal";
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pw);
+        const user = userCredential.user;
+
+        const avatarText = nickname.substring(0,1);
+        await updateDoc(doc(db, "usernames", id.toLowerCase()), { uid: user.uid });
+        await updateDoc(doc(db, "users", user.uid), {
+          username: id,
+          nickname: nickname,
+          avatarText: avatarText,
+          createdAt: new Date().toISOString()
+        });
+
+        sSucc.innerHTML = '회원가입이 완료되었습니다!';
+        setTimeout(() => { closeSignupModal(); window.location.reload(); }, 1000);
+      } catch(err) {
+        console.error(err);
+        sErr.innerHTML = '가입 중 오류가 발생했습니다. 다시 시도해 주세요.';
+      }
+    };
+
+    // Profile Bottom Sheet Action Setup
+    const sheetHost = document.getElementById('sharerProfileSheetHost');
+    function openProfileSheet() {
+      if(!currentUser) return;
+      sheetHost.removeAttribute('hidden');
+      sheetHost.innerHTML = `
+        <div class="sps-backdrop" id="spsBackdrop"></div>
+        <div class="sps-panel" id="spsPanel">
+          <div class="sps-drag-area" id="spsDrag">
+            <div class="sps-grab"></div>
+          </div>
+          <div class="sps-profile">
+            <div class="sps-av">
+              ${currentUser.avatarUrl ? `<img src="${currentUser.avatarUrl}">` : (currentUser.avatarText || 'U')}
+            </div>
+            <div class="sps-name">${currentUser.nickname}</div>
+          </div>
+          <button class="sps-logout" id="spsLogoutBtn">로그아웃</button>
+        </div>
+      `;
+      setTimeout(() => sheetHost.classList.add('sps-host-open'), 20);
+
+      document.getElementById('spsBackdrop').addEventListener('click', closeProfileSheet);
+      document.getElementById('spsLogoutBtn').addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.reload();
+      });
+
+      setupDragSheet();
+    }
+    window.closeProfileSheet = () => {
+      sheetHost.classList.remove('sps-host-open');
+      setTimeout(() => sheetHost.setAttribute('hidden', ''), 440);
+    };
+
+    function setupDragSheet() {
+      const panel = document.getElementById('spsPanel');
+      const drag = document.getElementById('spsDrag');
+      let startY = 0, currentY = 0, initialY = 0;
+      let dragging = false;
+
+      drag.addEventListener('touchstart', e => {
+        startY = e.touches[0].clientY;
+        dragging = true;
+        panel.classList.add('sps-panel-dragging');
+      });
+      window.addEventListener('touchmove', e => {
+        if(!dragging) return;
+        currentY = e.touches[0].clientY;
+        const delta = currentY - startY;
+        if(delta > 0) {
+          panel.style.transform = `translateY(${delta}px)`;
+        } else {
+          panel.style.transform = `translateY(${delta * 0.2}px)`;
+        }
+      });
+      window.addEventListener('touchend', e => {
+        if(!dragging) return;
+        dragging = false;
+        panel.classList.remove('sps-panel-dragging');
+        const delta = currentY - startY;
+        panel.style.transform = '';
+        if(delta > 110) {
+          closeProfileSheet();
+        }
+      });
     }
 
-    const postIds = posts.map(p => p.id);
-    const postIdFilter = postIds.join(',');
+    // Post Creation Modal
+    function openCreateModal() { createModal.classList.add('active'); postContent.focus(); }
+    function closeCreateModal() {
+      createModal.classList.remove('active');
+      postContent.value = '';
+      imageInput.value = '';
+      imagePreview.src = '';
+      imagePreview.classList.remove('show');
+      postMessage.innerHTML = '';
+      modalPostBtn.disabled = false;
+    }
+    document.getElementById('closeModal').addEventListener('click', closeCreateModal);
+    uploadBtn.addEventListener('click', () => imageInput.click());
 
-    const [allLikes, myLikes] = await Promise.all([
-      api(`/likes?post_id=in.(${postIdFilter})&select=post_id`).catch(() => []),
-      currentUser ? api(`/likes?post_id=in.(${postIdFilter})&user_id=eq.${currentUser.id}&select=post_id`).catch(() => []) : Promise.resolve([])
-    ]);
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imagePreview.src = e.target.result;
+          imagePreview.classList.add('show');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-    const likeCountMap = {};
-    (allLikes || []).forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
-    const myLikeSet = new Set((myLikes || []).map(l => l.post_id));
+    modalPostBtn.addEventListener('click', async () => {
+      const text = postContent.value.trim();
+      const file = imageInput.files[0];
+      if (!text && !file) { postMessage.innerHTML = '<span style="color:var(--pink)">내용이나 사진을 추가해 주세요.</span>'; return; }
 
-    feedDiv.innerHTML = '';
-    posts.forEach((post, idx) => {
-      const userInfo = usersMap[post.author_id] || null;
-      const authorNickname = userInfo?.nickname || post.author || '알 수 없음';
-      const authorAvatar = userInfo?.profile_image || null;
-      const isVerified = authorNickname === "JB777";
-      const timeStr = formatPostTime(post.created_at);
-      const canDelete = currentUser?.nickname === "JB777";
-      const likeCount = likeCountMap[post.id] || 0;
-      const liked = myLikeSet.has(post.id);
-      
-      const hasStory = recentStoryAuthors.has(post.author_id);
+      modalPostBtn.disabled = true;
+      postMessage.innerHTML = '업로드 중...';
 
-      const avatarInnerHtml = authorAvatar
-        ? `<img src="${escapeHtml(authorAvatar)}" class="post-author-avatar" style="object-fit:cover;" alt="${escapeHtml(authorNickname)}">`
-        : `<div class="post-author-avatar">${(authorNickname[0] || '?').toUpperCase()}</div>`;
-        
-      const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}">${avatarInnerHtml}</div>`;
+      try {
+        let imageUrls = [];
+        if (file) {
+          const filename = Date.now() + "_" + file.name;
+          const storageRef = ref(storage, 'posts/' + filename);
+          const snapshot = await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(snapshot.ref);
+          imageUrls.push(url);
+        }
 
-      const authorDisplay = isVerified
-        ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
-        : escapeHtml(authorNickname);
+        await addDoc(collection(db, "posts"), {
+          uid: currentUser.uid,
+          authorName: currentUser.nickname,
+          authorUsername: currentUser.username || 'user',
+          authorAvatarText: currentUser.avatarText || currentUser.nickname.substring(0,1),
+          authorAvatarUrl: currentUser.avatarUrl || '',
+          content: text,
+          images: imageUrls,
+          createdAt: new Date().toISOString(),
+          likesCount: 0,
+          likedBy: []
+        });
 
-      const deleteButton = canDelete
-        ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
-        : '';
+        postMessage.innerHTML = '<span style="color:var(--green)">성공적으로 공유되었습니다!</span>';
+        setTimeout(() => { closeCreateModal(); window.location.reload(); }, 800);
+      } catch (err) {
+        console.error(err);
+        postMessage.innerHTML = '<span style="color:var(--pink)">업로드 중 에러가 발생했습니다.</span>';
+        modalPostBtn.disabled = false;
+      }
+    });
 
-      let contentHTML = '';
-      if (post.content) {
-        contentHTML = `<div class="post-content">${parseMarkdown(post.content)}</div>`;
+    // Content Feeds Loader
+    async function loadPosts(isRefresh = false) {
+      if (isFetching) return;
+      isFetching = true;
+
+      if (isRefresh) {
+        lastVisible = null;
+        hasMore = true;
       }
 
-      const postCard = document.createElement('div');
-      postCard.className = 'post-card';
-      postCard.style.animationDelay = `${Math.min(idx, 7) * 0.07}s`;
-      postCard.innerHTML = `
+      try {
+        let postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(6));
+        if (lastVisible && !isRefresh) {
+          postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"), startAfter(lastVisible), limit(6));
+        }
+
+        const snapshot = await getDocs(postsQuery);
+        if (isRefresh) postsFeed.innerHTML = '';
+
+        if (snapshot.empty) {
+          hasMore = false;
+          if (postsFeed.children.length === 0) {
+            postsFeed.innerHTML = `
+              <div class="no-posts">
+                <div class="no-posts-icon">🍃</div>
+                <div>아직 작성된 게시글이 없습니다.</div>
+                <div style="font-size:12px;color:var(--t3);margin-top:4px;">첫 번째 이야기를 사람들과 공유해 보세요.</div>
+              </div>
+            `;
+          }
+          isFetching = false;
+          return;
+        }
+
+        lastVisible = snapshot.docs[snapshot.docs.length - 1];
+
+        snapshot.forEach((docSnap) => {
+          const post = docSnap.data();
+          const postId = docSnap.id;
+          const card = createPostCard(postId, post);
+          postsFeed.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error("게시글 파싱 실패:", err);
+      } finally {
+        isFetching = false;
+      }
+    }
+
+    function createPostCard(id, post) {
+      const card = document.createElement('div');
+      card.className = 'post-card';
+
+      const hasImages = post.images && post.images.length > 0;
+      const isLiked = currentUser && post.likedBy && post.likedBy.includes(currentUser.uid);
+      const isAuthor = currentUser && currentUser.uid === post.uid;
+
+      // 시간 포맷팅
+      let timeString = '방금 전';
+      if (post.createdAt) {
+        const diff = Date.now() - new Date(post.createdAt).getTime();
+        const mins = Math.floor(diff / 60000);
+        const hours = Math.floor(mins / 60);
+        const days = Math.floor(hours / 24);
+        if (days > 0) timeString = `${days}일 전`;
+        else if (hours > 0) timeString = `${hours}시간 전`;
+        else if (mins > 0) timeString = `${mins}분 전`;
+      }
+
+      // 글자수 체크 후 더보기 페이드 클래스 결정
+      const needsFade = post.content && post.content.length > 220;
+
+      card.innerHTML = `
         <div class="post-header">
-          <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(authorNickname)}')">
-            ${avatarHTML}
-            <div class="post-author-name">${authorDisplay}</div>
+          <div class="post-author-info">
+            <div class="story-ring-wrapper">
+              <div class="post-author-avatar">
+                ${post.authorAvatarUrl ? `<img src="${post.authorAvatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : (post.authorAvatarText || 'U')}
+              </div>
+            </div>
+            <div class="post-author-name">
+              ${post.authorName}
+              ${post.authorUsername === 'jbjb' ? '<span class="verification-badge"></span>' : ''}
+            </div>
           </div>
-          ${deleteButton}
+          ${isAuthor ? `<button class="delete-btn" data-id="${id}">삭제</button>` : ''}
         </div>
-        ${renderPostImages(post.image_url)}
-        ${contentHTML}
+
+        ${hasImages ? `
+          <div class="post-image-container">
+            <div class="post-image-carousel">
+              <div class="post-image-slide"><img src="${post.images[0]}" alt="Post Image"></div>
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="post-content ${needsFade ? 'fade' : ''}" id="content-${id}">
+          ${post.content ? post.content.replace(/\n/g, '<br>') : ''}
+        </div>
+
+        <div class="post-time">${timeString}</div>
+
         <div class="post-actions">
-          <button class="like-button ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
-            <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
-              <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
+          <button class="like-button ${isLiked ? 'liked' : ''}" data-id="${id}">
+            <svg class="like-heart" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
-            <span class="like-count">${likeCount}</span>
+            <span class="like-count">${post.likesCount || 0}</span>
           </button>
         </div>
-        <div class="post-time">${timeStr}</div>
       `;
-      postCard.onclick = (e) => {
-        if (!e.target.closest('.like-button') && !e.target.closest('.delete-btn') && !e.target.closest('.post-author-info') && !e.target.closest('.post-image-nav')) {
-          window.location.href = `view.html?id=${post.id}`;
-        }
-      };
-      feedDiv.appendChild(postCard);
-    });
 
-  } catch (err) {
-    console.error('게시물 로드 오류:', err);
-    feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
-  }
-}
+      // 이벤트 위임 대신 개별 바인딩
+      if (isAuthor) {
+        card.querySelector('.delete-btn').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if(confirm("정말 이 게시물을 삭제하시겠습니까?")) {
+            await deleteDoc(doc(db, "posts", id));
+            card.remove();
+          }
+        });
+      }
 
-async function loadRecommendedProfiles() {
-  const container = document.getElementById('recommendProfiles');
-  const skeleton = document.getElementById('recommendSkeleton');
-  try {
-    let users = await api("/users?select=id,nickname,profile_image");
-    if (!users?.length) {
-      skeleton?.remove();
-      container.innerHTML += '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">사용자 없음</div>';
-      return;
-    }
-    for (let i = users.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [users[i], users[j]] = [users[j], users[i]];
-    }
-    users = users.slice(0, 7);
-    skeleton?.remove();
-    users.forEach((user, idx) => {
-      const hasStory = recentStoryAuthors.has(user.id);
-      
-      const avatarInnerHtml = user.profile_image
-        ? `<img src="${escapeHtml(user.profile_image)}" class="profile-avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt="${escapeHtml(user.nickname)}">`
-        : `<div class="profile-avatar">${(user.nickname?.[0] || '?').toUpperCase()}</div>`;
+      card.querySelector('.like-button').addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!currentUser) { showLoginModal(); return; }
+        const btn = e.currentTarget;
+        const countEl = btn.querySelector('.like-count');
+        const currentIsLiked = btn.classList.contains('liked');
         
-      const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}">${avatarInnerHtml}</div>`;
+        // UI 반영 최적화 (Optimistic update)
+        let count = parseInt(countEl.innerText);
+        if (currentIsLiked) {
+          btn.classList.remove('liked');
+          count = Math.max(0, count - 1);
+        } else {
+          btn.classList.add('liked');
+          count += 1;
+        }
+        countEl.innerText = count;
 
-      const item = document.createElement('div');
-      item.className = 'profile-item';
-      item.style.cssText = `opacity:0; transform:translateX(8px); transition: opacity 0.3s ease ${idx * 0.05}s, transform 0.3s cubic-bezier(0.22,1,0.36,1) ${idx * 0.05}s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);`;
-      item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}</span>`;
-      item.onclick = () => { window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`; };
-      container.appendChild(item);
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        item.style.opacity = '1';
-        item.style.transform = 'translateX(0)';
-      }));
+        try {
+          const postRef = doc(db, "posts", id);
+          if (currentIsLiked) {
+            await updateDoc(postRef, { likedBy: arrayRemove(currentUser.uid), likesCount: increment(-1) });
+          } else {
+            await updateDoc(postRef, { likedBy: arrayUnion(currentUser.uid), likesCount: increment(1) });
+          }
+        } catch(err) {
+          console.error(err);
+        }
+      });
+
+      if (needsFade) {
+        card.querySelector(`#content-${id}`).addEventListener('click', (e) => {
+          e.currentTarget.classList.remove('fade');
+          e.currentTarget.style.maxHeight = 'none';
+        });
+      }
+
+      return card;
+    }
+
+    async function loadRecommendedProfiles() {
+      if (!recommendList) return;
+      try {
+        const userQuery = query(collection(db, "users"), limit(5));
+        const snapshot = await getDocs(userQuery);
+        
+        if (recommendSkeleton) recommendSkeleton.style.display = 'none';
+        recommendList.innerHTML = '';
+
+        snapshot.forEach(docSnap => {
+          const u = docSnap.data();
+          if (currentUser && docSnap.id === currentUser.uid) return;
+
+          const item = document.createElement('div');
+          item.className = 'profile-item';
+          item.innerHTML = `
+            <div class="profile-avatar">${u.avatarUrl ? `<img src="${u.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : (u.avatarText || 'U')}</div>
+            <div class="profile-nickname">${u.nickname}</div>
+          `;
+          recommendList.appendChild(item);
+        });
+      } catch (err) {
+        console.error("추천 프로필 로딩 실패:", err);
+      }
+    }
+
+    // 인피니트 스크롤 핸들러
+    const contentEl = document.querySelector('.main-content');
+    contentEl.addEventListener('scroll', () => {
+      if (!hasMore || isFetching) return;
+      const { scrollTop, scrollHeight, clientHeight } = contentEl;
+      if (scrollTop + clientHeight >= scrollHeight - 160) {
+        loadPosts();
+      }
     });
-  } catch (err) {
-    console.error('추천 프로필 로드 오류:', err);
-    if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">로드 실패</div>';
-  }
-}
 
-window.goToProfile = (userId, nickname) => {
-  if (userId && nickname) window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
-};
+    // --- Pull to Refresh 드래그 앤 드롭 구현 로직 (지메일 스타일 원형 스피너 제어) ---
+    let startY = 0;
+    let pulling = false;
+    let isLoading = false;
+    const refreshEl = document.getElementById('pullRefresh');
+    const spinnerEl = document.getElementById('pullSpinner');
 
-window.deletePost = async (postId) => {
-  if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
-  try {
-    await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
-    loadPosts();
-  } catch (err) {
-    console.error('삭제 오류:', err);
-    alert('삭제에 실패했습니다.');
-  }
-};
+    function isScrollTop() {
+      return contentEl.scrollTop === 0;
+    }
 
-function escapeHtml(unsafe) {
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-fetchRecentStories().then(() => {
-  loadPosts().then(() => {
-    applyFadeEffect();
-  });
-  loadRecommendedProfiles();
-});
-
-// ─── 완벽하게 작동하는 Pull To Refresh 스크립트 수정본 ───
-(function() {
-  const scroller = document.querySelector('.main-content');
-  const refreshEl = document.getElementById('pullRefresh');
-  const refreshIcon = document.getElementById('pullIcon');
-
-  let startY = 0;
-  let pulling = false;
-  let isLoading = false;
-
-  // 현재 스크롤이 최상단(0)에 있는지 정확히 체크하는 함수
-  function isScrollTop() {
-    // 데스크톱 모드에선 scroller 요소가 스크롤되지만, 모바일 반응형 상태에선 window(html/body)가 스크롤될 수 있음
-    return scroller.scrollTop <= 0 && window.scrollY <= 0;
-  }
-
-  window.addEventListener('touchstart', e => {
-    if (isLoading) return;
-    
-    if (isScrollTop()) {
+    window.addEventListener('touchstart', e => {
+      if (!isScrollTop() || isLoading) return;
       startY = e.touches[0].clientY;
       pulling = true;
-    }
-  }, { passive: true });
+    }, { passive: true });
 
-  window.addEventListener('touchmove', e => {
-    if (!pulling || isLoading) return;
+    window.addEventListener('touchmove', e => {
+      if (!pulling || isLoading) return;
+      const currentY = e.touches[0].clientY;
+      const distance = currentY - startY;
 
-    const currentY = e.touches[0].clientY;
-    const distance = currentY - startY;
+      if (distance > 0 && isScrollTop()) {
+        // 당길 때 화면 스크롤이 같이 동작하지 못하도록 기본 액션 제어
+        if (e.cancelable) e.preventDefault();
+        
+        // 최대 드래그 임계치 지정 및 감쇠 효과 적용
+        const topPos = Math.min(24, -65 + distance * 0.45);
+        refreshEl.style.top = `${topPos}px`;
+        refreshEl.style.transition = 'none'; // 드래그 중에는 애니메이션 제거
 
-    // 아래로 당기면서 스크롤 위치가 최상단일 때
-    if (distance > 0 && isScrollTop()) {
-      // 모바일 기본 기능(오버스크롤/바운스) 방지
-      if (e.cancelable) e.preventDefault();
-
-      refreshEl.classList.add('show');
-      
-      // 당긴 거리에 비례해서 회전 및 위치 조정 (최대 노출 위치 고정)
-      const rotation = Math.min(distance * 2, 360);
-      const topPos = Math.min(distance - 65, 24); // top 최대 24px까지만 내려오도록 설정
-
-      refreshIcon.style.transform = `rotate(${rotation}deg)`;
-      refreshEl.style.top = `${topPos}px`;
-      refreshEl.style.transition = 'none'; // 드래그 중엔 부드러운 애니메이션 일시 해제
-    } else {
-      // 만약 위로 다시 올리면 원래대로 숨김
-      pulling = false;
-      refreshEl.style.top = '-65px';
-      refreshEl.style.transition = 'top .2s ease';
-    }
-  }, { passive: false });
-
-  window.addEventListener('touchend', async e => {
-    if (!pulling || isLoading) return;
-    pulling = false;
-
-    const currentY = e.changedTouches[0].clientY;
-    const distance = currentY - startY;
-
-    refreshEl.style.transition = 'top .25s cubic-bezier(0.22, 1, 0.36, 1)';
-
-    // 80px 이상 충분히 당겼을 때 새로고침 트리거
-    if (distance > 80 && isScrollTop()) {
-      isLoading = true;
-      refreshEl.classList.add('loading');
-      refreshEl.style.top = '24px'; // 로딩 회전용 위치에 고정
-
-      try {
-        await fetchRecentStories();
-        await loadPosts();
-        await loadRecommendedProfiles();
-      } catch (err) {
-        console.error("새로고침 중 오류:", err);
-      } finally {
-        // 로딩 완료 후 부드럽게 원래 자리로 복귀
-        setTimeout(() => {
-          refreshEl.classList.remove('loading');
-          refreshEl.style.top = '-65px';
-          setTimeout(() => {
-            refreshEl.classList.remove('show');
-            isLoading = false;
-          }, 250);
-        }, 600);
+        // 당기는 거리에 반응하여 스피너 축 회전 각도 실시간 반영
+        const rotateDeg = distance * 2.5;
+        spinnerEl.style.transform = `rotate(${rotateDeg}deg)`;
+      } else {
+        pulling = false;
+        refreshEl.style.top = '-65px';
+        refreshEl.style.transition = 'top .2s ease';
       }
-    } else {
-      // 기준 미달 시 취소하고 숨김
-      refreshEl.style.top = '-65px';
-      setTimeout(() => {
-        refreshEl.classList.remove('show');
-      }, 250);
-    }
-  });
-})();
-</script>
-<script src="sharer-profile-sheet-host.js"></script>
+    }, { passive: false });
+
+    window.addEventListener('touchend', async e => {
+      if (!pulling || isLoading) return;
+      pulling = false;
+
+      const currentY = e.changedTouches[0].clientY;
+      const distance = currentY - startY;
+
+      refreshEl.style.transition = 'top .25s cubic-bezier(0.22, 1, 0.36, 1)';
+
+      // 80px 이상 충분히 아래로 넘겨 당겼을 때 새로고침 동작 활성화
+      if (distance > 80 && isScrollTop()) {
+        isLoading = true;
+        
+        // [수정사항] 새로고침 확정 즉시, 기존 게시물 영역을 스켈레톤 상태로 실시간 치환
+        postsFeed.innerHTML = defaultFeedSkeleton;
+        const recommendContainer = document.getElementById('recommendProfiles');
+        if (recommendContainer && defaultRecommendSkeleton) {
+          recommendContainer.innerHTML = defaultRecommendSkeleton;
+        }
+
+        refreshEl.classList.add('loading');
+        refreshEl.style.top = '24px'; // 로딩바 고정 위치 고수
+
+        try {
+          // 비동기 병렬 구조 처리로 성능 향상 촉진
+          await Promise.all([
+            loadPosts(true),
+            loadRecommendedProfiles()
+          ]);
+        } catch (err) {
+          console.error("새로고침 실행 중 데이터 연동 에러 발생:", err);
+        } finally {
+          // 비동기 통신 완료 후 안정적으로 원래 자리로 이동 조치
+          setTimeout(() => {
+            refreshEl.classList.remove('loading');
+            refreshEl.style.top = '-65px';
+            spinnerEl.style.transform = 'none';
+            isLoading = false;
+          }, 450);
+        }
+      } else {
+        // 임계값 미만 도달 시 자연스럽게 원상 복구 처리
+        refreshEl.style.top = '-65px';
+        spinnerEl.style.transform = 'none';
+      }
+    });
+
+    // 앱 구동 시 초기 로드 바인딩 진입점 정의
+    (async function initApp() {
+      NProgress.start();
+      await Promise.all([
+        loadPosts(true),
+        loadRecommendedProfiles()
+      ]);
+      NProgress.done();
+      
+      // 스플래시 화면 페이드아웃 적용
+      const splash = document.getElementById('splash');
+      if (splash) {
+        splash.classList.add('fade-out');
+        setTimeout(() => splash.remove(), 450);
+      }
+    })();
+
+  </script>
 </body>
 </html>
