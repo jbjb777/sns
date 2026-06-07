@@ -861,6 +861,11 @@
       z-index: 99999;
       box-shadow: 0 4px 12px rgba(0,0,0,0.35);
       pointer-events: none; /* 드래그를 방해하지 않도록 처리 */
+
+
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+
     }
 
     #pullIcon {
@@ -1563,22 +1568,22 @@ fetchRecentStories().then(() => {
     }
   }, { passive: false });
 
-  window.addEventListener('touchend', async e => {
+window.addEventListener('touchend', async e => {
     if (!pulling || isLoading) return;
     pulling = false;
 
     const currentY = e.changedTouches[0].clientY;
     const distance = currentY - startY;
 
-    refreshEl.style.transition = 'top .25s cubic-bezier(0.22, 1, 0.36, 1)';
-
-    // 80px 이상 충분히 당겼을 때 새로고침 트리거
+    // 80px 이상 충분히 당겼을 때
     if (distance > 80 && isScrollTop()) {
       isLoading = true;
       refreshEl.classList.add('loading');
-      refreshEl.style.top = '24px'; // 로딩 회전용 위치에 고정
-
-      // 스켈레톤 즉시 표시
+      
+      // 튕기면서 안착하는 느낌: 24px 대신 30px로 살짝 더 내렸다가 24px로 복귀
+      refreshEl.style.top = '30px'; 
+      
+      // 스켈레톤 표시
       document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
       const recommendContainer = document.getElementById('recommendProfiles');
       if (recommendContainer && defaultRecommendSkeleton) {
@@ -1592,22 +1597,22 @@ fetchRecentStories().then(() => {
       } catch (err) {
         console.error("새로고침 중 오류:", err);
       } finally {
-        // 로딩 완료 후 부드럽게 원래 자리로 복귀
+        // 로딩 완료 후 (약간의 지연 후 부드럽게 복귀)
         setTimeout(() => {
-          refreshEl.classList.remove('loading');
-          refreshEl.style.top = '-65px';
+          refreshEl.style.top = '24px'; // 30px에서 24px로 안착
           setTimeout(() => {
-            refreshEl.classList.remove('show');
-            isLoading = false;
-          }, 250);
+            refreshEl.classList.remove('loading');
+            refreshEl.style.top = '-65px'; // 최종 숨김
+            setTimeout(() => {
+              refreshEl.classList.remove('show');
+              isLoading = false;
+            }, 300);
+          }, 400);
         }, 600);
       }
     } else {
-      // 기준 미달 시 취소하고 숨김
+      // 당기다 말았을 때 자연스럽게 복귀
       refreshEl.style.top = '-65px';
-      setTimeout(() => {
-        refreshEl.classList.remove('show');
-      }, 250);
     }
   });
 })();
