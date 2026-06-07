@@ -845,6 +845,7 @@
     }
 
     /* --- Pull To Refresh CSS 설정 --- */
+  /* Pull To Refresh 스타일 */
     #pullRefresh {
       position: fixed;
       top: -65px;
@@ -860,12 +861,28 @@
       justify-content: center;
       z-index: 99999;
       box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-      pointer-events: none; /* 드래그를 방해하지 않도록 처리 */
-
-
+      /* 튕기는 효과를 위한 베지어 커브 */
       transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
 
+    /* 구글 스타일 스피너 */
+    #pullSpinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border3);
+      border-top-color: #4a90ff;
+      border-radius: 50%;
+      display: none; /* 로딩 전엔 숨김 */
+    }
 
+    #pullRefresh.loading #pullSpinner {
+      display: block;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     #pullIcon {
@@ -888,9 +905,7 @@
 <body>
 
 <div id="pullRefresh">
-  <svg id="pullIcon" viewBox="0 0 24 24">
-    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-  </svg>
+  <div id="pullSpinner"></div>
 </div>
 
 
@@ -1575,15 +1590,16 @@ window.addEventListener('touchend', async e => {
     const currentY = e.changedTouches[0].clientY;
     const distance = currentY - startY;
 
-    // 80px 이상 충분히 당겼을 때
+    // 80px 이상 당겼을 때 새로고침
     if (distance > 80 && isScrollTop()) {
       isLoading = true;
       refreshEl.classList.add('loading');
       
-      // 튕기면서 안착하는 느낌: 24px 대신 30px로 살짝 더 내렸다가 24px로 복귀
+      // 튕기면서 30px까지 내려왔다가 24px에 고정되는 효과
       refreshEl.style.top = '30px'; 
-      
-      // 스켈레톤 표시
+      setTimeout(() => { refreshEl.style.top = '24px'; }, 100);
+
+      // 스켈레톤 즉시 표시
       document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
       const recommendContainer = document.getElementById('recommendProfiles');
       if (recommendContainer && defaultRecommendSkeleton) {
@@ -1597,22 +1613,20 @@ window.addEventListener('touchend', async e => {
       } catch (err) {
         console.error("새로고침 중 오류:", err);
       } finally {
-        // 로딩 완료 후 (약간의 지연 후 부드럽게 복귀)
+        // 로딩 완료 후 부드럽게 복귀
         setTimeout(() => {
-          refreshEl.style.top = '24px'; // 30px에서 24px로 안착
+          refreshEl.classList.remove('loading');
+          refreshEl.style.top = '-65px';
           setTimeout(() => {
-            refreshEl.classList.remove('loading');
-            refreshEl.style.top = '-65px'; // 최종 숨김
-            setTimeout(() => {
-              refreshEl.classList.remove('show');
-              isLoading = false;
-            }, 300);
-          }, 400);
+            refreshEl.classList.remove('show');
+            isLoading = false;
+          }, 300);
         }, 600);
       }
     } else {
-      // 당기다 말았을 때 자연스럽게 복귀
+      // 취소 시 자연스럽게 복귀
       refreshEl.style.top = '-65px';
+      setTimeout(() => { refreshEl.classList.remove('show'); }, 300);
     }
   });
 })();
