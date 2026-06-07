@@ -843,12 +843,55 @@
         font-size: 20px;
       }
     }
+
+    /* --- Pull To Refresh CSS 추가 시작 --- */
+    #pullRefresh{
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:99999; /* 모달이나 로딩 화면 위에 뜨게 조정 */
+      transition: top .25s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    #pullRefresh.show{
+      top: 15px; /* 헤더 여백에 알맞게 조금 조정 */
+    }
+
+    #pullIcon{
+      width:24px;
+      height:24px;
+      fill:var(--t1);
+      transition: transform .15s linear;
+    }
+
+    #pullRefresh.loading #pullIcon{
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin{
+      from{transform:rotate(0deg);}
+      to{transform:rotate(360deg);}
+    }
+    /* --- Pull To Refresh CSS 추가 끝 --- */
   </style>
 </head>
 <body>
 
-
-
+<div id="pullRefresh">
+  <svg id="pullIcon" viewBox="0 0 24 24">
+    <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6a6 6 0 1 1-6-6z"/>
+  </svg>
+</div>
 <div id="splash">
   <div class="splash-inner">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
@@ -1466,6 +1509,71 @@ fetchRecentStories().then(() => {
   });
   loadRecommendedProfiles();
 });
+
+// --- Pull To Refresh 로직 추가 시작 ---
+const scroller = document.querySelector('.main-content');
+
+let startY = 0;
+let pulling = false;
+
+const refreshEl = document.getElementById('pullRefresh');
+const refreshIcon = document.getElementById('pullIcon');
+
+// 모바일 기기 등에서 부드럽게 작동하도록 이벤트 최적화
+scroller.addEventListener('touchstart', e => {
+  // 스크롤이 맨 위에 있을 때만 인식
+  if (scroller.scrollTop <= 0) {
+    startY = e.touches[0].clientY;
+    pulling = true;
+  }
+}, { passive: true });
+
+scroller.addEventListener('touchmove', e => {
+  if (!pulling) return;
+
+  const currentY = e.touches[0].clientY;
+  const distance = currentY - startY;
+
+  // 스크롤이 가장 위쪽인 상태에서 아래로 당기는 경우
+  if (distance > 0 && scroller.scrollTop <= 0) {
+    if (e.cancelable) e.preventDefault(); // 기본 스크롤 동작 방지
+
+    refreshEl.classList.add('show');
+    const rotation = Math.min(distance * 2, 360);
+    refreshIcon.style.transform = `rotate(${rotation}deg)`;
+    refreshEl.style.top = `${Math.min(distance - 50, 20)}px`;
+  }
+}, { passive: false });
+
+scroller.addEventListener('touchend', async e => {
+  if (!pulling) return;
+
+  const distance = e.changedTouches[0].clientY - startY;
+
+  // 충분히 당겨졌을 때만 새로고침 트리거
+  if (distance > 80 && scroller.scrollTop <= 0) {
+    refreshEl.classList.add('loading');
+    refreshEl.style.top = '20px'; // 로딩 중 UI 고정
+
+    try {
+      await fetchRecentStories();
+      await loadPosts();
+      await loadRecommendedProfiles();
+    } finally {
+      setTimeout(() => {
+        refreshEl.classList.remove('loading');
+        refreshEl.classList.remove('show');
+        refreshEl.style.top = '-60px'; // 다시 원래 자리로 복귀
+      }, 500);
+    }
+  } else {
+    refreshEl.classList.remove('show');
+    refreshEl.style.top = '-60px';
+  }
+
+  pulling = false;
+});
+// --- Pull To Refresh 로직 추가 끝 ---
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
 </body>
