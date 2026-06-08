@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
   <title>게시물 : Sharer</title>
   
@@ -1003,9 +1003,130 @@
     html[data-theme="light"] .info-icon-box img {
       filter: brightness(0);
     }
-  </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* --- 수정된 Pull To Refresh CSS 설정 --- */
+    #pullRefresh {
+      position: fixed;
+      top: -65px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* 구글 머티리얼 스타일 스피너 SVG 전용 CSS */
+    .material-spinner {
+      width: 26px;
+      height: 26px;
+      display: none;
+      transform-origin: center;
+    }
+
+    #pullRefresh.loading .material-spinner {
+      animation: spinner-rotate 1.4s linear infinite;
+    }
+
+    .spinner-path {
+      stroke-dasharray: 320.442;
+      transform-origin: center;
+      animation: spinner-dash 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes spinner-rotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spinner-dash {
+      0% { stroke-dashoffset: 304.42; transform: rotate(0deg); }
+      12.5% { stroke-dashoffset: 80.11; transform: rotate(0deg); }
+      25% { stroke-dashoffset: 304.42; transform: rotate(270deg); }
+      37.5% { stroke-dashoffset: 80.11; transform: rotate(270deg); }
+      50% { stroke-dashoffset: 304.42; transform: rotate(540deg); }
+      62.5% { stroke-dashoffset: 80.11; transform: rotate(540deg); }
+      75% { stroke-dashoffset: 304.42; transform: rotate(810deg); }
+      87.5% { stroke-dashoffset: 80.11; transform: rotate(810deg); }
+      100% { stroke-dashoffset: 304.42; transform: rotate(1080deg); }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style>
 </head>
 <body>
+
+
+
+
+
+
+<div id="pullRefresh">
+  <svg class="material-spinner" viewBox="0 0 110 110" id="pullSpinnerSvg">
+    <defs>
+      <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0d00ff"/>
+        <stop offset="100%" stop-color="#39f0ea"/>
+      </linearGradient>
+    </defs>
+    <circle
+      class="spinner-path"
+      cx="55"
+      cy="55"
+      r="51"
+      fill="none"
+      stroke="url(#spinnerGradient)"
+      stroke-width="8"
+      stroke-linecap="round"
+    />
+  </svg>
+</div>
+
+
+
+
+
+
+
   <div id="splash">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
@@ -1932,11 +2053,123 @@
   function escapeHtml(unsafe) {
     return unsafe
       .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
+
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+
+
+const defaultFeedSkeleton = document.getElementById('postsFeed').innerHTML;
+const defaultRecommendSkeleton = document.getElementById('recommendProfiles').innerHTML;
+
+
+
+// ─── 완벽하게 수정된 Pull To Refresh 스크립트 ───
+(function() {
+  const scroller = document.querySelector('.main-content');
+  const refreshEl = document.getElementById('pullRefresh');
+  const pullSpinnerSvg = document.getElementById('pullSpinnerSvg');
+
+  let startY = 0;
+  let pulling = false;
+  let isLoading = false;
+
+  // 스크롤이 맨 위인지 확인하는 조건을 조금 더 너그럽게 주어 스크롤 충돌(위로 튕김 등) 해결
+  function isScrollTop() {
+    const windowScrollY = window.scrollY || document.documentElement.scrollTop;
+    return windowScrollY <= 5 && scroller.scrollTop <= 5;
+  }
+
+  // 윈도우 전체에 걸어 스크롤을 감지하여 안정성을 높임
+  window.addEventListener('touchstart', e => {
+    if (isLoading) return;
+    if (isScrollTop()) {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchmove', e => {
+    if (!pulling || isLoading) return;
+
+    const currentY = e.touches[0].clientY;
+    const distance = currentY - startY;
+
+    // 아래로 당기고 최상단일 때만 동작하도록 설정하여 정상적인 스크롤 방해 금지
+    if (distance > 0 && isScrollTop()) {
+      if (e.cancelable) e.preventDefault();
+
+      refreshEl.classList.add('show');
+      pullSpinnerSvg.style.display = 'block';
+      
+      const rotation = Math.min(distance * 2, 360);
+      const topPos = Math.min(distance - 65, 24);
+
+      pullSpinnerSvg.style.transform = `rotate(${rotation}deg)`;
+      refreshEl.style.top = `${topPos}px`;
+      refreshEl.style.transition = 'none';
+    } else if (distance < 0) {
+      // 위로 스크롤 시 당기기 취소
+      pulling = false;
+      refreshEl.style.top = '-65px';
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchend', async e => {
+    if (!pulling || isLoading) return;
+    pulling = false;
+
+    const currentY = e.changedTouches[0].clientY;
+    const distance = currentY - startY;
+
+    if (distance > 80 && isScrollTop()) {
+      isLoading = true;
+      refreshEl.classList.add('loading');
+      
+      // 애니메이션 회전에 맡기기 위해 초기화
+      pullSpinnerSvg.style.transform = 'none'; 
+      
+      refreshEl.style.transition = 'top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      refreshEl.style.top = '24px';
+
+      document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
+      const recommendContainer = document.getElementById('recommendProfiles');
+      if (recommendContainer && defaultRecommendSkeleton) {
+        recommendContainer.innerHTML = defaultRecommendSkeleton;
+      }
+
+      try {
+        await fetchRecentStories();
+        await loadPosts();
+        await loadRecommendedProfiles();
+      } catch (err) {
+        console.error("새로고침 중 오류:", err);
+      } finally {
+        setTimeout(() => {
+          refreshEl.classList.remove('loading');
+          refreshEl.style.transition = 'top 0.3s ease';
+          refreshEl.style.top = '-65px';
+          setTimeout(() => {
+            refreshEl.classList.remove('show');
+            pullSpinnerSvg.style.display = 'none';
+            isLoading = false;
+          }, 300);
+        }, 600);
+      }
+    } else {
+      refreshEl.style.transition = 'top 0.3s ease';
+      refreshEl.style.top = '-65px';
+      setTimeout(() => { 
+        refreshEl.classList.remove('show');
+        pullSpinnerSvg.style.display = 'none';
+      }, 300);
+    }
+  });
+})();
+
+
+
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
 </body>
