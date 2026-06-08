@@ -26,7 +26,6 @@
   <meta name="twitter:description" content="Sharer는 이미지와 텍스트를 업로드하고 사람들과 소통할 수 있는 무료 커뮤니티·SNS 서비스입니다. JBJB 만들었습니다.">
   <meta name="twitter:image" content="https://sharer.r-e.kr/logo.png">
 
-
   <meta name="application-name" content="Sharer">
   <meta name="apple-mobile-web-app-title" content="Sharer">
   <script type="application/ld+json">
@@ -36,7 +35,6 @@
     "name": "Sharer",
     "url": "https://sharer.r-e.kr",
     "logo": "https://sharer.r-e.kr/logo_google.png"
-
   }
   </script>
 
@@ -60,11 +58,11 @@
       font-size: 20px;
       font-weight: 700;
       letter-spacing: 0.05em;
-      color: var(--t1); /* 테마 변수로 수정 */
+      color: var(--t1);
     }
     .splash-sub {
       font-size: 12px;
-      color: var(--t2); /* 테마 변수로 수정 */
+      color: var(--t2);
       margin-top: 4px;
       letter-spacing: 0.08em;
     }
@@ -94,7 +92,6 @@
       --r4: 28px;
     }
 
-    /* 라이트 모드 변수 정의 추가 */
     html[data-theme="light"] {
       --bg: #fafafa;
       --bg2: #ffffff;
@@ -120,13 +117,10 @@
       -webkit-font-smoothing: antialiased;
       opacity: 0;
       animation: bodyReveal 0.4s ease forwards;
-      padding-top: 45px; /* 상단 고정 배너 높이만큼 여백 제공 (배너가 글을 가리지 않게 함) */
-      transition: padding-top 0.3s ease; /* 배너가 닫힐 때 여백도 부드럽게 사라짐 */
+      padding-top: 45px;
+      transition: padding-top 0.3s ease;
     }
     @keyframes bodyReveal { to { opacity: 1; } }
-
-
-
 
     #splash {
       position: fixed;
@@ -156,7 +150,7 @@
       to   { opacity: 1; transform: scale(1); }
     }
 
-    #nprogress .bar { background: var(--t1) !important; height: 2px !important; } /* 테마 변수로 수정 */
+    #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
     #nprogress .peg { display: none !important; }
     #nprogress .spinner { display: none !important; }
 
@@ -184,7 +178,7 @@
       justify-content: center;
       align-items: flex-start;
       padding: 36px 28px;
-      overflow-y: visible; /* 스크롤이 정상 작동하도록 auto에서 visible로 수정 */
+      overflow-y: auto;
       opacity: 0;
       transform: translateY(16px);
       animation: contentReveal 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
@@ -243,10 +237,9 @@
       font-weight: 600;
       flex-shrink: 0;
       object-fit: cover;
-      color: var(--t2); /* 테마 변수로 수정 */
+      color: var(--t2);
     }
 
-    /* 스토리 프로필 테두리 그라데이션 */
     .story-ring-wrapper {
       position: relative;
       display: inline-flex;
@@ -254,7 +247,7 @@
       justify-content: center;
       border-radius: 50%;
       flex-shrink: 0;
-      vertical-align: middle; /* 다른 텍스트나 버튼과 수평 축 맞추기 */
+      vertical-align: middle;
     }
     .story-ring-wrapper.has-story {
       padding: 2.5px;
@@ -319,7 +312,7 @@
       position: relative;
     }
     @keyframes postIn { to { opacity: 1; transform: translateY(0); } }
-    .post-card:hover { background: var(--bg2); } /* 테마 변수로 수정 */
+    .post-card:hover { background: var(--bg2); }
     .post-card:last-child { border-bottom: none; }
 
     .post-header {
@@ -345,7 +338,7 @@
       font-weight: 600;
       flex-shrink: 0;
       transition: border-color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      color: var(--t2); /* 테마 변수로 수정 */
+      color: var(--t2);
     }
     .post-author-info:hover .post-author-avatar {
       border-color: var(--border3);
@@ -419,7 +412,6 @@
       overflow: hidden;
       position: relative;
     }
-    /* 라이트 모드 대응을 위해 투명 그라데이션의 끝 색상을 각 모드의 배경색 변수(--bg)로 매핑 */
     .post-content.fade::after {
       display: block;
       content: "";
@@ -431,7 +423,6 @@
       pointer-events: none;
     }
 
-    /* 만약 라이트 모드일 때 조금 더 또렷하고 깔끔한 그라데이션 처리를 원할 경우 대비 */
     html[data-theme="light"] .post-content.fade::after {
       background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.4) 40%, rgba(250,250,250,0.8) 75%, var(--bg) 100%);
     }
@@ -490,7 +481,7 @@
 
     .delete-btn {
       background: transparent;
-      border: 1px solid var(--border2); /* 테마 변수로 수정 */
+      border: 1px solid var(--border2);
       color: var(--pink);
       cursor: pointer;
       font-size: 11px;
@@ -606,13 +597,13 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      background: var(--t1); /* 테마 변수로 수정 */
-      color: var(--bg); /* 테마 변수로 수정 */
+      background: var(--t1);
+      color: var(--bg);
       margin-bottom: 8px;
       font-family: inherit;
       transition: opacity 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .auth-box button:hover { opacity: 0.85; transform: scale(1.02); } /* 테마 변수로 수정 */
+    .auth-box button:hover { opacity: 0.85; transform: scale(1.02); }
     .auth-box button:active { transform: scale(0.97); }
     .auth-box button.secondary {
       background: var(--bg3);
@@ -640,8 +631,8 @@
     }
 
     .post-btn {
-      background: var(--t1); /* 테마 변수로 수정 */
-      color: var(--bg); /* 테마 변수로 수정 */
+      background: var(--t1);
+      color: var(--bg);
       border: none;
       cursor: pointer;
       font-size: 13px;
@@ -651,7 +642,7 @@
       font-family: inherit;
       transition: opacity 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .post-btn:hover { opacity: 0.85; transform: scale(1.04); } /* 테마 변수로 수정 */
+    .post-btn:hover { opacity: 0.85; transform: scale(1.04); }
     .post-btn:active { transform: scale(0.94); }
     .post-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 
@@ -706,7 +697,7 @@
 
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; } /* 테마 변수로 수정 */
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--border3); }
 
     .sharer-profile-sheet-host[hidden] { display: none !important; }
@@ -732,8 +723,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: var(--bg); /* 테마 변수로 수정 */
-      border: 1px solid var(--border); /* 테마 변수로 수정 */
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-bottom: none;
       border-radius: 20px 20px 0 0;
       padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
@@ -775,7 +766,7 @@
       width: 40px;
       height: 5px;
       border-radius: 5px;
-      background: var(--border3); /* 테마 변수로 수정 */
+      background: var(--border3);
       flex-shrink: 0;
     }
     .sharer-profile-sheet-host .sps-profile {
@@ -784,7 +775,7 @@
       gap: 12px;
       padding: 12px 14px;
       border-radius: 14px;
-      background: var(--bg2); /* 테마 변수로 수정 */
+      background: var(--bg2);
       cursor: pointer;
       margin-bottom: 12px;
     }
@@ -809,7 +800,7 @@
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
-      color: var(--t1); /* 테마 변수로 수정 */
+      color: var(--t1);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -844,8 +835,7 @@
       }
     }
 
-    /* --- Pull To Refresh CSS 설정 --- */
-  /* Pull To Refresh 스타일 */
+    /* --- 수정된 Pull To Refresh CSS 설정 --- */
     #pullRefresh {
       position: fixed;
       top: -65px;
@@ -861,55 +851,66 @@
       justify-content: center;
       z-index: 99999;
       box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-      /* 튕기는 효과를 위한 베지어 커브 */
       transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* 구글 스타일 스피너 */
-    #pullSpinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--border3);
-      border-top-color: #4a90ff;
-      border-radius: 50%;
-      display: none; /* 로딩 전엔 숨김 */
-    }
-
-    #pullRefresh.loading #pullSpinner {
-      display: block;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    #pullIcon {
-      width: 22px;
-      height: 22px;
-      fill: var(--t1);
+    /* 구글 머티리얼 스타일 스피너 SVG 전용 CSS */
+    .material-spinner {
+      width: 26px;
+      height: 26px;
+      display: none;
       transform-origin: center;
     }
 
-    #pullRefresh.loading #pullIcon {
-      animation: spin .8s linear infinite;
+    #pullRefresh.loading .material-spinner {
+      animation: spinner-rotate 1.4s linear infinite;
     }
 
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+    .spinner-path {
+      stroke-dasharray: 320.442;
+      transform-origin: center;
+      animation: spinner-dash 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes spinner-rotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spinner-dash {
+      0% { stroke-dashoffset: 304.42; transform: rotate(0deg); }
+      12.5% { stroke-dashoffset: 80.11; transform: rotate(0deg); }
+      25% { stroke-dashoffset: 304.42; transform: rotate(270deg); }
+      37.5% { stroke-dashoffset: 80.11; transform: rotate(270deg); }
+      50% { stroke-dashoffset: 304.42; transform: rotate(540deg); }
+      62.5% { stroke-dashoffset: 80.11; transform: rotate(540deg); }
+      75% { stroke-dashoffset: 304.42; transform: rotate(810deg); }
+      87.5% { stroke-dashoffset: 80.11; transform: rotate(810deg); }
+      100% { stroke-dashoffset: 304.42; transform: rotate(1080deg); }
     }
   </style>
 </head>
 <body>
 
 <div id="pullRefresh">
-  <div id="pullSpinner"></div>
+  <svg class="material-spinner" viewBox="0 0 110 110" id="pullSpinnerSvg">
+    <defs>
+      <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0d00ff"/>
+        <stop offset="100%" stop-color="#39f0ea"/>
+      </linearGradient>
+    </defs>
+    <circle
+      class="spinner-path"
+      cx="55"
+      cy="55"
+      r="51"
+      fill="none"
+      stroke="url(#spinnerGradient)"
+      stroke-width="8"
+      stroke-linecap="round"
+    />
+  </svg>
 </div>
-
-
-
 
 <div id="splash">
   <div class="splash-inner">
@@ -1038,7 +1039,6 @@ function closeNoticeBanner() {
   }
 }
 
-// ─── NPROGRESS 설정 ───
 NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
 
 document.addEventListener('click', function(e) {
@@ -1048,7 +1048,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ─── SPLASH ───
 (function () {
   const splash = document.getElementById('splash');
 
@@ -1513,13 +1512,11 @@ window.deletePost = async (postId) => {
 function escapeHtml(unsafe) {
   return unsafe
     .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
+    .replace(/</g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
 
-// 초기 스켈레톤 상태 저장
 const defaultFeedSkeleton = document.getElementById('postsFeed').innerHTML;
 const defaultRecommendSkeleton = document.getElementById('recommendProfiles').innerHTML;
 
@@ -1530,25 +1527,25 @@ fetchRecentStories().then(() => {
   loadRecommendedProfiles();
 });
 
-// ─── 완벽하게 작동하는 Pull To Refresh 스크립트 수정본 ───
+// ─── 완벽하게 수정된 Pull To Refresh 스크립트 ───
 (function() {
   const scroller = document.querySelector('.main-content');
   const refreshEl = document.getElementById('pullRefresh');
-  const refreshIcon = document.getElementById('pullIcon');
+  const pullSpinnerSvg = document.getElementById('pullSpinnerSvg');
 
   let startY = 0;
   let pulling = false;
   let isLoading = false;
 
-  // 현재 스크롤이 최상단(0)에 있는지 정확히 체크하는 함수
+  // 스크롤이 맨 위인지 확인하는 조건을 조금 더 너그럽게 주어 스크롤 충돌(위로 튕김 등) 해결
   function isScrollTop() {
-    // 데스크톱 모드에선 scroller 요소가 스크롤되지만, 모바일 반응형 상태에선 window(html/body)가 스크롤될 수 있음
-    return scroller.scrollTop <= 0 && window.scrollY <= 0;
+    const windowScrollY = window.scrollY || document.documentElement.scrollTop;
+    return windowScrollY <= 5 && scroller.scrollTop <= 5;
   }
 
+  // 윈도우 전체에 걸어 스크롤을 감지하여 안정성을 높임
   window.addEventListener('touchstart', e => {
     if (isLoading) return;
-    
     if (isScrollTop()) {
       startY = e.touches[0].clientY;
       pulling = true;
@@ -1561,45 +1558,43 @@ fetchRecentStories().then(() => {
     const currentY = e.touches[0].clientY;
     const distance = currentY - startY;
 
-    // 아래로 당기면서 스크롤 위치가 최상단일 때
+    // 아래로 당기고 최상단일 때만 동작하도록 설정하여 정상적인 스크롤 방해 금지
     if (distance > 0 && isScrollTop()) {
-      // 모바일 기본 기능(오버스크롤/바운스) 방지
       if (e.cancelable) e.preventDefault();
 
       refreshEl.classList.add('show');
+      pullSpinnerSvg.style.display = 'block';
       
-      // 당긴 거리에 비례해서 회전 및 위치 조정 (최대 노출 위치 고정)
       const rotation = Math.min(distance * 2, 360);
-      const topPos = Math.min(distance - 65, 24); // top 최대 24px까지만 내려오도록 설정
+      const topPos = Math.min(distance - 65, 24);
 
-      refreshIcon.style.transform = `rotate(${rotation}deg)`;
+      pullSpinnerSvg.style.transform = `rotate(${rotation}deg)`;
       refreshEl.style.top = `${topPos}px`;
-      refreshEl.style.transition = 'none'; // 드래그 중엔 부드러운 애니메이션 일시 해제
-    } else {
-      // 만약 위로 다시 올리면 원래대로 숨김
+      refreshEl.style.transition = 'none';
+    } else if (distance < 0) {
+      // 위로 스크롤 시 당기기 취소
       pulling = false;
       refreshEl.style.top = '-65px';
-      refreshEl.style.transition = 'top .2s ease';
     }
   }, { passive: false });
 
-window.addEventListener('touchend', async e => {
+  window.addEventListener('touchend', async e => {
     if (!pulling || isLoading) return;
     pulling = false;
 
     const currentY = e.changedTouches[0].clientY;
     const distance = currentY - startY;
 
-    // 80px 이상 당겼을 때 새로고침
     if (distance > 80 && isScrollTop()) {
       isLoading = true;
       refreshEl.classList.add('loading');
       
-      // 튕기면서 30px까지 내려왔다가 24px에 고정되는 효과
-      refreshEl.style.top = '30px'; 
-      setTimeout(() => { refreshEl.style.top = '24px'; }, 100);
+      // 애니메이션 회전에 맡기기 위해 초기화
+      pullSpinnerSvg.style.transform = 'none'; 
+      
+      refreshEl.style.transition = 'top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      refreshEl.style.top = '24px';
 
-      // 스켈레톤 즉시 표시
       document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
       const recommendContainer = document.getElementById('recommendProfiles');
       if (recommendContainer && defaultRecommendSkeleton) {
@@ -1613,20 +1608,24 @@ window.addEventListener('touchend', async e => {
       } catch (err) {
         console.error("새로고침 중 오류:", err);
       } finally {
-        // 로딩 완료 후 부드럽게 복귀
         setTimeout(() => {
           refreshEl.classList.remove('loading');
+          refreshEl.style.transition = 'top 0.3s ease';
           refreshEl.style.top = '-65px';
           setTimeout(() => {
             refreshEl.classList.remove('show');
+            pullSpinnerSvg.style.display = 'none';
             isLoading = false;
           }, 300);
         }, 600);
       }
     } else {
-      // 취소 시 자연스럽게 복귀
+      refreshEl.style.transition = 'top 0.3s ease';
       refreshEl.style.top = '-65px';
-      setTimeout(() => { refreshEl.classList.remove('show'); }, 300);
+      setTimeout(() => { 
+        refreshEl.classList.remove('show');
+        pullSpinnerSvg.style.display = 'none';
+      }, 300);
     }
   });
 })();
