@@ -1038,6 +1038,7 @@
 
     #pullRefresh.loading .material-spinner {
       animation: spinner-rotate 1.4s linear infinite;
+      display: block;
     }
 
     .spinner-path {
@@ -1120,38 +1121,8 @@
     <h1 class="header-title">게시물</h1>
   </div>
 
-  <div class="container" id="container">
-    <!-- 스켈레톤 로딩 UI -->
-    <div id="skeletonLoader">
-      <div class="post-detail-skeleton">
-        <div class="skeleton-post-header">
-          <div class="skeleton skeleton-avatar"></div>
-          <div style="flex: 1;">
-            <div class="skeleton skeleton-username" style="margin-bottom: 8px;"></div>
-            <div class="skeleton skeleton-username" style="width: 80px;"></div>
-          </div>
-        </div>
-        <div class="skeleton skeleton-post-image"></div>
-        <div class="skeleton skeleton-text text-long"></div>
-        <div class="skeleton skeleton-text text-medium"></div>
-        <div class="skeleton skeleton-text text-short"></div>
-      </div>
-      <div style="margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--border);">
-        <div class="skeleton-post-header">
-          <div class="skeleton skeleton-avatar"></div>
-          <div style="flex: 1;">
-            <div class="skeleton skeleton-username"></div>
-          </div>
-        </div>
-        <div class="skeleton skeleton-text text-long" style="margin: 12px 0;"></div>
-        <div class="skeleton skeleton-text text-medium"></div>
-      </div>
-    </div>
-
-    <!-- 실제 콘텐츠 -->
-    <div id="contentLoader" style="display: none;">
-      <!-- 동적으로 렌더링될 콘텐츠 -->
-    </div>
+  <div class="container">
+    <div id="container"></div>
   </div>
 
   <div id="loginAlertContainer"></div>
