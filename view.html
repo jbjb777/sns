@@ -1003,9 +1003,90 @@
     html[data-theme="light"] .info-icon-box img {
       filter: brightness(0);
     }
+
+    /* ─── 추가된 스켈레톤 로딩 (Skeleton Loading) CSS ─── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
+      background-size: 300% 100%;
+      animation: shimmer 1.6s ease-in-out infinite;
+      border-radius: var(--r1);
+    }
+    @keyframes shimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+
+    /* ─── 추가된 위로 스크롤하여 새로고침 (Pull To Refresh) CSS ─── */
+    #pullRefresh {
+      position: fixed;
+      top: -65px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .material-spinner {
+      width: 26px;
+      height: 26px;
+      display: none;
+      transform-origin: center;
+    }
+    #pullRefresh.loading .material-spinner {
+      animation: spinner-rotate 1.4s linear infinite;
+    }
+    .spinner-path {
+      stroke-dasharray: 320.442;
+      transform-origin: center;
+      animation: spinner-dash 5.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    @keyframes spinner-rotate {
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes spinner-dash {
+      0% { stroke-dashoffset: 304.42; transform: rotate(0deg); }
+      12.5% { stroke-dashoffset: 80.11; transform: rotate(0deg); }
+      25% { stroke-dashoffset: 304.42; transform: rotate(270deg); }
+      37.5% { stroke-dashoffset: 80.11; transform: rotate(270deg); }
+      50% { stroke-dashoffset: 304.42; transform: rotate(540deg); }
+      62.5% { stroke-dashoffset: 80.11; transform: rotate(540deg); }
+      75% { stroke-dashoffset: 304.42; transform: rotate(810deg); }
+      87.5% { stroke-dashoffset: 80.11; transform: rotate(810deg); }
+      100% { stroke-dashoffset: 304.42; transform: rotate(1080deg); }
+    }
   </style>
 </head>
 <body>
+
+  <div id="pullRefresh">
+    <svg class="material-spinner" viewBox="0 0 110 110" id="pullSpinnerSvg">
+      <defs>
+        <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0d00ff"/>
+          <stop offset="100%" stop-color="#39f0ea"/>
+        </linearGradient>
+      </defs>
+      <circle
+        class="spinner-path"
+        cx="55"
+        cy="55"
+        r="51"
+        fill="none"
+        stroke="url(#spinnerGradient)"
+        stroke-width="8"
+        stroke-linecap="round"
+      />
+    </svg>
+  </div>
+
   <div id="splash">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
@@ -1088,7 +1169,30 @@
     </div>
 
     <div class="container">
-      <div id="postContent"></div>
+      <div id="postContent">
+        <div class="post-detail-card">
+          <div class="post-detail-header">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div class="skeleton" style="width: 52px; height: 52px; border-radius: 50%;"></div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div class="skeleton" style="width: 120px; height: 18px; border-radius: 4px;"></div>
+                <div class="skeleton" style="width: 80px; height: 12px; border-radius: 4px;"></div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div class="skeleton" style="width: 70px; height: 34px; border-radius: 22px;"></div>
+              <div class="skeleton" style="width: 60px; height: 34px; border-radius: 22px;"></div>
+            </div>
+          </div>
+          <div class="skeleton" style="width: 100%; height: 350px; border-radius: var(--r3); margin: 28px 0;"></div>
+          <div class="post-detail-content" style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="skeleton" style="width: 100%; height: 16px; border-radius: 4px;"></div>
+            <div class="skeleton" style="width: 85%; height: 16px; border-radius: 4px;"></div>
+            <div class="skeleton" style="width: 60%; height: 16px; border-radius: 4px;"></div>
+          </div>
+        </div>
+      </div>
+      
       <div class="comment-section">
         <div class="comment-input-wrapper">
           <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
@@ -1110,6 +1214,9 @@
 
 <script src="markdown.js"></script>
 <script>
+  // ─── 초기 스켈레톤 HTML 저장 (새로고침 시 활용) ───
+  const defaultPostSkeleton = document.getElementById('postContent').innerHTML;
+
   // ─── NPROGRESS 설정 ───
   NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
   document.addEventListener('click', function(e) {
@@ -1937,6 +2044,107 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+
+  // ─── 추가된 위로 스크롤해서 새로고침 (Pull To Refresh) 스크립트 ───
+  (function() {
+    const refreshEl = document.getElementById('pullRefresh');
+    const pullSpinnerSvg = document.getElementById('pullSpinnerSvg');
+
+    let startY = 0;
+    let pulling = false;
+    let isLoading = false;
+
+    // 스크롤이 맨 위인지 확인
+    function isScrollTop() {
+      const windowScrollY = window.scrollY || document.documentElement.scrollTop;
+      return windowScrollY <= 5;
+    }
+
+    // 터치 이벤트 연결
+    window.addEventListener('touchstart', e => {
+      if (isLoading) return;
+      if (isScrollTop()) {
+        startY = e.touches[0].clientY;
+        pulling = true;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', e => {
+      if (!pulling || isLoading) return;
+
+      const currentY = e.touches[0].clientY;
+      const distance = currentY - startY;
+
+      // 아래로 당기고 최상단일 때만 동작
+      if (distance > 0 && isScrollTop()) {
+        if (e.cancelable) e.preventDefault();
+
+        refreshEl.classList.add('show');
+        pullSpinnerSvg.style.display = 'block';
+        
+        const rotation = Math.min(distance * 2, 360);
+        const topPos = Math.min(distance - 65, 24);
+
+        pullSpinnerSvg.style.transform = `rotate(${rotation}deg)`;
+        refreshEl.style.top = `${topPos}px`;
+        refreshEl.style.transition = 'none';
+      } else if (distance < 0) {
+        // 위로 스크롤 시 당기기 취소
+        pulling = false;
+        refreshEl.style.top = '-65px';
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', async e => {
+      if (!pulling || isLoading) return;
+      pulling = false;
+
+      const currentY = e.changedTouches[0].clientY;
+      const distance = currentY - startY;
+
+      if (distance > 80 && isScrollTop() && postId) {
+        isLoading = true;
+        refreshEl.classList.add('loading');
+        
+        // 애니메이션 회전에 맡기기 위해 초기화
+        pullSpinnerSvg.style.transform = 'none'; 
+        
+        refreshEl.style.transition = 'top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        refreshEl.style.top = '24px';
+
+        // 스켈레톤 상태로 UI 초기화
+        document.getElementById('postContent').innerHTML = defaultPostSkeleton;
+        document.getElementById('commentList').innerHTML = '';
+
+        try {
+          // 데이터 다시 불러오기
+          await fetchRecentStories();
+          await loadPost(postId);
+          await listenComments(postId);
+        } catch (err) {
+          console.error("새로고침 중 오류:", err);
+        } finally {
+          setTimeout(() => {
+            refreshEl.classList.remove('loading');
+            refreshEl.style.transition = 'top 0.3s ease';
+            refreshEl.style.top = '-65px';
+            setTimeout(() => {
+              refreshEl.classList.remove('show');
+              pullSpinnerSvg.style.display = 'none';
+              isLoading = false;
+            }, 300);
+          }, 600);
+        }
+      } else {
+        refreshEl.style.transition = 'top 0.3s ease';
+        refreshEl.style.top = '-65px';
+        setTimeout(() => { 
+          refreshEl.classList.remove('show');
+          pullSpinnerSvg.style.display = 'none';
+        }, 300);
+      }
+    });
+  })();
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
 </body>
