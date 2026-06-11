@@ -162,7 +162,7 @@
       margin-bottom: 24px;
     }
 
-/* 스토리 소유 시 파란 그라데이션 테두리 래퍼 */
+    /* 스토리 소유 시 파란 그라데이션 테두리 래퍼 */
     .profile-avatar-wrapper {
       position: relative;
       width: 96px; height: 96px;
@@ -1478,6 +1478,8 @@
       return;
     }
     currentStoryIndex = index;
+    const item = storyItems[index]; // 👈 핵심 버그 수정: 이 줄이 추가되었습니다!
+
     for (let i = 0; i < storyItems.length; i++) {
       const fill = document.getElementById(`story-fill-${i}`);
       if (fill) {
