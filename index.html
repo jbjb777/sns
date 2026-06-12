@@ -494,15 +494,21 @@
     .delete-btn:hover { background: rgba(255,107,107,0.1); border-color: var(--pink); transform: scale(1.04); }
     .delete-btn:active { transform: scale(0.94); }
 
-    .verification-badge {
-      display: inline-block;
-      width: 2em; 
-      height: 1em;
+    /* 관리자 텍스트 배지 스타일 추가 (다크/라이트 UI 대응) */
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
       vertical-align: middle;
-      background-image: url('https://sharer.r-e.kr/badge.svg');
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-position: center;
+      margin-left: 5px;
+      line-height: 1;
     }
 
     .footer {
@@ -1402,8 +1408,9 @@ async function loadPosts() {
         
       const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}">${avatarInnerHtml}</div>`;
 
+      /* 기존 이미지 배지 대신 스타일이 적용된 관리자 텍스트 사각형이 출력되도록 수정 */
       const authorDisplay = isVerified
-        ? `${escapeHtml(authorNickname)}<span class="verification-badge"></span>`
+        ? `${escapeHtml(authorNickname)}<span class="admin-badge">관리자</span>`
         : escapeHtml(authorNickname);
 
       const deleteButton = canDelete
