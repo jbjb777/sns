@@ -192,16 +192,24 @@
       letter-spacing: -0.3px;
     }
     .post-timestamp { font-size: 13px; color: var(--t3); }
-    .verification-badge {
-      display: inline-block;
-      width: 1em;
-      height: 12em;
+
+    /* 관리자 텍스트 배지 스타일 추가 (다크/라이트 UI 대응) */
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
       vertical-align: middle;
-      background-image: url('https://sharer.r-e.kr/badge.svg');
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-position: center;
+      margin-left: 5px;
+      line-height: 1;
     }
+    
     /* ─── ACCESS BADGE (공개범위) ─── */
     .access-badge {
       display: flex;
@@ -1573,7 +1581,7 @@
             <div class="author-details">
               <div class="author-name">
                 ${escapeHtml(post.author)}
-                ${isVerified ? '<span class="verification-badge"></span>' : ''}
+                ${isVerified ? '<span class="admin-badge">관리자</span>' : ''}
               </div>
               <div class="post-timestamp">${timeStr}</div>
             </div>
@@ -1829,7 +1837,7 @@
                     ${rAvatarContent}
                     <span class="comment-author">
                       ${escapeHtml(r.user_name)}
-                      ${rIsVerified ? '<span class="verification-badge" style="width:12px;height:12px;"></span>' : ''}
+                      ${rIsVerified ? '<span class="admin-badge">관리자</span>' : ''}
                     </span>
                   </div>
                   ${rIsMine ? `<button class="comment-del-btn" onclick="deleteComment('${r.id}')">삭제</button>` : ''}
@@ -1848,7 +1856,7 @@
             ${avatarContent}
             <span class="comment-author">
               ${escapeHtml(c.user_name)}
-              ${isVerified ? '<span class="verification-badge" style="width:13px;height:13px;"></span>' : ''}
+              ${isVerified ? '<span class="admin-badge">관리자</span>' : ''}
             </span>
           </div>
           ${isMine ? `<button class="comment-del-btn" onclick="deleteComment('${c.id}')">삭제</button>` : ''}
