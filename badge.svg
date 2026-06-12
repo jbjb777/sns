@@ -16,7 +16,7 @@
   <text x="50%" y="55%" 
         dominant-baseline="middle" 
         text-anchor="middle" 
-        fill="#ffffff" 
+        fill="#000000" 
         font-family="system-ui, -apple-system, sans-serif" 
         font-size="100" 
         font-weight="bold" 
