@@ -315,6 +315,41 @@
     .post-card:hover { background: var(--bg2); }
     .post-card:last-child { border-bottom: none; }
 
+    /* 공지사항(admin) 게시물 전용 둥근 사각형 카드 스타일 */
+    .post-card.admin-post {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r3);
+      padding: 24px 20px;
+      margin: 16px 0 32px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+    html[data-theme="light"] .post-card.admin-post {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+    .post-card.admin-post:hover {
+      background: var(--bg3);
+    }
+    .post-card.admin-post:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* 공지사항 텍스트 배지 스타일 */
+    .notice-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--pink);
+      color: #fff !important;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      vertical-align: middle;
+      line-height: 1;
+    }
+
     .post-header {
       display: flex;
       align-items: center;
@@ -495,11 +530,6 @@
     .delete-btn:active { transform: scale(0.94); }
 
     /* 관리자 텍스트 배지 스타일 추가 (다크/라이트 UI 대응) */
-
-
-
-
-
     /* 관리자 텍스트 배지 스타일 수정 (모양 유지, 무한 그라데이션 애니메이션 추가) */
     .admin-badge {
       display: inline-flex;
@@ -529,8 +559,6 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
-
 
     .footer {
       border-top: 1px solid var(--border);
@@ -1422,6 +1450,7 @@ async function loadPosts() {
       const liked = myLikeSet.has(post.id);
       
       const hasStory = recentStoryAuthors.has(post.author_id);
+      const isAdminPost = post.type === 'admin';
 
       const avatarInnerHtml = authorAvatar
         ? `<img src="${escapeHtml(authorAvatar)}" class="post-author-avatar" style="object-fit:cover;" alt="${escapeHtml(authorNickname)}">`
@@ -1429,10 +1458,12 @@ async function loadPosts() {
         
       const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}">${avatarInnerHtml}</div>`;
 
-      /* 기존 이미지 배지 대신 스타일이 적용된 관리자 텍스트 사각형이 출력되도록 수정 */
+      const noticeBadgeHTML = isAdminPost ? `<span class="notice-badge">공지사항</span>` : '';
+
+      /* 기존 이미지 배지 대신 스타일이 적용된 관리자 텍스트 사각형 및 공지사항 배지 적용 */
       const authorDisplay = isVerified
-        ? `${escapeHtml(authorNickname)}<span class="admin-badge">관리자</span>`
-        : escapeHtml(authorNickname);
+        ? `${escapeHtml(authorNickname)}<span class="admin-badge">관리자</span>${noticeBadgeHTML}`
+        : `${escapeHtml(authorNickname)}${noticeBadgeHTML}`;
 
       const deleteButton = canDelete
         ? `<button class="delete-btn" onclick="event.stopPropagation(); deletePost('${post.id}')">삭제</button>`
@@ -1444,7 +1475,7 @@ async function loadPosts() {
       }
 
       const postCard = document.createElement('div');
-      postCard.className = 'post-card';
+      postCard.className = isAdminPost ? 'post-card admin-post' : 'post-card';
       postCard.style.animationDelay = `${Math.min(idx, 7) * 0.07}s`;
       postCard.innerHTML = `
         <div class="post-header">
