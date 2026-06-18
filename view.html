@@ -198,11 +198,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(270deg, #0400ff, #c710ff,#0400ff, #c710ff);
-      background-size: 400% 400%;
-      animation: adminGradientFlow 6s ease infinite;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fff !important; /* 애니메이션 가독성을 위해 흰색 글자 고정 */
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
       font-size: 10px;
       font-weight: 600;
       padding: 2px 6px;
@@ -210,18 +208,8 @@
       vertical-align: middle;
       margin-left: 5px;
       line-height: 1;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .admin-badge:hover { transform: scale(1.05); }
-    .admin-badge:active { transform: scale(0.95); }
-
-    @keyframes adminGradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+    
     /* ─── ACCESS BADGE (공개범위) ─── */
     .access-badge {
       display: flex;
@@ -1125,18 +1113,7 @@
       </div>
     </div>
   </div>
-  <div class="modal-overlay" id="adminInfoModal">
-    <div class="modal-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 32px 24px;">
-      <img src="badge.svg" alt="set" style="width: 44px; height: 44px; margin-bottom: 4px;">
-      <div class="modal-title" style="font-size: 18px; font-weight: 700; margin-bottom: 0; color: var(--t1);">관리자</div>
-      <p style="color: var(--t2); font-size: 14px; line-height: 1.6; margin-bottom: 10px; word-break: keep-all;">
-        Sharer를 1인 개발한 중2 관리자입니다
-      </p>
-      <div class="modal-buttons" style="justify-content: center; width: 100%;">
-        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAdminModal()">확인</button>
-      </div>
-    </div>
-  </div>
+
   <div class="modal" id="accessInfoModal">
     <div class="modal-content">
       <button class="modal-close-btn" onclick="closeInfoModal()">
@@ -1701,14 +1678,7 @@
       btn.classList.remove('liked');
     }
   }
-  // 관리자 팝업 모달 제어 함수
-  window.openAdminModal = function(e) {
-    if (e) e.stopPropagation(); // 부모 스토리 이벤트 버블링 차단
-    document.getElementById('adminInfoModal').classList.add('active');
-  };
-  window.closeAdminModal = function() {
-    document.getElementById('adminInfoModal').classList.remove('active');
-  };
+
   window.toggleLike = async function() {
     if (!currentUser) return showLoginAlert();
     if (!currentPost) return;
@@ -1954,9 +1924,7 @@
   window.goToProfile = function(userId, nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   };
-  document.getElementById('adminInfoModal').addEventListener('click', function(e) {
-    if (e.target === this) closeAdminModal();
-  });
+  
   window.addComment = async function() {
     const input = document.getElementById('commentInput');
     const text = input.value.trim();
