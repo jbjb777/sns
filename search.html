@@ -338,14 +338,11 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ----------------------------------------------------
-   * 1. 전역 환경 설정 및 공통 모듈 (Cloudflare 연동 방식)
-   * ---------------------------------------------------- */
+
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   
-  // 🔥 정빈님이 사용하시는 실제 Cloudflare 워커 주소로 변경해주세요!
-  // 예: "https://api.sharer.r-e.kr" 또는 "https://my-worker.username.workers.dev"
-  const CF_API_BASE = "https://클라우드플레어주소를_여기에_넣어주세요"; 
+
+  const CF_API_BASE = "sharer-api.alexeom97.workers.dev"; 
 
   // 클라우드플레어를 거치므로 프론트엔드에서 API KEY를 직접 노출할 필요가 없습니다.
   async function api(path, options = {}) {
