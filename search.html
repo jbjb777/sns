@@ -96,7 +96,7 @@
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     .search-box:focus-within {
-      border-color: var(--pink);
+      border-color: #7d7d7d;
     }
 
     .search-box input {
@@ -144,7 +144,7 @@
       color: var(--t1);
     }
     .tab-btn.active {
-      color: var(--pink);
+      color: #7d7d7d;
     }
     .tab-btn.active::after {
       content: '';
@@ -153,7 +153,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--pink);
+      background: #7d7d7d;
     }
 
     /* 결과 영역 */
@@ -278,8 +278,8 @@
       bottom: 90px;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: rgba(255, 107, 107, 0.95);
-      color: #fff;
+      background: rgba(255, 255, 255, 0.95);
+      color: #7d7d7d;
       padding: 10px 20px;
       border-radius: var(--r3);
       font-size: 14px;
@@ -458,7 +458,7 @@
 
     } catch (err) {
       console.error("검색 중 치명적 오류 발생:", err);
-      searchResultsArea.innerHTML = `<div class="status-msg" style="color:var(--pink);">데이터를 가져오는 중 오류가 발생했습니다.</div>`;
+      searchResultsArea.innerHTML = `<div class="status-msg" style="color:#7d7d7d;">데이터를 가져오는 중 오류가 발생했습니다.</div>`;
     } finally {
       NProgress.done();
     }
