@@ -254,7 +254,7 @@
       display: flex;
       gap: 6px;
       margin-top: 10px;
-      overflow-hidden;
+      overflow: hidden;
     }
     .post-img-thumb {
       width: 60px;
@@ -339,31 +339,30 @@
 
 <script>
   /* ----------------------------------------------------
-   * 1. 전역 환경 설정 및 공통 모듈 (기존 파일 스펙 이식)
+   * 1. 전역 환경 설정 및 공통 모듈 (Cloudflare 연동 방식)
    * ---------------------------------------------------- */
-  // 기존 프로젝트의 공통 로컬스토리지 key 구조 차용
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   
-  // 기존 프로젝트의 API 호출 추상화 베이스 함수 구조 반영
-  // Supabase REST API 직접 조회를 가정한 엔드포인트 세팅 (공통 api 주소 처리 방식 매핑)
-  async function api(path, options = {}) {
-    // 본인의 인프라 환경 주소에 맞게 세팅 필요 (예: supabase url 혹은 자체 api 게이트웨이)
-    const BASE_URL = localStorage.getItem('api_base_url') || "https://your-supabase-project.supabase.co/rest/v1"; 
-    const SUPABASE_KEY = localStorage.getItem('supabase_anon_key') || "";
+  // 🔥 정빈님이 사용하시는 실제 Cloudflare 워커 주소로 변경해주세요!
+  // 예: "https://api.sharer.r-e.kr" 또는 "https://my-worker.username.workers.dev"
+  const CF_API_BASE = "https://클라우드플레어주소를_여기에_넣어주세요"; 
 
-    const url = `${BASE_URL}${path}`;
+  // 클라우드플레어를 거치므로 프론트엔드에서 API KEY를 직접 노출할 필요가 없습니다.
+  async function api(path, options = {}) {
+    const url = `${CF_API_BASE}${path}`;
     const headers = {
       "Content-Type": "application/json",
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
       ...options.headers
     };
 
     const res = await fetch(url, { ...options, headers });
+    
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
       throw new Error(errData.message || `API 오류가 발생했습니다. (${res.status})`);
     }
+    
+    // 상태 코드가 204(No Content)일 경우 빈 데이터 반환
     if (res.status === 204) return null;
     return res.json();
   }
@@ -406,7 +405,7 @@
     currentQuery = e.target.value;
     clearBtn.style.display = currentQuery ? 'flex' : 'none';
 
-    // 연속 타이핑 시 불필요한 API 요청 차단 (300ms 디바운스)
+    // 연속 타이핑 시 불필요한 API 요청 차단 (400ms 디바운스)
     clearTimeout(debounceTimeout);
     if (!currentQuery.trim()) {
       searchResultsArea.innerHTML = `<div class="status-msg">검색어를 입력하고 Enter를 누르거나 기다려주세요.</div>`;
@@ -435,7 +434,7 @@
   });
 
   /* ----------------------------------------------------
-   * 3. Supabase 연동 데이터 검색 로직 (Core API)
+   * 3. Cloudflare 연동 데이터 검색 로직 (Core API)
    * ---------------------------------------------------- */
   async function executeSearch() {
     const query = currentQuery.trim();
@@ -448,15 +447,13 @@
       let usersResult = [];
       let postsResult = [];
 
-      // 탭 분류에 맞춰 필요한 테이블에 독립 쿼리 분기 전송 (ilike 문법 활용)
+      // Cloudflare 워커가 기존 Supabase REST API 경로를 그대로 포워딩해준다고 가정한 호출입니다.
+      // (만약 워커 쪽에서 /search 등으로 경로를 다르게 짰다면 이 부분을 수정해야 합니다)
       if (currentTab === 'all' || currentTab === 'users') {
-        // 기존 테이블 스펙 매핑 (nickname 필드 매칭 부분 부분 부분 포함 여부 조회)
-        // 공용 접근이 가능한 profiles 혹은 users 테이블 기준 조회 처리
         usersResult = await api(`/profiles?nickname=ilike.*${encodeURIComponent(query)}*&select=*&limit=10`).catch(() => []);
       }
       
       if (currentTab === 'all' || currentTab === 'posts') {
-        // 기존 posts 테이블 스펙 매핑 (content 내 본문 포함 여부 조회, public 접근 권한만 필터 처리 추가 가능)
         postsResult = await api(`/posts?content=ilike.*${encodeURIComponent(query)}*&access=eq.public&order=created_at.desc&limit=15`).catch(() => []);
       }
 
