@@ -342,7 +342,7 @@
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   
 
-  const CF_API_BASE = "sharer-api.alexeom97.workers.dev"; 
+  const CF_API_BASE = "https://sharer-api.alexeom97.workers.dev/api"; 
 
   // 클라우드플레어를 거치므로 프론트엔드에서 API KEY를 직접 노출할 필요가 없습니다.
   async function api(path, options = {}) {
