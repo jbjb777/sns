@@ -447,7 +447,7 @@
       // Cloudflare 워커가 기존 Supabase REST API 경로를 그대로 포워딩해준다고 가정한 호출입니다.
       // (만약 워커 쪽에서 /search 등으로 경로를 다르게 짰다면 이 부분을 수정해야 합니다)
       if (currentTab === 'all' || currentTab === 'users') {
-        usersResult = await api(`/profiles?nickname=ilike.*${encodeURIComponent(query)}*&select=*&limit=10`).catch(() => []);
+        usersResult = await api(`/users?nickname=ilike.*${encodeURIComponent(query)}*&select=*&limit=10`).catch(() => []);
       }
       
       if (currentTab === 'all' || currentTab === 'posts') {
