@@ -243,7 +243,7 @@
       height: 16px;
       display: block;
     }
-    .access-badge.public {
+    .access-badge.public, .access-badge.notice {
       border: 1px solid var(--green);
       color: var(--green);
       background: rgba(74,222,128,0.06);
@@ -1575,7 +1575,11 @@
     let accessIcon = 'link.svg';
     let accessText = '일부 공개';
 
-    if (post.access === 'public') {
+    if (post.type === 'admin') {
+      accessClass = 'notice';
+      accessIcon = 'alert.svg';
+      accessText = '공지사항';
+    } else if (post.access === 'public') {
       accessClass = 'public';
       accessIcon = 'earth.svg';
       accessText = '공개';
