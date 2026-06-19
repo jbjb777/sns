@@ -339,8 +339,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: #7fff7b;
-      color: #000000 !important;
+      background: #07c700;
+      color: #fbfbfb !important;
       font-size: 10px;
       font-weight: 700;
       padding: 3px 6px;
@@ -349,6 +349,43 @@
       vertical-align: middle;
       line-height: 1;
     }
+
+
+
+
+
+
+    .notice-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px; /* 아이콘과 글자 간격 */
+      background: #07c700;
+      color: #fbfbfb !important;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      vertical-align: middle;
+      line-height: 1;
+    }
+
+    .notice-icon {
+      width: 10px;
+      height: 10px;
+      display: block;
+    }
+
+
+
+
+
+
+
+
+
+
 
     .post-header {
       display: flex;
@@ -1458,7 +1495,7 @@ async function loadPosts() {
         
       const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}">${avatarInnerHtml}</div>`;
 
-      const noticeBadgeHTML = isAdminPost ? `<span class="notice-badge">공지사항</span>` : '';
+      const noticeBadgeHTML = isAdminPost ? `<span class="notice-badge"><img src="alert.svg" alt="" class="notice-icon">공지사항</span>` : '';
 
       /* 기존 이미지 배지 대신 스타일이 적용된 관리자 텍스트 사각형 및 공지사항 배지 적용 */
       const authorDisplay = isVerified
