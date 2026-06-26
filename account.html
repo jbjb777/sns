@@ -63,7 +63,7 @@
         <div class="slider-track" id="sliderTrack">
           
           <div class="slider-step">
-            <img src="service.svg" class="step-icon" alt="복구">
+            <img src="service.png" class="step-icon" alt="복구">
             <h2>복구 옵션 선택</h2>
             <p class="intro-desc">계정을 찾기 위한 방법을 선택해주세요.</p>
             <button onclick="selectType('ID')">
@@ -87,7 +87,7 @@
           </div>
 
           <div class="slider-step">
-            <img src="mail.svg" class="step-icon" alt="인증">
+            <img src="mail.png" class="step-icon" alt="인증">
             <h2>이메일 인증</h2>
             <p class="intro-desc">전송된 인증번호 6자리를 입력해주세요.</p>
             <input type="text" id="verifyCode" placeholder="인증번호">
@@ -133,11 +133,11 @@
     if (type === 'ID') {
       input.placeholder = "아이디를 입력하세요";
       title.textContent = "아이디로 찾기";
-      icon.src = "id.svg";
+      icon.src = "id.png";
     } else {
       input.placeholder = "비밀번호를 입력하세요";
       title.textContent = "비밀번호로 찾기";
-      icon.src = "key.svg";
+      icon.src = "key.png";
     }
     moveStep(1);
   }
