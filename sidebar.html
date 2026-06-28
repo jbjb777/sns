@@ -351,7 +351,7 @@
         height: auto;
         min-height: 0;
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         column-gap: 12px;
         align-items: center;
         justify-items: center;
@@ -372,7 +372,7 @@
         pointer-events: auto;
       }
       .sidebar.has-profile {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
       }
       .logo-container { display: none; }
       #setNav,
@@ -511,6 +511,10 @@
           <img src="exploreX.png" alt="탐색" class="nav-icon-img-explore" id="exploreIcon">
         </div>
       </div>
+
+      <div class="nav-item" id="searchNav" data-tooltip="검색">
+        <img src="searchX.png" alt="검색" class="nav-icon-img" id="searchIcon">
+      </div>
       <div class="nav-item" id="setNav" data-tooltip="채팅">
         <img src="setX.svg" alt="채팅" class="nav-icon-img" id="setIcon">
       </div>
@@ -580,6 +584,7 @@
   <script>
     const homeNav = document.getElementById('homeNav');
     const exploreNav = document.getElementById('exploreNav');
+    const searchNav = document.getElementById('searchNav');
     const setNav = document.getElementById('setNav');
     const discordNav = document.getElementById('discordNav');
     const createBtn = document.getElementById('createBtn');
@@ -588,6 +593,7 @@
     const userInfo = document.getElementById('userInfo');
     const homeIcon = document.getElementById('homeIcon');
     const exploreIcon = document.getElementById('exploreIcon');
+    const searchIcon = document.getElementById('searchIcon');
     const setIcon = document.getElementById('setIcon');
     const profileSheetBackdrop = document.getElementById('profileSheetBackdrop');
     const profileSheet = document.getElementById('profileSheet');
@@ -604,11 +610,10 @@
       return window.matchMedia('(min-width: 200px)').matches;
     }
 
-    // 3번 애니메이션을 실행시키고 깔끔하게 제거하는 공통 제어 함수
     function triggerBorderFlow() {
       if (sessionStorage.getItem('sharerAnimationPlayed')) return;
       createBtnSpinner.classList.remove('animate');
-      void createBtnSpinner.offsetWidth; // 브라우저 리플로우 트리거로 애니메이션 초기화
+      void createBtnSpinner.offsetWidth; 
       createBtnSpinner.classList.add('animate');
       setTimeout(() => {
         createBtnSpinner.classList.remove('animate');
@@ -656,7 +661,6 @@
     let currentUserNickname = null;
     let currentUserProfileImage = null;
 
-    // ─── 테마 통합 제어 변수 및 시스템 구현 ───
     let currentTheme = localStorage.getItem('theme') || 'dark';
     
     function applyThemeStyle() {
@@ -680,13 +684,17 @@
       } else {
         exploreIcon.src = 'exploreX.png';
       }
+      if (searchNav.classList.contains('active')) {
+        searchIcon.src = isLight ? 'searchO.png' : 'search.png';
+      } else {
+        searchIcon.src = 'searchX.png';
+      }
       if (setNav.classList.contains('active')) {
         setIcon.src = isLight ? 'setO.svg' : 'set.svg';
       } else {
         setIcon.src = 'setX.svg';
       }
       
-      // 모바일 시트용 설정 아이콘: 라이트/다크에 맞게 변경 (set.svg / setX.svg 사용)
       const sheetSetIcon = document.getElementById('sheetSetIcon');
       if (sheetSetIcon) {
         sheetSetIcon.src = isLight ? 'setX.svg' : 'set.svg'; 
@@ -718,6 +726,9 @@
     };
     exploreNav.onclick = () => {
       window.top.location.href = 'https://sharer.r-e.kr/explore.html';
+    };
+    searchNav.onclick = () => {
+      parent.postMessage({ type: 'toggleSearch' }, '*');
     };
     setNav.onclick = () => {
       window.top.location.href = 'https://sharer.r-e.kr/set.html';
@@ -766,7 +777,6 @@
     sheetSetBtn.onclick = (e) => {
       e.stopPropagation();
       closeProfileSheet();
-      // 요청에 따라 현재 창 최상단 윈도우에서 /set.html 로 이동
       window.top.location.href = 'https://sharer.r-e.kr/set.html';
     };
 
@@ -783,7 +793,6 @@
       const data = event.data;
       if (!data?.type) return;
 
-      // 테마 변경 관련 포스트 메시지 감지 및 동기화 처리
       if (data.type === 'updateTheme' || data.type === 'setTheme' || data.type === 'theme' || data.theme) {
         const theme = data.theme || data.value || data.themeMode;
         if (theme === 'light' || theme === 'dark') {
@@ -797,18 +806,29 @@
       if (data.type === 'activateHome' || data.type === 'default') {
         homeNav.classList.add('active');
         exploreNav.classList.remove('active');
+        searchNav.classList.remove('active');
         setNav.classList.remove('active');
         updateIcons();
       }
       if (data.type === 'activateExplore') {
         homeNav.classList.remove('active');
         exploreNav.classList.add('active');
+        searchNav.classList.remove('active');
         setNav.classList.remove('active');
+        updateIcons();
+      }
+      if (data.type === 'activateSearch') {
+        if (data.active) {
+          searchNav.classList.add('active');
+        } else {
+          searchNav.classList.remove('active');
+        }
         updateIcons();
       }
       if (data.type === 'activateSet') {
         homeNav.classList.remove('active');
         exploreNav.classList.remove('active');
+        searchNav.classList.remove('active');
         setNav.classList.add('active');
         updateIcons();
       }
@@ -859,7 +879,6 @@
       }
     });
 
-    // 타 페이지간의 로컬스토리지 실시간 감지 연동 처리
     window.addEventListener('storage', (e) => {
       if (e.key === 'theme') {
         currentTheme = e.newValue || 'dark';
@@ -868,7 +887,6 @@
       }
     });
 
-    // 주기적인 동기화 보완 검사 루프 추가 (500ms 간격)
     setInterval(() => {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       if (savedTheme !== currentTheme) {
@@ -878,7 +896,6 @@
       }
     }, 500);
 
-    // 초기 실행부
     applyThemeStyle();
     homeNav.classList.add('active');
     updateIcons();
