@@ -316,7 +316,7 @@
       <span class="search-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       </span>
-      <input type="text" id="searchInput" placeholder="사용자 닉네임 또는 게시물 검색..." autocomplete="off">
+      <input type="text" id="searchInput" placeholder="사용자 닉네임, 아이디 또는 게시물 검색..." autocomplete="off">
       <span class="clear-icon" id="clearBtn" style="display: none;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </span>
@@ -444,10 +444,9 @@
       let usersResult = [];
       let postsResult = [];
 
-      // Cloudflare 워커가 기존 Supabase REST API 경로를 그대로 포워딩해준다고 가정한 호출입니다.
-      // (만약 워커 쪽에서 /search 등으로 경로를 다르게 짰다면 이 부분을 수정해야 합니다)
+      // 아이디(id)와 닉네임(nickname) 모두에서 검색되도록 or 조건으로 수정
       if (currentTab === 'all' || currentTab === 'users') {
-        usersResult = await api(`/users?nickname=ilike.*${encodeURIComponent(query)}*&select=*&limit=10`).catch(() => []);
+        usersResult = await api(`/users?or=(id.ilike.*${encodeURIComponent(query)}*,nickname.ilike.*${encodeURIComponent(query)}*)&select=*&limit=10`).catch(() => []);
       }
       
       if (currentTab === 'all' || currentTab === 'posts') {
@@ -511,7 +510,8 @@
     </svg>
   `);
 
-const avatarSrc = user.avatar_url || defaultAvatar;
+        // avatar_url 대신 프로필 페이지(HTML2)처럼 profile_image 필드를 사용하도록 수정
+        const avatarSrc = user.profile_image || defaultAvatar;
         
 card.innerHTML = `
   <img class="user-avatar"
