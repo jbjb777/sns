@@ -529,6 +529,7 @@ card.innerHTML = `
     }
 
     // [전체 탭 혹은 게시물 탭] 그룹 빌드
+// [전체 탭 혹은 게시물 탭] 그룹 빌드
     if ((currentTab === 'all' || currentTab === 'posts') && hasPosts) {
       const postGroup = document.createElement('div');
       postGroup.className = 'result-group';
@@ -554,12 +555,32 @@ card.innerHTML = `
           imageThumbsHtml += `</div>`;
         }
 
+        // 기본 아바타 설정
+        const defaultAvatar =
+          "data:image/svg+xml;utf8," +
+          encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="50" fill="#222"/>
+            </svg>
+          `);
+
+        // 만약 테이블 구조상 post.author_avatar나 post.avatar_url 등으로 프로필을 들고 온다면 연동, 없으면 기본값
+        const postAvatarSrc = post.author_avatar || post.avatar_url || defaultAvatar;
+
+        // ★ 프로필 이미지가 보이도록 post-header 구조 변경
         card.innerHTML = `
-          <div class="post-header">
-            <span class="post-author">${escapeHtml(post.author)}</span>
-            <span class="post-date">${dateStr}</span>
+          <div class="post-header" style="display: flex; align-items: center; gap: 8px;">
+            <img class="user-avatar" 
+                 src="${postAvatarSrc}" 
+                 alt="avatar" 
+                 style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: var(--bg4);"
+                 onerror="this.src='${defaultAvatar}'">
+            <div style="display: flex; flex-direction: column;">
+              <span class="post-author" style="font-weight: 600; font-size: 14px;">${escapeHtml(post.author)}</span>
+              <span class="post-date" style="font-size: 11px; color: var(--t3); margin-left: 0;">${dateStr}</span>
+            </div>
           </div>
-          <div class="post-content">${escapeHtml(post.content)}</div>
+          <div class="post-content" style="margin-top: 8px;">${escapeHtml(post.content)}</div>
           ${imageThumbsHtml}
         `;
         postGroup.appendChild(card);
