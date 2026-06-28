@@ -529,45 +529,42 @@ card.innerHTML = `
     }
 
     // [전체 탭 혹은 게시물 탭] 그룹 빌드
-// [전체 탭 혹은 게시물 탭] 그룹 빌드
-    // [전체 탭 혹은 사용자 탭] 그룹 빌드
-    if ((currentTab === 'all' || currentTab === 'users') && hasUsers) {
-      const userGroup = document.createElement('div');
-      userGroup.className = 'result-group';
-      if (currentTab === 'all') userGroup.innerHTML = `<div class="section-title">사용자</div>`;
+    if ((currentTab === 'all' || currentTab === 'posts') && hasPosts) {
+      const postGroup = document.createElement('div');
+      postGroup.className = 'result-group';
+      if (currentTab === 'all') postGroup.innerHTML = `<div class="section-title">게시물</div>`;
 
-      users.forEach(user => {
+      posts.forEach(post => {
         const card = document.createElement('div');
-        card.className = 'user-card';
-        // 기존 유저 클릭 시 해당 프로필 화면(user.html?id=xxx) 이동 로직 이식
-        card.onclick = () => { window.location.href = `user.html?id=${user.id || user.nickname}`; };
-        
-        // 아바타 혹은 기본 프레임 처리
-        const defaultAvatar =
-          "data:image/svg+xml;utf8," +
-          encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="50" fill="#222"/>
-            </svg>
-          `);
+        card.className = 'post-card';
+        // 기존 게시글 보기 피드 클릭 시 상세조회(view.html?id=xxx) 연동 구조 매핑
+        card.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
 
-        // 유저 데이터에서 avatar_url 가져오기
-        const avatarSrc = user.avatar_url || defaultAvatar;
-                
-        // 중복 코드를 제거하고 정당한 avatarSrc 변수를 사용하도록 수정
+        // 작성일자 포맷팅 파서 처리
+        const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString('ko-KR', {month:'short', day:'numeric'}) : '';
+        
+        // 이미지 썸네일 스트링 파싱 로직 포함 (make.html의 cloudinary join 구조 연계)
+        let imageThumbsHtml = '';
+        if (post.image_url) {
+          const urls = post.image_url.split(',');
+          imageThumbsHtml = `<div class="post-images">`;
+          urls.slice(0, 3).forEach(url => { // 최대 3개까지만 미리보기 타일 생성
+            imageThumbsHtml += `<img class="post-img-thumb" src="${url}" alt="thumb">`;
+          });
+          imageThumbsHtml += `</div>`;
+        }
+
         card.innerHTML = `
-          <img class="user-avatar"
-               src="${avatarSrc}"
-               alt="avatar"
-               onerror="this.src='${defaultAvatar}'">
-          <div class="user-info">
-            <div class="user-nickname">${escapeHtml(user.nickname)}</div>
-            <div class="user-id">@${escapeHtml(user.id || user.nickname)}</div>
+          <div class="post-header">
+            <span class="post-author">${escapeHtml(post.author)}</span>
+            <span class="post-date">${dateStr}</span>
           </div>
+          <div class="post-content">${escapeHtml(post.content)}</div>
+          ${imageThumbsHtml}
         `;
-        userGroup.appendChild(card);
+        postGroup.appendChild(card);
       });
-      searchResultsArea.appendChild(userGroup);
+      searchResultsArea.appendChild(postGroup);
     }
   }
 
