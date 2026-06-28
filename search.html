@@ -503,7 +503,15 @@
         card.onclick = () => { window.location.href = `user.html?id=${user.id || user.nickname}`; };
         
         // 아바타 혹은 기본 프레임 처리
-        const avatarSrc = user.avatar_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23222"/></svg>';
+        const defaultAvatar =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill="#222"/>
+    </svg>
+  `);
+
+const avatarSrc = user.avatar_url || defaultAvatar;
         
         card.innerHTML = `
           <img class="user-avatar" src="${avatarSrc}" alt="avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%23222\'/></svg>'">
