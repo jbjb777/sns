@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sharer | 커뮤니티 · SNS</title>
+  <link rel="icon" type="image/png" href="./logo_round.png">
+
+  <link rel="shortcut icon" href="/logo_round.png">
+  <link rel="apple-touch-icon" href="/logo_round.png">
+  <link rel="canonical" href="https://sharer.r-e.kr/index.html">
+  <meta name="description" content="Sharer는 이미지와 텍스트를 업로드하고 사람들과 소통할 수 있는 무료 커뮤니티·SNS 서비스입니다. JBJB 만들었습니다.">
+  <meta name="keywords" content="Sharer, 커뮤니티, SNS, 정빈777, 정빈정빈, jbjb, 이미지 ,업로드, 공유, 서비스,소개">
+  <meta name="author" content="JBJB">
+  <meta name="robots" content="index, follow">
+  
+  <script>
+    // 화면 깜빡임(FOUC) 방지를 위해 HTML 렌더링 전 테마를 즉시 적용합니다.
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
+  <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  
+  <style>
+    /* Sharer 피드 페이지 원본 리셋 및 애니메이션 */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    
+    .privacy-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  color: var(--t1);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.privacy-link:hover {
+  opacity: 0.8;
+}
+
+.link-icon {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+    
+    
+    
+    
+    /* Sharer 원본 변수 시스템 (피드 페이지 기준) */
+    :root {
+      --bg: #000;
+      --bg2: #111;
+      --bg3: #1a1a1a;
+      --bg4: #222;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --border3: #333;
+      --t1: #fff;
+      --t2: #888;
+      --t3: #444;
+      --pink: #ff6b6b;
+      --r1: 10px;
+      --r2: 14px;
+      --r3: 20px;
+      --r4: 28px;
+    }
+
+    html[data-theme="light"] {
+      --bg: #fafafa;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e4e4e4;
+      --border: #dbdbdb;
+      --border2: #cccccc;
+      --border3: #a3a3a3;
+      --t1: #000000;
+      --t2: #737373;
+      --t3: #a8a8a8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      animation: bodyReveal 0.4s ease forwards;
+      padding-top: 65px; /* 상단바 공간 */
+      line-height: 1.6;
+    }
+
+    @keyframes bodyReveal { to { opacity: 1; } }
+
+    /* 상단바 (푸터 메뉴 + 로그인/회원가입 결합) */
+    header {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 65px;
+      background: rgba(var(--bg-rgb), 0.85); /* 투명도 효과를 원하면 var(--bg) 활용 */
+      background-color: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 30px;
+      z-index: 1000;
+    }
+
+    .logo-area {
+      display: flex; align-items: center;
+      text-decoration: none; color: var(--t1);
+      font-weight: 700; font-size: 20px;
+      gap: 10px;
+    }
+    .logo-area img { width: 32px; height: 32px; }
+
+    nav { display: flex; align-items: center; gap: 24px; }
+    nav a.text-link {
+      color: var(--t2); text-decoration: none; font-size: 13px; font-weight: 500;
+      transition: color 0.15s;
+    }
+    nav a.text-link:hover { color: var(--t1); }
+
+    .auth-group { display: flex; gap: 10px; align-items: center; margin-left: 15px; }
+
+    /* 피드 페이지 스타일의 범용 버튼 */
+    .post-btn {
+      background: linear-gradient(155deg, #00E76F, #1917FF,#7A00FF  100%);
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 22px;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .post-btn:hover { opacity: 0.85; transform: scale(1.04); }
+    .post-btn:active { transform: scale(0.94); }
+
+    .btn-secondary {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t1);
+    }
+    .btn-secondary:hover {
+      background: var(--bg4);
+    }
+
+    /* 메인 컨텐츠 영역 */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+.post-btn .btn-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+    .hero-section {
+      text-align: center;
+      padding: 80px 0 60px;
+      animation: contentReveal 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    @keyframes contentReveal { to { opacity: 1; transform: translateY(0); } }
+
+    .hero-section h1 { font-size: 36px; font-weight: 800; margin-bottom: 16px; color: var(--t1); letter-spacing: -0.02em; }
+    .hero-section p { font-size: 15px; color: var(--t2); margin: 0 auto 32px; max-width: 600px; }
+
+    .hero-actions { display: flex; justify-content: center; gap: 14px; }
+    .hero-actions .post-btn { font-size: 15px; padding: 12px 30px; }
+
+    /* 서비스 소개 섹션 (피드 페이지의 카드형 UI 응용) */
+    .features {
+      width: 100%;
+      border-top: 1px solid var(--border);
+      padding-top: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .feature-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r3);
+      padding: 40px 36px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      transition: background 0.15s;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: postIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    @keyframes postIn { to { opacity: 1; transform: translateY(0); } }
+
+    html[data-theme="light"] .feature-card { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); }
+    .feature-card:hover { background: var(--bg3); }
+    
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .feature-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 14px; color: var(--t1); }
+    .feature-card p { font-size: 14px; color: var(--t2); line-height: 1.7; }
+
+    /* 피드 원본 푸터 완벽 적용 */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      width: 100%;
+      background: var(--bg);
+      margin-top: auto;
+    }
+    .footer-links { margin-bottom: 12px; }
+    .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--t1); }
+    .footer-text { color: var(--t3); font-size: 11px; margin-bottom: 12px; }
+
+    .theme-switch {
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s;
+    }
+    .theme-switch:hover { background: var(--bg3); color: var(--t1); }
+
+    /* 반응형 모바일 대응 */
+    @media (max-width: 768px) {
+      header { padding: 0 16px; }
+      nav .text-link { display: none; } /* 공간 확보를 위해 텍스트 링크 숨김 */
+      .hero-section h1 { font-size: 28px; }
+      .feature-card { padding: 30px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단바 -->
+  <header>
+    <a href="https://sharer.r-e.kr/index.html" class="logo-area">
+      <img src="./logo.svg" alt="Sharer" onerror="this.style.display='none';">
+      <span>Sharer</span>
+    </a>
+    <nav>
+      <!-- 푸터에 있던 주요 링크들을 상단바에 배치 -->
+      <a href="https://sharer.r-e.kr/privacy.html" class="text-link">개인정보처리방침</a>
+      <a href="https://sharer.r-e.kr/policy.html" class="text-link">이용약관</a>
+      <a href="/cdn-cgi/l/email-protection#a0c1ccc5d8c5cfcd9997e0cfd5d4cccfcfcb8ec3cfcd" class="text-link">문의하기</a>
+      
+      <!-- 회원가입/로그인 버튼 -->
+      <div class="auth-group">
+        <a href="https://sharer.r-e.kr/login.html" class="post-btn btn-secondary">로그인</a>
+        <a href="https://sharer.r-e.kr/join.html" class="post-btn">회원가입</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 상단 소개 영역 -->
+    <section class="hero-section">
+      <h1>공간을 상상해보세요...</h1>
+      <p>
+        Sharer는 이미지와 텍스트를 자유롭게 업로드하고 사람들과 깊이 있게 소통할 수 있는 무료 커뮤니티·SNS 서비스입니다. 나만의 일상과 스토리를 공유하고, 새로운 피드를 발견해보세요.
+      </p>
+      
+      <!-- 변경 요청된 두 개의 버튼 배치 -->
+      <div class="hero-actions">
+<a href="https://sharer.r-e.kr/index.html" class="post-btn">
+  <img src="link_.svg" alt="" class="btn-icon">
+  웹에서 Sharer 열기
+</a>
+        <a href="https://sharer.r-e.kr/login.html" class="post-btn btn-secondary">로그인</a>
+      </div>
+    </section>
+
+    <!-- 서비스 소개 섹션 -->
+    <section class="features">
+      
+      <div class="feature-card">
+        <h2>나만의 특별한 스토리와 일상을 공유하세요</h2>
+        <p>
+          생생한 이미지와 정성 어린 텍스트를 통해 당신의 순간을 기록하세요. 직관적인 인터페이스를 통해 복잡한 과정 없이 누구나 쉽게 컨텐츠를 제작하고 즉시 커뮤니티에 공유할 수 있습니다.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2>관심사가 같은 사람들과 소통하세요</h2>
+        <p>
+          트렌디한 피드를 탐색하고 마음에 드는 게시물에 댓글을 남겨보세요. 나와 어울리는 추천 프로필을 발견하고, 소중한 인연들과 함께 끊임없이 확장되는 네트워크를 경험할 수 있습니다.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2>안전화된 개인정보</h2>
+        <p>
+          Sharer 서비스는 사용자의 개인정보를 중요하게 생각하며,
+관련 법령을 준수하고 최소한의 정보만을 수집·이용합니다.
+
+        
+            <a href="https://sharer.r-e.kr/privacy.html" class="privacy-link">
+      개인정보 처리방침
+      <img src="link.png" alt="" class="link-icon">
+        
+        
+        </p>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- 원본 피드 페이지 하단 푸터 유지 -->
+  <div class="footer">
+    <div class="footer-links">
+      <a href="https://sharer.r-e.kr/privacy.html">개인정보처리방침</a>
+      <a href="https://sharer.r-e.kr/policy.html">이용약관</a>
+      <a href="/cdn-cgi/l/email-protection#a0c1ccc5d8c5cfcd9997e0cfd5d4cccfcfcb8ec3cfcd">문의하기</a>
+    </div>
+    <div class="footer-text">본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
+    <button class="theme-switch" onclick="toggleTheme()">테마 변경</button>
+  </div>
+
+  <script>
+    // 테마 토글 스크립트
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+
+    // 페이지 로드 애니메이션
+    NProgress.start();
+    window.addEventListener('load', () => {
+      NProgress.done();
+    });
+
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (link && link.href && !link.target && !link.hasAttribute('download') && !link.href.includes('#')) {
+        NProgress.start();
+      }
+    });
+  </script>
+</body>
+</html>
