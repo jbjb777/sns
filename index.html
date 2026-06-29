@@ -935,13 +935,7 @@
     }
 
 @media (max-width: 768px) {
-      .recommend-container { display: none; }
-      .sidebar-container {
-        left: 0; right: 0; top: auto; bottom: 0;
-        width: 100%; min-width: 0;
-        height: calc(64px + env(safe-area-inset-bottom, 0px));
-      }
-      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
+      /* ... 기존 recommend-container, sidebar-container 스타일들은 그대로 두고 ... */
       
       .search-panel {
         left: 0;
@@ -952,13 +946,22 @@
         top: 0;
         z-index: 90;
         
-        /* [수정 핵심] 접혀있을 때 화면 왼쪽 밖으로 더 깊숙하게(120%) 밀어내어 겹침을 완전히 방지합니다 */
-        transform: translateX(-200%); 
+        /* [수정 핵심 1] 원래 위치(-100%)로 두고, 아예 투명하게 만들고 클릭을 막습니다 */
+        transform: translateX(-100%);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        
+        /* 부드러운 전환 효과 추가 */
+        transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease;
       }
       
-      /* 펼쳐졌을 때는 원래대로 제자리(0)로 오도록 명시해 줍니다 */
+      /* [수정 핵심 2] 열렸을 때(open 클래스가 붙었을 때)만 보이게 켜줍니다 */
       .search-panel.open {
         transform: translateX(0);
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto; /* 클릭 가능하게 복구 */
       }
 
       .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
