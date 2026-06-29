@@ -180,12 +180,24 @@
       display: flex;
       flex-direction: column;
       box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+
+opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+
     }
     html[data-theme="light"] .search-panel {
       box-shadow: 4px 0 24px rgba(0,0,0,0.1);
     }
     .search-panel.open {
       transform: translateX(0);
+
+opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+
     }
     .search-panel-header {
       display: flex;
@@ -934,8 +946,14 @@
       font-family: inherit;
     }
 
-@media (max-width: 768px) {
-      /* ... 기존 recommend-cㄴontainer, sidebar-container 스타일들은 그대로 두고 ... */
+    @media (max-width: 768px) {
+      .recommend-container { display: none; }
+      .sidebar-container {
+        left: 0; right: 0; top: auto; bottom: 0;
+        width: 100%; min-width: 0;
+        height: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
       
       .search-panel {
         left: 0;
@@ -945,23 +963,6 @@
         bottom: calc(64px + env(safe-area-inset-bottom, 0px));
         top: 0;
         z-index: 90;
-        
-        /* [수정 핵심 1] 원래 위치(-100%)로 두고, 아예 투명하게 만들고 클릭을 막습니다 */
-        transform: translateX(-100%);
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        
-        /* 부드러운 전환 효과 추가 */
-        transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease;
-      }
-      
-      /* [수정 핵심 2] 열렸을 때(open 클래스가 붙었을 때)만 보이게 켜줍니다 */
-      .search-panel.open {
-        transform: translateX(0);
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto; /* 클릭 가능하게 복구 */
       }
 
       .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
