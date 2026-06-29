@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI탭 시작하기 버튼 - 테두리 강화</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Pretendard', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .background {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.75) contrast(1.15);
+      z-index: -2;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(15, 15, 30, 0.7), rgba(20, 20, 50, 0.8));
+      z-index: -1;
+    }
+
+    .btn.type_conversation {
+      width: 55px;
+      height: 55px;
+      border-radius: 200px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transform: scale(0.5);
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      cursor: pointer;
+      z-index: 10;
+      
+
+  background:
+    linear-gradient(99.46deg, #3c404f38 34.89%, #3c404f3d 93.75%),
+    linear-gradient(293.7deg, #ffffff8f 3.46%, #ffffff2d 11.58%, #ffffff09 17%, #fff0 24.31%),
+    linear-gradient(127.22deg, #fff6 4.25%, #ffffff20 15%, #ffffff06 20.38%, #fff0 25.75%);
+
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+    /* 리퀴드 글래스 테두리 핵심 */
+    .btn.type_conversation::before,
+    .btn.type_conversation::after {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      pointer-events: none;
+      filter: blur(10px);
+    
+    }
+
+    /* 밝은 하이라이트 테두리 */
+    .btn.type_conversation::before {
+      background: linear-gradient(145deg, rgba(255,255,255,0.9), transparent 40%, rgba(255,255,255,0.6));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.75;
+    }
+
+    /* 부드러운 글로우 */
+    .btn.type_conversation::after {
+      background: linear-gradient(170deg, #ffffff, transparent, #a0d8ff);
+
+      opacity: 0.4;
+      z-index: -1;
+      filter: blur(10px);
+    
+    
+    }
+
+    .ico_ai {
+      width: 19px;
+      height: 19px;
+      background: url('https://mkt-cdn.pstatic.net/mkt/2026/06/aitab/img/sp_mo.png#ico_ai') no-repeat;
+      background-size: 19px;
+      transition: transform 0.7s 0.3s;
+      transform: translateX(3px);
+      z-index: 2;
+    }
+
+    .btn_text {
+      color: #e8e8e8;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.72px;
+      margin-left: 8px;
+      opacity: 0;
+      white-space: nowrap;
+      z-index: 2;
+    }
+
+    .ico_btn_arrow {
+      width: 10px;
+      height: 17px;
+      background: url('https://mkt-cdn.pstatic.net/mkt/2026/06/aitab/img/ico_btn_arrow_gray.svg') no-repeat;
+      background-size: contain;
+      opacity: 0;
+      margin-left: 9px;
+      z-index: 2;
+    }
+
+    /* 활성화 */
+    .btn.type_conversation.active,
+    .btn.type_conversation:hover {
+      width: 205px;
+      transform: scale(1);
+      box-shadow: 
+        0 0 0 1.5px rgba(255,255,255,0.35) inset,
+        0 12px 45px rgba(0, 0, 0, 0.5),
+        0 0 35px rgba(160, 220, 255, 0.4);
+    }
+
+    .btn.type_conversation.active .ico_ai { transform: translateX(0); }
+    .btn.type_conversation.active .btn_text { animation: fadeIn 0.3s 0.3s forwards, colorChange 0.5s 0.5s forwards; }
+    .btn.type_conversation.active .ico_btn_arrow { animation: fadeIn 0.3s 0.3s forwards, arrowColor 0.5s 0.5s forwards; }
+
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes colorChange { to { color: #ffffff; } }
+    @keyframes arrowColor {
+      to { background-image: url('https://mkt-cdn.pstatic.net/mkt/2026/06/aitab/img/ico_btn_arrow_white.svg'); }
+    }
+
+    .demo-info {
+      position: absolute;
+      bottom: 40px;
+      color: #ddd;
+      font-size: 15px;
+      z-index: 20;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="background" id="bgImage"></div>
+  <div class="overlay"></div>
+
+  <div class="btn type_conversation" id="aiBtn">
+    <span class="ico_ai"></span>
+    <span class="btn_text">AI탭 시작하기</span>
+    <span class="ico_btn_arrow"></span>
+  </div>
+
+  <div class="demo-info">버튼 호버 또는 클릭 → 리퀴드 글래스 테두리 확인</div>
+
+  <script>
+    const btn = document.getElementById('aiBtn');
+    const bg = document.getElementById('bgImage');
+
+    function setBackground(url) {
+      bg.style.backgroundImage = `url('${url}')`;
+    }
+
+    setBackground("https://picsum.photos/id/1015/1920/1080"); // 기본 배경
+
+    btn.addEventListener('click', () => btn.classList.toggle('active'));
+    btn.addEventListener('mouseenter', () => btn.classList.add('active'));
+  </script>
+
+</body>
+</html>
