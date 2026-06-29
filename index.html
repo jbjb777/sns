@@ -161,24 +161,7 @@
       position: fixed;
       left: 0; top: 0;
       z-index: 100;
-
-  transition: transform .35s cubic-bezier(.22,1,.36,1);
-}
-
-.sidebar-container.hide {
-  transform: translateX(-100%);
-}
-
-
-    
-
-
-
-
-
-
-
-
+    }
     .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
     /* 검색 패널 슬라이드 */
@@ -961,14 +944,16 @@
       .sidebar-container iframe { width: 100% !important; height: 100% !important; }
       
       .search-panel {
-        left: 0;
-        width: 100%;
-        max-width: 100%;
-        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
-        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-        top: 0;
-        z-index: 90;
-      }
+          left: 0;
+          width: 100%;
+          max-width: 100%;
+          /* 겹침 방지 핵심: top을 0으로 고정하고 height를 하단 바 높이(64px + 알파)를 뺀 만큼만 지정 */
+          top: 0;
+          bottom: auto; 
+          height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
+          z-index: 90;
+          /* 모바일에서는 왼쪽 -> 오른쪽 슬라이드 대신 아래에서 위로 올라오는 게 자연스럽다면 전환 가능 (선택) */
+        }
 
       .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .main-content { padding: 20px 16px; }
@@ -1316,26 +1301,13 @@ function updateSidebarMode() {
 let searchPanelOpen = false;
 window.toggleSearchPanel = function() {
   const panel = document.getElementById('searchPanel');
-  const sidebar = document.querySelector('.sidebar-container'); // 추가
-
   searchPanelOpen = !searchPanelOpen;
-
   if (searchPanelOpen) {
     panel.classList.add('open');
-    sidebar.classList.add('hide'); // 추가
-
-    document.getElementById('sidebarFrame').contentWindow.postMessage({
-      type: 'activateSearch',
-      active: true
-    }, '*');
+    document.getElementById('sidebarFrame').contentWindow.postMessage({ type: 'activateSearch', active: true }, '*');
   } else {
     panel.classList.remove('open');
-    sidebar.classList.remove('hide'); // 추가
-
-    document.getElementById('sidebarFrame').contentWindow.postMessage({
-      type: 'activateSearch',
-      active: false
-    }, '*');
+    document.getElementById('sidebarFrame').contentWindow.postMessage({ type: 'activateSearch', active: false }, '*');
   }
 };
 
