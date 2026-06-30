@@ -1216,7 +1216,7 @@ opacity: 1;
     return allPosts.find(p => p.id === postId) || displayedPosts.find(p => p.id === postId) || null;
   }
 
-  // 프로필 이미지 캐시 (user_id → url)
+  // 프로필 이미지 캐시 (user_kjid → url)
   const profileImageCache = new Map();
 
   async function getProfileImage(userId) {
