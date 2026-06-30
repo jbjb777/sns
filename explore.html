@@ -1025,13 +1025,13 @@ opacity: 1;
 
 
 
-<div id="searchPanel" class="search-panel">
-  <div class="search-panel-header">
-    <h2>검색</h2>
-    <button class="search-close-btn" onclick="toggleSearchPanel()">✕</button>
+  <div id="searchPanel" class="search-panel">
+    <div class="search-panel-header">
+      <h2>검색</h2>
+      <button class="search-close-btn" onclick="toggleSearchPanel()">✕</button>
+    </div>
+    <iframe src="search.html" frameborder="0"></iframe>
   </div>
-  <iframe src="search.html" frameborder="0"></iframe>
-</div>
 
     <iframe
       src="sidebar.html"
@@ -1263,9 +1263,9 @@ opacity: 1;
   window.addEventListener('message', (event) => {
 
 
-    if (type === 'toggleSearch') {
-      window.toggleSearchPanel();
-    }
+//    if (type === 'toggleSearch') {
+//      window.toggleSearchPanel();
+//    }
 
     const { type, page } = event.data || {};
     if (type === 'navigate') {
