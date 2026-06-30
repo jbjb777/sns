@@ -1009,7 +1009,7 @@
   }
 
   const urlParams = new URLSearchParams(window.location.search);
-  const userNickname = urlParams.get('nickname');
+  const userId = urlParams.get('id');
   let currentUser = null;
   let viewingUser = null;
   let rawPostsCached = [];
@@ -1081,19 +1081,18 @@
     }
   });
 
-  if (!userNickname) {
-    showError('사용자 정보(nickname)가 없습니다.');
+  if (!userId) {
+    showError('사용자 정보(id)가 없습니다.');
   } else {
     loadUserProfile();
-    loadUserPosts();
   }
 
   async function loadUserProfile() {
     try {
-      let users = await api(`/users?nickname=eq.${encodeURIComponent(userNickname)}&select=*`);
+      let users = await api(`/users?id=eq.${encodeURIComponent(userId)}&select=*`);
       if (users?.length === 0) {
-        if (userNickname === "JB777" || userNickname === "진정오") {
-          users = [{ nickname: userNickname, isVerified: true, message: null, profile_image: null }];
+        if (userId === "JB777" || userId === "진정오") {
+          users = [{ id: userId, nickname: userId, isVerified: true, message: null, profile_image: null }];
         } else {
           showError('사용자를 찾을 수 없습니다.');
           return;
@@ -1105,6 +1104,9 @@
       if (urlParams.get('u') === 'new' && currentUser && currentUser.nickname === viewingUser.nickname) {
         document.getElementById('profilePicModal').classList.add('active');
       }
+      
+      // 사용자 정보 로드가 완료되면 해당 사용자의 닉네임으로 게시물을 조회합니다.
+      loadUserPosts(viewingUser.nickname);
     } catch (e) {
       console.error('프로필 로드 오류:', e);
       showError('프로필을 불러오는 중 오류가 발생했습니다.');
@@ -1214,17 +1216,17 @@
     updateProfileStoryBorder();
   }
 
-  async function loadUserPosts() {
+  async function loadUserPosts(nickname) {
     const postsDiv = document.getElementById('userPosts');
     try {
-      const posts = await api(`/posts?author=eq.${encodeURIComponent(userNickname)}&select=*&order=created_at.desc`);
+      const posts = await api(`/posts?author=eq.${encodeURIComponent(nickname)}&select=*&order=created_at.desc`);
       if (!posts?.length) {
         postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
         return;
       }
 
       rawPostsCached = posts; // 전역 캐시에 저장
-      const isOwnProfile = currentUser && currentUser.nickname === userNickname;
+      const isOwnProfile = currentUser && currentUser.nickname === nickname;
       const filteredPosts = posts.filter(post => {
         if (isOwnProfile) return true;
         return post.access !== 'private' && post.access !== 'link';
