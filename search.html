@@ -94,8 +94,6 @@
       padding: 0 14px;
       height: 48px;
       transition: border-color 0.2s, box-shadow 0.2s;
-
-
     }
     .search-box:focus-within {
       border-color: #7d7d7d;
@@ -112,8 +110,6 @@
     }
     .search-box input::placeholder {
       color: var(--t3);
-
-
     }
 
     .search-icon, .clear-icon {
@@ -502,8 +498,8 @@
       users.forEach(user => {
         const card = document.createElement('div');
         card.className = 'user-card';
-        // 기존 유저 클릭 시 해당 프로필 화면(user.html?id=xxx) 이동 로직 이식
-        card.onclick = () => { window.location.href = `user.html?id=${user.id || user.nickname}`; };
+        // window.location.href 대신 window.parent.location.href를 사용하여 최상위 부모 창을 이동시킵니다.
+        card.onclick = () => { window.parent.location.href = `user.html?id=${user.id || user.nickname}`; };
         
         // 아바타 혹은 기본 프레임 처리
         const defaultAvatar =
@@ -541,8 +537,8 @@ card.innerHTML = `
       posts.forEach(post => {
         const card = document.createElement('div');
         card.className = 'post-card';
-        // 기존 게시글 보기 피드 클릭 시 상세조회(view.html?id=xxx) 연동 구조 매핑
-        card.onclick = () => { window.location.href = `view.html?id=${post.id}`; };
+        // window.location.href 대신 window.parent.location.href를 사용하여 최상위 부모 창을 이동시킵니다.
+        card.onclick = () => { window.parent.location.href = `view.html?id=${post.id}`; };
 
         // 작성일자 포맷팅 파서 처리
         const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString('ko-KR', {month:'short', day:'numeric'}) : '';
