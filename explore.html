@@ -1263,9 +1263,9 @@ opacity: 1;
   window.addEventListener('message', (event) => {
 
 
-//    if (type === 'toggleSearch') {
-//      window.toggleSearchPanel();
-//    }
+  if (type === 'toggleSearch') {
+    window.toggleSearchPanel();
+  }
 
     const { type, page } = event.data || {};
     if (type === 'navigate') {
