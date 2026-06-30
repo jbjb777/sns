@@ -89,7 +89,75 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--t1); min-height: 100vh; display: flex; overflow: hidden; transition: background 0.3s, color 0.3s; }
-  
+    /* 검색 패널 슬라이드 */
+    .search-panel {
+      position: fixed;
+      top: 0;
+      left: 72px;
+      width: 380px;
+      max-width: calc(100vw - 72px);
+      height: 100vh;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      z-index: 90;
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+
+opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+
+    }
+    html[data-theme="light"] .search-panel {
+      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+    }
+    .search-panel.open {
+      transform: translateX(0);
+
+opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+
+    }
+    .search-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .search-panel-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--t1);
+    }
+    .search-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--t2);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .search-close-btn:hover {
+      color: var(--t1);
+      transform: scale(1.1);
+    }
+    .search-panel iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
+    }
     .sidebar-container {
       width: 72px;
       min-width: 72px;
@@ -830,6 +898,22 @@
     }
 
     @media (max-width: 768px) {
+
+
+
+      .search-panel {
+        left: 0;
+        width: 100%;
+        max-width: 100%;
+        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
+        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+        top: 0;
+        z-index: 90;
+      }
+
+
+
+
       .sidebar-container {
         left: 0;
         right: 0;
@@ -938,6 +1022,17 @@
 </head>
 <body>
   <div class="sidebar-container">
+
+
+
+<div id="searchPanel" class="search-panel">
+  <div class="search-panel-header">
+    <h2>검색</h2>
+    <button class="search-close-btn" onclick="toggleSearchPanel()">✕</button>
+  </div>
+  <iframe src="search.html" frameborder="0"></iframe>
+</div>
+
     <iframe
       src="sidebar.html"
       id="sidebarFrame"
@@ -1166,6 +1261,12 @@
   }
 
   window.addEventListener('message', (event) => {
+
+
+    if (type === 'toggleSearch') {
+      window.toggleSearchPanel();
+    }
+
     const { type, page } = event.data || {};
     if (type === 'navigate') {
       if (page === 'home') location.href = 'index.html';
@@ -1264,7 +1365,18 @@
       showError();
     }
   }
-
+  let searchPanelOpen = false;
+  window.toggleSearchPanel = function() {
+    const panel = document.getElementById('searchPanel');
+    searchPanelOpen = !searchPanelOpen;
+    if (searchPanelOpen) {
+      panel.classList.add('open');
+      document.getElementById('sidebarFrame').contentWindow.postMessage({ type: 'activateSearch', active: true }, '*');
+    } else {
+      panel.classList.remove('open');
+      document.getElementById('sidebarFrame').contentWindow.postMessage({ type: 'activateSearch', active: false }, '*');
+    }
+  };
   function shuffleAndDisplay() {
     displayedPosts = [...allPosts].sort(() => Math.random() - 0.5);
     currentPostIndex = 0;
