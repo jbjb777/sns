@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카카오 로그인 테스트</title>
+
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+
+<style>
+body{
+    font-family:Pretendard,sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    background:#f7f7f7;
+}
+
+button{
+    background:#FEE500;
+    border:none;
+    border-radius:10px;
+    padding:14px 22px;
+    font-size:16px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+#profile{
+    margin-top:30px;
+    text-align:center;
+}
+
+img{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+}
+</style>
+</head>
+
+<body>
+
+<button onclick="login()">
+카카오 로그인
+</button>
+
+<div id="profile"></div>
+
+<script>
+
+// JavaScript 키 입력
+Kakao.init("bc817345a961eaced5fe86e5e1f2ca2e");
+
+console.log(Kakao.isInitialized());
+
+function login(){
+
+    Kakao.Auth.login({
+        scope:'profile_nickname,profile_image',
+
+        success:function(){
+
+            Kakao.API.request({
+                url:'/v2/user/me',
+
+                success:function(res){
+
+                    const profile=res.kakao_account.profile;
+
+                    document.getElementById("profile").innerHTML=`
+                        <img src="${profile.profile_image_url}">
+                        <h2>${profile.nickname}</h2>
+                        <p>ID : ${res.id}</p>
+                    `;
+
+                    console.log(res);
+
+                },
+
+                fail:function(error){
+                    console.error(error);
+                }
+
+            });
+
+        },
+
+        fail:function(error){
+            console.error(error);
+        }
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>
