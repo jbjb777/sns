@@ -110,6 +110,79 @@
     .back-btn:active { transform: scale(0.82); }
     .header-title { font-size: 16px; font-weight: 600; color: var(--t1); }
     /* ─── CONTAINER ─── */
+
+
+    /* 검색 패널 슬라이드 */
+    .search-panel {
+      position: fixed;
+      top: 0;
+      left: 72px;
+      width: 380px;
+      max-width: calc(100vw - 72px);
+      height: 100vh;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      z-index: 90;
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+
+opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+
+    }
+    html[data-theme="light"] .search-panel {
+      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+    }
+    .search-panel.open {
+      transform: translateX(0);
+
+opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+
+    }
+    .search-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .search-panel-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--t1);
+    }
+    .search-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--t2);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .search-close-btn:hover {
+      color: var(--t1);
+      transform: scale(1.1);
+    }
+    .search-panel iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
+    }
+
+
     .container {
       max-width: 720px;
       width: 100%;
@@ -758,6 +831,17 @@
       .post-detail-header { flex-direction: column; align-items: flex-start; gap: 16px; }
       .header-actions { align-self: flex-end; }
       .carousel-nav { width: 36px; height: 36px; font-size: 18px; }
+
+      .search-panel {
+        left: 0;
+        width: 100%;
+        max-width: 100%;
+        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
+        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+        top: 0;
+        z-index: 90;
+      }
+
     }
     /* 푸터 */
     .footer {
@@ -1177,7 +1261,13 @@
     <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
   </div>
   <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
-
+<div id="searchPanel" class="search-panel">
+  <div class="search-panel-header">
+    <h2>검색</h2>
+    <button class="search-close-btn" onclick="toggleSearchPanel()">✕</button>
+  </div>
+  <iframe src="search.html" frameborder="0"></iframe>
+</div>
   <div class="main-wrapper">
     <div class="header">
       <button class="back-btn" onclick="goHome()">
@@ -1371,6 +1461,9 @@
 
   window.addEventListener('message', (event) => {
     const { type, page } = event.data || {};
+    if (type === 'toggleSearch') {
+      window.toggleSearchPanel();
+    }
     if (type === 'navigate') {
       if (page === 'home') location.href = 'index.html';
       if (page === 'explore') location.href = 'explore.html';
@@ -1470,7 +1563,18 @@
     lightbox.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   };
-  
+let searchPanelOpen = false;
+window.toggleSearchPanel = function() {
+  const panel = document.getElementById('searchPanel');
+  searchPanelOpen = !searchPanelOpen;
+  if (searchPanelOpen) {
+    panel.classList.add('open');
+    document.getElementById('sidebarFrame').contentWindow.postMessage({ type: 'activateSearch', active: true }, '*');
+  } else {
+    panel.classList.remove('open');
+    document.getElementById('sidebarFrame').contentWindow.postMessage({ type: 'activateSearch', active: false }, '*');
+  }
+};
   window.closeLightbox = function() {
     const lightbox = document.getElementById('imageLightbox');
     lightbox.style.display = 'none';
