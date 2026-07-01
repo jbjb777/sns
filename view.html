@@ -1464,10 +1464,7 @@ opacity: 1;
     if (type === 'toggleSearch') {
       window.toggleSearchPanel();
     }
-    if (type === 'navigate') {
-      if (page === 'home') location.href = 'index.html';
-      if (page === 'explore') location.href = 'explore.html';
-    }
+  if (type === 'navigate') {
     if (type === 'logout') { 
       localStorage.removeItem('snsUser'); 
       currentUser = null; 
