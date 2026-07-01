@@ -1464,15 +1464,15 @@ opacity: 1;
     if (type === 'toggleSearch') {
       window.toggleSearchPanel();
     }
-if (type === 'navigate') {
-  if (page === 'home') location.href = 'index.html';
-  if (page === 'explore') location.href = 'explore.html';
-  if (page === 'set') location.href = 'set.html';
-  if (page === 'search') location.href = 'search.html';
-  if (page === 'notifications') location.href = 'notifications.html';
-  if (page === 'profile') location.href = 'profile.html';
-}
-
+    if (type === 'navigate') {
+      if (page === 'home') location.href = 'index.html';
+      if (page === 'explore') location.href = 'explore.html';
+      if (page === 'set') location.href = 'set.html';
+      if (page === 'search') location.href = 'search.html';
+      if (page === 'notifications') location.href = 'notifications.html';
+      if (page === 'profile') location.href = 'profile.html';
+    }
+  });
   window.onSharerProfileLogout = function () {
     localStorage.removeItem('snsUser');
     currentUser = null;
