@@ -1196,11 +1196,21 @@ document.addEventListener('click', function(e) {
 
 (function () {
   const splash = document.getElementById('splash');
+  // LocalStorage에서 유저 정보가 있는지 확인 (로그인 여부 체크)
+  const isLoggedOut = !localStorage.getItem('snsUser'); 
 
+  // 세션 스토리지에 표시 기록이 있다면 (탭 전환이나 단순 새로고침)
   if (sessionStorage.getItem('splashShown')) {
     splash.style.display = 'none';
   } else {
+    // 처음 탭을 열고 접속했을 때
     sessionStorage.setItem('splashShown', 'true');
+
+    // 만약 로그아웃된 상태라면 스플래시를 보여주지 않고 바로 home.html로 이동
+    if (isLoggedOut) {
+      location.replace('home.html');
+      return; // 이후 스플래시 타이머 실행 방지
+    }
 
     function finishSplash() {
       splash.classList.add('fade-out');
