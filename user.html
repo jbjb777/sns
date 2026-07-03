@@ -1105,7 +1105,7 @@ opacity: 1;
   let currentUser = null;
   let viewingUser = null;
   let rawPostsCached = [];
-  // 스토리 재실행을 위한 원ㅇ본 게시물 임시 ㅁㅁㅁ저장소
+  // 스토리 재실행을 위한 원본 게시물 임시 저장소
 
   function initCurrentUser() {
     const savedUser = localStorage.getItem('snsUser');
@@ -1340,12 +1340,13 @@ window.toggleSearchPanel = function() {
         return;
       }
 
-      rawPostsCached = posts; // 전역 캐시에 저장
       const isOwnProfile = currentUser && currentUser.nickname === nickname;
       const filteredPosts = posts.filter(post => {
         if (isOwnProfile) return true;
         return post.access !== 'private' && post.access !== 'link';
       });
+      rawPostsCached = filteredPosts; // 전역 캐시에 필터링된 게시물 저장 (스토리 재생 시 적용)
+
       if (!filteredPosts.length) {
         postsDiv.innerHTML = '<div class="no-posts">아직 게시물이 없습니다.</div>';
         return;
