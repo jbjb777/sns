@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sharer AI Chatbot</title>
+  <style>
+    :root {
+      --bg-color: #f7f9fa;
+      --chat-bg: #ffffff;
+      --primary-color: #4f46e5;
+      --user-msg-bg: #4f46e5;
+      --user-msg-color: #ffffff;
+      --ai-msg-bg: #f1f5f9;
+      --ai-msg-color: #1e293b;
+      --border-color: #e2e8f0;
+      --thinking-bg: #f8fafc;
+      --thinking-border: #cbd5e1;
+      --thinking-color: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      height: 80vh;
+      background-color: var(--chat-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .chat-header {
+      padding: 16px;
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-header .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .message {
+      max-width: 85%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .message.user {
+      align-self: flex-end;
+    }
+
+    .message.ai {
+      align-self: flex-start;
+    }
+
+    .message-content {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .user .message-content {
+      background-color: var(--user-msg-bg);
+      color: var(--user-msg-color);
+      border-bottom-right-radius: 4px;
+    }
+
+    .ai .message-content {
+      background-color: var(--ai-msg-bg);
+      color: var(--ai-msg-color);
+      border-bottom-left-radius: 4px;
+    }
+
+    /* AI 생각하기 블록 스타일 */
+    .thinking-box {
+      font-size: 0.85rem;
+      background-color: var(--thinking-bg);
+      border-left: 3px solid var(--thinking-border);
+      color: var(--thinking-color);
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      font-style: italic;
+    }
+
+    .thinking-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+      font-style: normal;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chat-input-area {
+      padding: 16px;
+      background-color: #ffffff;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: var(--primary-color);
+    }
+
+    .send-btn {
+      padding: 0 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .send-btn:hover {
+      background-color: #4338ca;
+    }
+
+    .send-btn:disabled {
+      background-color: #cbd5e1;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="status-dot"></div>
+      <span>Sharer AI Assistant (Nemotron)</span>
+    </div>
+    
+    <div class="chat-messages" id="chatMessages">
+      </div>
+
+    <form class="chat-input-area" id="chatForm">
+      <input type="text" id="chatInput" class="chat-input" placeholder="AI에게 물어보고 싶은 말을 입력하세요..." autocomplete="off" required>
+      <button type="submit" id="sendBtn" class="send-btn">전송</button>
+    </form>
+  </div>
+
+  <script>
+    // ⚠️ [중요] 배포한 본인의 Cloudflare Worker 주소로 변경하세요!
+    // 예: "https://your-worker.your-subdomain.workers.dev/api/ai"
+    const WORKER_API_URL = "http://127.0.0.1:8787/api/ai"; 
+
+    const chatMessages = document.getElementById("chatMessages");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    // 대화 내역 유지용 배열
+    let messageHistory = [];
+
+    // 메시지 화면 추가 함수
+    function appendMessage(sender, text = "") {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", sender);
+
+      const contentDiv = document.createElement("div");
+      contentDiv.classList.add("message-content");
+      contentDiv.textContent = text;
+
+      messageDiv.appendChild(contentDiv);
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      return contentDiv; // 추후 스트리밍 텍스트 추가를 위해 반환
+    }
+
+    // AI용 생각하기 박스 생성 함수
+    function createThinkingBox(messageElement) {
+      const box = document.createElement("div");
+      box.classList.add("thinking-box");
+      box.style.display = "none"; // 처음엔 숨김
+
+      const title = document.createElement("div");
+      title.classList.add("thinking-title");
+      title.innerHTML = "💡 <span>생각하는 중...</span>";
+      
+      const content = document.createElement("div");
+      content.classList.add("thinking-content");
+
+      box.appendChild(title);
+      box.appendChild(content);
+      
+      // 메시지 컨텐츠 위쪽에 삽입
+      messageElement.parentNode.insertBefore(box, messageElement);
+      return { box, content };
+    }
+
+    // 폼 제출 이벤트 (전송 버튼 클릭)
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const userText = chatInput.value.trim();
+      if (!userText) return;
+
+      // 1. 유저 메시지 화면 표시 및 히스토리 저장
+      appendMessage("user", userText);
+      messageHistory.push({ role: "user", content: userText });
+      
+      chatInput.value = "";
+      chatInput.disabled = true;
+      sendBtn.disabled = true;
+
+      // 2. AI 메시지 틀 먼저 생성
+      const aiMessageElement = appendMessage("ai", "");
+      const thinkingElement = createThinkingBox(aiMessageElement);
+
+      let fullContent = "";
+      let fullReasoning = "";
+
+      try {
+        // 3. Worker API에 POST 스트리밍 요청
+        const response = await fetch(WORKER_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            messages: messageHistory
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("네트워크 응답에 문제가 있습니다.");
+        }
+
+        // 4. ReadableStream 읽기 시작
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          // 들어온 바이너리 데이터를 텍스트로 전환
+          buffer += decoder.decode(value, { stream: true });
+          
+          // SSE 라인별 쪼개기 (\n\n 규칙)
+          const lines = buffer.split("\n");
+          // 마지막 incomplete 라인은 다음 루프를 위해 버퍼에 남김
+          buffer = lines.pop(); 
+
+          for (const line of lines) {
+            const cleanedLine = line.trim();
+            if (!cleanedLine) continue;
+            if (cleanedLine === "data: [DONE]") break;
+
+            if (cleanedLine.startsWith("data: ")) {
+              try {
+                const jsonStr = cleanedLine.slice(6);
+                const parsed = JSON.parse(jsonStr);
+                const delta = parsed.choices[0]?.delta;
+
+                if (!delta) continue;
+
+                // 💡 모델이 생각하는 과정 처리 (reasoning_content)
+                if (delta.reasoning_content) {
+                  thinkingElement.box.style.display = "block"; // 데이터가 있으면 노출
+                  fullReasoning += delta.reasoning_content;
+                  thinkingElement.content.textContent = fullReasoning;
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+
+                // ✍️ 모델의 최종 답변 처리 (content)
+                if (delta.content) {
+                  fullContent += delta.content;
+                  aiMessageElement.textContent = fullContent;
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+              } catch (err) {
+                // 파싱 에러 찌꺼기 라인은 무시
+              }
+            }
+          }
+        }
+
+        // 스트리밍 완료 후 대화 기록에 최종 답변 누적 (다음 질문 연동용)
+        messageHistory.push({ role: "assistant", content: fullContent });
+
+      } catch (error) {
+        console.error(error);
+        aiMessageElement.textContent = "⚠️ 에러가 발생했습니다. 다시 시도해 주세요.";
+        aiMessageElement.style.color = "#ef4444";
+      } finally {
+        // 입력창 복구
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+        chatInput.focus();
+      }
+    });
+  </script>
+</body>
+</html>
