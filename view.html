@@ -2171,7 +2171,7 @@ window.toggleSearchPanel = function() {
   }
 
   // ─── 추가된 위로 스크롤해서 새로고침 (Pull To Refresh) 스크립트 ───
-  (function() {
+  function initPullToRefresh() {
     const refreshEl = document.getElementById('pullRefresh');
     const pullSpinnerSvg = document.getElementById('pullSpinnerSvg');
 
@@ -2269,7 +2269,8 @@ window.toggleSearchPanel = function() {
         }, 300);
       }
     });
-  })();
+  }
+  initPullToRefresh();
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
 </body>
