@@ -307,7 +307,7 @@
     @keyframes colorChange { to { color: #ffffff; } }
 
     /* =================================================================== */
-    /* 새롭게 추가된 통계/지표 섹션 (토스 스타일) */
+    /* 통계/지표 섹션 (토스 스타일) */
     .stats-section {
       width: 100%;
       display: grid;
@@ -351,30 +351,47 @@
       color: var(--t3);
     }
 
-    /* 피쳐 섹션 (스크롤 페이드업 애니메이션으로 변경) */
+    /* 피쳐 섹션 */
     .features {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 40px; /* 기존의 엄청 넓은 여백 대신 적당한 간격 */
+      gap: 40px; 
       position: relative;
     }
 
     .feature-card {
-      /* sticky 관련 속성 제거 */
       background: var(--bg2);
       border: 1px solid var(--border);
-      border-top: 4px solid var(--card-color, var(--border));
       border-radius: var(--r3);
       padding: 40px 36px;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden; /* 상단 가상 그라데이션 선 커팅 유도 */
       
-      /* 페이드 업 애니메이션 준비 */
+      /* 페이드 업 애니메이션 */
       opacity: 0;
       transform: translateY(60px);
       transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, background 0.2s ease;
     }
+
+    /* 일반 컬러 기반 카드 전용 상단 border 테두리 설정 (2, 3, 4번째 카드 적용) */
+    .feature-card.color-border {
+      border-top: 4px solid var(--card-color);
+    }
     
+    /* [수정] 첫 번째 카드 전용: 단색 보더를 지우고 깔끔하게 4px 그라데이션 선 하나만 구현 */
+    .feature-card.gradient-border::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(155deg, #00E76F, #1917FF, #7A00FF 100%);
+      z-index: 2;
+    }
+
     .feature-card.is-visible {
       opacity: 1;
       transform: translateY(0);
@@ -382,7 +399,7 @@
 
     .feature-card:hover {
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
-      transform: translateY(-5px); /* 호버 시 살짝 떠오르는 효과 */
+      transform: translateY(-5px);
     }
 
     html[data-theme="light"] .feature-card { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08); }
@@ -410,7 +427,7 @@
     .feature-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 14px; color: var(--t1); }
     .feature-card p { font-size: 15px; color: var(--t2); line-height: 1.7; }
 
-    /* 하단 고정 액션 바 (토스 스타일 및 요구사항 반영) */
+    /* 하단 고정 액션 바 */
     .bottom-sticky-bar {
       position: fixed;
       bottom: 0;
@@ -424,8 +441,6 @@
       z-index: 999;
       display: flex;
       justify-content: center;
-      
-      /* 초기 상태는 아래로 숨겨짐 */
       transform: translateY(100%);
       transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s;
       box-shadow: 0 -4px 24px rgba(0,0,0,0.2);
@@ -449,7 +464,6 @@
       gap: 16px;
     }
 
-    /* 하단 바 왼쪽 로고 + 텍스트 영역 */
     .bottom-brand-area {
       display: flex;
       align-items: center;
@@ -501,17 +515,13 @@
       flex-shrink: 0;
     }
     
-    .bottom-sticky-btn:hover {
-      opacity: 0.85;
-    }
-    .bottom-sticky-btn:active {
-      transform: scale(0.96);
-    }
+    .bottom-sticky-btn:hover { opacity: 0.85; }
+    .bottom-sticky-btn:active { transform: scale(0.96); }
 
     /* 푸터 */
     .footer {
       border-top: 1px solid var(--border);
-      padding: 30px 24px 100px; /* 고정 바를 위해 하단 여백 추가 */
+      padding: 30px 24px 100px;
       text-align: center;
       font-size: 12px;
       width: 100%;
@@ -546,8 +556,6 @@
       .hero-section h1 { font-size: 32px; }
       .stats-section { grid-template-columns: 1fr; gap: 40px; padding: 40px 0; }
       .feature-card { padding: 30px 24px; }
-      
-      /* 모바일 환경 하단 바 완벽 대응 및 크기 조절 */
       .bottom-sticky-bar { padding: 12px 16px; }
       .bottom-brand-logo { width: 32px; height: 32px; }
       .bottom-brand-title { font-size: 14px; }
@@ -615,7 +623,8 @@
     </section>
 
     <section class="features">
-      <div class="feature-card reveal-item" style="--card-color: var(--pink);">
+
+      <div class="feature-card reveal-item gradient-border" style="--card-color: #00E76F;">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9h-2V7h-2v5H6v2h2v5h2v-5h2v-2zM15 7h4v2h-4zm0 6h4v2h-4z"/></svg>
         </div>
@@ -625,7 +634,8 @@
         </p>
       </div>
 
-      <div class="feature-card reveal-item" style="--card-color: var(--blue);">
+
+      <div class="feature-card reveal-item gradient-border" style="--card-color: #00E76F;">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
         </div>
@@ -635,7 +645,7 @@
         </p>
       </div>
 
-      <div class="feature-card reveal-item" style="--card-color: var(--green);">
+      <div class="feature-card reveal-item gradient-border" style="--card-color: #00E76F;">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
         </div>
@@ -650,7 +660,7 @@
         </p>
       </div>
 
-      <div class="feature-card reveal-item" style="--card-color: var(--purple);">
+      <div class="feature-card reveal-item gradient-border" style="--card-color: #00E76F;">
         <div class="feature-icon">
           <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7zm1-11h-2v3H8v2h3v3h2v-3h3v-2h-3V8z"/></svg>
         </div>
@@ -705,17 +715,15 @@
       }
     });
 
-    // 리퀴드 글래스 버튼 인터랙션 스크립트
     const aiBtn = document.getElementById('aiBtn');
     if (aiBtn) {
       aiBtn.addEventListener('mouseenter', () => aiBtn.classList.add('active'));
       aiBtn.addEventListener('mouseleave', () => aiBtn.classList.remove('active'));
     }
 
-    // 숫자 카운트업(롤링 애니메이션) 함수
     function animateCountUp(element, targetValue) {
       let startValue = 0;
-      const duration = 1200; // 애니메이션 총 지속 시간 (ms)
+      const duration = 1200;
       const startTime = performance.now();
 
       function updateNumber(currentTime) {
@@ -724,7 +732,6 @@
           element.textContent = targetValue;
           return;
         }
-        // Ease-out 자승 기법으로 부드럽게 감속 효과 적용
         const progress = elapsedTime / duration;
         const easeOutProgress = 1 - Math.pow(1 - progress, 3);
         const currentValue = Math.floor(easeOutProgress * targetValue);
@@ -735,7 +742,6 @@
       requestAnimationFrame(updateNumber);
     }
 
-    // 1. 스크롤 뷰포트 감지 애니메이션 (통계 및 카드 섹션 올라오기)
     const revealOptions = {
       root: null,
       rootMargin: '0px',
@@ -747,7 +753,6 @@
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible');
           
-          // 해당 카드에 롤링 애니메이션 대상 속성이 있다면 작동
           if (entry.target.hasAttribute('data-animate-count')) {
             const targetNum = parseInt(entry.target.getAttribute('data-animate-count'), 10);
             const textSpan = entry.target.querySelector('.count-target');
@@ -755,8 +760,6 @@
               animateCountUp(textSpan, targetNum);
             }
           }
-          
-          // 한번 나타난 후에는 관찰 해제
           observer.unobserve(entry.target);
         }
       });
@@ -766,7 +769,6 @@
       revealObserver.observe(item);
     });
 
-    // 2. 하단 고정 바 스크롤 감지 (히어로 섹션의 버튼 영역을 지나면 표시)
     const heroActions = document.getElementById('heroActions');
     const bottomStickyBar = document.getElementById('bottomStickyBar');
     
@@ -779,7 +781,6 @@
 
       const stickyObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          // heroActions 영역이 화면에서 사라지면(교차하지 않으면) 바를 보여줌
           if (!entry.isIntersecting && window.scrollY > 100) {
             bottomStickyBar.classList.add('show');
           } else {
