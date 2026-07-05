@@ -643,14 +643,8 @@
     addLoadingIndicator();
 
     // 답변이 들어갈 빈 껍데기 생성 (숨김 처리)
-    const aiMessageElement = document.createElement("div");
-    aiMessageElement.classList.add("message", "ai");
-    aiMessageElement.style.display = "none";
-    
-    const contentDiv = document.createElement("div");
-    contentDiv.classList.add("message-content", "markdown-body");
-    aiMessageElement.appendChild(contentDiv);
-    chatMessages.appendChild(aiMessageElement);
+let aiMessageElement = null;
+let contentDiv = null;
 
     let fullContent = "";
 
@@ -663,8 +657,6 @@
 
       if (!response.ok) throw new Error("네트워크 오류");
 
-      removeLoadingIndicator(); // 첫 응답이 오면 로딩 제거
-      aiMessageElement.style.display = "flex"; // 마크다운 영역 노출
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
@@ -693,15 +685,27 @@
               const delta = parsed.choices[0]?.delta;
               
               if (delta && delta.content) {
-                fullContent += delta.content;
-                
-                // 💡 최적화: 매 글자마다 렌더링하지 않고 50ms 간격으로 화면 업데이트
-                const now = Date.now();
-                if (now - lastRenderTime > 50) {
-                  contentDiv.innerHTML = marked.parse(fullContent);
-                  chatMessages.scrollTop = chatMessages.scrollHeight;
-                  lastRenderTime = now;
-                }
+                  fullContent += delta.content;
+
+                  if (!aiMessageElement) {
+                      removeLoadingIndicator();
+
+                      aiMessageElement = document.createElement("div");
+                      aiMessageElement.className = "message ai";
+
+                      contentDiv = document.createElement("div");
+                      contentDiv.className = "message-content markdown-body";
+
+                      aiMessageElement.appendChild(contentDiv);
+                      chatMessages.appendChild(aiMessageElement);
+                  }
+
+                  const now = Date.now();
+                  if (now - lastRenderTime > 50) {
+                      contentDiv.innerHTML = marked.parse(fullContent);
+                      chatMessages.scrollTop = chatMessages.scrollHeight;
+                      lastRenderTime = now;
+                  }
               }
             } catch (err) { }
           }
@@ -729,7 +733,8 @@
       chatInput.focus();
     }
   }
-
+let aiMessageElement = null;
+let contentDiv = null;
   // 입력 폼 제출 이벤트
   chatForm.addEventListener("submit", (e) => {
     e.preventDefault();
