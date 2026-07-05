@@ -24,6 +24,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   
   <style>
     /* Sharer 피드 페이지 원본 리셋 및 애니메이션 */
@@ -58,6 +59,7 @@
       --blue: #4dabf7;
       --green: #51cf66;
       --purple: #cc5de8;
+      --ai-user: #4f46e5; /* AI 사용자 말풍선 색상 추가 */
       --r1: 10px;
       --r2: 14px;
       --r3: 20px;
@@ -75,6 +77,7 @@
       --t1: #000000;
       --t2: #737373;
       --t3: #a8a8a8;
+      --ai-user: #4f46e5; /* AI 사용자 말풍선 색상 추가 */
     }
 
     html { scroll-behavior: smooth; }
@@ -305,6 +308,76 @@
 
     @keyframes fadeIn { to { opacity: 1; } }
     @keyframes colorChange { to { color: #ffffff; } }
+
+    /* ====================================================
+       새로 추가된 AI 채팅 영역 스타일
+       ==================================================== */
+    .ai-chat-section {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r3);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+      overflow: hidden;
+      margin-bottom: 60px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: contentReveal 0.6s cubic-bezier(0.22,1,0.36,1) 0.3s forwards;
+    }
+    html[data-theme="light"] .ai-chat-section {
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    @keyframes slideUpMsg {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .message { max-width: 85%; display: flex; flex-direction: column; gap: 6px; animation: slideUpMsg 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; }
+    .message.user { align-self: flex-end; }
+    .message.ai { align-self: flex-start; }
+    .message-content { padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.6; word-break: break-word; }
+    .message.user .message-content { background-color: var(--ai-user); color: #ffffff; border-bottom-right-radius: 4px; }
+    .message.ai .message-content { background-color: var(--bg3); border: 1px solid var(--border); color: var(--t1); border-bottom-left-radius: 4px; }
+    .markdown-body p { margin-bottom: 10px; }
+    .markdown-body p:last-child { margin-bottom: 0; }
+    .markdown-body strong { font-weight: 600; }
+    .markdown-body ul, .markdown-body ol { margin-left: 20px; margin-bottom: 10px; }
+    .markdown-body code { background: var(--bg4); padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+    .markdown-body pre { background: var(--bg4); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+    .markdown-body pre code { background: transparent; padding: 0; }
+    .ai-actions { display: flex; gap: 10px; padding-left: 4px; margin-top: 2px; }
+    .action-btn { background: transparent; border: none; color: var(--t2); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: color 0.2s; }
+    .action-btn:hover { color: var(--t1); }
+    .action-btn svg { width: 16px; height: 16px; }
+    .typing-indicator { display: flex; gap: 6px; padding: 6px 4px; align-items: center; height: 24px; }
+    .typing-indicator span { width: 8px; height: 8px; background-color: var(--t2); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+    .chat-input-area { padding: 12px 16px; background: var(--bg2); border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+    .chat-input { flex: 1; padding: 14px 16px; border: 1px solid var(--border2); background: var(--bg3); color: var(--t1); border-radius: 24px; font-size: 15px; outline: none; transition: border-color 0.2s; }
+    .chat-input:focus { border-color: var(--ai-user); }
+    .chat-input::placeholder { color: var(--t3); }
+    .send-btn { width: 44px; height: 44px; background-color: var(--ai-user); color: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.2s; flex-shrink: 0; }
+    .send-btn:disabled { background-color: var(--bg4); color: var(--t2); cursor: not-allowed; }
+    .send-btn svg { width: 18px; height: 18px; position: relative; right: 1px; top: 1px; }
+    .toast {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--t1); color: var(--bg); padding: 10px 20px; border-radius: var(--r3);
+      font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* =================================================================== */
     /* 통계/지표 섹션 (토스 스타일) */
@@ -604,6 +677,26 @@
       </div>
     </section>
 
+    <section class="ai-chat-section" id="aiChatArea">
+      <div class="chat-messages" id="chatMessages">
+        <div class="message ai">
+          <div class="message-content markdown-body">
+            <p>안녕하세요! 무엇이든 물어보세요. 😊</p>
+          </div>
+        </div>
+      </div>
+      
+      <form class="chat-input-area" id="chatForm">
+        <input type="text" id="chatInput" class="chat-input" placeholder="메시지를 입력하세요..." autocomplete="off" required>
+        <button type="submit" id="sendBtn" class="send-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </section>
+
     <section class="stats-section">
       <div class="stat-card reveal-item" data-animate-count="100">
         <div class="stat-title">누적 생성된 스토리</div>
@@ -694,6 +787,8 @@
     <div class="footer-text">본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다.<br>모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.</div>
     <button class="theme-switch" onclick="toggleTheme()">테마 변경</button>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <script>
     function toggleTheme() {
@@ -790,6 +885,195 @@
       }, stickyOptions);
 
       stickyObserver.observe(heroActions);
+    }
+
+    // ====================================================
+    // 새로 이식된 AI 챗봇 스크립트 기능
+    // ====================================================
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2500);
+    }
+
+    const WORKER_API_URL = "https://sharer-api.alexeom97.workers.dev/api/ai"; 
+    const chatMessages = document.getElementById("chatMessages");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+    
+    let messageHistory = [];
+
+    function appendUserMessage(text) {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", "user");
+      const contentDiv = document.createElement("div");
+      contentDiv.classList.add("message-content");
+      contentDiv.textContent = text;
+      messageDiv.appendChild(contentDiv);
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addLoadingIndicator() {
+      removeLoadingIndicator();
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", "ai");
+      messageDiv.id = "aiLoadingIndicator";
+      const contentDiv = document.createElement("div");
+      contentDiv.classList.add("message-content");
+      contentDiv.style.padding = "8px 12px";
+      contentDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+      messageDiv.appendChild(contentDiv);
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return messageDiv;
+    }
+
+    function removeLoadingIndicator() {
+      const loading = document.getElementById("aiLoadingIndicator");
+      if (loading) loading.remove();
+    }
+
+    function addAiActions(messageElement, textContent) {
+      const actionsDiv = document.createElement("div");
+      actionsDiv.classList.add("ai-actions");
+
+      const copyBtn = document.createElement("button");
+      copyBtn.classList.add("action-btn");
+      copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(textContent);
+        showToast("답변이 복사되었습니다.");
+      };
+
+      const regenBtn = document.createElement("button");
+      regenBtn.classList.add("action-btn");
+      regenBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+      regenBtn.onclick = () => {
+        messageElement.remove();
+        if (messageHistory.length > 0 && messageHistory[messageHistory.length - 1].role === 'assistant') {
+          messageHistory.pop(); 
+        }
+        fetchAIResponse('', true);
+      };
+
+      actionsDiv.appendChild(copyBtn);
+      actionsDiv.appendChild(regenBtn);
+      messageElement.appendChild(actionsDiv);
+    }
+
+    async function fetchAIResponse(userText, isRegen = false) {
+      if (!isRegen) {
+        appendUserMessage(userText);
+        messageHistory.push({ role: "user", content: userText });
+      }
+      
+      chatInput.value = "";
+      chatInput.disabled = true;
+      sendBtn.disabled = true;
+
+      addLoadingIndicator();
+
+      let aiMessageElement = null;
+      let contentDiv = null;
+      let fullContent = "";
+
+      try {
+        const response = await fetch(WORKER_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: messageHistory })
+        });
+
+        if (!response.ok) throw new Error("네트워크 오류");
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+        let lastRenderTime = 0; 
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop(); 
+
+          for (const line of lines) {
+            const cleanedLine = line.trim();
+            if (!cleanedLine) continue;
+            if (cleanedLine === "data: [DONE]") break;
+
+            if (cleanedLine.startsWith("data: ")) {
+              try {
+                const parsed = JSON.parse(cleanedLine.slice(6));
+                const delta = parsed.choices[0]?.delta;
+                
+                if (delta && delta.content) {
+                    fullContent += delta.content;
+
+                    if (!aiMessageElement) {
+                        removeLoadingIndicator();
+
+                        aiMessageElement = document.createElement("div");
+                        aiMessageElement.className = "message ai";
+
+                        contentDiv = document.createElement("div");
+                        contentDiv.className = "message-content markdown-body";
+
+                        aiMessageElement.appendChild(contentDiv);
+                        chatMessages.appendChild(aiMessageElement);
+                    }
+
+                    const now = Date.now();
+                    if (now - lastRenderTime > 50) {
+                        contentDiv.innerHTML = marked.parse(fullContent);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                        lastRenderTime = now;
+                    }
+                }
+              } catch (err) { }
+            }
+          }
+        }
+
+        contentDiv.innerHTML = marked.parse(fullContent);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        messageHistory.push({ role: "assistant", content: fullContent });
+        addAiActions(aiMessageElement, fullContent);
+
+      } catch (error) {
+        console.error(error);
+        removeLoadingIndicator();
+        if (!aiMessageElement) {
+            aiMessageElement = document.createElement("div");
+            aiMessageElement.className = "message ai";
+            contentDiv = document.createElement("div");
+            contentDiv.className = "message-content markdown-body";
+            aiMessageElement.appendChild(contentDiv);
+            chatMessages.appendChild(aiMessageElement);
+        }
+        aiMessageElement.style.display = "flex";
+        contentDiv.innerHTML = `<p style="color:#ef4444;">⚠️ 에러가 발생했습니다. 다시 시도해 주세요.</p>`;
+      } finally {
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    if (chatForm) {
+      chatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const userText = chatInput.value.trim();
+        if (!userText) return;
+        fetchAIResponse(userText, false);
+      });
     }
   </script>
 </body>
