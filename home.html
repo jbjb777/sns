@@ -1084,7 +1084,7 @@
 
                   contentDiv.innerHTML = marked.parse(fullContent);
 
-                  // 스트리밍되는 요ㄱㅈㄷ소들에 순차적으로 애니메이션 딜레이 부여
+                  // 스트리밍되는 요소들에 순차적으로 애니메이션 딜레이 부여
                   const children = contentDiv.children;
                   for (let i = 0; i < children.length; i++) {
                     if (!children[i].style.animationDelay) {
