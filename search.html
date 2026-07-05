@@ -16,6 +16,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,6 +34,7 @@
       --t3: #444;
       --pink: #ff6b6b;
       --green: #4ade80;
+      --ai-user: #4f46e5;
       --r1: 10px;
       --r2: 14px;
       --r3: 20px;
@@ -50,6 +52,7 @@
       --t1: #000;
       --t2: #666;
       --t3: #999;
+      --ai-user: #4f46e5;
     }
 
     body {
@@ -57,32 +60,27 @@
       background: var(--bg);
       color: var(--t1);
       -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
 
-    /* 전체 레이아웃 (기존 사이드바 공간 확보 구조) */
+    /* 전체 레이아웃 */
     .app-container {
       max-width: 600px;
       margin: 0 auto;
-      min-height: 100vh;
+      height: 100vh; /* AI 채팅을 위해 높이 고정 및 내부 스크롤 처리 */
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      padding-bottom: 80px; /* 하단 네비게이션 공간 */
+      display: flex;
+      flex-direction: column;
       position: relative;
     }
 
     /* 검색 상단 바 */
     .search-header {
-      position: sticky;
-      top: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 100;
+      background: var(--bg);
       padding: 16px;
       border-bottom: 1px solid var(--border);
-    }
-    [data-theme="light"] .search-header {
-      background: rgba(255, 255, 255, 0.8);
+      flex-shrink: 0;
     }
 
     .search-box {
@@ -95,207 +93,220 @@
       height: 48px;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .search-box:focus-within {
-      border-color: #7d7d7d;
-    }
-
+    .search-box:focus-within { border-color: #7d7d7d; }
     .search-box input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--t1);
-      font-size: 16px;
-      padding-left: 10px;
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--t1); font-size: 16px; padding-left: 10px;
     }
-    .search-box input::placeholder {
-      color: var(--t3);
-    }
-
-    .search-icon, .clear-icon {
-      color: var(--t2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .search-box input::placeholder { color: var(--t3); }
+    .search-icon, .clear-icon { color: var(--t2); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
     /* 탭 메뉴 */
     .search-tabs {
       display: flex;
       border-bottom: 1px solid var(--border);
       background: var(--bg);
+      flex-shrink: 0;
     }
     .tab-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--t2);
-      font-size: 15px;
-      font-weight: 600;
-      padding: 14px 0;
-      cursor: pointer;
-      position: relative;
-      text-align: center;
-      transition: color 0.2s;
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--t2); font-size: 15px; font-weight: 600; padding: 14px 0;
+      cursor: pointer; position: relative; text-align: center; transition: color 0.2s;
     }
-    .tab-btn:hover {
-      color: var(--t1);
-    }
-    .tab-btn.active {
-      color: #7d7d7d;
-    }
+    .tab-btn:hover { color: var(--t1); }
+    .tab-btn.active { color: var(--t1); }
     .tab-btn.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: #7d7d7d;
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 2px; background: var(--t1);
     }
 
-    /* 결과 영역 */
+    /* 일반 검색 결과 영역 */
     .search-results {
-      padding: 16px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      color: var(--t2);
-      margin-bottom: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .result-group {
-      margin-bottom: 24px;
-    }
-
-    /* 사용자 카드 스타일 */
-    .user-card {
-      display: flex;
-      align-items: center;
-      padding: 12px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r2);
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .user-card:hover {
-      background: var(--bg3);
-      transform: translateY(-1px);
-    }
-    .user-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--bg4);
-      margin-right: 12px;
-      object-fit: cover;
-    }
-    .user-info {
       flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      padding-bottom: 100px; /* 여유 공간 */
     }
-    .user-nickname {
-      font-weight: 600;
+
+    .section-title { font-size: 14px; color: var(--t2); margin-bottom: 12px; font-weight: 600; }
+    .result-group { margin-bottom: 24px; }
+    .user-card { display: flex; align-items: center; padding: 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); margin-bottom: 10px; cursor: pointer; }
+    .user-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--bg4); margin-right: 12px; object-fit: cover; }
+    .user-info { flex: 1; }
+    .user-nickname { font-weight: 600; font-size: 15px; color: var(--t1); }
+    .user-id { font-size: 13px; color: var(--t2); margin-top: 2px; }
+    .post-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-bottom: 12px; cursor: pointer; }
+    .post-header { display: flex; align-items: center; margin-bottom: 10px; }
+    .post-author { font-weight: 600; font-size: 14px; }
+    .post-date { font-size: 12px; color: var(--t3); margin-left: 8px; }
+    .post-content { font-size: 14px; line-height: 1.5; color: var(--t1); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; }
+    .post-images { display: flex; gap: 6px; margin-top: 10px; overflow: hidden; }
+    .post-img-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: var(--r1); background: var(--bg4); }
+    .status-msg { text-align: center; padding: 40px 20px; color: var(--t2); font-size: 14px; }
+
+    /* ====================================================
+       AI 채팅 영역 스타일 
+       ==================================================== */
+    .ai-chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-bottom: 20px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* 카카오톡 스타일 스르륵 올라오는 애니메이션 */
+    @keyframes slideUpMsg {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .message {
+      max-width: 85%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: slideUpMsg 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    }
+
+    .message.user { align-self: flex-end; }
+    .message.ai { align-self: flex-start; }
+
+    .message-content {
+      padding: 12px 16px;
+      border-radius: 18px;
       font-size: 15px;
-      color: var(--t1);
+      line-height: 1.6;
+      word-break: break-word;
     }
-    .user-id {
-      font-size: 13px;
-      color: var(--t2);
+
+    .message.user .message-content {
+      background-color: var(--ai-user);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.ai .message-content {
+      background-color: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--t1);
+      border-bottom-left-radius: 4px;
+    }
+
+    /* 마크다운 스타일 (AI 답변) */
+    .markdown-body p { margin-bottom: 10px; }
+    .markdown-body p:last-child { margin-bottom: 0; }
+    .markdown-body strong { font-weight: 600; }
+    .markdown-body ul, .markdown-body ol { margin-left: 20px; margin-bottom: 10px; }
+    .markdown-body code { background: var(--bg4); padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+    .markdown-body pre { background: var(--bg4); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+    .markdown-body pre code { background: transparent; padding: 0; }
+    
+    /* 재생성 / 복사 버튼 아이콘 영역 */
+    .ai-actions {
+      display: flex;
+      gap: 10px;
+      padding-left: 4px;
       margin-top: 2px;
     }
-
-    /* 게시물 카드 스타일 */
-    .post-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--r2);
-      padding: 16px;
-      margin-bottom: 12px;
+    .action-btn {
+      background: transparent;
+      border: none;
+      color: var(--t2);
       cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .post-card:hover {
-      background: var(--bg3);
-      transform: translateY(-1px);
-    }
-    .post-header {
       display: flex;
       align-items: center;
-      margin-bottom: 10px;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.2s;
     }
-    .post-author {
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .post-date {
-      font-size: 12px;
-      color: var(--t3);
-      margin-left: 8px;
-    }
-    .post-content {
-      font-size: 14px;
-      line-height: 1.5;
-      color: var(--t1);
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      word-break: break-all;
-    }
-    .post-images {
+    .action-btn:hover { color: var(--t1); }
+    .action-btn svg { width: 16px; height: 16px; }
+
+    /* 로딩 인디케이터 (ChatGPT 스타일 바운싱 원) */
+    .typing-indicator {
       display: flex;
       gap: 6px;
-      margin-top: 10px;
-      overflow: hidden;
+      padding: 6px 4px;
+      align-items: center;
+      height: 24px;
     }
-    .post-img-thumb {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: var(--r1);
-      background: var(--bg4);
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background-color: var(--t2);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
     }
 
-    /* 상태 표시 메시지 */
-    .status-msg {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--t2);
-      font-size: 14px;
+    /* 채팅 하단 입력 폼 */
+    .chat-input-area {
+      padding: 12px 16px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
     }
+    
+    .chat-input {
+      flex: 1;
+      padding: 14px 16px;
+      border: 1px solid var(--border2);
+      background: var(--bg2);
+      color: var(--t1);
+      border-radius: 24px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--ai-user); }
+    .chat-input::placeholder { color: var(--t3); }
+
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      background-color: var(--ai-user);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .send-btn:disabled { background-color: var(--bg4); color: var(--t2); cursor: not-allowed; }
+    .send-btn svg { width: 18px; height: 18px; position: relative; right: 1px; top: 1px; }
 
     /* 토스트 알림 */
     .toast {
-      position: fixed;
-      bottom: 90px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(255, 255, 255, 0.95);
-      color: #7d7d7d;
-      padding: 10px 20px;
-      border-radius: var(--r3);
-      font-size: 14px;
-      font-weight: 500;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s, transform 0.3s;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--t1); color: var(--bg); padding: 10px 20px; border-radius: var(--r3);
+      font-size: 14px; font-weight: 500; z-index: 1000; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* 스켈레톤 UI (로딩) */
+    /* 스켈레톤 UI (검색 로딩) */
     .skeleton {
       background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%);
       background-size: 200% 100%;
@@ -311,7 +322,7 @@
 
 <div class="app-container">
   
-  <header class="search-header">
+  <header class="search-header" id="searchHeader" style="display: none;">
     <div class="search-box">
       <span class="search-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -324,13 +335,34 @@
   </header>
 
   <nav class="search-tabs">
-    <button class="tab-btn active" data-tab="all">전체</button>
+    <button class="tab-btn active" data-tab="ai">AI</button>
+    <button class="tab-btn" data-tab="all">전체</button>
     <button class="tab-btn" data-tab="users">사용자</button>
     <button class="tab-btn" data-tab="posts">게시물</button>
   </nav>
 
-  <main class="search-results" id="searchResultsArea">
+  <main class="search-results" id="searchResultsArea" style="display: none;">
     <div class="status-msg">검색어를 입력하고 Enter를 누르거나 기다려주세요.</div>
+  </main>
+
+  <main class="ai-chat-container" id="aiChatArea">
+    <div class="chat-messages" id="chatMessages">
+      <div class="message ai">
+        <div class="message-content markdown-body">
+          <p>안녕하세요! 무엇이든 물어보세요. 😊</p>
+        </div>
+      </div>
+    </div>
+    
+    <form class="chat-input-area" id="chatForm">
+      <input type="text" id="chatInput" class="chat-input" placeholder="메시지를 입력하세요..." autocomplete="off" required>
+      <button type="submit" id="sendBtn" class="send-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </form>
   </main>
 
 </div>
@@ -338,33 +370,11 @@
 <div class="toast" id="toast"></div>
 
 <script>
-
+  // ====================================================
+  // 공통 및 UI 토스트 알림 함수
+  // ====================================================
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   
-
-  const CF_API_BASE = "https://sharer-api.alexeom97.workers.dev/api"; 
-
-  // 클라우드플레어를 거치므로 프론트엔드에서 API KEY를 직접 노출할 필요가 없습니다.
-  async function api(path, options = {}) {
-    const url = `${CF_API_BASE}${path}`;
-    const headers = {
-      "Content-Type": "application/json",
-      ...options.headers
-    };
-
-    const res = await fetch(url, { ...options, headers });
-    
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.message || `API 오류가 발생했습니다. (${res.status})`);
-    }
-    
-    // 상태 코드가 204(No Content)일 경우 빈 데이터 반환
-    if (res.status === 204) return null;
-    return res.json();
-  }
-
-  // 간단 토스트 알림 함수
   function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
@@ -372,48 +382,70 @@
     setTimeout(() => { toast.classList.remove('show'); }, 2500);
   }
 
-  /* ----------------------------------------------------
-   * 2. 상태 관리 및 탭 제어 인터랙션
-   * ---------------------------------------------------- */
-  let currentTab = 'all'; // 'all' | 'users' | 'posts'
-  let currentQuery = '';
-  let debounceTimeout = null;
-
-  const searchInput = document.getElementById('searchInput');
-  const clearBtn = document.getElementById('clearBtn');
+  // ====================================================
+  // 탭 제어 로직
+  // ====================================================
+  let currentTab = 'ai'; // 기본 탭 AI로 설정
+  const searchHeader = document.getElementById('searchHeader');
   const searchResultsArea = document.getElementById('searchResultsArea');
+  const aiChatArea = document.getElementById('aiChatArea');
   const tabButtons = document.querySelectorAll('.tab-btn');
 
-  // 탭 변경 이벤트 바인딩
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       tabButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentTab = btn.getAttribute('data-tab');
       
-      if (currentQuery.trim()) {
-        executeSearch();
+      if (currentTab === 'ai') {
+        searchHeader.style.display = 'none';
+        searchResultsArea.style.display = 'none';
+        aiChatArea.style.display = 'flex';
+        const msgs = document.getElementById('chatMessages');
+        msgs.scrollTop = msgs.scrollHeight;
+      } else {
+        searchHeader.style.display = 'block';
+        searchResultsArea.style.display = 'block';
+        aiChatArea.style.display = 'none';
+        if (currentQuery.trim()) {
+          executeSearch();
+        }
       }
     });
   });
 
-  // 검색어 타이핑 이벤트 제어 (X 버튼 토글 및 자동 검색 디바운싱 추가)
+  // ====================================================
+  // 1. 기존 검색 기능 유지
+  // ====================================================
+  let currentQuery = '';
+  let debounceTimeout = null;
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const CF_API_BASE = "https://sharer-api.alexeom97.workers.dev/api"; 
+
+  async function api(path, options = {}) {
+    const url = `${CF_API_BASE}${path}`;
+    const headers = { "Content-Type": "application/json", ...options.headers };
+    const res = await fetch(url, { ...options, headers });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.message || `API 오류가 발생했습니다. (${res.status})`);
+    }
+    if (res.status === 204) return null;
+    return res.json();
+  }
+
   searchInput.addEventListener('input', (e) => {
     currentQuery = e.target.value;
     clearBtn.style.display = currentQuery ? 'flex' : 'none';
-
-    // 연속 타이핑 시 불필요한 API 요청 차단 (400ms 디바운스)
     clearTimeout(debounceTimeout);
     if (!currentQuery.trim()) {
       searchResultsArea.innerHTML = `<div class="status-msg">검색어를 입력하고 Enter를 누르거나 기다려주세요.</div>`;
       return;
     }
-    debounceTimeout = setTimeout(() => {
-      executeSearch();
-    }, 400);
+    debounceTimeout = setTimeout(() => { executeSearch(); }, 400);
   });
 
-  // 엔터 키 쳤을 때 즉시 검색 실행
   searchInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       clearTimeout(debounceTimeout);
@@ -421,66 +453,40 @@
     }
   });
 
-  // 입력 내용 초기화 버튼 클릭
   clearBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    currentQuery = '';
-    clearBtn.style.display = 'none';
+    searchInput.value = ''; currentQuery = ''; clearBtn.style.display = 'none';
     searchResultsArea.innerHTML = `<div class="status-msg">검색어를 입력하고 Enter를 누르거나 기다려주세요.</div>`;
     searchInput.focus();
   });
 
-  /* ----------------------------------------------------
-   * 3. Cloudflare 연동 데이터 검색 로직 (Core API)
-   * ---------------------------------------------------- */
   async function executeSearch() {
     const query = currentQuery.trim();
     if (!query) return;
-
     NProgress.start();
-    renderSkeleton();
-
+    searchResultsArea.innerHTML = `
+      <div class="result-group">
+        <div class="post-card skeleton" style="height: 80px; margin-bottom: 12px; border:none;"></div>
+        <div class="post-card skeleton" style="height: 120px; border:none;"></div>
+      </div>
+    `;
     try {
-      let usersResult = [];
-      let postsResult = [];
-
-      // 아이디(id)와 닉네임(nickname) 모두에서 검색되도록 or 조건으로 수정
+      let usersResult = [], postsResult = [];
       if (currentTab === 'all' || currentTab === 'users') {
         usersResult = await api(`/users?or=(id.ilike.*${encodeURIComponent(query)}*,nickname.ilike.*${encodeURIComponent(query)}*)&select=*&limit=10`).catch(() => []);
       }
-      
       if (currentTab === 'all' || currentTab === 'posts') {
         postsResult = await api(`/posts?content=ilike.*${encodeURIComponent(query)}*&access=eq.public&order=created_at.desc&limit=15`).catch(() => []);
       }
-
       renderResults(usersResult, postsResult);
-
     } catch (err) {
-      console.error("검색 중 치명적 오류 발생:", err);
       searchResultsArea.innerHTML = `<div class="status-msg" style="color:#7d7d7d;">데이터를 가져오는 중 오류가 발생했습니다.</div>`;
     } finally {
       NProgress.done();
     }
   }
 
-  /* ----------------------------------------------------
-   * 4. 렌더링 엔진 (UI 배치 및 컴포넌트 생성)
-   * ---------------------------------------------------- */
-  // 로딩 플레이스홀더 애니메이션 출력
-  function renderSkeleton() {
-    searchResultsArea.innerHTML = `
-      <div class="result-group">
-        <div class="post-card skeleton" style="height: 80px; margin-bottom: 12px; border:none;"></div>
-        <div class="post-card skeleton" style="height: 120px; margin-bottom: 12px; border:none;"></div>
-        <div class="post-card skeleton" style="height: 100px; border:none;"></div>
-      </div>
-    `;
-  }
-
-  // 검색 결과 분기 및 빌드업
   function renderResults(users, posts) {
     searchResultsArea.innerHTML = '';
-
     const hasUsers = users && users.length > 0;
     const hasPosts = posts && posts.length > 0;
 
@@ -489,71 +495,44 @@
       return;
     }
 
-    // [전체 탭 혹은 사용자 탭] 그룹 빌드
     if ((currentTab === 'all' || currentTab === 'users') && hasUsers) {
       const userGroup = document.createElement('div');
       userGroup.className = 'result-group';
       if (currentTab === 'all') userGroup.innerHTML = `<div class="section-title">사용자</div>`;
-
       users.forEach(user => {
         const card = document.createElement('div');
         card.className = 'user-card';
-        // window.location.href 대신 window.parent.location.href를 사용하여 최상위 부모 창을 이동시킵니다.
         card.onclick = () => { window.parent.location.href = `user.html?id=${user.id || user.nickname}`; };
-        
-        // 아바타 혹은 기본 프레임 처리
-        const defaultAvatar =
-  "data:image/svg+xml;utf8," +
-  encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="50" fill="#222"/>
-    </svg>
-  `);
-
-        // avatar_url 대신 프로필 페이지(HTML2)처럼 profile_image 필드를 사용하도록 수정
+        const defaultAvatar = "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#222"/></svg>`);
         const avatarSrc = user.profile_image || defaultAvatar;
-        
-card.innerHTML = `
-  <img class="user-avatar"
-       src="${avatarSrc}"
-       alt="avatar"
-       onerror="this.src='${defaultAvatar}'">
-  <div class="user-info">
-    <div class="user-nickname">${escapeHtml(user.nickname)}</div>
-    <div class="user-id">@${escapeHtml(user.id || user.nickname)}</div>
-  </div>
-`;
+        card.innerHTML = `
+          <img class="user-avatar" src="${avatarSrc}" alt="avatar" onerror="this.src='${defaultAvatar}'">
+          <div class="user-info">
+            <div class="user-nickname">${escapeHtml(user.nickname)}</div>
+            <div class="user-id">@${escapeHtml(user.id || user.nickname)}</div>
+          </div>
+        `;
         userGroup.appendChild(card);
       });
       searchResultsArea.appendChild(userGroup);
     }
 
-    // [전체 탭 혹은 게시물 탭] 그룹 빌드
     if ((currentTab === 'all' || currentTab === 'posts') && hasPosts) {
       const postGroup = document.createElement('div');
       postGroup.className = 'result-group';
       if (currentTab === 'all') postGroup.innerHTML = `<div class="section-title">게시물</div>`;
-
       posts.forEach(post => {
         const card = document.createElement('div');
         card.className = 'post-card';
-        // window.location.href 대신 window.parent.location.href를 사용하여 최상위 부모 창을 이동시킵니다.
         card.onclick = () => { window.parent.location.href = `view.html?id=${post.id}`; };
-
-        // 작성일자 포맷팅 파서 처리
         const dateStr = post.created_at ? new Date(post.created_at).toLocaleDateString('ko-KR', {month:'short', day:'numeric'}) : '';
-        
-        // 이미지 썸네일 스트링 파싱 로직 포함 (make.html의 cloudinary join 구조 연계)
         let imageThumbsHtml = '';
         if (post.image_url) {
           const urls = post.image_url.split(',');
           imageThumbsHtml = `<div class="post-images">`;
-          urls.slice(0, 3).forEach(url => { // 최대 3개까지만 미리보기 타일 생성
-            imageThumbsHtml += `<img class="post-img-thumb" src="${url}" alt="thumb">`;
-          });
+          urls.slice(0, 3).forEach(url => { imageThumbsHtml += `<img class="post-img-thumb" src="${url}" alt="thumb">`; });
           imageThumbsHtml += `</div>`;
         }
-
         card.innerHTML = `
           <div class="post-header">
             <span class="post-author">${escapeHtml(post.author)}</span>
@@ -568,11 +547,181 @@ card.innerHTML = `
     }
   }
 
-  // XSS 방지 특수문자 에스케이프 헬퍼 함수
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
+
+  // ====================================================
+  // 2. AI 챗봇 스트리밍 및 렌더링 기능 (새로 이식된 영역)
+  // ====================================================
+  const WORKER_API_URL = "https://sharer-api.alexeom97.workers.dev/api/ai"; 
+  const chatMessages = document.getElementById("chatMessages");
+  const chatForm = document.getElementById("chatForm");
+  const chatInput = document.getElementById("chatInput");
+  const sendBtn = document.getElementById("sendBtn");
+  
+  let messageHistory = [];
+
+  // 사용자 메시지 화면에 추가 (카톡처럼 스르륵 올라가는 애니메이션 적용됨)
+  function appendUserMessage(text) {
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message", "user");
+    const contentDiv = document.createElement("div");
+    contentDiv.classList.add("message-content");
+    contentDiv.textContent = text;
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // ChatGPT 스타일의 바운싱 로딩 인디케이터 추가
+  function addLoadingIndicator() {
+    removeLoadingIndicator(); // 중복 방지
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message", "ai");
+    messageDiv.id = "aiLoadingIndicator";
+    const contentDiv = document.createElement("div");
+    contentDiv.classList.add("message-content");
+    contentDiv.style.padding = "8px 12px";
+    contentDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return messageDiv;
+  }
+
+  function removeLoadingIndicator() {
+    const loading = document.getElementById("aiLoadingIndicator");
+    if (loading) loading.remove();
+  }
+
+  // 답변 하단의 [복사], [다시 생성] 아이콘 추가 함수
+  function addAiActions(messageElement, textContent) {
+    const actionsDiv = document.createElement("div");
+    actionsDiv.classList.add("ai-actions");
+
+    // 복사 버튼 (SVG)
+    const copyBtn = document.createElement("button");
+    copyBtn.classList.add("action-btn");
+    copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(textContent);
+      showToast("답변이 복사되었습니다.");
+    };
+
+    // 다시 생성 (Regenerate) 버튼 (SVG)
+    const regenBtn = document.createElement("button");
+    regenBtn.classList.add("action-btn");
+    regenBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+    regenBtn.onclick = () => {
+      messageElement.remove();
+      // 마지막 AI 응답 삭제 후 재전송
+      if (messageHistory.length > 0 && messageHistory[messageHistory.length - 1].role === 'assistant') {
+        messageHistory.pop(); 
+      }
+      fetchAIResponse('', true); // true = 다시 생성 모드 (입력창 출력 생략)
+    };
+
+    actionsDiv.appendChild(copyBtn);
+    actionsDiv.appendChild(regenBtn);
+    messageElement.appendChild(actionsDiv);
+  }
+
+  // AI 통신 메인 함수 (스트리밍 및 마크다운 처리)
+  async function fetchAIResponse(userText, isRegen = false) {
+    if (!isRegen) {
+      appendUserMessage(userText);
+      messageHistory.push({ role: "user", content: userText });
+    }
+    
+    chatInput.value = "";
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+
+    // 로딩 점 3개 표시
+    addLoadingIndicator();
+
+    // 답변이 들어갈 빈 껍데기 생성 (숨김 처리)
+    const aiMessageElement = document.createElement("div");
+    aiMessageElement.classList.add("message", "ai");
+    aiMessageElement.style.display = "none";
+    
+    const contentDiv = document.createElement("div");
+    contentDiv.classList.add("message-content", "markdown-body");
+    aiMessageElement.appendChild(contentDiv);
+    chatMessages.appendChild(aiMessageElement);
+
+    let fullContent = "";
+
+    try {
+      const response = await fetch(WORKER_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: messageHistory })
+      });
+
+      if (!response.ok) throw new Error("네트워크 오류");
+
+      removeLoadingIndicator(); // 첫 응답이 오면 로딩 제거
+      aiMessageElement.style.display = "flex"; // 마크다운 영역 노출
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop(); 
+
+        for (const line of lines) {
+          const cleanedLine = line.trim();
+          if (!cleanedLine) continue;
+          if (cleanedLine === "data: [DONE]") break;
+
+          if (cleanedLine.startsWith("data: ")) {
+            try {
+              const parsed = JSON.parse(cleanedLine.slice(6));
+              const delta = parsed.choices[0]?.delta;
+              
+              if (delta && delta.content) {
+                fullContent += delta.content;
+                // marked 라이브러리를 통해 즉각적인 마크다운 변환
+                contentDiv.innerHTML = marked.parse(fullContent);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
+            } catch (err) { }
+          }
+        }
+      }
+
+      // 대화 기록 저장 및 복사/재생성 버튼 부착
+      messageHistory.push({ role: "assistant", content: fullContent });
+      addAiActions(aiMessageElement, fullContent);
+
+    } catch (error) {
+      console.error(error);
+      removeLoadingIndicator();
+      aiMessageElement.style.display = "flex";
+      contentDiv.innerHTML = `<p style="color:#ef4444;">⚠️ 에러가 발생했습니다. 다시 시도해 주세요.</p>`;
+    } finally {
+      chatInput.disabled = false;
+      sendBtn.disabled = false;
+      chatInput.focus();
+    }
+  }
+
+  // 입력 폼 제출 이벤트
+  chatForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const userText = chatInput.value.trim();
+    if (!userText) return;
+    fetchAIResponse(userText, false);
+  });
 </script>
 </body>
 </html>
