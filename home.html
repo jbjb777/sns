@@ -371,31 +371,17 @@ html[data-theme="light"] .ai-chat-section.expanded {
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .message { max-width: 85%; display: flex; flex-direction: column; gap: 6px; animation: slideUpMsg 0.4s cubic-bezier(0.25, 1, 0.3, 1) forwards; }
+.message { max-width: 85%; display: flex; flex-direction: column; gap: 6px; animation: slideUpMsg 0.4s cubic-bezier(0.25, 1, 0.3, 1) forwards; }
     .message.user { align-self: flex-end; }
     .message.ai { align-self: flex-start; }
-    
-    .message-content { 
-      padding: 14px 18px; 
-      border-radius: 22px; 
-      font-size: 15px; 
-      line-height: 1.6; 
-      word-break: break-word; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    
     .message.user .message-content { 
       background-color: var(--ai-user); 
       color: #ffffff; 
       border-bottom-right-radius: 6px; 
+      padding: 14px 18px;
     }
     
-    .message.ai .message-content {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      padding: 4px 8px !important;
-    }
+
     html[data-theme="light"] .message.ai .message-content {
       background: rgba(255, 255, 255, 0.8);
     }
@@ -824,17 +810,16 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       </div>
     </section>
 
-    <section class="ai-chat-section" id="aiChatArea">
-      <div class="chat-messages" id="chatMessages">
-        </div>
-      
-      <form class="chat-input-area" id="chatForm">
-        <input type="text" id="chatInput" class="chat-input" placeholder="Sharer AI에 묻기" autocomplete="off" required>
-        <button type="submit" id="sendBtn" class="send-btn" disabled>
-<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-arrow-up-icon lucide-circle-arrow-up"><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>
-        </button>
-      </form>
-    </section>
+<section class="ai-chat-section" id="aiChatArea">
+    <div class="chat-messages" id="chatMessages"></div>
+    
+    <form class="chat-input-area" id="chatForm">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Sharer AI에 묻기" autocomplete="off" required>
+      <button type="submit" id="sendBtn" class="send-btn" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>
+      </button>
+    </form>
+  </section>
 
     <section class="stats-section">
       <div class="stat-card reveal-item" data-animate-count="100">
@@ -1118,14 +1103,13 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
     }
 
 async function fetchAIResponse(userText, isRegen = false) {
-      if (!aiChatArea.classList.contains('expanded')) {
-        aiChatArea.classList.add('expanded');
-      }
+      if (!aiChatArea.classList.contains('expanded')) aiChatArea.classList.add('expanded');
+      
       if (!isRegen) {
         appendUserMessage(userText);
         messageHistory.push({ role: "user", content: userText });
       }
-     
+
       chatInput.value = "";
       chatInput.disabled = true;
       sendBtn.disabled = true;
@@ -1136,41 +1120,83 @@ async function fetchAIResponse(userText, isRegen = false) {
       let fullContent = "";
 
       try {
-        const response = await fetch(WORKER_API_URL, { /* ... */ });
-        // ... streaming 로직 ...
+        const response = await fetch(WORKER_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: messageHistory })
+        });
 
-        if (!aiMessageElement) {
-          removeLoadingIndicator();
-          aiMessageElement = document.createElement("div");
-          aiMessageElement.className = "message ai";
-          
-          const wrapper = document.createElement("div");
-          wrapper.className = "ai-message-wrapper";
-          
-          contentDiv = document.createElement("div");
-          contentDiv.className = "message-content markdown-body";
-          
-          wrapper.appendChild(contentDiv);
-          aiMessageElement.appendChild(wrapper);
-          chatMessages.appendChild(aiMessageElement);
-        }
+        if (!response.ok) throw new Error("네트워크 오류");
 
+<<<<<<< HEAD
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+=======
         // ... 스트리밍 중 업데이트 ...ㄹ
+>>>>>>> 5e48f6eddce3aa7540dd73b13ed6610641a688ea
 
-        contentDiv.innerHTML = marked.parse(fullContent);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
 
-        // 답변 완성 후 부드럽게 드러내기
-        const wrapper = aiMessageElement.querySelector('.ai-message-wrapper');
-        if (wrapper) {
-          setTimeout(() => wrapper.classList.add('revealed'), 30);
+          for (const line of lines) {
+            const cleaned = line.trim();
+            if (!cleaned || cleaned === "data: [DONE]") continue;
+            if (cleaned.startsWith("data: ")) {
+              try {
+                const parsed = JSON.parse(cleaned.slice(6));
+                const delta = parsed.choices?.[0]?.delta;
+                if (delta?.content) {
+                  fullContent += delta.content;
+
+                  if (!aiMessageElement) {
+                    removeLoadingIndicator();
+                    aiMessageElement = document.createElement("div");
+                    aiMessageElement.className = "message ai";
+
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "ai-message-wrapper";
+                    contentDiv = document.createElement("div");
+                    contentDiv.className = "message-content markdown-body";
+                    
+                    wrapper.appendChild(contentDiv);
+                    aiMessageElement.appendChild(wrapper);
+                    chatMessages.appendChild(aiMessageElement);
+                  }
+
+                  contentDiv.innerHTML = marked.parse(fullContent);
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+              } catch(e) {}
+            }
+          }
         }
+
+        // 최종 렌더링 + 부드러운 등장 효과
+        if (contentDiv) contentDiv.innerHTML = marked.parse(fullContent);
+        const wrapper = aiMessageElement?.querySelector('.ai-message-wrapper');
+        if (wrapper) setTimeout(() => wrapper.classList.add('revealed'), 50);
 
         messageHistory.push({ role: "assistant", content: fullContent });
         addAiActions(aiMessageElement, fullContent);
 
-      } catch (error) { /* ... */ }
-      finally {
+      } catch (error) {
+        console.error(error);
+        removeLoadingIndicator();
+        if (!aiMessageElement) {
+          aiMessageElement = document.createElement("div");
+          aiMessageElement.className = "message ai";
+          contentDiv = document.createElement("div");
+          contentDiv.className = "message-content markdown-body";
+          aiMessageElement.appendChild(contentDiv);
+          chatMessages.appendChild(aiMessageElement);
+        }
+        contentDiv.innerHTML = `<p style="color:#ef4444;">⚠️ 오류가 발생했습니다. 다시 시도해주세요.</p>`;
+      } finally {
         chatInput.disabled = false;
         sendBtn.disabled = true;
         chatInput.focus();
@@ -1181,10 +1207,19 @@ async function fetchAIResponse(userText, isRegen = false) {
       chatForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const userText = chatInput.value.trim();
-        if (!userText) return; 
-        fetchAIResponse(userText, false);
+        if (userText) fetchAIResponse(userText);
       });
     }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+
   </script>
 </body>
 </html>
