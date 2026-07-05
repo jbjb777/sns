@@ -1128,13 +1128,10 @@ async function fetchAIResponse(userText, isRegen = false) {
 
         if (!response.ok) throw new Error("네트워크 오류");
 
-<<<<<<< HEAD
+
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let buffer = "";
-=======
-        // ... 스트리밍 중 업데이트 ...ㄹ
->>>>>>> 5e48f6eddce3aa7540dd73b13ed6610641a688ea
 
         while (true) {
           const { done, value } = await reader.read();
