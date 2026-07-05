@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Sharer | 커뮤니티 · SNS</title>
   <link rel="icon" type="image/png" href="./logo_round.png">
-
   <link rel="shortcut icon" href="/logo_round.png">
   <link rel="apple-touch-icon" href="/logo_round.png">
   <link rel="canonical" href="https://sharer.r-e.kr/index.html">
@@ -13,23 +12,19 @@
   <meta name="keywords" content="Sharer, 커뮤니티, SNS, 정빈777, 정빈정빈, jbjb, 이미지 ,업로드, 공유, 서비스,소개">
   <meta name="author" content="JBJB">
   <meta name="robots" content="index, follow">
-  
+ 
   <script>
-    // 화면 깜빡임(FOUC) 방지를 위해 HTML 렌더링 전 테마를 즉시 적용합니다.
     const savedTheme = localStorage.getItem('theme') || 'dark';
     if (savedTheme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
     }
   </script>
-
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  
+ 
   <style>
-    /* Sharer 피드 페이지 원본 리셋 및 애니메이션 */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     .privacy-link {
       display: inline-flex;
       align-items: center;
@@ -42,8 +37,6 @@
 
     .privacy-link:hover { opacity: 0.8; }
     .link-icon { width: 12px; height: 12px; object-fit: contain; }
-    
-    /* Sharer 원본 변수 시스템 */
     :root {
       --bg: #000;
       --bg2: #111;
@@ -59,13 +52,12 @@
       --blue: #4dabf7;
       --green: #51cf66;
       --purple: #cc5de8;
-      --ai-user: #4f46e5; 
+      --ai-user: #4f46e5;
       --r1: 10px;
       --r2: 14px;
       --r3: 20px;
       --r4: 28px;
     }
-
     html[data-theme="light"] {
       --bg: #fafafa;
       --bg2: #ffffff;
@@ -77,11 +69,8 @@
       --t1: #000000;
       --t2: #737373;
       --t3: #a8a8a8;
-      --ai-user: #4f46e5; 
     }
-
     html { scroll-behavior: smooth; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
@@ -89,15 +78,11 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      -webkit-font-smoothing: antialiased;
-      opacity: 0;
-      animation: bodyReveal 0.4s ease forwards;
-      padding-top: 65px; 
+      padding-top: 65px;
       line-height: 1.6;
-      position: relative;
     }
 
-    /* 다채로운 투명 배경 그라데이션 */
+          /* 다채로운 투명 배경 그라데이션 */
     .bg-gradients {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -310,81 +295,74 @@
     @keyframes colorChange { to { color: #ffffff; } }
 
 
-       
-.ai-chat-section {
-  width: 100%;
-  max-width: 780px;
-  margin: 40px auto 80px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  height: 68px;
-  min-height: 68px;           /* 최소 높이 강제 */
-  overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  position: relative;
-  
-  display: flex;
-  flex-direction: column;
-}
-    
-html[data-theme="light"] .ai-chat-section {
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-}
-
-    /* 🌟 질문 전송 후 확장된 상태 */
-.ai-chat-section.expanded {
-  height: 560px;
-  border-radius: 28px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-}
-html[data-theme="light"] .ai-chat-section.expanded {
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.85);
-}
-
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  
-  /* collapsed 상태에서는 완전히 숨기고 공간도 차지하지 않음 */
-  display: none;                    /* 가장 확실한 방법 */
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-/* 확장되었을 때만 공간 차지 + 보이기 */
-.ai-chat-section.expanded .chat-messages {
-  display: flex;                    /* 확장되면 보이기 */
-  opacity: 1;
-}
-    
-
-
-    @keyframes slideUpMsg {
-      0% { opacity: 0; transform: translateY(15px) scale(0.98); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
+           .ai-chat-section {
+      width: 100%;
+      max-width: 780px;
+      margin: 40px auto 80px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      height: 68px;
+      min-height: 68px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    html[data-theme="light"] .ai-chat-section {
+      background: rgba(255, 255, 255, 0.7);
+    }
+    .ai-chat-section.expanded {
+      height: 560px;
+      border-radius: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+    html[data-theme="light"] .ai-chat-section.expanded {
+      background: rgba(255, 255, 255, 0.85);
     }
 
-.message { max-width: 85%; display: flex; flex-direction: column; gap: 6px; animation: slideUpMsg 0.4s cubic-bezier(0.25, 1, 0.3, 1) forwards; }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      display: none;
+      opacity: 0;
+    }
+    .ai-chat-section.expanded .chat-messages {
+      display: flex;
+      opacity: 1;
+    }
+
+    .message {
+      max-width: 85%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: slideUpMsg 0.4s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+    }
     .message.user { align-self: flex-end; }
     .message.ai { align-self: flex-start; }
-    .message.user .message-content { 
-      background-color: var(--ai-user); 
-      color: #ffffff; 
-      border-bottom-right-radius: 6px; 
-      padding: 14px 18px;
-    }
-    
 
-    html[data-theme="light"] .message.ai .message-content {
-      background: rgba(255, 255, 255, 0.8);
+    .message.user .message-content {
+      background-color: var(--ai-user);
+      color: #ffffff;
+      padding: 14px 18px;
+      border-radius: 22px;
+      border-bottom-right-radius: 6px;
     }
+
+    .message.ai .message-content {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 4px 8px !important;
+    }
+
     .ai-message-wrapper {
       opacity: 0.3;
       filter: blur(4px);
@@ -395,118 +373,56 @@ html[data-theme="light"] .ai-chat-section.expanded {
       opacity: 1;
       filter: blur(0);
     }
+
     .markdown-body p { margin-bottom: 10px; }
     .markdown-body p:last-child { margin-bottom: 0; }
     .markdown-body strong { font-weight: 600; }
-    .markdown-body ul, .markdown-body ol { margin-left: 20px; margin-bottom: 10px; }
-    .markdown-body code { background: var(--bg4); padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
-    .markdown-body pre { background: var(--bg4); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
-    .markdown-body pre code { background: transparent; padding: 0; }
-    
-    .ai-actions { display: flex; gap: 10px; padding-left: 4px; margin-top: 4px; }
-    .action-btn { background: transparent; border: none; color: var(--t2); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; transition: all 0.2s; }
-    .action-btn:hover { background: rgba(128,128,128,0.1); color: var(--t1); transform: scale(1.05); }
-    .action-btn:active { transform: scale(0.95); }
-    .action-btn svg { width: 16px; height: 16px; }
-    
-    .typing-indicator { display: flex; align-items: center; justify-content: center; height: 24px; padding: 0 8px; }
-    .typing-indicator span { 
-      width: 12px; 
-      height: 12px; 
-      background-color: var(--t1); 
-      border-radius: 50%; 
-      animation: pulseAI 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite; 
+
+    .ai-actions {
+      display: flex;
+      gap: 10px;
+      padding-left: 4px;
+      margin-top: 4px;
     }
-    @keyframes pulseAI {
-      0%, 100% { transform: scale(0.6); opacity: 0.3; }
-      50% { transform: scale(1); opacity: 1; }
+    .action-btn {
+      background: transparent;
+      border: none;
+      color: var(--t2);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .action-btn:hover {
+      background: rgba(128,128,128,0.1);
+      color: var(--t1);
+      transform: scale(1.05);
     }
 
-.chat-input-area {
-  height: 68px;
-  min-height: 68px;
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: transparent;
-  flex-shrink: 0;             /* 절대 줄어들지 않게 */
-  border-top: 1px solid transparent;
-  margin-top: auto;           /* 핵심: 아래로 붙이기 */
-}
-    
-    /* 확장되었을 때만 입력창 상단에 선명한 구분선을 줍니다 */
-.ai-chat-section.expanded .chat-input-area {
-  border-top: 1px solid var(--border);
-  background: var(--bg3);
-}
-
-html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.chat-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  color: var(--t1);
-  padding: 0 8px;
-}
-    
-    /* 확장되었을 땐 입력창 배경을 따로 구분 */
-    .ai-chat-section.expanded .chat-input {
-      background: var(--bg3);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    .send-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #4f46e5;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      transition: all 0.2s ease;
     }
-    .chat-input:focus { 
-      border-color: transparent; 
-    }
-    .ai-chat-section.expanded .chat-input:focus {
-      border-color: var(--ai-user); 
-      background: var(--bg2);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15), inset 0 2px 4px rgba(0,0,0,0.05);
-    }
-.chat-input::placeholder {
-  color: #888;
-}
-    
-.send-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #4f46e5;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: none;                    /* 테두리 완전 제거 */
-  box-shadow: none;                /* 그림자 제거 */
-  transition: all 0.2s ease;
-}
-
-.send-btn:hover:not(:disabled) {
+    .send-btn:hover:not(:disabled) {
       background: #6366f1;
-      filter: brightness(1.15);     /* ← 밝기 효과로 변경 */
+      filter: brightness(1.15);
     }
-
-.send-btn:active:not(:disabled) {
-  transform: scale(0.92);
-}
-
-.send-btn:disabled { 
-  background-color: var(--bg4); 
-  color: var(--t2); 
-  cursor: default; 
-  opacity: 0.6;
-}
-.send-btn svg {
-  width: 40px;
-  height: 40px;
-}
-    
+    .send-btn:active:not(:disabled) {
+      transform: scale(0.92);
+    }
+    .send-btn:disabled {
+      background-color: var(--bg4);
+      opacity: 0.6;
+      cursor: default;
+    }
     .toast {
       position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
       background: var(--t1); color: var(--bg); padding: 10px 20px; border-radius: var(--r3);
@@ -539,7 +455,6 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       opacity: 1;
       transform: translateY(0);
     }
-
     .stat-title {
       font-size: 15px;
       color: var(--t2);
@@ -768,6 +683,29 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       .bottom-brand-desc { font-size: 11px; }
       .bottom-sticky-btn { font-size: 12px; padding: 0 14px; height: 36px; }
     }
+
+    .chat-input-area {
+      height: 68px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: transparent;
+      border-top: 1px solid transparent;
+      margin-top: auto;
+    }
+    .ai-chat-section.expanded .chat-input-area {
+      border-top: 1px solid var(--border);
+      background: var(--bg3);
+    }
+    .chat-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      color: var(--t1);
+    }
   </style>
 </head>
 <body>
@@ -783,7 +721,6 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       <a href="https://sharer.r-e.kr/privacy.html" class="text-link">개인정보처리방침</a>
       <a href="https://sharer.r-e.kr/policy.html" class="text-link">이용약관</a>
       <a href="/cdn-cgi/l/email-protection#a0c1ccc5d8c5cfcd9997e0cfd5d4cccfcfcb8ec3cfcd" class="text-link">문의하기</a>
-      
       <div class="auth-group">
         <a href="https://sharer.r-e.kr/join.html" class="post-btn">회원가입</a>
       </div>
@@ -796,13 +733,11 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       <p>
         Sharer는 이미지와 텍스트를 자유롭게 업로드하고 사람들과 깊이 있게 소통할 수 있는 무료 커뮤니티·SNS 서비스입니다. 나만의 일상과 스토리를 공유하고, 새로운 피드를 발견해보세요.
       </p>
-      
       <div class="hero-actions" id="heroActions">
         <a href="https://sharer.r-e.kr/index.html" class="post-btn">
           <img src="link_.svg" alt="" class="btn-icon">
           웹에서 Sharer 열기
         </a>
-        
         <a href="https://sharer.r-e.kr/login.html" class="btn type_conversation" id="aiBtn">
           <span class="ico_ai"></span>
           <span class="btn_text">로그인</span>
@@ -810,16 +745,16 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       </div>
     </section>
 
-<section class="ai-chat-section" id="aiChatArea">
-    <div class="chat-messages" id="chatMessages"></div>
-    
-    <form class="chat-input-area" id="chatForm">
-      <input type="text" id="chatInput" class="chat-input" placeholder="Sharer AI에 묻기" autocomplete="off" required>
-      <button type="submit" id="sendBtn" class="send-btn" disabled>
-        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>
-      </button>
-    </form>
-  </section>
+    <section class="ai-chat-section" id="aiChatArea">
+      <div class="chat-messages" id="chatMessages"></div>
+      
+      <form class="chat-input-area" id="chatForm">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Sharer AI에 묻기" autocomplete="off" required>
+        <button type="submit" id="sendBtn" class="send-btn" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>
+        </button>
+      </form>
+    </section>
 
     <section class="stats-section">
       <div class="stat-card reveal-item" data-animate-count="100">
@@ -915,7 +850,7 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
   <div class="toast" id="toast"></div>
 
   <script>
-    function toggleTheme() {
+        function toggleTheme() {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', newTheme);
@@ -1010,46 +945,30 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
 
       stickyObserver.observe(heroActions);
     }
-
-    // ====================================================
-    // 새로 이식된 AI 챗봇 모달 스크립트 기능
-    // ====================================================
     function showToast(msg) {
       const toast = document.getElementById('toast');
-      if (!toast) return;
       toast.textContent = msg;
       toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 2500);
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    const WORKER_API_URL = "https://sharer-api.alexeom97.workers.dev/api/ai"; 
+    const WORKER_API_URL = "https://sharer-api.alexeom97.workers.dev/api/ai";
     const aiChatArea = document.getElementById("aiChatArea");
     const chatMessages = document.getElementById("chatMessages");
     const chatForm = document.getElementById("chatForm");
     const chatInput = document.getElementById("chatInput");
     const sendBtn = document.getElementById("sendBtn");
-    
+
     let messageHistory = [];
 
-    // 입력창 값에 따른 버튼 활성화/비활성화 로직
     chatInput.addEventListener('input', () => {
-      if (chatInput.value.trim().length > 0) {
-        sendBtn.disabled = false;
-      } else {
-        sendBtn.disabled = true;
-      }
+      sendBtn.disabled = chatInput.value.trim().length === 0;
     });
-
-    // 초기 상태에서 버튼 비활성화 확인
-    sendBtn.disabled = chatInput.value.trim().length === 0;
 
     function appendUserMessage(text) {
       const messageDiv = document.createElement("div");
-      messageDiv.classList.add("message", "user");
-      const contentDiv = document.createElement("div");
-      contentDiv.classList.add("message-content");
-      contentDiv.textContent = text;
-      messageDiv.appendChild(contentDiv);
+      messageDiv.className = "message user";
+      messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
       chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -1057,16 +976,11 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
     function addLoadingIndicator() {
       removeLoadingIndicator();
       const messageDiv = document.createElement("div");
-      messageDiv.classList.add("message", "ai");
+      messageDiv.className = "message ai";
       messageDiv.id = "aiLoadingIndicator";
-      const contentDiv = document.createElement("div");
-      contentDiv.classList.add("message-content");
-      contentDiv.style.padding = "8px 12px";
-      contentDiv.innerHTML = `<div class="typing-indicator"><span></span></div>`;
-      messageDiv.appendChild(contentDiv);
+      messageDiv.innerHTML = `<div class="message-content"><div class="typing-indicator"><span></span></div></div>`;
       chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
-      return messageDiv;
     }
 
     function removeLoadingIndicator() {
@@ -1075,11 +989,12 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
     }
 
     function addAiActions(messageElement, textContent) {
+      if (!messageElement) return;
       const actionsDiv = document.createElement("div");
-      actionsDiv.classList.add("ai-actions");
+      actionsDiv.className = "ai-actions";
 
       const copyBtn = document.createElement("button");
-      copyBtn.classList.add("action-btn");
+      copyBtn.className = "action-btn";
       copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
       copyBtn.onclick = () => {
         navigator.clipboard.writeText(textContent);
@@ -1087,12 +1002,12 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       };
 
       const regenBtn = document.createElement("button");
-      regenBtn.classList.add("action-btn");
+      regenBtn.className = "action-btn";
       regenBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
       regenBtn.onclick = () => {
         messageElement.remove();
         if (messageHistory.length > 0 && messageHistory[messageHistory.length - 1].role === 'assistant') {
-          messageHistory.pop(); 
+          messageHistory.pop();
         }
         fetchAIResponse('', true);
       };
@@ -1102,9 +1017,10 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       messageElement.appendChild(actionsDiv);
     }
 
-async function fetchAIResponse(userText, isRegen = false) {
-      if (!aiChatArea.classList.contains('expanded')) aiChatArea.classList.add('expanded');
-      
+    async function fetchAIResponse(userText, isRegen = false) {
+      if (!aiChatArea.classList.contains('expanded')) {
+        aiChatArea.classList.add('expanded');
+      }
       if (!isRegen) {
         appendUserMessage(userText);
         messageHistory.push({ role: "user", content: userText });
@@ -1127,7 +1043,6 @@ async function fetchAIResponse(userText, isRegen = false) {
         });
 
         if (!response.ok) throw new Error("네트워크 오류");
-
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
@@ -1159,7 +1074,7 @@ async function fetchAIResponse(userText, isRegen = false) {
                     wrapper.className = "ai-message-wrapper";
                     contentDiv = document.createElement("div");
                     contentDiv.className = "message-content markdown-body";
-                    
+
                     wrapper.appendChild(contentDiv);
                     aiMessageElement.appendChild(wrapper);
                     chatMessages.appendChild(aiMessageElement);
@@ -1173,8 +1088,8 @@ async function fetchAIResponse(userText, isRegen = false) {
           }
         }
 
-        // 최종 렌더링 + 부드러운 등장 효과
         if (contentDiv) contentDiv.innerHTML = marked.parse(fullContent);
+        
         const wrapper = aiMessageElement?.querySelector('.ai-message-wrapper');
         if (wrapper) setTimeout(() => wrapper.classList.add('revealed'), 50);
 
@@ -1207,16 +1122,13 @@ async function fetchAIResponse(userText, isRegen = false) {
         if (userText) fetchAIResponse(userText);
       });
     }
-
-    function showToast(msg) {
+        function showToast(msg) {
       const toast = document.getElementById('toast');
       if (!toast) return;
       toast.textContent = msg;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
-
-
   </script>
 </body>
 </html>
