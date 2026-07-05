@@ -363,21 +363,20 @@
       padding: 4px 8px !important;
     }
 
-    /* 개별 텍스트 요소가 나타날 때 적용될 기본 스타일 (블러 + 투명 + 약간 아래 위치) */
-    .markdown-body > * {
+    /* AI 메시지 내부 개별 문단/요소 순차 애니메이션 설정 */
+    .message.ai .message-content > * {
       opacity: 0;
       filter: blur(6px);
-      transform: translateY(10px);
-      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
-                  filter 0.6s cubic-bezier(0.23, 1, 0.32, 1),
-                  transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      transform: translateY(12px);
+      animation: revealSentence 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
     }
 
-    /* 효과가 서서히 사라질 때 붙는 클래스 */
-    .markdown-body > .reveal-text {
-      opacity: 1;
-      filter: blur(0);
-      transform: translateY(0);
+    @keyframes revealSentence {
+      to {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+      }
     }
 
     .markdown-body p { margin-bottom: 10px; }
@@ -426,7 +425,7 @@
     }
     .send-btn:disabled {
       background-color: var(--bg4);
-      opacity: 6;
+      opacity: 0.6;
       cursor: default;
     }
     .toast {
@@ -1083,24 +1082,16 @@
                     chatMessages.appendChild(aiMessageElement);
                   }
 
-                  // 마크다운 랜더링 결과를 주입
                   contentDiv.innerHTML = marked.parse(fullContent);
-                  
-                  // 새로 추가되거나 생성된 개별 자식 노드 순회하며 reveal-text 클래스 적용
-                  const childNodes = contentDiv.children;
-                  for(let i = 0; i < childNodes.length; i++) {
-                    const child = childNodes[i];
-                    // 마지막 노드는 아직 글자가 완성되는 중일 수 있으므로 즉시 반영하고, 
-                    // 이전 노드들은 약간의 시차(requestAnimationFrame)를 두고 애니메이션 효과를 부여
-                    if (i === childNodes.length - 1) {
-                      child.classList.add('reveal-text');
-                    } else {
-                      requestAnimationFrame(() => {
-                        child.classList.add('reveal-text');
-                      });
+
+                  // 스트리밍되는 요소들에 순차적으로 애니메이션 딜레이 부여
+                  const children = contentDiv.children;
+                  for (let i = 0; i < children.length; i++) {
+                    if (!children[i].style.animationDelay) {
+                      children[i].style.animationDelay = `${i * 0.15}s`;
                     }
                   }
-                  
+
                   chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
               } catch(e) {}
@@ -1108,14 +1099,14 @@
           }
         }
 
-        // 전체 완성 후 최종 정렬 및 노드reveal 확정 처리
         if (contentDiv) {
           contentDiv.innerHTML = marked.parse(fullContent);
-          Array.from(contentDiv.children).forEach(child => {
-            child.classList.add('reveal-text');
-          });
+          const children = contentDiv.children;
+          for (let i = 0; i < children.length; i++) {
+            children[i].style.animationDelay = `${i * 0.15}s`;
+          }
         }
-        
+
         messageHistory.push({ role: "assistant", content: fullContent });
         addAiActions(aiMessageElement, fullContent);
 
