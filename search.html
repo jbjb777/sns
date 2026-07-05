@@ -670,6 +670,10 @@
       const decoder = new TextDecoder("utf-8");
       let buffer = "";
 
+// ... 기존 코드 (let buffer = ""; 까지 동일) ...
+
+      let lastRenderTime = 0; // 렌더링 최적화를 위한 변수 추가
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -690,18 +694,29 @@
               
               if (delta && delta.content) {
                 fullContent += delta.content;
-                // marked 라이브러리를 통해 즉각적인 마크다운 변환
-                contentDiv.innerHTML = marked.parse(fullContent);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // 💡 최적화: 매 글자마다 렌더링하지 않고 50ms 간격으로 화면 업데이트
+                const now = Date.now();
+                if (now - lastRenderTime > 50) {
+                  contentDiv.innerHTML = marked.parse(fullContent);
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+                  lastRenderTime = now;
+                }
               }
             } catch (err) { }
           }
         }
       }
 
+      // 💡 스트리밍이 완전히 끝난 후 최종적으로 한 번 더 완벽하게 렌더링
+      contentDiv.innerHTML = marked.parse(fullContent);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
       // 대화 기록 저장 및 복사/재생성 버튼 부착
       messageHistory.push({ role: "assistant", content: fullContent });
       addAiActions(aiMessageElement, fullContent);
+
+
 
     } catch (error) {
       console.error(error);
