@@ -363,15 +363,21 @@
       padding: 4px 8px !important;
     }
 
-    .ai-message-wrapper {
-      opacity: 0.3;
-      filter: blur(4px);
-      transition: opacity 0.65s cubic-bezier(0.23, 1, 0.32, 1),
-                  filter 0.85s cubic-bezier(0.23, 1, 0.32, 1);
+    /* 개별 텍스트 요소가 나타날 때 적용될 기본 스타일 (블러 + 투명 + 약간 아래 위치) */
+    .markdown-body > * {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateY(10px);
+      transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                  filter 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+                  transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
     }
-    .ai-message-wrapper.revealed {
+
+    /* 효과가 서서히 사라질 때 붙는 클래스 */
+    .markdown-body > .reveal-text {
       opacity: 1;
       filter: blur(0);
+      transform: translateY(0);
     }
 
     .markdown-body p { margin-bottom: 10px; }
@@ -420,7 +426,7 @@
     }
     .send-btn:disabled {
       background-color: var(--bg4);
-      opacity: 0.6;
+      opacity: 6;
       cursor: default;
     }
     .toast {
@@ -1070,17 +1076,31 @@
                     aiMessageElement = document.createElement("div");
                     aiMessageElement.className = "message ai";
 
-                    const wrapper = document.createElement("div");
-                    wrapper.className = "ai-message-wrapper";
                     contentDiv = document.createElement("div");
                     contentDiv.className = "message-content markdown-body";
 
-                    wrapper.appendChild(contentDiv);
-                    aiMessageElement.appendChild(wrapper);
+                    aiMessageElement.appendChild(contentDiv);
                     chatMessages.appendChild(aiMessageElement);
                   }
 
+                  // 마크다운 랜더링 결과를 주입
                   contentDiv.innerHTML = marked.parse(fullContent);
+                  
+                  // 새로 추가되거나 생성된 개별 자식 노드 순회하며 reveal-text 클래스 적용
+                  const childNodes = contentDiv.children;
+                  for(let i = 0; i < childNodes.length; i++) {
+                    const child = childNodes[i];
+                    // 마지막 노드는 아직 글자가 완성되는 중일 수 있으므로 즉시 반영하고, 
+                    // 이전 노드들은 약간의 시차(requestAnimationFrame)를 두고 애니메이션 효과를 부여
+                    if (i === childNodes.length - 1) {
+                      child.classList.add('reveal-text');
+                    } else {
+                      requestAnimationFrame(() => {
+                        child.classList.add('reveal-text');
+                      });
+                    }
+                  }
+                  
                   chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
               } catch(e) {}
@@ -1088,11 +1108,14 @@
           }
         }
 
-        if (contentDiv) contentDiv.innerHTML = marked.parse(fullContent);
+        // 전체 완성 후 최종 정렬 및 노드reveal 확정 처리
+        if (contentDiv) {
+          contentDiv.innerHTML = marked.parse(fullContent);
+          Array.from(contentDiv.children).forEach(child => {
+            child.classList.add('reveal-text');
+          });
+        }
         
-        const wrapper = aiMessageElement?.querySelector('.ai-message-wrapper');
-        if (wrapper) setTimeout(() => wrapper.classList.add('revealed'), 50);
-
         messageHistory.push({ role: "assistant", content: fullContent });
         addAiActions(aiMessageElement, fullContent);
 
