@@ -380,12 +380,30 @@
 
   // ====================================================
   // 탭 제어 로직
+
+
+  // ====================================================
+  // 1. 기존 검색 기능 유지
+  // ====================================================
+  
+    // ====================================================
+  // 탭 제어 로직 (수정본)
   // ====================================================
   let currentTab = 'all';
   const searchHeader = document.getElementById('searchHeader');
   const searchResultsArea = document.getElementById('searchResultsArea');
   const aiChatArea = document.getElementById('aiChatArea');
   const tabButtons = document.querySelectorAll('.tab-btn');
+
+  // [추가] 초기 페이지 로드 시 '전체(all)' 탭에 맞는 화면 설정
+  function initTab() {
+    searchHeader.style.display = 'block';
+    searchResultsArea.style.display = 'block';
+    aiChatArea.style.display = 'none';
+  }
+  
+  // 초기화 함수 실행
+  initTab();
 
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -394,9 +412,9 @@
       currentTab = btn.getAttribute('data-tab');
       
       if (currentTab === 'ai') {
-
         window.parent.location.href = "https://sharer.r-e.kr/ai.html";
       } else {
+        // 전체, 사용자, 게시물 탭을 누르면 검색창과 결과창을 띄우고 AI 영역은 확실히 숨김
         searchHeader.style.display = 'block';
         searchResultsArea.style.display = 'block';
         aiChatArea.style.display = 'none';
@@ -407,9 +425,12 @@
     });
   });
 
-  // ====================================================
-  // 1. 기존 검색 기능 유지
-  // ====================================================
+  
+  
+  
+  
+  
+  
   let currentQuery = '';
   let debounceTimeout = null;
   const searchInput = document.getElementById('searchInput');
