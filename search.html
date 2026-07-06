@@ -344,9 +344,12 @@
   <main class="search-results" id="searchResultsArea" style="display: none;">
     <div class="status-msg">검색어를 입력하고 Enter를 누르거나 기다려주세요.</div>
   </main>
+<main class="ai-chat-container" id="aiChatArea" style="display:none">
 
-    
+    <div class="chat-messages" id="chatMessages"></div>
+
     <form class="chat-input-area" id="chatForm">
+
       <input type="text" id="chatInput" class="chat-input" placeholder="메시지를 입력하세요..." autocomplete="off" required>
       <button type="submit" id="sendBtn" class="send-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -355,8 +358,9 @@
         </svg>
       </button>
     </form>
-  </main>
+  
 
+  </main>
 </div>
 
 <div class="toast" id="toast"></div>
