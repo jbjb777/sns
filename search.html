@@ -385,7 +385,7 @@
   // ====================================================
   // 탭 제어 로직
   // ====================================================
-  let currentTab = 'ai'; // 기본 탭 AI로 설정
+  let cusearchHeader'all'; // 기본 탭 AI로 설정
   const searchHeader = document.getElementById('searchHeader');
   const searchResultsArea = document.getElementById('searchResultsArea');
   const aiChatArea = document.getElementById('aiChatArea');
@@ -403,6 +403,7 @@
         aiChatArea.style.display = 'flex';
         const msgs = document.getElementById('chatMessages');
         msgs.scrollTop = msgs.scrollHeight;
+        window.location.href = "https://sharer.r-e.kr/ai.html";
       } else {
         searchHeader.style.display = 'block';
         searchResultsArea.style.display = 'block';
