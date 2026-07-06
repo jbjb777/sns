@@ -282,7 +282,7 @@
       0%, 100% { transform: scale(0.6); opacity: 0.3; }
       50% { transform: scale(1); opacity: 1; }
     }
-
+.header { background: var(--bg); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
     /* 토스트 알림 */
     .toast {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
@@ -303,7 +303,12 @@
   </style>
 </head>
 <body>
-
+  <div class="header">
+    <div class="logo-container" onclick="location.href='index.html'">
+      <img src="logo.svg" alt="Sharer" class="logo-svg">
+      <span class="logo-text">Sharer</span>
+    </div>
+  </div>
   <div class="bg-gradients"></div>
 
   <button class="theme-toggle" onclick="toggleTheme()">테마 변경</button>
