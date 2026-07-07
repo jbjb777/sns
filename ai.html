@@ -94,15 +94,17 @@
     }
 
     /* 메인 채팅 메시지 영역 */
-    .chat-messages-container {
-      flex: 1;
-      width: 100%;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-      opacity: 0; 
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
+.chat-messages-container {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+
+  padding-top: 65px;   /* 헤더 높이만큼 확보 */
+}
 
     /* 채팅이 시작되면 메시지 영역 활성화 */
     .chat-layout.chatting .chat-messages-container {
@@ -114,7 +116,7 @@
       max-width: 800px;
       margin: 0 auto;
       width: 100%;
-      padding: 60px 20px 160px; /* 하단 입력창에 가려지지 않도록 패딩 확보 */
+      padding: 20px 20px 160px; /* 하단 입력창에 가려지지 않도록 패딩 확보 */
       display: flex;
       flex-direction: column;
       gap: 24px;
@@ -284,7 +286,21 @@
       0%, 100% { transform: scale(0.6); opacity: 0.3; }
       50% { transform: scale(1); opacity: 1; }
     }
-.header { background: var(--bg); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
     /* 토스트 알림 */
     .toast {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
