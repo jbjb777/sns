@@ -354,6 +354,12 @@ opacity: 1;
 
     .stat-label { font-size: 12px; color: var(--t3); font-weight: 500; }
 
+    .action-btns-wrapper {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+
     .share-btn {
       background: var(--bg3);
       border: 1px solid var(--border2);
@@ -364,7 +370,6 @@ opacity: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-left: auto;
       flex-shrink: 0;
       transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
@@ -1013,6 +1018,19 @@ opacity: 1;
     </div>
   </div>
 
+  <div class="modal-overlay" id="aiAnalysisModal">
+    <div class="modal-content" style="text-align: left; padding: 32px 24px;">
+      <div class="modal-title" style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--t1); display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <img src="logo_ai/color.png" alt="AI" style="width: 24px; height: 24px; object-fit: contain;"> AI 사용자 분석
+      </div>
+      <div id="aiAnalysisContent" style="color: var(--t1); font-size: 14px; line-height: 1.6; word-break: keep-all; max-height: 60vh; overflow-y: auto;">
+      </div>
+      <div class="modal-buttons" style="justify-content: center; width: 100%; margin-top: 24px;">
+        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAiAnalysisModal()">확인</button>
+      </div>
+    </div>
+  </div>
+
   <input type="file" id="profileFileInput" accept="image/*" style="display:none;">
 
 <script src="markdown.js"></script>
@@ -1288,12 +1306,17 @@ opacity: 1;
                 <div class="stat-number">${totalLikes}</div>
                 <div class="stat-label">좋아요</div>
               </div>
-              <button class="share-btn" id="shareBtn" onclick="copyProfileLink()" title="프로필 링크 복사">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-              </button>
+              <div class="action-btns-wrapper">
+                <button class="share-btn" id="aiAnalyzeBtn" onclick="analyzeUser()" title="AI 사용자 분석">
+                  <img src="logo_ai/color.png" alt="AI" style="width: 20px; height: 20px; object-fit: contain;">
+                </button>
+                <button class="share-btn" id="shareBtn" onclick="copyProfileLink()" title="프로필 링크 복사">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+              </div>
              </div>
           </div>
         </div>
@@ -1505,6 +1528,103 @@ window.toggleSearchPanel = function() {
     document.getElementById('adminInfoModal').classList.remove('active');
   };
 
+  // AI 사용자 분석 모달 제어 함수
+  window.openAiAnalysisModal = function() {
+    document.getElementById('aiAnalysisModal').classList.add('active');
+  };
+  window.closeAiAnalysisModal = function() {
+    document.getElementById('aiAnalysisModal').classList.remove('active');
+  };
+
+  // AI 사용자 분석 로직
+  window.analyzeUser = async function() {
+    openAiAnalysisModal();
+    const contentDiv = document.getElementById('aiAnalysisContent');
+
+    // 대기 중 스켈레톤 UI 표시
+    contentDiv.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+        <div class="skeleton skeleton-text" style="width: 100%; margin: 0; height: 18px;"></div>
+        <div class="skeleton skeleton-text" style="width: 90%; margin: 0; height: 18px;"></div>
+        <div class="skeleton skeleton-text" style="width: 75%; margin: 0; height: 18px;"></div>
+      </div>
+    `;
+
+    const nickname = viewingUser.nickname || '알 수 없음';
+    const statusMessage = viewingUser.message || '없음';
+    const postCount = rawPostsCached.length;
+    let totalLikes = 0;
+
+    try {
+      const postIds = rawPostsCached.map(p => p.id).join(',');
+      if (postIds) {
+        const allLikes = await api(`/likes?post_id=in.(${postIds})&select=post_id`);
+        totalLikes = allLikes?.length || 0;
+      }
+    } catch(e) {}
+
+    const postsText = rawPostsCached.map((p, idx) => `[게시물 ${idx+1}] ${p.content || '(내용 없음)'}`).join('\n');
+    
+    const prompt = `이 정보를 바탕으로 사용자에 대해 칭찬하고 분석하는 글을 작성해줘. 이메일이나 비밀번호 같은 민감한 정보는 없어.\n\n[사용자 정보]\n닉네임: ${nickname}\n상태메시지: ${statusMessage}\n작성 게시물 수: ${postCount}\n총 좋아요 수: ${totalLikes}\n\n[게시물 내용]\n${postsText}`;
+
+    try {
+      const WORKER_API_URL = "https://sharer-api.alexeom97.workers.dev/api/ai";
+      const response = await fetch(WORKER_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      if (!response.ok) throw new Error("AI 분석 요청 실패");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+      let fullContent = "";
+
+      contentDiv.innerHTML = ""; // 스켈레톤 제거
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const cleaned = line.trim();
+          if (!cleaned || cleaned === "data: [DONE]") continue;
+          if (cleaned.startsWith("data: ")) {
+            try {
+              const parsed = JSON.parse(cleaned.slice(6));
+              const delta = parsed.choices?.[0]?.delta;
+              if (delta?.content) {
+                fullContent += delta.content;
+                contentDiv.innerHTML = parseMarkdown(fullContent);
+              }
+            } catch(e) {}
+          }
+        }
+      }
+      
+      if (buffer.trim().startsWith("data: ")) {
+        try {
+          const parsed = JSON.parse(buffer.trim().slice(6));
+          if (parsed.choices?.[0]?.delta?.content) {
+            fullContent += parsed.choices[0].delta.content;
+            contentDiv.innerHTML = parseMarkdown(fullContent);
+          }
+        } catch(e) {}
+      }
+    } catch(err) {
+      console.error(err);
+      contentDiv.innerHTML = `<div style="color: var(--pink); text-align: center;">사용자 분석 중 오류가 발생했습니다. 나중에 다시 시도해주세요.</div>`;
+    }
+  };
+
   window.saveStatusMessage = async function() {
     const input = document.getElementById('statusInput');
     const newMessage = input.value.trim();
@@ -1529,6 +1649,9 @@ window.toggleSearchPanel = function() {
   });
   document.getElementById('adminInfoModal').addEventListener('click', function(e) {
     if (e.target === this) closeAdminModal();
+  });
+  document.getElementById('aiAnalysisModal').addEventListener('click', function(e) {
+    if (e.target === this) closeAiAnalysisModal();
   });
 
   window.goBack = () => { NProgress.start(); window.history.back(); };
