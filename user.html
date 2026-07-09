@@ -1565,7 +1565,7 @@ window.toggleSearchPanel = function() {
 
     const postsText = rawPostsCached.map((p, idx) => `[게시물 ${idx+1}] ${p.content || '(내용 없음)'}`).join('\n');
     
-    const prompt = `이 정보를 바탕으로 사용자에 대해 칭찬하고 분석하는 글을 작성해줘. 이메일이나 비밀번호 같은 민감한 정보는 없어.\n\n[사용자 정보]\n닉네임: ${nickname}\n상태메시지: ${statusMessage}\n작성 게시물 수: ${postCount}\n총 좋아요 수: ${totalLikes}\n\n[게시물 내용]\n${postsText}`;
+    const prompt = `이 정보를 바탕으로 사용자에 대해 칭찬하고 분석하는 글을 작성해줘. 20줄 정도로. 이메일이나 비밀번호 같은 민감한 정보는 없어.\n\n[사용자 정보]\n닉네임: ${nickname}\n상태메시지: ${statusMessage}\n작성 게시물 수: ${postCount}\n총 좋아요 수: ${totalLikes}\n\n[게시물 내용]\n${postsText}`;
 
     try {
       const WORKER_API_URL = "https://sharer-api.alexeom97.workers.dev/api/ai";
@@ -1579,36 +1579,38 @@ window.toggleSearchPanel = function() {
 
       if (!response.ok) throw new Error("AI 분석 요청 실패");
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let buffer = "";
-      let fullContent = "";
+const reader = response.body.getReader();
+const decoder = new TextDecoder("utf-8");
+let buffer = "";
+let fullContent = "";
+let isFirstChunk = true; // ◀ 첫 데이터가 들어오는지 체크할 변수 추가
 
-      contentDiv.innerHTML = ""; // 스켈레톤 제거
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          const cleaned = line.trim();
-          if (!cleaned || cleaned === "data: [DONE]") continue;
-          if (cleaned.startsWith("data: ")) {
-            try {
-              const parsed = JSON.parse(cleaned.slice(6));
-              const delta = parsed.choices?.[0]?.delta;
-              if (delta?.content) {
-                fullContent += delta.content;
-                contentDiv.innerHTML = parseMarkdown(fullContent);
-              }
-            } catch(e) {}
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
+  const lines = buffer.split("\n");
+  buffer = lines.pop() || "";
+  for (const line of lines) {
+    const cleaned = line.trim();
+    if (!cleaned || cleaned === "data: [DONE]") continue;
+    if (cleaned.startsWith("data: ")) {
+      try {
+        const parsed = JSON.parse(cleaned.slice(6));
+        const delta = parsed.choices?.[0]?.delta;
+        if (delta?.content) {
+          // ◀ 실제 AI 텍스트가 처음 들어왔을 때만 스켈레톤을 비워줍니다.
+          if (isFirstChunk) {
+            contentDiv.innerHTML = ""; 
+            isFirstChunk = false;
           }
+          fullContent += delta.content;
+          contentDiv.innerHTML = parseMarkdown(fullContent);
         }
-      }
+      } catch(e) {}
+    }
+  }
+}
       
       if (buffer.trim().startsWith("data: ")) {
         try {
