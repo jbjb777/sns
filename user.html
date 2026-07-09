@@ -1565,7 +1565,7 @@ window.toggleSearchPanel = function() {
 
     const postsText = rawPostsCached.map((p, idx) => `[게시물 ${idx+1}] ${p.content || '(내용 없음)'}`).join('\n');
     
-    const prompt = `이 정보를 바탕으로 사용자에 대해 칭찬하고 분석하는 글을 작성해줘. 20줄 정도로. 마지막에 ,본 정보는 게시물 (받은 게시물 개수)개 에 기반으로 인공지능에 의해 생성된 정보로 잘못된 정보가 있을수 있습니다. 라고 해줘. 이메일이나 비밀번호 같은 민감한 정보는 없어.\n\n[사용자 정보]\n닉네임: ${nickname}\n상태메시지: ${statusMessage}\n작성 게시물 수: ${postCount}\n총 좋아요 수: ${totalLikes}\n\n[게시물 내용]\n${postsText}`;
+    const prompt = `이 정보를 바탕으로 사용자에 대해 제 3자 입장에서 분석하는 글을 작성해줘. 20줄 정도로. 마지막에 ,본 정보는 게시물 (받은 게시물 개수)개 에 기반으로 인공지능에 의해 생성된 정보로 잘못된 정보가 있을수 있습니다. 라고 해줘. 이메일이나 비밀번호 같은 민감한 정보는 없어.\n\n[사용자 정보]\n닉네임: ${nickname}\n상태메시지: ${statusMessage}\n작성 게시물 수: ${postCount}\n총 좋아요 수: ${totalLikes}\n\n[게시물 내용]\n${postsText}`;
 
     try {
       const WORKER_API_URL = "https://sharer-api.alexeom97.workers.dev/api/ai";
