@@ -480,7 +480,7 @@
           body: JSON.stringify({ messages: messageHistory })
         });
 
-        if (!response.ok) throw new Error("네트워크 오류");
+        if (!response.ok) throw new Error("문제가 발생했어요. 1분 뒤 다시 시도해 보세요");
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
@@ -543,7 +543,7 @@
           aiMessageElement.appendChild(contentDiv);
           chatMessages.appendChild(aiMessageElement);
         }
-        contentDiv.innerHTML = `<p style="color:#ef4444;">⚠️ 오류가 발생했습니다. 다시 시도해주세요.</p>`;
+        contentDiv.innerHTML = `<p style="color:#ef4444;">문제가 발생했어요. 1분 뒤 다시 시도해 보세요</p>`;
         scrollToBottom();
       } finally {
         chatInput.disabled = false;
