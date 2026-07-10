@@ -382,7 +382,7 @@
       background: var(--bg2);
       border: 1px solid var(--border2);
       width: 90%;
-      max-width: 420px;
+      max-width: 400px;
       border-radius: var(--r4);
       padding: 24px;
       position: relative;
@@ -410,7 +410,7 @@
     }
     .form-group input:focus { border-color: var(--blue); }
 
-    /* 모달 내부 검색창 스타일 (source: 2 스타일 이식) */
+    /* 모달 내부 검색 상자 스타일 정의 */
     .modal-search-box {
       display: flex;
       align-items: center;
@@ -428,60 +428,39 @@
       color: var(--t1); font-size: 14px; padding-left: 8px;
     }
     .modal-search-box input::placeholder { color: var(--t3); }
-    .modal-search-icon { color: var(--t2); display: flex; align-items: center; justify-content: center; }
+    .modal-search-box .search-icon { color: var(--t2); display: flex; align-items: center; }
     
     .user-select-list {
       max-height: 200px; overflow-y: auto;
       border: 1px solid var(--border2); border-radius: var(--r2);
       background: var(--bg);
     }
-    .user-select-list::-webkit-scrollbar { width: 4px; }
-    .user-select-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-    /* 커스텀 선택 체크 버튼 스타일 */
     .user-select-item {
-      display: flex; align-items: center; padding: 12px 14px; gap: 12px;
-      cursor: pointer; border-bottom: 1px solid var(--border);
-      position: relative; transition: background 0.2s;
-      user-select: none;
+      display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+      cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.2s;
     }
     .user-select-item:last-child { border-bottom: none; }
     .user-select-item:hover { background: var(--bg3); }
+    .user-select-item .user-meta { display: flex; align-items: center; gap: 10px; }
+    .user-select-item .user-meta span { font-size: 14px; font-weight: 500; }
     
-    /* 실제 체크박스는 숨김 */
-    .user-select-item input[type="checkbox"] {
-      position: absolute; opacity: 0; width: 0; height: 0;
+    /* 기존 체크박스 대신 커스텀 버튼 스타일 생성 */
+    .select-chk-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    
-    /* 직접 만드는 체크 버튼 커스텀 UI */
-    .custom-checkbox {
-      width: 22px; height: 22px;
-      border: 2px solid var(--border3);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s ease;
-      flex-shrink: 0;
-      background: transparent;
-    }
-    .user-select-item input[type="checkbox"]:checked + .custom-checkbox {
+    .select-chk-btn.checked {
       background: var(--blue);
       border-color: var(--blue);
-    }
-    .custom-checkbox svg {
-      width: 14px; height: 14px;
       color: #fff;
-      display: none;
     }
-    .user-select-item input[type="checkbox"]:checked + .custom-checkbox svg {
-      display: block;
-    }
-    
-    /* 사용자 정보 텍스트 정렬 */
-    .user-select-info {
-      flex: 1; display: flex; flex-direction: column; gap: 2px;
-    }
-    .user-select-nickname { font-size: 14px; font-weight: 600; color: var(--t1); }
-    .user-select-id { font-size: 12px; color: var(--t2); }
     
     .modal-btn {
       width: 100%; padding: 14px; border-radius: var(--r2);
@@ -489,6 +468,29 @@
       border: none; font-size: 14px; font-weight: 600; cursor: pointer;
     }
     .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* 위에서 아래로 스르륵 내려오는 커스텀 토스트 알림 스타일 */
+    .custom-alert {
+      position: fixed;
+      top: -70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg3);
+      color: var(--t1);
+      border: 1px solid var(--border2);
+      padding: 14px 24px;
+      border-radius: var(--r3);
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .custom-alert.show { top: 24px; }
+    .custom-alert-icon { display: flex; align-items: center; }
 
     /* ─── MOBILE RESPONSIVE ─── */
     @media (max-width: 768px) {
@@ -518,6 +520,14 @@
 <body>
   <div class="sidebar-container">
     <iframe src="sidebar.html"></iframe>
+  </div>
+
+  <!-- 커스텀 슬라이드 알림창 엘리먼트 -->
+  <div class="custom-alert" id="customAlert">
+    <div class="custom-alert-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    </div>
+    <span id="customAlertMsg">알림 메시지</span>
   </div>
 
   <div class="main-wrapper">
@@ -589,12 +599,12 @@
       </div>
       <div class="form-group">
         <label>초대할 사용자 선택</label>
-        <!-- 검색 상자 추가 (source: 2 스타일과 로직 반영) -->
+        <!-- 상단 검색바 구성 추가 -->
         <div class="modal-search-box">
-          <span class="modal-search-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span class="search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </span>
-          <input type="text" id="createRoomSearchInput" placeholder="사용자 닉네임 또는 아이디 검색..." autocomplete="off" oninput="filterUserList('createRoomSearchInput', 'newUserList')">
+          <input type="text" id="createRoomUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('newUserList', this.value)">
         </div>
         <div class="user-select-list" id="newUserList">
           <!-- 유저 목록 -->
@@ -613,12 +623,12 @@
       <div class="modal-title">사용자 초대하기</div>
       <div class="form-group">
         <label>초대할 사용자 선택</label>
-        <!-- 검색 상자 추가 -->
+        <!-- 상단 검색바 구성 추가 -->
         <div class="modal-search-box">
-          <span class="modal-search-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span class="search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </span>
-          <input type="text" id="inviteSearchInput" placeholder="사용자 닉네임 또는 아이디 검색..." autocomplete="off" oninput="filterUserList('inviteSearchInput', 'inviteUserList')">
+          <input type="text" id="inviteUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('inviteUserList', this.value)">
         </div>
         <div class="user-select-list" id="inviteUserList">
           <!-- 유저 목록 -->
@@ -635,6 +645,20 @@
     let activeRoomId = null;
     let messagePollInterval = null;
     let isSending = false;
+
+    // 선택된 유저 아이디 보관용 객체
+    let selectedUserIds = new Set();
+
+    // 부드럽게 위에서 스르륵 내려오는 알림창 구현 함수
+    function showAlert(message) {
+      const alertEl = document.getElementById('customAlert');
+      const msgEl = document.getElementById('customAlertMsg');
+      msgEl.textContent = message;
+      alertEl.classList.add('show');
+      setTimeout(() => {
+        alertEl.classList.remove('show');
+      }, 2500);
+    }
 
     // API 통신 공통 함수
     async function api(endpoint, options = {}) {
@@ -659,8 +683,8 @@
       NProgress.start();
       const savedUser = localStorage.getItem('snsUser');
       if (!savedUser) {
-        alert('로그인이 필요합니다.');
-        window.location.href = 'login.html';
+        showAlert('로그인이 필요합니다.');
+        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
         return;
       }
       currentUser = JSON.parse(savedUser);
@@ -802,8 +826,7 @@
           }
           html += `
             <div style="display:flex; align-items:flex-end; gap:4px; ${isMe ? 'flex-direction:row-reverse;' : ''}">
-              <div class="message-bubble">${msg.content.replace(/
-/g, '<br>')}</div>
+              <div class="message-bubble">${msg.content.replace(/\n/g, '<br>')}</div>
               <div class="message-time">${time}</div>
             </div>
           `;
@@ -836,8 +859,7 @@
       tempWrapper.style.opacity = '0.7';
       tempWrapper.innerHTML = `
         <div style="display:flex; align-items:flex-end; gap:4px; flex-direction:row-reverse;">
-          <div class="message-bubble">${escapeHTML(content).replace(/
-/g, '<br>')}</div>
+          <div class="message-bubble">${escapeHTML(content).replace(/\n/g, '<br>')}</div>
           <div class="message-time">${time}</div>
         </div>
       `;
@@ -860,7 +882,7 @@
         // 전송 성공 시 갱신
         loadMessages(activeRoomId);
       } catch (e) {
-        alert("메시지 전송에 실패했습니다.");
+        showAlert("메시지 전송에 실패했습니다.");
         tempWrapper.remove();
       } finally {
         isSending = false;
@@ -886,70 +908,86 @@
     function closeModals() {
       document.getElementById('createRoomModal').classList.remove('open');
       document.getElementById('inviteModal').classList.remove('open');
+      selectedUserIds.clear();
     }
 
     function openCreateRoomModal() {
       document.getElementById('createRoomModal').classList.add('open');
       document.getElementById('newRoomName').value = '';
-      document.getElementById('createRoomSearchInput').value = '';
+      document.getElementById('createRoomUserSearch').value = '';
+      selectedUserIds.clear();
       renderUserSelectList('newUserList');
     }
 
     function openInviteModal() {
       document.getElementById('inviteModal').classList.add('open');
-      document.getElementById('inviteSearchInput').value = '';
+      document.getElementById('inviteUserSearch').value = '';
+      selectedUserIds.clear();
       renderUserSelectList('inviteUserList');
     }
 
-    function renderUserSelectList(containerId, filterQuery = '') {
+    // 유저 목록 렌더링 함수 (커스텀 선택 토글 버튼 형식)
+    function renderUserSelectList(containerId, filterKeyword = '') {
       const container = document.getElementById(containerId);
       container.innerHTML = '';
-      const query = filterQuery.toLowerCase().trim();
       
-      let matchedCount = 0;
-      Object.values(usersCache).forEach(u => {
-        if (u.id === currentUser.id) return; // 자신 제외
-        
-        // 검색 쿼리가 있는 경우 필터링 (source: 2 검색 대상 조건 매칭)
-        if (query) {
-          const nicknameMatch = u.nickname && u.nickname.toLowerCase().includes(query);
-          const idMatch = u.id && u.id.toLowerCase().includes(query);
-          if (!nicknameMatch && !idMatch) return;
-        }
-        
-        matchedCount++;
-        const label = document.createElement('label');
-        label.className = 'user-select-item';
-        label.innerHTML = `
-          <input type="checkbox" value="${u.id}">
-          <div class="custom-checkbox">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-          <div class="user-select-info">
-            <div class="user-select-nickname">${escapeHTML(u.nickname)}</div>
-            <div class="user-select-id">@${escapeHTML(u.id || u.nickname)}</div>
-          </div>
-        `;
-        container.appendChild(label);
+      const filteredUsers = Object.values(usersCache).filter(u => {
+        if (u.id === currentUser.id) return false; // 자신 제외
+        if (!filterKeyword) return true;
+        return u.nickname.toLowerCase().includes(filterKeyword.toLowerCase());
       });
 
-      if (matchedCount === 0) {
-        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--t3); font-size: 13px;">검색 결과가 없습니다.</div>';
+      if (filteredUsers.length === 0) {
+        container.innerHTML = '<div style="padding:20px; color:var(--t3); text-align:center; font-size:14px;">검색 결과가 없습니다.</div>';
+        return;
       }
+
+      filteredUsers.forEach(u => {
+        const item = document.createElement('div');
+        item.className = 'user-select-item';
+        
+        const isChecked = selectedUserIds.has(u.id);
+        
+        item.innerHTML = `
+          <div class="user-meta">
+            <span>${escapeHTML(u.nickname)}</span>
+          </div>
+          <button type="button" class="select-chk-btn ${isChecked ? 'checked' : ''}" data-id="${u.id}">
+            ${isChecked ? '선택됨' : '선택'}
+          </button>
+        `;
+
+        // 행 및 커스텀 버튼 클릭 시 선택 변경 기능 적용
+        const btn = item.querySelector('.select-chk-btn');
+        const toggleSelection = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (selectedUserIds.has(u.id)) {
+            selectedUserIds.delete(u.id);
+            btn.classList.remove('checked');
+            btn.textContent = '선택';
+          } else {
+            selectedUserIds.add(u.id);
+            btn.classList.add('checked');
+            btn.textContent = '선택됨';
+          }
+        };
+
+        item.onclick = toggleSelection;
+        btn.onclick = toggleSelection;
+
+        container.appendChild(item);
+      });
     }
 
-    // 검색창 입력 시 실시간으로 유저 목록 필터링하는 함수 (source: 2 검색 연동 대응)
-    function filterUserList(inputId, containerId) {
-      const query = document.getElementById(inputId).value;
-      renderUserSelectList(containerId, query);
+    // 입력 실시간 검색 필터링 핸들러
+    function filterUserList(containerId, value) {
+      renderUserSelectList(containerId, value.trim());
     }
 
     async function createRoom() {
       const name = document.getElementById('newRoomName').value.trim() || '새 채팅방';
-      const checkboxes = document.querySelectorAll('#newUserList input:checked');
-      const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+      const selectedIds = Array.from(selectedUserIds);
       
       const btn = document.getElementById('createRoomBtn');
       btn.disabled = true;
@@ -986,9 +1024,10 @@
         closeModals();
         await loadRooms();
         openRoom(newRoomId, name);
+        showAlert("새 채팅방이 개설되었습니다.");
 
       } catch (e) {
-        alert("방 생성 실패: " + e.message);
+        showAlert("방 생성 실패: " + e.message);
       } finally {
         btn.disabled = false;
         NProgress.done();
@@ -997,9 +1036,11 @@
 
     async function inviteUsers() {
       if (!activeRoomId) return;
-      const checkboxes = document.querySelectorAll('#inviteUserList input:checked');
-      const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-      if (selectedIds.length === 0) return;
+      const selectedIds = Array.from(selectedUserIds);
+      if (selectedIds.length === 0) {
+        showAlert("초대할 사용자를 선택해주세요.");
+        return;
+      }
 
       const btn = document.getElementById('inviteBtn');
       btn.disabled = true;
@@ -1017,10 +1058,10 @@
           body: JSON.stringify(membersData)
         });
 
-        alert("초대 완료되었습니다.");
+        showAlert("성공적으로 사용자를 초대했습니다.");
         closeModals();
       } catch (e) {
-        alert("초대 실패: " + e.message);
+        showAlert("초대 실패: " + e.message);
       } finally {
         btn.disabled = false;
         NProgress.done();
