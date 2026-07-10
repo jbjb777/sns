@@ -382,7 +382,7 @@
       background: var(--bg2);
       border: 1px solid var(--border2);
       width: 90%;
-      max-width: 400px;
+      max-width: 420px;
       border-radius: var(--r4);
       padding: 24px;
       position: relative;
@@ -409,19 +409,79 @@
       color: var(--t1); font-size: 14px; outline: none;
     }
     .form-group input:focus { border-color: var(--blue); }
+
+    /* 모달 내부 검색창 스타일 (source: 2 스타일 이식) */
+    .modal-search-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 0 14px;
+      height: 44px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .modal-search-box:focus-within { border-color: var(--blue); }
+    .modal-search-box input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--t1); font-size: 14px; padding-left: 8px;
+    }
+    .modal-search-box input::placeholder { color: var(--t3); }
+    .modal-search-icon { color: var(--t2); display: flex; align-items: center; justify-content: center; }
     
     .user-select-list {
       max-height: 200px; overflow-y: auto;
       border: 1px solid var(--border2); border-radius: var(--r2);
       background: var(--bg);
     }
+    .user-select-list::-webkit-scrollbar { width: 4px; }
+    .user-select-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    /* 커스텀 선택 체크 버튼 스타일 */
     .user-select-item {
-      display: flex; align-items: center; padding: 10px 14px; gap: 10px;
+      display: flex; align-items: center; padding: 12px 14px; gap: 12px;
       cursor: pointer; border-bottom: 1px solid var(--border);
+      position: relative; transition: background 0.2s;
+      user-select: none;
     }
     .user-select-item:last-child { border-bottom: none; }
     .user-select-item:hover { background: var(--bg3); }
-    .user-select-item input { width: auto; margin: 0; }
+    
+    /* 실제 체크박스는 숨김 */
+    .user-select-item input[type="checkbox"] {
+      position: absolute; opacity: 0; width: 0; height: 0;
+    }
+    
+    /* 직접 만드는 체크 버튼 커스텀 UI */
+    .custom-checkbox {
+      width: 22px; height: 22px;
+      border: 2px solid var(--border3);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      background: transparent;
+    }
+    .user-select-item input[type="checkbox"]:checked + .custom-checkbox {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    .custom-checkbox svg {
+      width: 14px; height: 14px;
+      color: #fff;
+      display: none;
+    }
+    .user-select-item input[type="checkbox"]:checked + .custom-checkbox svg {
+      display: block;
+    }
+    
+    /* 사용자 정보 텍스트 정렬 */
+    .user-select-info {
+      flex: 1; display: flex; flex-direction: column; gap: 2px;
+    }
+    .user-select-nickname { font-size: 14px; font-weight: 600; color: var(--t1); }
+    .user-select-id { font-size: 12px; color: var(--t2); }
     
     .modal-btn {
       width: 100%; padding: 14px; border-radius: var(--r2);
@@ -478,13 +538,6 @@
       <div class="room-list-pane">
         <div class="rooms-scroll-area" id="roomList">
           <!-- 채팅방 아이템 예시 (동적 생성) -->
-          <!-- <div class="room-item active">
-            <div class="room-avatar">A</div>
-            <div class="room-info">
-              <div class="room-name">테스트 방</div>
-              <div class="room-last-msg">마지막 메시지 내용</div>
-            </div>
-          </div> -->
         </div>
       </div>
 
@@ -536,6 +589,13 @@
       </div>
       <div class="form-group">
         <label>초대할 사용자 선택</label>
+        <!-- 검색 상자 추가 (source: 2 스타일과 로직 반영) -->
+        <div class="modal-search-box">
+          <span class="modal-search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
+          <input type="text" id="createRoomSearchInput" placeholder="사용자 닉네임 또는 아이디 검색..." autocomplete="off" oninput="filterUserList('createRoomSearchInput', 'newUserList')">
+        </div>
         <div class="user-select-list" id="newUserList">
           <!-- 유저 목록 -->
         </div>
@@ -553,6 +613,13 @@
       <div class="modal-title">사용자 초대하기</div>
       <div class="form-group">
         <label>초대할 사용자 선택</label>
+        <!-- 검색 상자 추가 -->
+        <div class="modal-search-box">
+          <span class="modal-search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
+          <input type="text" id="inviteSearchInput" placeholder="사용자 닉네임 또는 아이디 검색..." autocomplete="off" oninput="filterUserList('inviteSearchInput', 'inviteUserList')">
+        </div>
         <div class="user-select-list" id="inviteUserList">
           <!-- 유저 목록 -->
         </div>
@@ -735,7 +802,8 @@
           }
           html += `
             <div style="display:flex; align-items:flex-end; gap:4px; ${isMe ? 'flex-direction:row-reverse;' : ''}">
-              <div class="message-bubble">${msg.content.replace(/\n/g, '<br>')}</div>
+              <div class="message-bubble">${msg.content.replace(/
+/g, '<br>')}</div>
               <div class="message-time">${time}</div>
             </div>
           `;
@@ -768,7 +836,8 @@
       tempWrapper.style.opacity = '0.7';
       tempWrapper.innerHTML = `
         <div style="display:flex; align-items:flex-end; gap:4px; flex-direction:row-reverse;">
-          <div class="message-bubble">${escapeHTML(content).replace(/\n/g, '<br>')}</div>
+          <div class="message-bubble">${escapeHTML(content).replace(/
+/g, '<br>')}</div>
           <div class="message-time">${time}</div>
         </div>
       `;
@@ -822,27 +891,59 @@
     function openCreateRoomModal() {
       document.getElementById('createRoomModal').classList.add('open');
       document.getElementById('newRoomName').value = '';
+      document.getElementById('createRoomSearchInput').value = '';
       renderUserSelectList('newUserList');
     }
 
     function openInviteModal() {
       document.getElementById('inviteModal').classList.add('open');
+      document.getElementById('inviteSearchInput').value = '';
       renderUserSelectList('inviteUserList');
     }
 
-    function renderUserSelectList(containerId) {
+    function renderUserSelectList(containerId, filterQuery = '') {
       const container = document.getElementById(containerId);
       container.innerHTML = '';
+      const query = filterQuery.toLowerCase().trim();
+      
+      let matchedCount = 0;
       Object.values(usersCache).forEach(u => {
         if (u.id === currentUser.id) return; // 자신 제외
+        
+        // 검색 쿼리가 있는 경우 필터링 (source: 2 검색 대상 조건 매칭)
+        if (query) {
+          const nicknameMatch = u.nickname && u.nickname.toLowerCase().includes(query);
+          const idMatch = u.id && u.id.toLowerCase().includes(query);
+          if (!nicknameMatch && !idMatch) return;
+        }
+        
+        matchedCount++;
         const label = document.createElement('label');
         label.className = 'user-select-item';
         label.innerHTML = `
           <input type="checkbox" value="${u.id}">
-          <span>${escapeHTML(u.nickname)}</span>
+          <div class="custom-checkbox">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="user-select-info">
+            <div class="user-select-nickname">${escapeHTML(u.nickname)}</div>
+            <div class="user-select-id">@${escapeHTML(u.id || u.nickname)}</div>
+          </div>
         `;
         container.appendChild(label);
       });
+
+      if (matchedCount === 0) {
+        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--t3); font-size: 13px;">검색 결과가 없습니다.</div>';
+      }
+    }
+
+    // 검색창 입력 시 실시간으로 유저 목록 필터링하는 함수 (source: 2 검색 연동 대응)
+    function filterUserList(inputId, containerId) {
+      const query = document.getElementById(inputId).value;
+      renderUserSelectList(containerId, query);
     }
 
     async function createRoom() {
@@ -856,9 +957,7 @@
 
       try {
         // 1. 방 생성 (PostgREST는 uuid 자동생성 or return=representation)
-        // uuidv4 생성이 DB에 설정되어 있다고 가정, 만약 없다면 JS에서 생성해 넘겨야함
         const roomPayload = { name: name, created_at: new Date().toISOString() };
-        // UUID가 자동생성이 안될수 있으므로 간단한 uuid 생성기 사용 (Postgres default없을대비)
         roomPayload.id = crypto.randomUUID ? crypto.randomUUID() : 'temp-' + Date.now(); 
 
         const roomRes = await api("/dm_rooms", {
