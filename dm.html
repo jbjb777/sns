@@ -160,7 +160,7 @@
             showLoading(true);
             // 실제 API 엔드포인트는 개발하신 Cloudflare Worker 구조에 맞게 조정 필요
             // 예: /dm/rooms?user_id=...
-            const data = await callApi(`/dm/rooms?user_id=${currentUser.id}`);
+            const data = await callApi(`/dm_rooms?user_id=${currentUser.id}`);
             const container = document.getElementById('room-list-view');
             container.innerHTML = '';
 
@@ -198,7 +198,7 @@
         // 메시지 불러오기
         async function loadMessages() {
             if (!currentRoomId) return;
-            const data = await callApi(`/dm/messages?room_id=${currentRoomId}`);
+                const data = await callApi(`/dm_messages?room_id=${currentRoomId}`);
             if (data && data.messages) {
                 const container = document.getElementById('chat-messages');
                 const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
@@ -226,7 +226,7 @@
             const content = input.value.trim();
             if (!content || !currentRoomId) return;
 
-            const res = await callApi('/dm/messages', 'POST', {
+            const res = await callApi('/dm_messages', 'POST', {
                 room_id: currentRoomId,
                 sender_id: currentUser.id,
                 content: content
@@ -243,7 +243,7 @@
             const name = document.getElementById('new-room-name').value.trim();
             if (!name) return;
 
-            const res = await callApi('/dm/rooms', 'POST', {
+            const res = await callApi('/dm_rooms', 'POST', {
                 name: name,
                 creator_id: currentUser.id
             });
