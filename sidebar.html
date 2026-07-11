@@ -518,6 +518,10 @@
       <div class="nav-item" id="setNav" data-tooltip="채팅">
         <img src="setX.svg" alt="채팅" class="nav-icon-img" id="setIcon">
       </div>
+      <div class="nav-item" id="dmNav" data-tooltip="다이렉트">
+        <img src="sendX.svg" alt="다이렉트" class="nav-icon-img" id="setIcon">
+      </div>
+
       <div class="nav-item" id="discordNav" data-tooltip="Discord 커뮤니티">
         <img src="discord.png" alt="Discord" class="nav-icon-img">
       </div>
@@ -586,6 +590,7 @@
     const exploreNav = document.getElementById('exploreNav');
     const searchNav = document.getElementById('searchNav');
     const setNav = document.getElementById('setNav');
+    const dmNav = document.getElementById('dmNav');
     const discordNav = document.getElementById('discordNav');
     const createBtn = document.getElementById('createBtn');
     const createBtnSpinner = document.getElementById('createBtnSpinner');
@@ -694,7 +699,11 @@
       } else {
         setIcon.src = 'setX.svg';
       }
-      
+      if (dmNav.classList.contains('active')) {
+        setIcon.src = isLight ? 'sendO.svg' : 'send.svg';
+      } else {
+        setIcon.src = 'sendX.svg';
+      }
       const sheetSetIcon = document.getElementById('sheetSetIcon');
       if (sheetSetIcon) {
         sheetSetIcon.src = isLight ? 'setX.svg' : 'set.svg'; 
@@ -732,6 +741,9 @@
     };
     setNav.onclick = () => {
       window.top.location.href = 'https://sharer.r-e.kr/set.html';
+    };
+    dmNav.onclick = () => {
+      window.top.location.href = 'https://sharer.r-e.kr/dm.html';
     };
     discordNav.onclick = () => {
       window.open('https://discord.gg/8s6XuWkfQb', '_blank');
@@ -808,6 +820,7 @@
         exploreNav.classList.remove('active');
         searchNav.classList.remove('active');
         setNav.classList.remove('active');
+        dmNav.classList.remove('active');
         updateIcons();
       }
       if (data.type === 'activateExplore') {
@@ -815,6 +828,7 @@
         exploreNav.classList.add('active');
         searchNav.classList.remove('active');
         setNav.classList.remove('active');
+        dmNav.classList.remove('active');
         updateIcons();
       }
       if (data.type === 'activateSearch') {
@@ -830,6 +844,7 @@
         exploreNav.classList.remove('active');
         searchNav.classList.remove('active');
         setNav.classList.add('active');
+        dmNav.classList.add('active');
         updateIcons();
       }
       if (data.type === 'updateUser') {
