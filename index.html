@@ -1355,7 +1355,37 @@ window.onSharerProfileLogout = function () {
   currentUser = null;
   location.reload();
 };
+// 1. 로그인 성공 후
+function handleLogin() {
+  // ... 기존 로그인 로직
+  const user = res.user;
+  localStorage.setItem('snsUser', JSON.stringify(user));
+  
+  // 사이드바 iframe에 유저정보 전달
+  const sidebarFrame = document.querySelector('iframe[src*="sidebar"]');
+  if (sidebarFrame?.contentWindow) {
+    sidebarFrame.contentWindow.postMessage({ 
+      type: 'updateUser', 
+      user: user 
+    }, '*');
+  }
+}
 
+// 2. 페이지 새로고침해도 유지되게
+window.addEventListener('DOMContentLoaded', () => {
+  const savedUser = localStorage.getItem('snsUser');
+  if (savedUser) {
+    const user = JSON.parse(savedUser);
+    const sidebarFrame = document.querySelector('iframe[src*="sidebar"]');
+    // iframe 로드 완료 후 전송
+    sidebarFrame.onload = () => {
+      sidebarFrame.contentWindow.postMessage({ 
+        type: 'updateUser', 
+        user: user 
+      }, '*');
+    };
+  }
+});
 initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
