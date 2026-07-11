@@ -974,7 +974,7 @@
     function openRoom(roomId, roomName) {
       activeRoomId = roomId;
       document.getElementById('dmContainer').classList.add('room-active');
-      
+      document.body.classList.add('chat-room-active');
       document.getElementById('chatEmptyState').style.display = 'none';
       document.getElementById('chatHeader').style.display = 'flex';
       document.getElementById('chatMessages').style.display = 'flex';
@@ -993,6 +993,7 @@
     }
 
     function closeRoom() {
+      document.body.classList.remove('chat-room-active');
       activeRoomId = null;
       document.getElementById('dmContainer').classList.remove('room-active');
       if (messagePollInterval) clearInterval(messagePollInterval);
