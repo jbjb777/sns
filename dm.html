@@ -259,7 +259,7 @@
 
     .msg-time { font-size: 10px; color: var(--t3); flex-shrink: 0; margin-bottom: 2px; }
 
-    /* 시스템 메시지 UI (카카오톡 양옆 라운드 형태) */
+    /* 시스템 메시지 UI */
     .system-msg {
       align-self: center;
       background: var(--bg3);
@@ -296,7 +296,7 @@
     .send-btn:hover { opacity: 0.85; }
     .send-btn:active { transform: scale(0.95); }
 
-    /* 알림 시스템 (커스텀 텍스트+백경) */
+    /* 알림 시스템 */
     .noti-toast {
       position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
       background: var(--bg3); border: 1px solid var(--border2); color: var(--t1);
@@ -306,7 +306,7 @@
     }
     .noti-toast.show { top: 20px; opacity: 1; }
 
-    /* 모달 스타일 (사용자 초대/서랍 기능용) */
+    /* 모달 스타일 */
     .modal {
       display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
@@ -387,15 +387,13 @@
 </head>
 <body>
 
-  <!-- 알림 토스트 (텍스트와 배경만 적용) -->
   <div class="noti-toast" id="notiToast">새로운 메시지가 도착했습니다.</div>
 
-  <!-- 사이드바 컨테이너 -->
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame"></iframe>
   </div>
 
-  <!-- 검색 패널 & 스켈레톤 로딩 -->
+  <!-- 유저 검색 패널 -->
   <div class="search-panel" id="searchPanel">
     <div class="search-panel-header">
       <h3 style="font-size: 16px; font-weight: 600;">유저 검색</h3>
@@ -404,26 +402,10 @@
     <div class="search-input-box">
       <input type="text" class="search-input" id="userSearchInput" placeholder="닉네임으로 검색..." oninput="handleSearchInput(this.value)">
     </div>
-    <div class="search-results-area" id="searchResultsArea">
-      <!-- 스켈레톤 영역 구성 -->
-      <div class="sk-item">
-        <div class="skeleton sk-circle"></div>
-        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
-          <div class="skeleton sk-text-line" style="width: 40%;"></div>
-          <div class="skeleton sk-text-line" style="width: 60%;"></div>
-        </div>
-      </div>
-      <div class="sk-item">
-        <div class="skeleton sk-circle"></div>
-        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
-          <div class="skeleton sk-text-line" style="width: 30%;"></div>
-          <div class="skeleton sk-text-line" style="width: 50%;"></div>
-        </div>
-      </div>
-    </div>
+    <div class="search-results-area" id="searchResultsArea"></div>
   </div>
 
-  <!-- 서랍/멤버 리스트 팝업 모달 -->
+  <!-- 대화방 서랍/상세 정보 모달 -->
   <div class="modal" id="roomDrawerModal">
     <div class="modal-content">
       <button class="modal-close-btn" onclick="closeDrawerModal()">✕</button>
@@ -434,7 +416,7 @@
     </div>
   </div>
 
-  <!-- 대화 상대 초대용 모달 -->
+  <!-- 멤버 초대 모달 -->
   <div class="modal" id="inviteUserModal">
     <div class="modal-content">
       <button class="modal-close-btn" onclick="closeInviteModal()">✕</button>
@@ -444,7 +426,6 @@
     </div>
   </div>
 
-  <!-- 메인 레이아웃 본문 -->
   <div class="main-wrapper">
     <div class="header">
       <div class="header-left">
@@ -461,7 +442,7 @@
     </div>
 
     <div class="dm-container">
-      <!-- 룸 목록 판넬 -->
+      <!-- 대화방 목록 -->
       <div class="room-list-pane" id="roomListPane">
         <div class="room-list-header">
           <span>채팅방</span>
@@ -472,14 +453,13 @@
         <div class="rooms-scroll-area" id="roomsContainer"></div>
       </div>
 
-      <!-- 우측 채팅 창 판넬 -->
+      <!-- 채팅창 메인 판넬 -->
       <div class="chat-pane" id="chatPane">
         <div class="chat-empty-state" id="chatEmptyState">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--t3);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
           <span>선택된 채팅방이 없습니다. 대화를 시작해 보세요.</span>
         </div>
 
-        <!-- 선택 시 렌더링 될 영역 구조 -->
         <div class="chat-sub-header">
           <div class="sub-header-left" id="chatSubHeaderTitle">대화방</div>
           <div class="sub-header-right">
@@ -505,33 +485,36 @@
   <script>
     NProgress.configure({ showSpinner: false });
 
-    // Mock API 및 가상 리포지토리 구성 (Supabase mock 연동)
-    let currentUser = JSON.parse(localStorage.getItem('snsUser')) || { id: "user_me", nickname: "정빈(나)", profile_image: "" };
+    // 1. 로그인 유저 상태 연동 (없으면 기본 정빈 계정으로 초기화 생성)
+    let currentUser = JSON.parse(localStorage.getItem('snsUser'));
+    if (!currentUser) {
+      currentUser = { id: "user_me", nickname: "정빈", profile_image: "" };
+      localStorage.setItem('snsUser', JSON.stringify(currentUser));
+    }
     
-    // 가상의 글로벌 유저 리스트 데이터셋 정의
-    let mockUsers = [
+    // 2. 글로벌 가상 데이터베이스 초기화 (localStorage 세션에 의존하여 유저방 유지 가능)
+    let mockUsers = JSON.parse(localStorage.getItem('mock_users')) || [
       { id: "user_1", nickname: "김철수", profile_image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop" },
       { id: "user_2", nickname: "이영희", profile_image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop" },
       { id: "user_3", nickname: "박민수", profile_image: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=80&h=80&fit=crop" },
-      { id: "user_4", nickname: "최지우", profile_image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop" },
-      { id: "user_5", nickname: "JB777", profile_image: "" }
+      { id: "user_4", nickname: "최지우", profile_image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop" }
     ];
 
-    // 가상 대화방 원본 데이터셋
-    let mockRooms = [
-      { id: "room_1", name: "동아리 단톡방", members: ["user_me", "user_1", "user_2", "user_3"], last_message: "내일 정기 회의 확인하셨나요?", timestamp: "오후 4:15" },
-      { id: "room_2", name: "이영희", members: ["user_me", "user_2"], last_message: "디자인 시안 전송 완료!", timestamp: "어제" }
+    // 현재 접속해 있는 currentUser가 들어있는 방 정보들만 로드
+    let mockRooms = JSON.parse(localStorage.getItem('mock_rooms')) || [
+      { id: "room_init_1", name: "동아리 단톡방", members: [currentUser.id, "user_1", "user_2", "user_3"], last_message: "디자인 결과물 공유드립니다.", timestamp: "오후 12:40" },
+      { id: "room_init_2", name: "이영희", members: [currentUser.id, "user_2"], last_message: "넵 알겠습니다!", timestamp: "어제" }
     ];
 
-    // 가상 메시지 원본 데이터셋
-    let mockMessages = {
-      "room_1": [
-        { id: "m1", user_id: "user_1", user_name: "김철수", text: "안녕하세요 다들!", is_system: false, timestamp: "오후 4:00" },
-        { id: "m2", user_id: "", user_name: "", text: "김철수님이 이영희님을 초대했습니다.", is_system: true, timestamp: "오후 4:01" },
-        { id: "m3", user_id: "user_2", user_name: "이영희", text: "반가워요~", is_system: false, timestamp: "오fung 4:05" }
+    let mockMessages = JSON.parse(localStorage.getItem('mock_messages')) || {
+      "room_init_1": [
+        { id: "m1", user_id: "user_1", user_name: "김철수", text: "정빈님 안녕하세요!", is_system: false, timestamp: "오후 12:30" },
+        { id: "m2", user_id: "", user_name: "", text: "김철수님이 이영희님을 초대했습니다.", is_system: true, timestamp: "오후 12:31" },
+        { id: "m3", user_id: "user_2", user_name: "이영희", text: "디자인 결과물 공유드립니다.", is_system: false, timestamp: "오후 12:40" }
       ],
-      "room_2": [
-        { id: "m4", user_id: "user_2", user_name: "이영희", text: "안녕하세요 정빈님!", is_system: false, timestamp: "어제" }
+      "room_init_2": [
+        { id: "m4", user_id: "user_2", user_name: "이영희", text: "정빈님 확인 부탁드려요!", is_system: false, timestamp: "어제" },
+        { id: "m5", user_id: currentUser.id, user_name: currentUser.nickname, text: "넵 알겠습니다!", is_system: false, timestamp: "어제" }
       ]
     };
 
@@ -540,11 +523,17 @@
 
     window.addEventListener('load', () => {
       document.body.style.opacity = 1;
+      saveToStorage();
       renderRoomList();
       setupSidebarLink();
     });
 
-    // 사이드바 프레임 통신 기능 정의
+    function saveToStorage() {
+      localStorage.setItem('mock_users', JSON.stringify(mockUsers));
+      localStorage.setItem('mock_rooms', JSON.stringify(mockRooms));
+      localStorage.setItem('mock_messages', JSON.stringify(mockMessages));
+    }
+
     function setupSidebarLink() {
       window.addEventListener('message', (event) => {
         const { type, page } = event.data || {};
@@ -556,23 +545,18 @@
       });
     }
 
-    // 복합 프로필 이미지 생성 처리 로직
+    // 로그인한 사용자가 속한 방만 필터링해서 그리는 카카오톡 스타일 복합 프로필 생성기
     function generateRoomAvatarHTML(memberIds) {
       const others = memberIds.filter(id => id !== currentUser.id);
       
-      // 나 홀로 방인 경우 처리
       if (others.length === 0) {
         return `<div class="room-avatar grid-1"><div class="avatar-text">나</div></div>`;
       }
-      
-      // 1명 상대방 단독 프로필
       if (others.length === 1) {
         const u = getUserInfo(others[0]);
-        if (u.profile_image) return `<div class="room-avatar grid-1"><img src="${u.profile_image}" alt=""></div>`;
+        if (u.profile_image) return `<div class="room-avatar grid-1"><img src="${u.profile_image}"></div>`;
         return `<div class="room-avatar grid-1"><div class="avatar-text">${u.nickname[0]}</div></div>`;
       }
-      
-      // 2명 대화방
       if (others.length === 2) {
         return `
           <div class="room-avatar grid-2">
@@ -580,8 +564,6 @@
             ${renderIndividualAvatar(others[1])}
           </div>`;
       }
-      
-      // 3명 대화방
       if (others.length === 3) {
         return `
           <div class="room-avatar grid-3">
@@ -590,8 +572,6 @@
             ${renderIndividualAvatar(others[2])}
           </div>`;
       }
-      
-      // 4명 이상 복합 대화방
       return `
         <div class="room-avatar grid-4">
           ${renderIndividualAvatar(others[0])}
@@ -603,58 +583,76 @@
 
     function renderIndividualAvatar(userId) {
       const u = getUserInfo(userId);
-      if (u.profile_image) return `<img src="${u.profile_image}" alt="">`;
+      if (u.profile_image) return `<img src="${u.profile_image}">`;
       return `<div class="avatar-text" style="font-size:10px;">${u.nickname[0]}</div>`;
     }
 
     function getUserInfo(userId) {
       if (userId === currentUser.id) return currentUser;
-      return mockUsers.find(u => u.id === userId) || { id: userId, nickname: "알수없음", profile_image: "" };
+      return mockUsers.find(u => u.id === userId) || { id: userId, nickname: "퇴장인원", profile_image: "" };
     }
 
-    // 룸 리스트 렌더링 함수
+    // 내 계정이 속한 대화방만 동적으로 렌더링하도록 매핑 변경
     function renderRoomList() {
       const container = document.getElementById('roomsContainer');
       container.innerHTML = '';
 
-      mockRooms.forEach(room => {
+      // 내가 포함된 방 필터링
+      const myRooms = mockRooms.filter(room => room.members.includes(currentUser.id));
+
+      if (myRooms.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--t3); font-size:13px;">참여 중인 대화방이 없습니다.</div>`;
+        return;
+      }
+
+      myRooms.forEach(room => {
         const div = document.createElement('div');
         div.className = `room-item ${room.id === activeRoomId ? 'active' : ''}`;
         div.onclick = () => selectRoom(room.id);
 
         const avatarHTML = generateRoomAvatarHTML(room.members);
 
+        // 방 이름 정의 (단독 채팅방이면 상대방 이름으로 가변 자동 지정)
+        let displayRoomName = room.name;
+        if (room.members.length === 2) {
+          const opponentId = room.members.find(id => id !== currentUser.id);
+          if (opponentId) displayRoomName = getUserInfo(opponentId).nickname;
+        }
+
         div.innerHTML = `
           ${avatarHTML}
           <div class="room-info">
-            <div style="display:flex; justify-content:between; width:100%;">
-              <span class="room-name" style="flex:1;">${escapeHtml(room.name)}</span>
+            <div style="display:flex; justify-content:space-between; width:100%;">
+              <span class="room-name" style="flex:1;">${escapeHtml(displayRoomName)}</span>
               <span style="font-size:11px; color:var(--t3);">${room.timestamp}</span>
             </div>
-            <div class="room-last-msg">${escapeHtml(room.last_message)}</div>
+            <div class="room-last-msg">${escapeHtml(room.last_message || '')}</div>
           </div>
         `;
         container.appendChild(div);
       });
     }
 
-    // 특정 룸 활성화 스위칭 처리
     function selectRoom(roomId) {
       activeRoomId = roomId;
       document.getElementById('chatEmptyState').style.display = 'none';
       
-      // 모바일 클래스 가시성 전환
       document.getElementById('roomListPane').classList.add('hidden-mobile');
       document.getElementById('chatPane').classList.add('active-mobile');
 
       const room = mockRooms.find(r => r.id === roomId);
-      document.getElementById('chatSubHeaderTitle').textContent = `${room.name} (${room.members.length})`;
+      let roomTitle = room.name;
+      if (room.members.length === 2) {
+        const opponentId = room.members.find(id => id !== currentUser.id);
+        if (opponentId) roomTitle = getUserInfo(opponentId).nickname;
+      }
+
+      document.getElementById('chatSubHeaderTitle').textContent = `${roomTitle} (${room.members.length})`;
 
       renderRoomMessages();
       renderRoomList();
     }
 
-    // 대화 메시지 목록 렌der 펑션
     function renderRoomMessages() {
       const area = document.getElementById('chatMessagesArea');
       area.innerHTML = '';
@@ -705,7 +703,6 @@
       area.scrollTop = area.scrollHeight;
     }
 
-    // 메시지 송신 파이프라인
     function sendMessage() {
       const ta = document.getElementById('chatTextarea');
       const text = ta.value.trim();
@@ -728,26 +725,21 @@
       mockMessages[activeRoomId].push(newMsg);
       renderRoomMessages();
 
-      // 프로토타입 상태 변화 트리거 가속 (딜레이 800ms)
       setTimeout(() => {
         const found = mockMessages[activeRoomId].find(m => m.id === tempId);
-        if (found) {
-          delete found.sending;
-        }
+        if (found) delete found.sending;
         
-        // 룸 최근 정보 갱신
         const room = mockRooms.find(r => r.id === activeRoomId);
         if (room) {
           room.last_message = text;
           room.timestamp = getNowTimeString();
         }
         
+        saveToStorage();
         renderRoomMessages();
         renderRoomList();
-        
-        // 커스텀 텍스트 알림창 기동 예시 호출
-        showToastNotification(`메시지가 전송 완료되었습니다.`);
-      }, 800);
+        showToastNotification(`메시지가 전송되었습니다.`);
+      }, 600);
     }
 
     function handleTextAreaKey(e) {
@@ -766,7 +758,6 @@
       }
     }
 
-    // 검색 판넬 토글 및 스켈레톤 로딩 로직 연동
     let isSearchOpen = false;
     function toggleSearchPanel() {
       const p = document.getElementById('searchPanel');
@@ -783,16 +774,16 @@
 
     function triggerSearchSkeleton() {
       const area = document.getElementById('searchResultsArea');
-      // 최초 스켈레톤 삽입
       area.innerHTML = `
         <div class="sk-item"><div class="skeleton sk-circle"></div><div style="flex:1; display:flex; flex-direction:column; gap:6px;"><div class="skeleton sk-text-line" style="width:40%;"></div><div class="skeleton sk-text-line" style="width:60%;"></div></div></div>
         <div class="sk-item"><div class="skeleton sk-circle"></div><div style="flex:1; display:flex; flex-direction:column; gap:6px;"><div class="skeleton sk-text-line" style="width:50%;"></div><div class="skeleton sk-text-line" style="width:30%;"></div></div></div>
       `;
       
       setTimeout(() => {
-        // 기본 전체 리스트 바인딩
-        renderSearchResults(mockUsers);
-      }, 700);
+        // 나를 제외한 전체 유저 바인딩
+        const others = mockUsers.filter(u => u.id !== currentUser.id);
+        renderSearchResults(others);
+      }, 500);
     }
 
     function handleSearchInput(val) {
@@ -803,9 +794,9 @@
 
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
-        const filtered = mockUsers.filter(u => u.nickname.toLowerCase().includes(val.toLowerCase()));
+        const filtered = mockUsers.filter(u => u.id !== currentUser.id && u.nickname.toLowerCase().includes(val.toLowerCase()));
         renderSearchResults(filtered);
-      }, 400);
+      }, 300);
     }
 
     function renderSearchResults(users) {
@@ -828,14 +819,13 @@
         item.innerHTML = `
           <div class="member-avatar">${avInner}</div>
           <span class="member-name">${escapeHtml(u.nickname)}</span>
-          <span style="font-size:11px; color:var(--t3);">대화하기</span>
+          <span style="font-size:11px; color:var(--blue); font-weight:600;">대화하기</span>
         `;
         area.appendChild(item);
       });
     }
 
     function startSingleChatWithUser(targetUser) {
-      // 이미 단톡 혹은 개인방이 있는지 조회
       let existing = mockRooms.find(r => r.members.length === 2 && r.members.includes(targetUser.id) && r.members.includes(currentUser.id));
       if (existing) {
         selectRoom(existing.id);
@@ -847,31 +837,36 @@
         id: newId,
         name: targetUser.nickname,
         members: [currentUser.id, targetUser.id],
-        last_message: "새로운 대화가 개설되었습니다.",
+        last_message: "새로운 대화방이 생성되었습니다.",
         timestamp: getNowTimeString()
       };
 
       mockRooms.unshift(newRoom);
       mockMessages[newId] = [
-        { id: 'sys_' + Date.now(), user_id: '', user_name: '', text: `${currentUser.nickname}님이 ${targetUser.nickname}님과 대화를 시작했습니다.`, is_system: true, timestamp: getNowTimeString() }
+        { id: 'sys_' + Date.now(), user_id: '', user_name: '', text: `${currentUser.nickname}님이 대화를 시작했습니다.`, is_system: true, timestamp: getNowTimeString() }
       ];
+      saveToStorage();
       selectRoom(newId);
     }
 
-    // 알림 토스트 트리거 (요구사항: 아이콘 없이 텍스트, 백경만 동작)
     function showToastNotification(text) {
       const t = document.getElementById('notiToast');
       t.textContent = text;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2500);
+      setTimeout(() => t.classList.remove('show'), 2200);
     }
 
-    // 정보 보기 및 서랍/멤버 리스트 팝업 
     function openDrawerModal() {
       if (!activeRoomId) return;
       const room = mockRooms.find(r => r.id === activeRoomId);
       
-      document.getElementById('drawerRoomName').textContent = room.name;
+      let displayRoomName = room.name;
+      if (room.members.length === 2) {
+        const opponentId = room.members.find(id => id !== currentUser.id);
+        if (opponentId) displayRoomName = getUserInfo(opponentId).nickname;
+      }
+
+      document.getElementById('drawerRoomName').textContent = displayRoomName;
       const listArea = document.getElementById('drawerMemberList');
       listArea.innerHTML = '';
 
@@ -879,7 +874,6 @@
         const u = getUserInfo(mId);
         const div = document.createElement('div');
         div.className = 'member-item';
-        // 게시물 페이지 참고 링크 이동 액션 설정 기입
         div.onclick = () => {
           location.href = `user.html?id=${u.id}&nickname=${encodeURIComponent(u.nickname)}`;
         };
@@ -888,7 +882,7 @@
         div.innerHTML = `
           <div class="member-avatar">${avInner}</div>
           <div class="member-name">${escapeHtml(u.nickname)} ${mId === currentUser.id ? '<span style="color:var(--t3); font-size:11px;">(나)</span>':''}</div>
-          <span style="font-size:11px; color:var(--t3);">프로필 보기</span>
+          <span style="font-size:11px; color:var(--t2);">프로필</span>
         `;
         listArea.appendChild(div);
       });
@@ -900,18 +894,16 @@
       document.getElementById('roomDrawerModal').classList.remove('open');
     }
 
-    // 초대 모달 핸들러 
     function openInviteModal() {
       if (!activeRoomId) return;
       const room = mockRooms.find(r => r.id === activeRoomId);
       const listArea = document.getElementById('inviteUsersList');
       listArea.innerHTML = '';
 
-      // 현재 방에 없는 유저만 필터링
       const nonMembers = mockUsers.filter(u => !room.members.includes(u.id));
 
       if (nonMembers.length === 0) {
-        listArea.innerHTML = `<div style="text-align:center; padding:20px; font-size:12px; color:var(--t3);">초대 가능한 사용자가 없습니다.</div>`;
+        listArea.innerHTML = `<div style="text-align:center; padding:20px; font-size:12px; color:var(--t3);">초대할 수 있는 다른 유저가 없습니다.</div>`;
       } else {
         nonMembers.forEach(u => {
           const div = document.createElement('div');
@@ -941,7 +933,6 @@
 
       room.members.push(targetId);
       
-      // 카카오톡 스타일 시스템 메시지 주입
       const sysMsg = {
         id: 'sys_' + Date.now(),
         user_id: '',
@@ -954,27 +945,41 @@
       mockMessages[activeRoomId].push(sysMsg);
       room.last_message = `${targetName}님이 초대되었습니다.`;
       
-      document.getElementById('chatSubHeaderTitle').textContent = `${room.name} (${room.members.length})`;
+      let roomTitle = room.name;
+      if (room.members.length === 2) {
+        const opponentId = room.members.find(id => id !== currentUser.id);
+        if (opponentId) roomTitle = getUserInfo(opponentId).nickname;
+      }
+      document.getElementById('chatSubHeaderTitle').textContent = `${roomTitle} (${room.members.length})`;
       
+      saveToStorage();
       closeInviteModal();
       renderRoomMessages();
       renderRoomList();
       showToastNotification(`${targetName}님을 초대했습니다.`);
     }
 
-    // 방 나가기 로직 인터페이스 구현
     function leaveCurrentRoom() {
       if (!activeRoomId) return;
       if (!confirm("정말로 이 채팅방에서 나가시겠습니까?")) return;
 
-      const roomIndex = mockRooms.findIndex(r => r.id === activeRoomId);
-      if (roomIndex > -1) {
-        const room = mockRooms[roomIndex];
+      const room = mockRooms.find(r => r.id === activeRoomId);
+      if (room) {
+        // 내 아이디를 멤버 목록에서 차감
+        room.members = room.members.filter(id => id !== currentUser.id);
         
-        // 시스템 메시지 기록 유무와 상관없이 가상 동기화 제거 처리
-        mockRooms.splice(roomIndex, 1);
-        delete mockMessages[activeRoomId];
+        const sysMsg = {
+          id: 'sys_' + Date.now(),
+          user_id: '',
+          user_name: '',
+          text: `${currentUser.nickname}님이 퇴장하셨습니다.`,
+          is_system: true,
+          timestamp: getNowTimeString()
+        };
+        mockMessages[activeRoomId].push(sysMsg);
+        room.last_message = `${currentUser.nickname}님이 퇴장하셨습니다.`;
         
+        saveToStorage();
         closeDrawerModal();
         activeRoomId = null;
         
@@ -1003,6 +1008,7 @@
     }
 
     function escapeHtml(unsafe) {
+      if (!unsafe) return '';
       return unsafe
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
