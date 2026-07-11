@@ -1333,6 +1333,11 @@ window.toggleSearchPanel = function() {
 
 window.addEventListener('message', (event) => {
   const { type, page } = event.data || {};
+  if (type === 'requestUserInfo') {
+    updateSidebar(); 
+    return; // 처리 후 리턴
+  }
+
   if (type === 'toggleSearch') {
     window.toggleSearchPanel();
   }
