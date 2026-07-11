@@ -573,6 +573,45 @@
         z-index: 90;
       }
     }
+  
+    /* === 읽음 처리 UI (추가) === */
+    .message-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .message-row.me { flex-direction: row-reverse; }
+    .message-row.other { flex-direction: row; }
+    .msg-side {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+      min-width: 28px;
+    }
+    .message-wrapper.me .msg-side { align-items: flex-end; }
+    .message-wrapper.other .msg-side { align-items: flex-start; }
+    .unread-count {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffcc00;
+      line-height: 1;
+      min-height: 11px;
+    }
+    html[data-theme="light"] .unread-count { color: #ff8a00; }
+    .room-item { position: relative; }
+    .unread-blue-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--blue);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-left: 8px;
+      box-shadow: 0 0 10px rgba(62,59,246,0.7);
+      display: none;
+    }
+    .unread-blue-dot.show { display: block; }
+
   </style>
 </head>
 <body>
@@ -693,7 +732,7 @@
     </div>
   </div>
 
-  <!-- 채팅방 정보 모달 -->
+  <!-- 채팅방 정보 모달 (새로 추가) -->
   <div class="modal" id="roomInfoModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModals()">
@@ -777,6 +816,8 @@
       }
     });
     window.addEventListener('resize', updateSidebarMode);
+
+
 
     function showAlert(message) {
       const alertEl = document.getElementById('customAlert');
@@ -880,6 +921,7 @@
       return `<div class="avatar-text" style="font-size:10px;">${u.nickname[0]}</div>`;
     }
 
+    // 스켈레톤 로딩 렌더링 함수
     function renderRoomSkeleton() {
       const listEl = document.getElementById('roomList');
       let html = '';
@@ -897,7 +939,7 @@
     }
 
     async function loadRooms() {
-      renderRoomSkeleton();
+      renderRoomSkeleton(); // 로딩 전 스켈레톤 노출
       
       try {
         const myMemberships = await api(`/dm_room_members?user_id=eq.${encodeURIComponent(currentUser.id)}`);
@@ -945,22 +987,18 @@
         div.innerHTML = `
           <div id="avatarContainer-${room.id}"></div>
           <div class="room-info">
-            <div class="room-name" style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                ${escapeHTML(displayRoomName)} 
-                <span style="font-size:12px; font-weight:400; color:var(--t3);">${members.length}</span>
-              </span>
-              <span id="unreadDot-${room.id}" style="width:6px; height:6px; background:var(--blue); border-radius:50%; display:none; flex-shrink:0; margin-left:6px;"></span>
-            </div>
+            <div class="room-name">${escapeHTML(displayRoomName)} <span style="font-size:12px; font-weight:400; color:var(--t3);">${members.length}</span></div>
             <div class="room-last-msg" id="lastMsg-${room.id}">대화를 시작해보세요</div>
           </div>
+          <div class="unread-blue-dot" id="unreadDot-${room.id}"></div>
         `;
         listEl.appendChild(div);
 
         document.getElementById(`avatarContainer-${room.id}`).innerHTML = generateMultiAvatarHTML(room.id);
 
+        // 최신 메시지 + 안읽음 파란점 처리
         api(`/dm_messages?room_id=eq.${room.id}&order=created_at.desc&limit=1`)
-          .then(msgs => {
+          .then(async msgs => {
             if (msgs && msgs.length > 0) {
               const el = document.getElementById(`lastMsg-${room.id}`);
               if (el) {
@@ -968,14 +1006,22 @@
                 if(text.startsWith('[SYSTEM] ')) text = text.replace('[SYSTEM] ', '');
                 el.textContent = text;
               }
-              // 안 읽은 메시지 여부 확인하여 파란점 표시
-              api(`/dm_read?message_id=eq.${msgs[0].id}&user_id=eq.${currentUser.id}`)
-                .then(reads => {
-                   if (!reads || reads.length === 0) {
-                     const dot = document.getElementById(`unreadDot-${room.id}`);
-                     if(dot) dot.style.display = 'inline-block';
-                   }
-                }).catch(()=>{});
+              const lastMsg = msgs[0];
+              // 내가 보낸 메시지거나 시스템 메시지는 안읽음 처리 안함
+              if (lastMsg.sender_id === currentUser.id || lastMsg.content.startsWith('[SYSTEM] ')) {
+                return;
+              }
+              try {
+                const readCheck = await api(`/dm_read?message_id=eq.${lastMsg.id}&user_id=eq.${encodeURIComponent(currentUser.id)}`);
+                const isUnread = !readCheck || readCheck.length === 0;
+                const dotEl = document.getElementById(`unreadDot-${room.id}`);
+                if (dotEl && isUnread) {
+                  dotEl.classList.add('show');
+                  dotEl.style.display = 'block';
+                }
+              } catch(e) {
+                // 조회 실패시 조용히 무시
+              }
             }
           }).catch(()=>{});
       });
@@ -1009,93 +1055,116 @@
       if (messagePollInterval) clearInterval(messagePollInterval);
       loadRooms();
     }
+// 채팅방 클릭 시
+function openChatRoom(roomId) {
+  document.body.classList.add('chat-room-active');
+  // 채팅방 여는 기존 로직...
+}
 
-    function openChatRoom(roomId) {
-      document.body.classList.add('chat-room-active');
-    }
-
-    function closeChatRoom() {
-      document.body.classList.remove('chat-room-active');
-    }
-
-    document.querySelector('.back-btn').addEventListener('click', () => {
-      document.body.classList.remove('chat-room-active');
-    });
-
+// 뒤로가기 or 목록으로 돌아갈 때
+function closeChatRoom() {
+  document.body.classList.remove('chat-room-active');
+  // 목록 보여주는 기존 로직...
+}
+document.querySelector('.back-btn').addEventListener('click', () => {
+  document.body.classList.remove('chat-room-active');
+});
     let currentMessages = [];
+    // === 읽음 처리: 메시지 읽음 맵 캐시 ===
+    async function getReadMapForMessages(messageIds) {
+      const readMap = {}; // message_id -> Set(user_id)
+      const readCountMap = {};
+      if (!messageIds || messageIds.length === 0) return { readMap, readCountMap };
+      const chunkSize = 80;
+      let allReads = [];
+      for (let i = 0; i < messageIds.length; i += chunkSize) {
+        const chunk = messageIds.slice(i, i + chunkSize);
+        try {
+          const reads = await api(`/dm_read?message_id=in.(${chunk.join(',')})`);
+          if (reads && reads.length) allReads = allReads.concat(reads);
+        } catch (e) {
+          console.warn('dm_read 조회 실패', e);
+        }
+      }
+      allReads.forEach(r => {
+        if (!readMap[r.message_id]) readMap[r.message_id] = new Set();
+        readMap[r.message_id].add(r.user_id);
+      });
+      messageIds.forEach(id => {
+        readCountMap[id] = readMap[id] ? readMap[id].size : 0;
+      });
+      return { readMap, readCountMap, allReads };
+    }
+
     async function loadMessages(roomId, isPolling = false) {
       try {
         const msgs = await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
         if (!msgs) return;
         
-        const msgIds = msgs.map(m => m.id);
-        let reads = [];
-        if (msgIds.length > 0) {
-          // URL 길이 제한 방지를 위해 50개 단위로 청크 요청
-          const chunkSize = 50;
-          for (let i = 0; i < msgIds.length; i += chunkSize) {
-            const chunk = msgIds.slice(i, i + chunkSize);
+        // 폴링시에도 읽음수는 변할 수 있으므로 길이 같아도 읽음 맵은 갱신해야 함
+        // 단, 완전히 동일하면 렌더 스킵을 위해선 별도 처리하지만 여기선 항상 최신 읽음 반영
+        if (!isPolling || msgs.length !== currentMessages.length) {
+          currentMessages = msgs;
+        }
+
+        const container = document.getElementById('chatMessages');
+        const totalMembers = (roomMembersMap[roomId] || []).length || 1;
+
+        // 시스템 메시지 제외한 실제 메시지 ID만 추출
+        const normalMessages = msgs.filter(m => !m.content.startsWith('[SYSTEM] '));
+        const messageIds = normalMessages.map(m => m.id);
+
+        let readMap = {};
+        let readCountMap = {};
+
+        if (messageIds.length > 0) {
+          const res = await getReadMapForMessages(messageIds);
+          readMap = res.readMap;
+          readCountMap = res.readCountMap;
+
+          // 내가 아직 안읽은 메시지 찾기
+          const unreadByMe = messageIds.filter(mid => !(readMap[mid] && readMap[mid].has(currentUser.id)));
+          if (unreadByMe.length > 0) {
+            const payload = unreadByMe.map(mid => ({ user_id: currentUser.id, message_id: mid }));
             try {
-              const chunkReads = await api(`/dm_read?message_id=in.(${chunk.join(',')})`);
-              if (chunkReads) reads = reads.concat(chunkReads);
-            } catch(e) {}
+              await api("/dm_read", {
+                method: "POST",
+                body: JSON.stringify(payload)
+              });
+              // 로컬 맵 업데이트 (내가 읽었으니 +1)
+              unreadByMe.forEach(mid => {
+                if (!readMap[mid]) readMap[mid] = new Set();
+                readMap[mid].add(currentUser.id);
+                readCountMap[mid] = (readCountMap[mid] || 0) + 1;
+              });
+              // 방 목록의 파란점 제거
+              const dotEl = document.getElementById(`unreadDot-${roomId}`);
+              if (dotEl) {
+                dotEl.classList.remove('show');
+                dotEl.style.display = 'none';
+              }
+            } catch (e) {
+              // 중복 삽입(409) 등은 무시
+              if (!String(e.message).includes('409') && !String(e.message).includes('duplicate')) {
+                console.warn('dm_read 삽입 실패', e);
+              } else {
+                // 중복이어도 로컬에선 읽은걸로 처리
+                unreadByMe.forEach(mid => {
+                  if (!readMap[mid]) readMap[mid] = new Set();
+                  readMap[mid].add(currentUser.id);
+                  if (!readCountMap[mid]) readCountMap[mid] = 1;
+                });
+              }
+            }
           }
         }
 
-        const readMap = {};
-        reads.forEach(r => {
-          if(!readMap[r.message_id]) readMap[r.message_id] = new Set();
-          readMap[r.message_id].add(r.user_id);
-        });
-
-        // 내가 안읽은 메시지 dm_read 추가
-        const unreadByMe = msgs.filter(m => !readMap[m.id]?.has(currentUser.id));
-        if (unreadByMe.length > 0) {
-          const insertData = unreadByMe.map(m => ({ message_id: m.id, user_id: currentUser.id }));
-          try {
-            await api("/dm_read", { 
-              method: "POST", 
-              headers: { "Prefer": "return=minimal" }, 
-              body: JSON.stringify(insertData) 
-            });
-            unreadByMe.forEach(m => {
-              if(!readMap[m.id]) readMap[m.id] = new Set();
-              readMap[m.id].add(currentUser.id);
-            });
-            // 읽었으므로 채팅방 목록의 파란점 숨기기
-            const dot = document.getElementById(`unreadDot-${roomId}`);
-            if(dot) dot.style.display = 'none';
-          } catch(e) {}
-        }
-
-        const totalMembers = roomMembersMap[roomId] ? roomMembersMap[roomId].length : 2;
-
-        // 폴링 중이고 새로운 메시지가 없으면 안읽음 카운트 텍스트만 업데이트
-        if (isPolling && msgs.length === currentMessages.length) {
-          msgs.forEach(msg => {
-            if (msg.content.startsWith('[SYSTEM] ')) return;
-            const readCount = readMap[msg.id] ? readMap[msg.id].size : 0;
-            const unreadCount = Math.max(0, totalMembers - readCount);
-            const countEl = document.getElementById(`unread-${msg.id}`);
-            if (countEl) {
-              if (unreadCount > 0) {
-                countEl.textContent = unreadCount;
-                countEl.style.display = 'inline-block';
-              } else {
-                countEl.style.display = 'none';
-              }
-            }
-          });
-          return;
-        }
-
-        currentMessages = msgs;
-        const container = document.getElementById('chatMessages');
         container.innerHTML = '';
 
         msgs.forEach(msg => {
           const wrapper = document.createElement('div');
           
+          // 시스템 메시지
           if (msg.content.startsWith('[SYSTEM] ')) {
             const sysText = msg.content.replace('[SYSTEM] ', '').trim();
             wrapper.className = 'system-message-container';
@@ -1107,10 +1176,9 @@
           const isMe = msg.sender_id === currentUser.id;
           const time = new Date(msg.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
           const senderName = isMe ? '' : getUserInfo(msg.sender_id).nickname;
-          
-          const readCount = readMap[msg.id] ? readMap[msg.id].size : 0;
+
+          const readCount = readCountMap[msg.id] || 0;
           const unreadCount = Math.max(0, totalMembers - readCount);
-          const unreadHTML = `<span id="unread-${msg.id}" style="font-size:11px; font-weight:600; color:var(--blue); margin-bottom:2px; ${unreadCount > 0 ? '' : 'display:none;'}">${unreadCount}</span>`;
 
           wrapper.className = `message-wrapper ${isMe ? 'me' : 'other'}`;
           
@@ -1119,11 +1187,11 @@
             html += `<div class="message-sender">${escapeHTML(senderName)}</div>`;
           }
           html += `
-            <div style="display:flex; align-items:flex-end; gap:4px; ${isMe ? 'flex-direction:row-reverse;' : ''}">
+            <div class="message-row ${isMe ? 'me' : 'other'}">
               <div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g, '<br>')}</div>
-              <div style="display:flex; flex-direction:column; align-items:${isMe ? 'flex-end' : 'flex-start'};">
-                ${unreadHTML}
-                <div class="message-time" style="margin:0;">${time}</div>
+              <div class="msg-side">
+                ${unreadCount > 0 ? `<span class="unread-count">${unreadCount}</span>` : `<span class="unread-count" style="opacity:0;">0</span>`}
+                <span class="message-time" style="margin:0;">${time}</span>
               </div>
             </div>
           `;
@@ -1153,16 +1221,16 @@
       tempWrapper.style.opacity = '0.7';
       
       tempWrapper.innerHTML = `
-        <div style="display:flex; align-items:flex-end; gap:4px; flex-direction:row-reverse;">
+        <div class="message-row me">
           <div class="message-bubble">${escapeHTML(content).replace(/\n/g, '<br>')}</div>
-          <div style="display:flex; flex-direction:column; align-items:flex-end;">
-            <div class="message-time" style="margin:0;">
+          <div class="msg-side">
+            <span class="message-time" style="margin:0; display:flex; align-items:center; gap:2px;">
               ${time} 
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
               </svg>
-            </div>
+            </span>
           </div>
         </div>
       `;
@@ -1172,16 +1240,30 @@
       input.value = '';
       input.style.height = '44px';
 
+      const newMessageId = (crypto.randomUUID ? crypto.randomUUID() : 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+
       try {
         await api("/dm_messages", {
           method: "POST",
+          headers: { "Prefer": "return=representation" },
           body: JSON.stringify({
+            id: newMessageId,
             room_id: activeRoomId,
             sender_id: currentUser.id,
             content: content,
             created_at: new Date().toISOString()
           })
         });
+        // 보낸 사람은 즉시 읽음 처리
+        try {
+          await api("/dm_read", {
+            method: "POST",
+            body: JSON.stringify({ user_id: currentUser.id, message_id: newMessageId })
+          });
+        } catch (readErr) {
+          // 읽음 삽입 실패는 무시 (loadMessages에서 다시 처리됨)
+          console.warn('보낸 메시지 읽음 처리 실패', readErr);
+        }
         loadMessages(activeRoomId);
       } catch (e) {
         showAlert("메시지 전송에 실패했습니다.");
@@ -1227,6 +1309,7 @@
       renderUserSelectList('inviteUserList');
     }
 
+    // 채팅방 정보 모달 열기 함수 (멤버 표시 및 마이페이지 연결)
     function openRoomInfoModal() {
       if (!activeRoomId) return;
       document.getElementById('roomInfoModal').classList.add('open');
@@ -1258,6 +1341,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
         `;
 
+        // 마이페이지 이동 링크 처리 (profile.html로 가정)
         item.onclick = () => {
           window.location.href = `user.html?id=${u.id}`;
         };
@@ -1272,6 +1356,7 @@
       
       NProgress.start();
       try {
+        // 나감 시스템 메시지 발송
         const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 나갔습니다.`;
         await api("/dm_messages", {
           method: "POST",
@@ -1283,6 +1368,7 @@
           })
         });
         
+        // 내 멤버 기록 삭제
         await api(`/dm_room_members?room_id=eq.${activeRoomId}&user_id=eq.${currentUser.id}`, {
           method: "DELETE"
         });
@@ -1303,7 +1389,7 @@
       
       const filteredUsers = Object.values(usersCache).filter(u => {
         if (u.id === currentUser.id) return false; 
-        if (containerId === 'inviteUserList' && activeRoomId && roomMembersMap[activeRoomId]?.includes(u.id)) return false; 
+        if (containerId === 'inviteUserList' && activeRoomId && roomMembersMap[activeRoomId]?.includes(u.id)) return false; // 이미 들어와 있는 유저 필터링
         if (!filterKeyword) return true;
         return u.nickname.toLowerCase().includes(filterKeyword.toLowerCase());
       });
@@ -1348,34 +1434,37 @@
         container.appendChild(item);
       });
     }
+// 1. 로그인 성공 후
+function handleLogin() {
+  // ... 기존 로그인 로직
+  const user = res.user;
+  localStorage.setItem('snsUser', JSON.stringify(user));
+  
+  // 사이드바 iframe에 유저정보 전달
+  const sidebarFrame = document.querySelector('iframe[src*="sidebar"]');
+  if (sidebarFrame?.contentWindow) {
+    sidebarFrame.contentWindow.postMessage({ 
+      type: 'updateUser', 
+      user: user 
+    }, '*');
+  }
+}
 
-    function handleLogin() {
-      const user = res.user;
-      localStorage.setItem('snsUser', JSON.stringify(user));
-      
-      const sidebarFrame = document.querySelector('iframe[src*="sidebar"]');
-      if (sidebarFrame?.contentWindow) {
-        sidebarFrame.contentWindow.postMessage({ 
-          type: 'updateUser', 
-          user: user 
-        }, '*');
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedUser = localStorage.getItem('snsUser');
-      if (savedUser) {
-        const user = JSON.parse(savedUser);
-        const sidebarFrame = document.querySelector('iframe[src*="sidebar"]');
-        sidebarFrame.onload = () => {
-          sidebarFrame.contentWindow.postMessage({ 
-            type: 'updateUser', 
-            user: user 
-          }, '*');
-        };
-      }
-    });
-
+// 2. 페이지 새로고침해도 유지되게
+window.addEventListener('DOMContentLoaded', () => {
+  const savedUser = localStorage.getItem('snsUser');
+  if (savedUser) {
+    const user = JSON.parse(savedUser);
+    const sidebarFrame = document.querySelector('iframe[src*="sidebar"]');
+    // iframe 로드 완료 후 전송
+    sidebarFrame.onload = () => {
+      sidebarFrame.contentWindow.postMessage({ 
+        type: 'updateUser', 
+        user: user 
+      }, '*');
+    };
+  }
+});
     function filterUserList(containerId, value) {
       renderUserSelectList(containerId, value.trim());
     }
@@ -1413,6 +1502,7 @@
           body: JSON.stringify(membersData)
         });
 
+        // 초대 완료 시스템 메시지 등록
         if (selectedIds.length > 0) {
           const invitedNames = selectedIds.map(id => getUserInfo(id).nickname).join(', ');
           const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
@@ -1463,6 +1553,7 @@
           body: JSON.stringify(membersData)
         });
 
+        // 시스템 메시지 등록sdsadsa
         const invitedNames = selectedIds.map(id => getUserInfo(id).nickname).join(', ');
         const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
         await api("/dm_messages", {
