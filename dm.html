@@ -90,7 +90,23 @@
       flex-direction: column; 
       height: 100vh; 
     }
+@media (max-width: 768px) {
+  /* 채팅방 안에 있을 때만 사이드바 숨김 */
+  body.chat-room-active .sidebar-container {
+    display: none;
+  }
+  
+  /* 사이드바 없어지니까 메인도 전체 너비로 */
+  body.chat-room-active .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
 
+  /* 입력창도 왼쪽 끝부터 시작하게 */
+  body.chat-room-active .message-input-container {
+    left: 0; 
+  }
+}
     /* HEADER */
     .header {
       background: var(--bg);
@@ -982,7 +998,20 @@
       if (messagePollInterval) clearInterval(messagePollInterval);
       loadRooms();
     }
+// 채팅방 클릭 시
+function openChatRoom(roomId) {
+  document.body.classList.add('chat-room-active');
+  // 채팅방 여는 기존 로직...
+}
 
+// 뒤로가기 or 목록으로 돌아갈 때
+function closeChatRoom() {
+  document.body.classList.remove('chat-room-active');
+  // 목록 보여주는 기존 로직...
+}
+document.querySelector('.back-btn').addEventListener('click', () => {
+  document.body.classList.remove('chat-room-active');
+});
     let currentMessages = [];
     async function loadMessages(roomId, isPolling = false) {
       try {
