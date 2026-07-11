@@ -1177,7 +1177,9 @@ document.querySelector('.back-btn').addEventListener('click', () => {
           const time = new Date(msg.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
           const senderName = isMe ? '' : getUserInfo(msg.sender_id).nickname;
 
-          const readCount = readCountMap[msg.id] || 0;
+
+          const senderRead = msg.sender_id ? 1 : 0;
+          const readCount = (readCountMap[msg.id] || 0) + senderRead;
           const unreadCount = Math.max(0, totalMembers - readCount);
 
           wrapper.className = `message-wrapper ${isMe ? 'me' : 'other'}`;
