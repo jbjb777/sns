@@ -974,6 +974,43 @@ opacity: 1;
       }
     }
 
+    .mobile-create-fab {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-create-fab {
+        display: flex;
+        position: fixed;
+        right: 18px;
+        bottom: calc(64px + 20px + env(safe-area-inset-bottom, 0px));
+        width: 64px;
+        height: 64px;
+        border: none;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #2c3d88, #37205f);
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.45), 0 0 18px rgba(82,105,255,0.22);
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 150;
+        transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, opacity 0.2s;
+      }
+      .mobile-create-fab:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.55), 0 0 22px rgba(82,105,255,0.30);
+      }
+      .mobile-create-fab:active {
+        transform: scale(0.96);
+      }
+      .mobile-create-fab img {
+        width: 34px;
+        height: 34px;
+        filter: drop-shadow(0 0 8px rgba(255,255,255,0.22));
+      }
+    }
+
     #pullRefresh {
       position: fixed;
       top: -65px;
@@ -1062,6 +1099,10 @@ opacity: 1;
 <div class="sidebar-container">
   <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
 </div>
+
+<button id="mobileCreateBtn" class="mobile-create-fab" type="button" aria-label="새 게시물 만들기">
+  <img src="new.png" alt="만들기">
+</button>
 
 <div id="searchPanel" class="search-panel">
   <div class="search-panel-header">
@@ -1389,6 +1430,15 @@ window.addEventListener('DOMContentLoaded', () => {
 initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
+
+document.getElementById('mobileCreateBtn')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (currentUser) {
+    window.location.href = 'make.html';
+  } else {
+    window.location.href = 'login.html';
+  }
+});
 
 window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('active');
 window.closeSignupModal = () => document.getElementById('signupModal').classList.remove('active');
