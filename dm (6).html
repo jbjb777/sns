@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <script>
+    // 화면 깜빡임(FOUC) 방지를 위해 HTML 렌더링 전 테마를 즉시 적용합니다.
     const savedTheme = localStorage.getItem('theme') || 'dark';
     if (savedTheme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
@@ -36,6 +37,7 @@
       --r4: 28px;
     }
 
+    /* 라이트 모드 변수 정의 */
     html[data-theme="light"] {
       --bg: #fafafa;
       --bg2: #ffffff;
@@ -62,15 +64,15 @@
       -webkit-font-smoothing: antialiased;
       opacity: 0;
       animation: fadeIn 0.4s ease forwards;
-      overflow: hidden;
+      overflow: hidden; /* DM 페이지는 내부 스크롤 사용 */
     }
     @keyframes fadeIn { to { opacity: 1; } }
 
-    /* SIDEBAR */
+    /* ─── SIDEBAR (메인 앱 사이드바) ─── */
     .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
     .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
-    /* MAIN WRAPPER */
+    /* ─── MAIN WRAPPER ─── */
     .main-wrapper { 
       margin-left: 72px; 
       width: calc(100% - 72px); 
@@ -79,7 +81,7 @@
       height: 100vh; 
     }
 
-    /* HEADER */
+    /* ─── HEADER ─── */
     .header {
       background: var(--bg);
       border-bottom: 1px solid var(--border);
@@ -120,7 +122,7 @@
     }
     .header-right .action-btn:active { transform: scale(0.95); }
 
-    /* DM LAYOUT */
+    /* ─── DM LAYOUT (Master-Detail) ─── */
     .dm-container {
       display: flex;
       flex: 1;
@@ -128,7 +130,7 @@
       background: var(--bg);
     }
 
-    /* 왼쪽 패널 (목록) */
+    /* 왼쪽: 채팅방 목록 */
     .room-list-pane {
       width: 320px;
       border-right: 1px solid var(--border);
@@ -137,7 +139,18 @@
       flex-shrink: 0;
       background: var(--bg);
     }
-    .rooms-scroll-area { flex: 1; overflow-y: auto; }
+    
+    .room-list-header {
+      padding: 16px 20px;
+      font-size: 18px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rooms-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+    }
     .rooms-scroll-area::-webkit-scrollbar { width: 6px; }
     .rooms-scroll-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
@@ -153,34 +166,41 @@
     .room-item:hover { background: var(--bg2); }
     .room-item.active { background: var(--bg3); }
 
-    /* 카카오톡 스타일 멀티 프로필 아바타 */
     .room-avatar {
       width: 48px; height: 48px;
       border-radius: 18px;
       background: var(--bg4);
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      gap: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--t2);
       flex-shrink: 0;
     }
-    .room-avatar.grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
-    .room-avatar.grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
-    .room-avatar.grid-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-    .room-avatar.grid-3 img:first-child, .room-avatar.grid-3 .avatar-text:first-child { grid-column: 1 / span 2; }
-    .room-avatar.grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-
-    .room-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .room-avatar .avatar-text {
-      width: 100%; height: 100%; display: flex; align-items: center; 
-      justify-content: center; font-size: 14px; font-weight: 600; color: var(--t1); background: var(--bg4);
+    .room-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .room-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--t1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .room-last-msg {
+      font-size: 13px;
+      color: var(--t2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .room-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-    .room-name { font-size: 15px; font-weight: 600; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .room-last-msg { font-size: 13px; color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    /* 오른쪽 패널 (채팅창) */
+    /* 오른쪽: 채팅 화면 */
     .chat-pane {
       flex: 1;
       display: flex;
@@ -188,9 +208,17 @@
       background: var(--bg2);
       position: relative;
     }
+
     .chat-empty-state {
-      position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; background: var(--bg); color: var(--t3); z-index: 10;
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--t3);
+      z-index: 10;
     }
     .chat-empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
     .chat-empty-state p { font-size: 15px; font-weight: 500; }
@@ -203,114 +231,286 @@
       align-items: center;
       justify-content: space-between;
     }
-    .chat-header-info { display: flex; align-items: center; gap: 12px; }
+    .chat-header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
     .mobile-back-to-list { display: none; }
+    
     .chat-title { font-size: 16px; font-weight: 700; color: var(--t1); }
     
     .chat-header-actions button {
-      background: var(--bg3); border: 1px solid var(--border2); color: var(--t1);
-      padding: 6px 12px; border-radius: var(--r1); font-size: 12px; cursor: pointer; transition: background 0.15s;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t1);
+      padding: 6px 12px;
+      border-radius: var(--r1);
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
     }
     .chat-header-actions button:hover { background: var(--bg4); }
 
     .chat-messages {
-      flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
     .chat-messages::-webkit-scrollbar { width: 6px; }
     .chat-messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-    .message-wrapper { display: flex; flex-direction: column; max-width: 70%; }
-    .message-wrapper.me { align-self: flex-end; align-items: flex-end; }
-    .message-wrapper.other { align-self: flex-start; align-items: flex-start; }
+    .message-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 70%;
+    }
+    .message-wrapper.me {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .message-wrapper.other {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
 
-    .message-sender { font-size: 11px; color: var(--t3); margin-bottom: 4px; margin-left: 4px; margin-right: 4px; }
-    .message-bubble { padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.5; word-break: break-all; }
-    
-    .message-wrapper.me .message-bubble { background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
-    .message-wrapper.other .message-bubble { background: var(--bg3); color: var(--t1); border: 1px solid var(--border2); border-bottom-left-radius: 4px; }
-    
-    .message-time { font-size: 10px; color: var(--t3); margin-top: 4px; margin-left: 4px; margin-right: 4px; }
+    .message-sender {
+      font-size: 11px;
+      color: var(--t3);
+      margin-bottom: 4px;
+      margin-left: 4px;
+      margin-right: 4px;
+    }
 
-    .chat-input-area { padding: 16px 24px; border-top: 1px solid var(--border); background: var(--bg); display: flex; gap: 12px; align-items: flex-end; }
+    .message-bubble {
+      padding: 12px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-all;
+    }
+    .message-wrapper.me .message-bubble {
+      background: var(--blue);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .message-wrapper.other .message-bubble {
+      background: var(--bg3);
+      color: var(--t1);
+      border: 1px solid var(--border2);
+      border-bottom-left-radius: 4px;
+    }
+    
+    .message-time {
+      font-size: 10px;
+      color: var(--t3);
+      margin-top: 4px;
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+
+    .chat-input-area {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    
     .chat-input {
-      flex: 1; background: var(--bg2); border: 1px solid var(--border2); border-radius: 24px;
-      padding: 12px 20px; color: var(--t1); font-size: 14px; font-family: inherit; resize: none;
-      outline: none; min-height: 44px; max-height: 120px; transition: border-color 0.2s;
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      padding: 12px 20px;
+      color: var(--t1);
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      min-height: 44px;
+      max-height: 120px;
+      transition: border-color 0.2s;
     }
     .chat-input:focus { border-color: var(--border3); }
 
     .send-btn {
-      width: 44px; height: 44px; border-radius: 50%; background: var(--blue); border: none; color: #fff;
-      display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.15s, opacity 0.15s;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--blue);
+      border: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s, opacity 0.15s;
     }
     .send-btn:hover { opacity: 0.9; }
     .send-btn:active { transform: scale(0.9); }
     .send-btn:disabled { background: var(--bg3); color: var(--t3); cursor: not-allowed; }
 
-    /* MODAL STYLE */
+    /* ─── MODAL (POPUP) STYLE ─── */
     .modal {
-      display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
-      justify-content: center; align-items: center; z-index: 200; pointer-events: none; visibility: hidden; transition: all 0.3s;
+      display: flex;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0);
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      pointer-events: none;
+      visibility: hidden;
+      transition: all 0.3s;
     }
     .modal.open { 
-      pointer-events: auto; visibility: visible; background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      pointer-events: auto;
+      visibility: visible;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .modal-content {
-      background: var(--bg2); border: 1px solid var(--border2); width: 90%; max-width: 400px;
-      border-radius: var(--r4); padding: 24px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      opacity: 0; transform: scale(0.9) translateY(20px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      width: 90%;
+      max-width: 400px;
+      border-radius: var(--r4);
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .modal.open .modal-content { opacity: 1; transform: scale(1) translateY(0); }
     
     .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-    .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--t2); cursor: pointer; padding: 4px; border-radius: 50%; }
+    .modal-close {
+      position: absolute; top: 20px; right: 20px;
+      background: none; border: none; color: var(--t2);
+      cursor: pointer; padding: 4px; border-radius: 50%;
+    }
     .modal-close:hover { background: var(--bg3); color: var(--t1); }
     
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-size: 13px; color: var(--t2); margin-bottom: 8px; }
-    .form-group input { width: 100%; padding: 12px 16px; border-radius: var(--r2); border: 1px solid var(--border2); background: var(--bg); color: var(--t1); font-size: 14px; outline: none; }
+    .form-group input {
+      width: 100%; padding: 12px 16px; border-radius: var(--r2);
+      border: 1px solid var(--border2); background: var(--bg);
+      color: var(--t1); font-size: 14px; outline: none;
+    }
     .form-group input:focus { border-color: var(--blue); }
 
-    .modal-search-box { display: flex; align-items: center; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--r2); padding: 0 14px; height: 44px; margin-bottom: 12px; transition: border-color 0.2s; }
+    /* 모달 내부 검색 상자 스타일 정의 */
+    .modal-search-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 0 14px;
+      height: 44px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
     .modal-search-box:focus-within { border-color: var(--blue); }
-    .modal-search-box input { flex: 1; background: transparent; border: none; outline: none; color: var(--t1); font-size: 14px; padding-left: 8px; }
+    .modal-search-box input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: var(--t1); font-size: 14px; padding-left: 8px;
+    }
     .modal-search-box input::placeholder { color: var(--t3); }
     .modal-search-box .search-icon { color: var(--t2); display: flex; align-items: center; }
     
-    .user-select-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--border2); border-radius: var(--r2); background: var(--bg); }
-    .user-select-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+    .user-select-list {
+      max-height: 200px; overflow-y: auto;
+      border: 1px solid var(--border2); border-radius: var(--r2);
+      background: var(--bg);
+    }
+    .user-select-item {
+      display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+      cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.2s;
+    }
     .user-select-item:last-child { border-bottom: none; }
     .user-select-item:hover { background: var(--bg3); }
     .user-select-item .user-meta { display: flex; align-items: center; gap: 10px; }
     .user-select-item .user-meta span { font-size: 14px; font-weight: 500; }
     
-    .select-chk-btn { background: var(--bg3); border: 1px solid var(--border2); color: var(--t2); padding: 6px 14px; border-radius: 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .select-chk-btn.checked { background: var(--blue); border-color: var(--blue); color: #fff; }
+    /* 기존 체크박스 대신 커스텀 버튼 스타일 생성 */
+    .select-chk-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--t2);
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .select-chk-btn.checked {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
     
-    .modal-btn { width: 100%; padding: 14px; border-radius: var(--r2); background: var(--t1); color: var(--bg); border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .modal-btn {
+      width: 100%; padding: 14px; border-radius: var(--r2);
+      background: var(--t1); color: var(--bg);
+      border: none; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
     .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    /* 위에서 아래로 스르륵 내려오는 커스텀 토스트 알림 스타일 */
     .custom-alert {
-      position: fixed; top: -70px; left: 50%; transform: translateX(-50%); background: var(--bg3); color: var(--t1);
-      border: 1px solid var(--border2); padding: 14px 24px; border-radius: var(--r3); font-size: 14px; font-weight: 600;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; gap: 10px;
+      position: fixed;
+      top: -70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg3);
+      color: var(--t1);
+      border: 1px solid var(--border2);
+      padding: 14px 24px;
+      border-radius: var(--r3);
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .custom-alert.show { top: 24px; }
     .custom-alert-icon { display: flex; align-items: center; }
 
+    /* ─── MOBILE RESPONSIVE ─── */
     @media (max-width: 768px) {
       .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .sidebar-container iframe { width: 100% !important; height: 100% !important; }
       .main-wrapper { margin-left: 0; width: 100%; height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px)); }
+      
       .dm-container { flex-direction: column; }
+      
       .room-list-pane { width: 100%; flex: 1; border-right: none; }
       .chat-pane { display: none; position: absolute; inset: 0; z-index: 60; }
+      
+      /* 모바일에서 채팅방이 열렸을 때 */
       .dm-container.room-active .room-list-pane { display: none; }
       .dm-container.room-active .chat-pane { display: flex; }
-      .mobile-back-to-list { display: flex; background: none; border: none; color: var(--t1); padding: 4px; cursor: pointer; align-items: center; justify-content: center; }
+      
+      .mobile-back-to-list {
+        display: flex; background: none; border: none; color: var(--t1);
+        padding: 4px; cursor: pointer; align-items: center; justify-content: center;
+      }
       .chat-header { padding: 12px 16px; }
       .chat-messages { padding: 16px; }
       .chat-input-area { padding: 12px 16px; }
@@ -322,6 +522,7 @@
     <iframe src="sidebar.html"></iframe>
   </div>
 
+  <!-- 커스텀 슬라이드 알림창 엘리먼트 -->
   <div class="custom-alert" id="customAlert">
     <div class="custom-alert-icon">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -343,10 +544,14 @@
     </div>
 
     <div class="dm-container" id="dmContainer">
+      <!-- 왼쪽: 채팅방 목록 -->
       <div class="room-list-pane">
-        <div class="rooms-scroll-area" id="roomList"></div>
+        <div class="rooms-scroll-area" id="roomList">
+          <!-- 채팅방 아이템 예시 (동적 생성) -->
+        </div>
       </div>
 
+      <!-- 오른쪽: 채팅 내용 -->
       <div class="chat-pane" id="chatPane">
         <div class="chat-empty-state" id="chatEmptyState">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -367,7 +572,9 @@
           </div>
         </div>
 
-        <div class="chat-messages" id="chatMessages" style="display: none;"></div>
+        <div class="chat-messages" id="chatMessages" style="display: none;">
+          <!-- 메시지들 (동적 생성) -->
+        </div>
 
         <div class="chat-input-area" id="chatInputArea" style="display: none;">
           <textarea class="chat-input" id="messageInput" placeholder="메시지를 입력하세요..." rows="1" oninput="resizeInput(this)" onkeydown="checkEnter(event)"></textarea>
@@ -392,13 +599,16 @@
       </div>
       <div class="form-group">
         <label>초대할 사용자 선택</label>
+        <!-- 상단 검색바 구성 추가 -->
         <div class="modal-search-box">
           <span class="search-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </span>
           <input type="text" id="createRoomUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('newUserList', this.value)">
         </div>
-        <div class="user-select-list" id="newUserList"></div>
+        <div class="user-select-list" id="newUserList">
+          <!-- 유저 목록 -->
+        </div>
       </div>
       <button class="modal-btn" id="createRoomBtn" onclick="createRoom()">만들기</button>
     </div>
@@ -413,13 +623,16 @@
       <div class="modal-title">사용자 초대하기</div>
       <div class="form-group">
         <label>초대할 사용자 선택</label>
+        <!-- 상단 검색바 구성 추가 -->
         <div class="modal-search-box">
           <span class="search-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </span>
           <input type="text" id="inviteUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('inviteUserList', this.value)">
         </div>
-        <div class="user-select-list" id="inviteUserList"></div>
+        <div class="user-select-list" id="inviteUserList">
+          <!-- 유저 목록 -->
+        </div>
       </div>
       <button class="modal-btn" id="inviteBtn" onclick="inviteUsers()">초대하기</button>
     </div>
@@ -428,21 +641,26 @@
   <script>
     const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
     let currentUser = null;
-    let usersCache = {}; 
-    let roomMembersMap = {}; // { room_id: [user_id, user_id, ...] } 실시간 멀티프로필 바인딩용 매핑맵
+    let usersCache = {}; // { id: { nickname, ... } }
     let activeRoomId = null;
     let messagePollInterval = null;
     let isSending = false;
+
+    // 선택된 유저 아이디 보관용 객체
     let selectedUserIds = new Set();
 
+    // 부드럽게 위에서 스르륵 내려오는 알림창 구현 함수
     function showAlert(message) {
       const alertEl = document.getElementById('customAlert');
       const msgEl = document.getElementById('customAlertMsg');
       msgEl.textContent = message;
       alertEl.classList.add('show');
-      setTimeout(() => alertEl.classList.remove('show'), 2500);
+      setTimeout(() => {
+        alertEl.classList.remove('show');
+      }, 2500);
     }
 
+    // API 통신 공통 함수
     async function api(endpoint, options = {}) {
       const url = API_BASE + endpoint;
       const res = await fetch(url, {
@@ -460,6 +678,7 @@
       try { return await res.json(); } catch(e) { return null; }
     }
 
+    // 초기화
     async function initPage() {
       NProgress.start();
       const savedUser = localStorage.getItem('snsUser');
@@ -479,6 +698,7 @@
       NProgress.done();
     }
 
+    // 유저 정보 로드 (닉네임, 프로필 매핑용)
     async function loadAllUsers() {
       try {
         const users = await api("/users?select=id,nickname,profile_image");
@@ -490,76 +710,25 @@
       }
     }
 
-    function getUserInfo(id) {
-      return usersCache[id] || { id, nickname: '알 수 없음', profile_image: '' };
+    function getUserName(id) {
+      if (id === currentUser.id) return currentUser.nickname;
+      return usersCache[id]?.nickname || '알 수 없음';
     }
 
-    // 카카오톡 방식 멀티 프로필 아바타 컴포넌트 빌더 생성 함수
-    function generateMultiAvatarHTML(roomId) {
-      const memberIds = roomMembersMap[roomId] || [];
-      const others = memberIds.filter(id => id !== currentUser.id);
-
-      if (others.length === 0) {
-        return `<div class="room-avatar grid-1"><div class="avatar-text">나</div></div>`;
-      }
-      if (others.length === 1) {
-        const u = getUserInfo(others[0]);
-        if (u.profile_image) return `<div class="room-avatar grid-1"><img src="${u.profile_image}"></div>`;
-        return `<div class="room-avatar grid-1"><div class="avatar-text">${u.nickname[0]}</div></div>`;
-      }
-      if (others.length === 2) {
-        return `
-          <div class="room-avatar grid-2">
-            ${renderIndividualSlice(others[0])}
-            ${renderIndividualSlice(others[1])}
-          </div>`;
-      }
-      if (others.length === 3) {
-        return `
-          <div class="room-avatar grid-3">
-            ${renderIndividualSlice(others[0])}
-            ${renderIndividualSlice(others[1])}
-            ${renderIndividualSlice(others[2])}
-          </div>`;
-      }
-      return `
-        <div class="room-avatar grid-4">
-          ${renderIndividualSlice(others[0])}
-          ${renderIndividualSlice(others[1])}
-          ${renderIndividualSlice(others[2])}
-          ${renderIndividualSlice(others[3])}
-        </div>`;
-    }
-
-    function renderIndividualSlice(userId) {
-      const u = getUserInfo(userId);
-      if (u.profile_image) return `<img src="${u.profile_image}">`;
-      return `<div class="avatar-text" style="font-size:10px;">${u.nickname[0]}</div>`;
-    }
-
+    // 내 채팅방 목록 로드
     async function loadRooms() {
       try {
-        // 1. 내가 속한 방 목록 매핑 데이터 조회
+        // 1. 내가 속한 방 멤버 레코드 가져오기
         const myMemberships = await api(`/dm_room_members?user_id=eq.${encodeURIComponent(currentUser.id)}`);
         if (!myMemberships || myMemberships.length === 0) {
           document.getElementById('roomList').innerHTML = '<div style="padding:20px; color:var(--t3); text-align:center;">참여중인 채팅방이 없습니다.</div>';
           return;
         }
 
-        const roomIds = myMemberships.map(m => m.room_id);
+        const roomIds = myMemberships.map(m => m.room_id).join(',');
+        // 2. 방 정보 가져오기 (이름 등)
+        const rooms = await api(`/dm_rooms?id=in.(${roomIds})&order=created_at.desc`);
         
-        // 2. 해당 방들의 전체 참여자 관계들을 캐싱 (멀티 프로필 구현 목적)
-        const allMembers = await api(`/dm_room_members?room_id=in.(${roomIds.join(',')})`);
-        roomMembersMap = {};
-        if (allMembers) {
-          allMembers.forEach(m => {
-            if (!roomMembersMap[m.room_id]) roomMembersMap[m.room_id] = [];
-            roomMembersMap[m.room_id].push(m.user_id);
-          });
-        }
-
-        // 3. 실제 방 기본 정보 조회 및 렌더링
-        const rooms = await api(`/dm_rooms?id=in.(${roomIds.join(',')})&order=created_at.desc`);
         renderRoomList(rooms || []);
       } catch (e) {
         console.error("채팅방 로드 오류", e);
@@ -573,29 +742,20 @@
       rooms.forEach(room => {
         const div = document.createElement('div');
         div.className = `room-item ${room.id === activeRoomId ? 'active' : ''}`;
-        
-        // 일대일 대화방이면 상대방 닉네임으로 자동 전환 처리 가변 적용
-        let displayRoomName = room.name || '채팅방';
-        const members = roomMembersMap[room.id] || [];
-        if (members.length === 2) {
-          const opponentId = members.find(id => id !== currentUser.id);
-          if (opponentId) displayRoomName = getUserInfo(opponentId).nickname;
-        }
+        div.onclick = () => openRoom(room.id, room.name);
 
-        div.onclick = () => openRoom(room.id, displayRoomName);
+        const avatarChar = (room.name ? room.name[0] : '방').toUpperCase();
 
         div.innerHTML = `
-          <div id="avatarContainer-${room.id}"></div>
+          <div class="room-avatar">${avatarChar}</div>
           <div class="room-info">
-            <div class="room-name">${escapeHTML(displayRoomName)} <span style="font-size:12px; font-weight:400; color:var(--t3);">${members.length}</span></div>
+            <div class="room-name">${escapeHTML(room.name)}</div>
             <div class="room-last-msg" id="lastMsg-${room.id}">대화를 시작해보세요</div>
           </div>
         `;
         listEl.appendChild(div);
 
-        // 아바타 분할 그래픽 컨테이너 삽입
-        document.getElementById(`avatarContainer-${room.id}`).innerHTML = generateMultiAvatarHTML(room.id);
-
+        // 마지막 메시지 비동기 로드 (간략하게 최신 1개)
         api(`/dm_messages?room_id=eq.${room.id}&order=created_at.desc&limit=1`)
           .then(msgs => {
             if (msgs && msgs.length > 0) {
@@ -606,30 +766,37 @@
       });
     }
 
+    // 채팅방 열기
     function openRoom(roomId, roomName) {
       activeRoomId = roomId;
+      
+      // 모바일 대응 클래스 토글
       document.getElementById('dmContainer').classList.add('room-active');
       
+      // UI 업데이트
       document.getElementById('chatEmptyState').style.display = 'none';
       document.getElementById('chatHeader').style.display = 'flex';
       document.getElementById('chatMessages').style.display = 'flex';
       document.getElementById('chatInputArea').style.display = 'flex';
       document.getElementById('activeRoomName').textContent = roomName;
 
+      // 목록 UI active 상태 업데이트
       document.querySelectorAll('.room-item').forEach(el => el.classList.remove('active'));
+      // 다시 렌더링 없이 현재 돔에서 active 추가
+      loadRooms(); 
 
+      // 메시지 불러오기 및 폴링 시작
       if (messagePollInterval) clearInterval(messagePollInterval);
       loadMessages(roomId);
       messagePollInterval = setInterval(() => {
         loadMessages(roomId, true);
-      }, 3000); 
+      }, 3000); // 3초마다 갱신
     }
 
     function closeRoom() {
       activeRoomId = null;
       document.getElementById('dmContainer').classList.remove('room-active');
       if (messagePollInterval) clearInterval(messagePollInterval);
-      loadRooms();
     }
 
     let currentMessages = [];
@@ -638,6 +805,7 @@
         const msgs = await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
         if (!msgs) return;
         
+        // 폴링 중 갯수가 같으면 다시 렌더링 안함 (간단한 최적화)
         if (isPolling && msgs.length === currentMessages.length) return;
         currentMessages = msgs;
 
@@ -647,7 +815,7 @@
         msgs.forEach(msg => {
           const isMe = msg.sender_id === currentUser.id;
           const time = new Date(msg.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-          const senderName = isMe ? '' : getUserInfo(msg.sender_id).nickname;
+          const senderName = isMe ? '' : getUserName(msg.sender_id);
 
           const wrapper = document.createElement('div');
           wrapper.className = `message-wrapper ${isMe ? 'me' : 'other'}`;
@@ -658,7 +826,7 @@
           }
           html += `
             <div style="display:flex; align-items:flex-end; gap:4px; ${isMe ? 'flex-direction:row-reverse;' : ''}">
-              <div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g, '<br>')}</div>
+              <div class="message-bubble">${msg.content.replace(/\n/g, '<br>')}</div>
               <div class="message-time">${time}</div>
             </div>
           `;
@@ -666,7 +834,9 @@
           container.appendChild(wrapper);
         });
 
+        // 스크롤 맨 아래로
         container.scrollTop = container.scrollHeight;
+
       } catch (e) {
         console.error("메시지 로드 오류", e);
       }
@@ -681,6 +851,7 @@
       isSending = true;
       document.getElementById('sendBtn').disabled = true;
 
+      // 낙관적 UI 업데이트 (바로 보이게)
       const container = document.getElementById('chatMessages');
       const time = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
       const tempWrapper = document.createElement('div');
@@ -708,6 +879,7 @@
             created_at: new Date().toISOString()
           })
         });
+        // 전송 성공 시 갱신
         loadMessages(activeRoomId);
       } catch (e) {
         showAlert("메시지 전송에 실패했습니다.");
@@ -719,6 +891,7 @@
       }
     }
 
+    // 입력창 크기 자동 조절
     function resizeInput(el) {
       el.style.height = '44px';
       el.style.height = Math.min(el.scrollHeight, 120) + 'px';
@@ -731,6 +904,7 @@
       }
     }
 
+    /* ─── 모달 제어 및 방 생성/초대 ─── */
     function closeModals() {
       document.getElementById('createRoomModal').classList.remove('open');
       document.getElementById('inviteModal').classList.remove('open');
@@ -752,13 +926,13 @@
       renderUserSelectList('inviteUserList');
     }
 
+    // 유저 목록 렌더링 함수 (커스텀 선택 토글 버튼 형식)
     function renderUserSelectList(containerId, filterKeyword = '') {
       const container = document.getElementById(containerId);
       container.innerHTML = '';
       
       const filteredUsers = Object.values(usersCache).filter(u => {
-        if (u.id === currentUser.id) return false; 
-        if (containerId === 'inviteUserList' && activeRoomId && roomMembersMap[activeRoomId]?.includes(u.id)) return false; // 이미 들어와 있는 유저 필터링
+        if (u.id === currentUser.id) return false; // 자신 제외
         if (!filterKeyword) return true;
         return u.nickname.toLowerCase().includes(filterKeyword.toLowerCase());
       });
@@ -771,6 +945,7 @@
       filteredUsers.forEach(u => {
         const item = document.createElement('div');
         item.className = 'user-select-item';
+        
         const isChecked = selectedUserIds.has(u.id);
         
         item.innerHTML = `
@@ -782,6 +957,8 @@
           </button>
         `;
 
+        // 행 및 커스텀 버튼 클릭 시 선택 변경 기능 적용
+        const btn = item.querySelector('.select-chk-btn');
         const toggleSelection = (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -796,7 +973,6 @@
           }
         };
 
-        const btn = item.querySelector('.select-chk-btn');
         item.onclick = toggleSelection;
         btn.onclick = toggleSelection;
 
@@ -804,6 +980,7 @@
       });
     }
 
+    // 입력 실시간 검색 필터링 핸들러
     function filterUserList(containerId, value) {
       renderUserSelectList(containerId, value.trim());
     }
@@ -817,8 +994,9 @@
       NProgress.start();
 
       try {
+        // 1. 방 생성 (PostgREST는 uuid 자동생성 or return=representation)
         const roomPayload = { name: name, created_at: new Date().toISOString() };
-        roomPayload.id = crypto.randomUUID ? crypto.randomUUID() : 'room-' + Date.now(); 
+        roomPayload.id = crypto.randomUUID ? crypto.randomUUID() : 'temp-' + Date.now(); 
 
         const roomRes = await api("/dm_rooms", {
           method: "POST",
@@ -828,10 +1006,12 @@
         
         const newRoomId = (roomRes && roomRes[0]) ? roomRes[0].id : roomPayload.id;
 
+        // 2. 나를 멤버에 추가
         const membersData = [
           { room_id: newRoomId, user_id: currentUser.id, joined_at: new Date().toISOString() }
         ];
 
+        // 3. 선택된 유저 멤버에 추가
         selectedIds.forEach(id => {
           membersData.push({ room_id: newRoomId, user_id: id, joined_at: new Date().toISOString() });
         });
@@ -845,6 +1025,7 @@
         await loadRooms();
         openRoom(newRoomId, name);
         showAlert("새 채팅방이 개설되었습니다.");
+
       } catch (e) {
         showAlert("방 생성 실패: " + e.message);
       } finally {
@@ -879,12 +1060,6 @@
 
         showAlert("성공적으로 사용자를 초대했습니다.");
         closeModals();
-        await loadRooms();
-        
-        if (roomMembersMap[activeRoomId]) {
-          let displayRoomName = document.getElementById('activeRoomName').textContent;
-          openRoom(activeRoomId, displayRoomName);
-        }
       } catch (e) {
         showAlert("초대 실패: " + e.message);
       } finally {
@@ -896,10 +1071,17 @@
     function escapeHTML(str) {
       if (!str) return '';
       return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
       );
     }
 
+    // 실행
     initPage();
   </script>
 </body>
