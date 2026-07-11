@@ -485,38 +485,7 @@
   <script>
     NProgress.configure({ showSpinner: false });
 
-    // 1. 로그인 유저 상태 연동 (없으면 기본 정빈 계정으로 초기화 생성)
-    let currentUser = JSON.parse(localStorage.getItem('snsUser'));
-    if (!currentUser) {
-      currentUser = { id: "user_me", nickname: "정빈", profile_image: "" };
-      localStorage.setItem('snsUser', JSON.stringify(currentUser));
-    }
-    
-    // 2. 글로벌 가상 데이터베이스 초기화 (localStorage 세션에 의존하여 유저방 유지 가능)
-    let mockUsers = JSON.parse(localStorage.getItem('mock_users')) || [
-      { id: "user_1", nickname: "김철수", profile_image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop" },
-      { id: "user_2", nickname: "이영희", profile_image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop" },
-      { id: "user_3", nickname: "박민수", profile_image: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=80&h=80&fit=crop" },
-      { id: "user_4", nickname: "최지우", profile_image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop" }
-    ];
 
-    // 현재 접속해 있는 currentUser가 들어있는 방 정보들만 로드
-    let mockRooms = JSON.parse(localStorage.getItem('mock_rooms')) || [
-      { id: "room_init_1", name: "동아리 단톡방", members: [currentUser.id, "user_1", "user_2", "user_3"], last_message: "디자인 결과물 공유드립니다.", timestamp: "오후 12:40" },
-      { id: "room_init_2", name: "이영희", members: [currentUser.id, "user_2"], last_message: "넵 알겠습니다!", timestamp: "어제" }
-    ];
-
-    let mockMessages = JSON.parse(localStorage.getItem('mock_messages')) || {
-      "room_init_1": [
-        { id: "m1", user_id: "user_1", user_name: "김철수", text: "정빈님 안녕하세요!", is_system: false, timestamp: "오후 12:30" },
-        { id: "m2", user_id: "", user_name: "", text: "김철수님이 이영희님을 초대했습니다.", is_system: true, timestamp: "오후 12:31" },
-        { id: "m3", user_id: "user_2", user_name: "이영희", text: "디자인 결과물 공유드립니다.", is_system: false, timestamp: "오후 12:40" }
-      ],
-      "room_init_2": [
-        { id: "m4", user_id: "user_2", user_name: "이영희", text: "정빈님 확인 부탁드려요!", is_system: false, timestamp: "어제" },
-        { id: "m5", user_id: currentUser.id, user_name: currentUser.nickname, text: "넵 알겠습니다!", is_system: false, timestamp: "어제" }
-      ]
-    };
 
     let activeRoomId = null;
     let searchTimeout = null;
