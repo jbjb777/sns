@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>다이렉트 : Sharer</title>
+  <title>메시지 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
@@ -81,70 +81,6 @@
     /* SIDEBAR */
     .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
     .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
-
-    /* 검색 패널 슬라이드 (홈페이지 연동) */
-    .search-panel {
-      position: fixed;
-      top: 0;
-      left: 72px;
-      width: 380px;
-      max-width: calc(100vw - 72px);
-      height: 100vh;
-      background: var(--bg);
-      border-right: 1px solid var(--border);
-      z-index: 90;
-      transform: translateX(-100%);
-      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex;
-      flex-direction: column;
-      box-shadow: 4px 0 24px rgba(0,0,0,0.3);
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-    html[data-theme="light"] .search-panel {
-      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
-    }
-    .search-panel.open {
-      transform: translateX(0);
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-    .search-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-    .search-panel-header h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--t1);
-    }
-    .search-close-btn {
-      background: transparent;
-      border: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .search-close-btn:hover {
-      color: var(--t1);
-      transform: scale(1.1);
-    }
-    .search-panel iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
-    }
 
     /* MAIN WRAPPER */
     .main-wrapper { 
@@ -393,34 +329,9 @@
     }
     .custom-alert.show { top: 24px; }
 
-    .sharer-profile-sheet-host[hidden] { display: none !important; }
-    .sharer-profile-sheet-host { position: fixed; inset: 0; z-index: 960; }
-    .sharer-profile-sheet-host .sps-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); opacity: 0; pointer-events: none; transition: opacity 0.34s ease; }
-    .sharer-profile-sheet-host.sps-host-open .sps-backdrop { opacity: 1; pointer-events: auto; }
-    .sharer-profile-sheet-host .sps-panel { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45); max-height: 44vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; transform: translateY(100%); transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
-    .sharer-profile-sheet-host.sps-host-open .sps-panel { transform: translateY(0); }
-    .sharer-profile-sheet-host .sps-drag-area { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px; padding: 6px 16px 14px; margin: -2px -16px 0 -16px; cursor: grab; user-select: none; }
-    .sharer-profile-sheet-host .sps-grab { width: 40px; height: 5px; border-radius: 5px; background: var(--border3); }
-    .sharer-profile-sheet-host .sps-profile { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--bg2); margin-bottom: 12px; }
-    .sharer-profile-sheet-host .sps-av { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; overflow: hidden; }
-    .sharer-profile-sheet-host .sps-av img { width: 100%; height: 100%; object-fit: cover; }
-    .sharer-profile-sheet-host .sps-name { font-size: 16px; font-weight: 600; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .sharer-profile-sheet-host .sps-logout { width: 100%; padding: 14px 16px; border: none; border-radius: 14px; background: rgba(255, 80, 80, 0.15); color: #ff8a8a; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
-
     @media (max-width: 768px) {
       .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .sidebar-container iframe { width: 100% !important; height: 100% !important; }
-      
-      .search-panel {
-        left: 0;
-        width: 100%;
-        max-width: 100%;
-        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
-        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-        top: 0;
-        z-index: 90;
-      }
-      
       .main-wrapper { margin-left: 0; width: 100%; height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px)); }
       .dm-container { flex-direction: column; }
       .room-list-pane { width: 100%; flex: 1; border-right: none; }
@@ -436,18 +347,8 @@
 </head>
 <body>
   <div class="sidebar-container">
-    <iframe src="sidebar.html" id="sidebarFrame"></iframe>
+    <iframe src="sidebar.html"></iframe>
   </div>
-
-  <div id="searchPanel" class="search-panel">
-    <div class="search-panel-header">
-      <h2>검색</h2>
-      <button class="search-close-btn" onclick="toggleSearchPanel()">✕</button>
-    </div>
-    <iframe src="search.html" frameborder="0"></iframe>
-  </div>
-
-  <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
 
   <div class="custom-alert" id="customAlert">
     <span id="customAlertMsg">알림 메시지</span>
@@ -510,201 +411,403 @@
   <div class="modal" id="createRoomModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModals()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="modal-title">새 채팅방 만들기</div>
       <div class="form-group">
-        <label>채팅방 이름 (비워두면 유저 이름으로 설정됨)</label>
-        <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요.">
+        <label>채팅방 이름</label>
+        <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요">
       </div>
       <div class="form-group">
-        <label>대화 상대 선택</label>
+        <label>초대할 사용자 선택</label>
         <div class="modal-search-box">
-          <input type="text" id="userSearchInput" placeholder="닉네임 검색..." oninput="searchUsersForRoom()">
+          <span class="search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
+          <input type="text" id="createRoomUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('newUserList', this.value)">
         </div>
-        <div class="user-select-list" id="userSelectList"></div>
+        <div class="user-select-list" id="newUserList"></div>
       </div>
-      <button class="modal-btn" id="createRoomSubmitBtn" onclick="submitCreateRoom()">채팅방 개설</button>
+      <button class="modal-btn" id="createRoomBtn" onclick="createRoom()">만들기</button>
     </div>
   </div>
 
-  <!-- 멤버 초대 모달 -->
+  <!-- 사용자 초대 모달 -->
   <div class="modal" id="inviteModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModals()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title">멤버 초대하기</div>
+      <div class="modal-title">사용자 초대하기</div>
       <div class="form-group">
+        <label>초대할 사용자 선택</label>
         <div class="modal-search-box">
-          <input type="text" id="inviteSearchInput" placeholder="닉네임 검색..." oninput="searchUsersForInvite()">
+          <span class="search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
+          <input type="text" id="inviteUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('inviteUserList', this.value)">
         </div>
-        <div class="user-select-list" id="inviteSelectList"></div>
+        <div class="user-select-list" id="inviteUserList"></div>
       </div>
-      <button class="modal-btn" id="inviteSubmitBtn" onclick="submitInviteUsers()">초대하기</button>
+      <button class="modal-btn" id="inviteBtn" onclick="inviteUsers()">초대하기</button>
     </div>
   </div>
 
-  <!-- 방 정보 모달 -->
+  <!-- 채팅방 정보 모달 (새로 추가) -->
   <div class="modal" id="roomInfoModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModals()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title" id="infoModalTitle">채팅방 정보</div>
+      <div class="modal-title">채팅방 정보</div>
       <div class="form-group">
-        <label>참여 중인 멤버</label>
-        <div class="user-select-list" id="roomMemberList" style="max-height: 160px;"></div>
+        <label>채팅방 이름</label>
+        <input type="text" id="infoRoomName" readonly>
       </div>
-      <button class="modal-btn danger" onclick="leaveRoom()">채팅방 나가기</button>
+      <div class="form-group">
+        <label>참여 멤버 리스트</label>
+        <div class="user-select-list" id="roomMembersList"></div>
+      </div>
+      <button class="modal-btn danger" onclick="leaveRoom()">방 나가기</button>
     </div>
   </div>
 
   <script>
-    NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
-    NProgress.start();
-
     const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
     let currentUser = null;
+    let usersCache = {}; 
+    let roomMembersMap = {}; 
     let activeRoomId = null;
+    let messagePollInterval = null;
+    let isSending = false;
     let selectedUserIds = new Set();
-    let currentRoomMembers = [];
-    let messagePollingInterval = null;
-    let roomsPollingInterval = null;
 
-    // 사이드바 전용 로직 연동
-    function initCurrentUser() {
-      const savedUser = localStorage.getItem('snsUser');
-      if (savedUser) { 
-        currentUser = JSON.parse(savedUser); 
-        updateSidebar(); 
-      } else {
-        showAlert("로그인이 필요한 서비스입니다.");
-        setTimeout(() => window.location.href = 'index.html', 1500);
-      }
-    }
-
-    function updateSidebar() {
-      const iframe = document.getElementById('sidebarFrame');
-      if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
-    }
-
-    function updateSidebarMode() {
-      const iframe = document.getElementById('sidebarFrame');
-      const narrow = window.innerWidth <= 768;
-      if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'setNarrowMode', narrow }, '*');
-    }
-
-    let searchPanelOpen = false;
-    window.toggleSearchPanel = function() {
-      const panel = document.getElementById('searchPanel');
-      searchPanelOpen = !searchPanelOpen;
-      if (searchPanelOpen) {
-        panel.classList.add('open');
-        document.getElementById('sidebarFrame').contentWindow.postMessage({ type: 'activateSearch', active: true }, '*');
-      } else {
-        panel.classList.remove('open');
-        document.getElementById('sidebarFrame').contentWindow.postMessage({ type: 'activateSearch', active: false }, '*');
-      }
-    };
-
-    window.addEventListener('message', (event) => {
-      const { type, page } = event.data || {};
-      if (type === 'toggleSearch') {
-        window.toggleSearchPanel();
-      }
-      if (type === 'navigate') {
-        if (page === 'home') location.href = 'index.html';
-        if (page === 'explore') location.href = 'explore.html';
-        if (page === 'set') location.href = 'set.html';
-        if (page === 'dm') location.href = 'dm.html';
-      }
-      if (type === 'logout') { 
-        localStorage.removeItem('snsUser'); 
-        currentUser = null; 
-        location.reload(); 
-      }
-      if (type === 'requestUserInfo') updateSidebar();
-    });
-
-    window.onSharerProfileLogout = function () {
-      localStorage.removeItem('snsUser');
-      currentUser = null;
-      location.reload();
-    };
-
-    // 공통 API 함수
-    async function api(endpoint, options = {}) {
-      const url = API_BASE + endpoint;
-      const res = await fetch(url, {
-        ...options,
-        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-      });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`API 오류 (${res.status}): ${text}`);
-      }
-      if (res.status === 204) return null;
-      return res.json();
-    }
-
-    function showAlert(msg) {
+    function showAlert(message) {
       const alertEl = document.getElementById('customAlert');
-      document.getElementById('customAlertMsg').innerText = msg;
+      const msgEl = document.getElementById('customAlertMsg');
+      msgEl.textContent = message;
       alertEl.classList.add('show');
       setTimeout(() => alertEl.classList.remove('show'), 2500);
     }
 
-    // 모달 관리
-    function openCreateRoomModal() {
-      selectedUserIds.clear();
-      document.getElementById('newRoomName').value = '';
-      document.getElementById('userSearchInput').value = '';
-      document.getElementById('createRoomModal').classList.add('open');
-      searchUsersForRoom();
+    async function api(endpoint, options = {}) {
+      const url = API_BASE + endpoint;
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        },
+      });
+      if (!res.ok) {
+        let err = ""; try { err = await res.text(); } catch{}
+        throw new Error(`API 오류 (${res.status}): ${err}`);
+      }
+      if (res.status === 204 || res.headers.get("content-length") === "0") return null;
+      try { return await res.json(); } catch(e) { return null; }
     }
 
-    function openInviteModal() {
-      selectedUserIds.clear();
-      document.getElementById('inviteSearchInput').value = '';
-      document.getElementById('inviteModal').classList.add('open');
-      searchUsersForInvite();
-    }
+    async function initPage() {
+      NProgress.start();
+      const savedUser = localStorage.getItem('snsUser');
+      if (!savedUser) {
+        showAlert('로그인이 필요합니다.');
+        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+        return;
+      }
+      currentUser = JSON.parse(savedUser);
 
-    async function openRoomInfoModal() {
-      if (!activeRoomId) return;
-      document.getElementById('roomInfoModal').classList.add('open');
-      const memberListEl = document.getElementById('roomMemberList');
-      memberListEl.innerHTML = '<div style="padding:16px; text-align:center; color:var(--t3);">불러오는 중...</div>';
-      
       try {
-        const members = await api(`/chat_room_members?room_id=eq.${activeRoomId}&select=user_id`);
-        const userIds = members.map(m => m.user_id);
-        if(userIds.length === 0) return;
-
-        const users = await api(`/users?id=in.(${userIds.join(',')})&select=nickname,profile_image`);
-        memberListEl.innerHTML = '';
-        users.forEach(u => {
-          memberListEl.innerHTML += `
-            <div class="user-select-item" style="cursor:default;">
-              <div class="user-meta">
-                <span>${escapeHtml(u.nickname)}</span>
-              </div>
-            </div>`;
-        });
+        await loadAllUsers();
+        await loadRooms();
       } catch (e) {
-        memberListEl.innerHTML = '<div style="padding:16px; text-align:center; color:var(--pink);">멤버 로드 실패</div>';
+        console.error("초기화 실패:", e);
+      }
+      NProgress.done();
+    }
+
+    async function loadAllUsers() {
+      try {
+        const users = await api("/users?select=id,nickname,profile_image");
+        if (users) {
+          users.forEach(u => usersCache[u.id] = u);
+        }
+      } catch (e) {
+        console.warn("유저 목록 로드 실패", e);
       }
     }
 
-    function closeModals() {
-      document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+    function getUserInfo(id) {
+      return usersCache[id] || { id, nickname: '알 수 없음', profile_image: '' };
     }
 
-    // 인풋 리사이즈 및 엔터키 감지
+    function generateMultiAvatarHTML(roomId) {
+      const memberIds = roomMembersMap[roomId] || [];
+      const others = memberIds.filter(id => id !== currentUser.id);
+
+      if (others.length === 0) {
+        return `<div class="room-avatar grid-1"><div class="avatar-text">나</div></div>`;
+      }
+      if (others.length === 1) {
+        const u = getUserInfo(others[0]);
+        if (u.profile_image) return `<div class="room-avatar grid-1"><img src="${u.profile_image}"></div>`;
+        return `<div class="room-avatar grid-1"><div class="avatar-text">${u.nickname[0]}</div></div>`;
+      }
+      if (others.length === 2) {
+        return `
+          <div class="room-avatar grid-2">
+            ${renderIndividualSlice(others[0])}
+            ${renderIndividualSlice(others[1])}
+          </div>`;
+      }
+      if (others.length === 3) {
+        return `
+          <div class="room-avatar grid-3">
+            ${renderIndividualSlice(others[0])}
+            ${renderIndividualSlice(others[1])}
+            ${renderIndividualSlice(others[2])}
+          </div>`;
+      }
+      return `
+        <div class="room-avatar grid-4">
+          ${renderIndividualSlice(others[0])}
+          ${renderIndividualSlice(others[1])}
+          ${renderIndividualSlice(others[2])}
+          ${renderIndividualSlice(others[3])}
+        </div>`;
+    }
+
+    function renderIndividualSlice(userId) {
+      const u = getUserInfo(userId);
+      if (u.profile_image) return `<img src="${u.profile_image}">`;
+      return `<div class="avatar-text" style="font-size:10px;">${u.nickname[0]}</div>`;
+    }
+
+    // 스켈레톤 로딩 렌더링 함수
+    function renderRoomSkeleton() {
+      const listEl = document.getElementById('roomList');
+      let html = '';
+      for(let i=0; i<6; i++) {
+        html += `
+        <div class="room-item" style="pointer-events:none;">
+          <div class="skeleton" style="width:48px; height:48px; border-radius:18px; flex-shrink:0;"></div>
+          <div class="room-info" style="gap:8px;">
+            <div class="skeleton" style="width:50%; height:16px; border-radius:4px;"></div>
+            <div class="skeleton" style="width:70%; height:13px; border-radius:4px;"></div>
+          </div>
+        </div>`;
+      }
+      listEl.innerHTML = html;
+    }
+
+    async function loadRooms() {
+      renderRoomSkeleton(); // 로딩 전 스켈레톤 노출
+      
+      try {
+        const myMemberships = await api(`/dm_room_members?user_id=eq.${encodeURIComponent(currentUser.id)}`);
+        if (!myMemberships || myMemberships.length === 0) {
+          document.getElementById('roomList').innerHTML = '<div style="padding:20px; color:var(--t3); text-align:center;">참여중인 채팅방이 없습니다.</div>';
+          return;
+        }
+
+        const roomIds = myMemberships.map(m => m.room_id);
+        const allMembers = await api(`/dm_room_members?room_id=in.(${roomIds.join(',')})`);
+        
+        roomMembersMap = {};
+        if (allMembers) {
+          allMembers.forEach(m => {
+            if (!roomMembersMap[m.room_id]) roomMembersMap[m.room_id] = [];
+            roomMembersMap[m.room_id].push(m.user_id);
+          });
+        }
+
+        const rooms = await api(`/dm_rooms?id=in.(${roomIds.join(',')})&order=created_at.desc`);
+        renderRoomList(rooms || []);
+      } catch (e) {
+        console.error("채팅방 로드 오류", e);
+        document.getElementById('roomList').innerHTML = '<div style="padding:20px; color:var(--pink); text-align:center;">채팅방을 불러올 수 없습니다.</div>';
+      }
+    }
+
+    function renderRoomList(rooms) {
+      const listEl = document.getElementById('roomList');
+      listEl.innerHTML = '';
+
+      rooms.forEach(room => {
+        const div = document.createElement('div');
+        div.className = `room-item ${room.id === activeRoomId ? 'active' : ''}`;
+        
+        let displayRoomName = room.name || '채팅방';
+        const members = roomMembersMap[room.id] || [];
+        if (members.length === 2) {
+          const opponentId = members.find(id => id !== currentUser.id);
+          if (opponentId) displayRoomName = getUserInfo(opponentId).nickname;
+        }
+
+        div.onclick = () => openRoom(room.id, displayRoomName);
+
+        div.innerHTML = `
+          <div id="avatarContainer-${room.id}"></div>
+          <div class="room-info">
+            <div class="room-name">${escapeHTML(displayRoomName)} <span style="font-size:12px; font-weight:400; color:var(--t3);">${members.length}</span></div>
+            <div class="room-last-msg" id="lastMsg-${room.id}">대화를 시작해보세요</div>
+          </div>
+        `;
+        listEl.appendChild(div);
+
+        document.getElementById(`avatarContainer-${room.id}`).innerHTML = generateMultiAvatarHTML(room.id);
+
+        api(`/dm_messages?room_id=eq.${room.id}&order=created_at.desc&limit=1`)
+          .then(msgs => {
+            if (msgs && msgs.length > 0) {
+              const el = document.getElementById(`lastMsg-${room.id}`);
+              if (el) {
+                // 시스템 메시지인 경우 필터링해서 보여주기
+                let text = msgs[0].content;
+                if(text.startsWith('[SYSTEM] ')) text = text.replace('[SYSTEM] ', '');
+                el.textContent = text;
+              }
+            }
+          }).catch(()=>{});
+      });
+    }
+
+    function openRoom(roomId, roomName) {
+      activeRoomId = roomId;
+      document.getElementById('dmContainer').classList.add('room-active');
+      
+      document.getElementById('chatEmptyState').style.display = 'none';
+      document.getElementById('chatHeader').style.display = 'flex';
+      document.getElementById('chatMessages').style.display = 'flex';
+      document.getElementById('chatInputArea').style.display = 'flex';
+      document.getElementById('activeRoomName').textContent = roomName;
+
+      document.querySelectorAll('.room-item').forEach(el => el.classList.remove('active'));
+      const activeEl = Array.from(document.querySelectorAll('.room-item')).find(el => el.innerHTML.includes(roomId));
+      if(activeEl) activeEl.classList.add('active');
+
+      if (messagePollInterval) clearInterval(messagePollInterval);
+      loadMessages(roomId);
+      messagePollInterval = setInterval(() => {
+        loadMessages(roomId, true);
+      }, 3000); 
+    }
+
+    function closeRoom() {
+      activeRoomId = null;
+      document.getElementById('dmContainer').classList.remove('room-active');
+      if (messagePollInterval) clearInterval(messagePollInterval);
+      loadRooms();
+    }
+
+    let currentMessages = [];
+    async function loadMessages(roomId, isPolling = false) {
+      try {
+        const msgs = await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
+        if (!msgs) return;
+        
+        if (isPolling && msgs.length === currentMessages.length) return;
+        currentMessages = msgs;
+
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = '';
+
+        msgs.forEach(msg => {
+          const wrapper = document.createElement('div');
+          
+          // 시스템 메시지 감지 및 UI 적용
+          if (msg.content.startsWith('[SYSTEM] ')) {
+            const sysText = msg.content.replace('[SYSTEM] ', '').trim();
+            wrapper.className = 'system-message-container';
+            wrapper.innerHTML = `<div class="system-message-bubble">${escapeHTML(sysText)}</div>`;
+            container.appendChild(wrapper);
+            return;
+          }
+
+          const isMe = msg.sender_id === currentUser.id;
+          const time = new Date(msg.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+          const senderName = isMe ? '' : getUserInfo(msg.sender_id).nickname;
+
+          wrapper.className = `message-wrapper ${isMe ? 'me' : 'other'}`;
+          
+          let html = '';
+          if (!isMe) {
+            html += `<div class="message-sender">${escapeHTML(senderName)}</div>`;
+          }
+          html += `
+            <div style="display:flex; align-items:flex-end; gap:4px; ${isMe ? 'flex-direction:row-reverse;' : ''}">
+              <div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g, '<br>')}</div>
+              <div class="message-time">${time}</div>
+            </div>
+          `;
+          wrapper.innerHTML = html;
+          container.appendChild(wrapper);
+        });
+
+        container.scrollTop = container.scrollHeight;
+      } catch (e) {
+        console.error("메시지 로드 오류", e);
+      }
+    }
+
+    async function sendMessage() {
+      if (!activeRoomId || isSending) return;
+      const input = document.getElementById('messageInput');
+      const content = input.value.trim();
+      if (!content) return;
+
+      isSending = true;
+      document.getElementById('sendBtn').disabled = true;
+
+      const container = document.getElementById('chatMessages');
+      const time = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+      const tempWrapper = document.createElement('div');
+      tempWrapper.className = 'message-wrapper me temp-msg';
+      tempWrapper.style.opacity = '0.7';
+      
+      // 전송 중 상태 표시 종이비행기 아이콘 추가
+      tempWrapper.innerHTML = `
+        <div style="display:flex; align-items:flex-end; gap:4px; flex-direction:row-reverse;">
+          <div class="message-bubble">${escapeHTML(content).replace(/\n/g, '<br>')}</div>
+          <div class="message-time">
+            ${time} 
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </div>
+        </div>
+      `;
+      container.appendChild(tempWrapper);
+      container.scrollTop = container.scrollHeight;
+
+      input.value = '';
+      input.style.height = '44px';
+
+      try {
+        await api("/dm_messages", {
+          method: "POST",
+          body: JSON.stringify({
+            room_id: activeRoomId,
+            sender_id: currentUser.id,
+            content: content,
+            created_at: new Date().toISOString()
+          })
+        });
+        loadMessages(activeRoomId);
+      } catch (e) {
+        showAlert("메시지 전송에 실패했습니다.");
+        tempWrapper.remove();
+      } finally {
+        isSending = false;
+        document.getElementById('sendBtn').disabled = false;
+        input.focus();
+      }
+    }
+
     function resizeInput(el) {
-      el.style.height = 'auto';
-      el.style.height = el.scrollHeight + '2px';
+      el.style.height = '44px';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     }
 
     function checkEnter(e) {
@@ -714,336 +817,279 @@
       }
     }
 
-    // 유저 검색 및 개설/초대 로직
-    async function searchUsersForRoom() {
-      const query = document.getElementById('userSearchInput').value.trim();
-      const listEl = document.getElementById('userSelectList');
-      listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--t3);">검색 중...</div>';
-      try {
-        let endpoint = `/users?id=neq.${currentUser.id}&select=id,nickname`;
-        if (query) endpoint += `&nickname=ilike.*${encodeURIComponent(query)}*`;
-        const users = await api(endpoint);
-        listEl.innerHTML = '';
-        if(users.length === 0) {
-          listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--t3);">검색 결과가 없습니다.</div>';
-          return;
-        }
-        users.forEach(u => {
-          const isChecked = selectedUserIds.has(u.id);
-          const item = document.createElement('div');
-          item.className = 'user-select-item';
-          item.innerHTML = `
-            <div class="user-meta"><span>${escapeHtml(u.nickname)}</span></div>
-            <button class="select-chk-btn ${isChecked?'checked':''}" onclick="toggleSelectUser('${u.id}', this)">${isChecked?'선택됨':'선택'}</button>
-          `;
-          listEl.appendChild(item);
-        });
-      } catch (e) { listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--pink);">로드 실패</div>'; }
+    function closeModals() {
+      document.getElementById('createRoomModal').classList.remove('open');
+      document.getElementById('inviteModal').classList.remove('open');
+      document.getElementById('roomInfoModal').classList.remove('open');
+      selectedUserIds.clear();
     }
 
-    async function searchUsersForInvite() {
-      const query = document.getElementById('inviteSearchInput').value.trim();
-      const listEl = document.getElementById('inviteSelectList');
-      listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--t3);">검색 중...</div>';
-      try {
-        let endpoint = `/users?id=neq.${currentUser.id}&select=id,nickname`;
-        if (query) endpoint += `&nickname=ilike.*${encodeURIComponent(query)}*`;
-        const users = await api(endpoint);
-        listEl.innerHTML = '';
-        
-        const filtered = users.filter(u => !currentRoomMembers.includes(u.id));
-        if(filtered.length === 0) {
-          listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--t3);">초대 가능한 유저가 없습니다.</div>';
-          return;
-        }
-        filtered.forEach(u => {
-          const isChecked = selectedUserIds.has(u.id);
-          const item = document.createElement('div');
-          item.className = 'user-select-item';
-          item.innerHTML = `
-            <div class="user-meta"><span>${escapeHtml(u.nickname)}</span></div>
-            <button class="select-chk-btn ${isChecked?'checked':''}" onclick="toggleSelectUser('${u.id}', this)">${isChecked?'선택됨':'선택'}</button>
-          `;
-          listEl.appendChild(item);
-        });
-      } catch (e) { listEl.innerHTML = '<div style="padding:12px;text-align:center;color:var(--pink);">로드 실패</div>'; }
+    function openCreateRoomModal() {
+      document.getElementById('createRoomModal').classList.add('open');
+      document.getElementById('newRoomName').value = '';
+      document.getElementById('createRoomUserSearch').value = '';
+      selectedUserIds.clear();
+      renderUserSelectList('newUserList');
     }
 
-    function toggleSelectUser(id, btn) {
-      if (selectedUserIds.has(id)) {
-        selectedUserIds.delete(id);
-        btn.classList.remove('checked');
-        btn.innerText = '선택';
-      } else {
-        selectedUserIds.add(id);
-        btn.classList.add('checked');
-        btn.innerText = '선택됨';
-      }
+    function openInviteModal() {
+      document.getElementById('inviteModal').classList.add('open');
+      document.getElementById('inviteUserSearch').value = '';
+      selectedUserIds.clear();
+      renderUserSelectList('inviteUserList');
     }
 
-    async function submitCreateRoom() {
-      if(selectedUserIds.size === 0) { showAlert("대화 상대를 최소 1명 선택하세요."); return; }
-      const btn = document.getElementById('createRoomSubmitBtn');
-      btn.disabled = true;
-      try {
-        let name = document.getElementById('newRoomName').value.trim();
-        const room = await api("/chat_rooms", {
-          method: "POST",
-          body: JSON.stringify({ name: name || null, created_at: new Date().toISOString() })
-        });
+    // 채팅방 정보 모달 열기 함수 (멤버 표시 및 마이페이지 연결)
+    function openRoomInfoModal() {
+      if (!activeRoomId) return;
+      document.getElementById('roomInfoModal').classList.add('open');
+      
+      const displayRoomName = document.getElementById('activeRoomName').textContent;
+      document.getElementById('infoRoomName').value = displayRoomName;
+      
+      const members = roomMembersMap[activeRoomId] || [];
+      const container = document.getElementById('roomMembersList');
+      container.innerHTML = '';
+      
+      members.forEach(id => {
+        const u = getUserInfo(id);
+        const item = document.createElement('div');
+        item.className = 'user-select-item';
+        item.title = '클릭하여 프로필로 이동';
         
-        const membersToInsert = [{ room_id: room.id, user_id: currentUser.id }];
-        selectedUserIds.forEach(id => membersToInsert.push({ room_id: room.id, user_id: id }));
-        
-        await api("/chat_room_members", {
-          method: "POST",
-          body: JSON.stringify(membersToInsert)
-        });
+        const avatarHTML = u.profile_image 
+          ? `<img src="${u.profile_image}" style="width:100%; height:100%; object-fit:cover;">`
+          : `<span style="font-size:12px;">${u.nickname[0]}</span>`;
 
-        await api("/chat_messages", {
-          method: "POST",
-          body: JSON.stringify({ room_id: room.id, sender_id: currentUser.id, message: `${currentUser.nickname}님이 채팅방을 개설했습니다.`, is_system: true, created_at: new Date().toISOString() })
-        });
-
-        closeModals();
-        showAlert("채팅방이 생성되었습니다.");
-        loadRooms();
-        selectRoom(room.id, name || "그룹 채팅");
-      } catch (e) {
-        showAlert("채팅방 생성에 실패했습니다.");
-      } finally { btn.disabled = false; }
-    }
-
-    async function submitInviteUsers() {
-      if(selectedUserIds.size === 0) { showAlert("초대할 유저를 선택하세요."); return; }
-      const btn = document.getElementById('inviteSubmitBtn');
-      btn.disabled = true;
-      try {
-        const membersToInsert = [];
-        selectedUserIds.forEach(id => membersToInsert.push({ room_id: activeRoomId, user_id: id }));
-        await api("/chat_room_members", { method: "POST", body: JSON.stringify(membersToInsert) });
-
-        await api("/chat_messages", {
-          method: "POST",
-          body: JSON.stringify({ room_id: activeRoomId, sender_id: currentUser.id, message: `새로운 멤버가 초대되었습니다.`, is_system: true, created_at: new Date().toISOString() })
-        });
-
-        closeModals();
-        showAlert("멤버를 초대했습니다.");
-        loadMessages(activeRoomId);
-      } catch(e) { showAlert("초대에 실패했습니다."); }
-      finally { btn.disabled = false; }
-    }
-
-    // 채팅방 핸들러
-    async function loadRooms() {
-      try {
-        const myRooms = await api(`/chat_room_members?user_id=eq.${currentUser.id}&select=room_id`);
-        const roomIds = myRooms.map(r => r.room_id);
-        const listEl = document.getElementById('roomList');
-        if (roomIds.length === 0) {
-          listEl.innerHTML = '<div style="padding:40px 20px; text-align:center; color:var(--t3); font-size:14px;">참여 중인 채팅방이 없습니다.</div>';
-          return;
-        }
-
-        const rooms = await api(`/chat_rooms?id=in.(${roomIds.join(',')})&order=created_at.desc`);
-        
-        // 각 방의 최근 메시지와 멤버 아바타 처리를 위한 일괄 로드
-        const lastMessages = await api(`/chat_messages?room_id=in.(${roomIds.join(',')})&order=created_at.desc`);
-        const allRoomMembers = await api(`/chat_room_members?room_id=in.(${roomIds.join(',')})&select=room_id,user_id`);
-        
-        const userIdsToFetch = [...new Set(allRoomMembers.map(m => m.user_id))];
-        const usersMap = {};
-        if(userIdsToFetch.length > 0) {
-          const fetchedUsers = await api(`/users?id=in.(${userIdsToFetch.join(',')})&select=id,nickname,profile_image`);
-          fetchedUsers.forEach(u => usersMap[u.id] = u);
-        }
-
-        listEl.innerHTML = '';
-        rooms.forEach(room => {
-          const roomMsgs = lastMessages.filter(m => m.room_id === room.id);
-          const lastMsgText = roomMsgs[0] ? (roomMsgs[0].is_system ? roomMsgs[0].message : roomMsgs[0].message) : "대화 내용 없음";
-          
-          const members = allRoomMembers.filter(m => m.room_id === room.id && m.user_id !== currentUser.id);
-          let roomName = room.name;
-          if (!roomName) {
-            roomName = members.map(m => usersMap[m.user_id]?.nickname || "알 수 없음").join(', ') || "나만의 채팅방";
-          }
-
-          // 아바타 분기 레이아웃 생성
-          const avatarMembers = members.slice(0, 4);
-          let gridClass = `grid-${Math.max(1, avatarMembers.length)}`;
-          let avatarHtml = `<div class="room-avatar ${gridClass}">`;
-          if (avatarMembers.length === 0) {
-            avatarHtml += `<div class="avatar-text">${(currentUser.nickname?.[0] || '?').toUpperCase()}</div>`;
-          } else {
-            avatarMembers.forEach(m => {
-              const u = usersMap[m.user_id];
-              if (u?.profile_image) {
-                avatarHtml += `<img src="${escapeHtml(u.profile_image)}" alt="">`;
-              } else {
-                avatarHtml += `<div class="avatar-text">${(u?.nickname?.[0] || '?').toUpperCase()}</div>`;
-              }
-            });
-          }
-          avatarHtml += `</div>`;
-
-          const item = document.createElement('div');
-          item.className = `room-item ${activeRoomId === room.id ? 'active' : ''}`;
-          item.innerHTML = `
-            ${avatarHtml}
-            <div class="room-info">
-              <div class="room-name">${escapeHtml(roomName)}</div>
-              <div class="room-last-msg">${escapeHtml(lastMsgText)}</div>
+        item.innerHTML = `
+          <div class="user-meta">
+            <div style="width:32px; height:32px; border-radius:50%; background:var(--bg3); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+              ${avatarHTML}
             </div>
-          `;
-          item.onclick = () => selectRoom(room.id, roomName);
-          listEl.appendChild(item);
-        });
-      } catch (e) { console.error(e); }
-    }
+            <span>${escapeHTML(u.nickname)} ${id === currentUser.id ? '(나)' : ''}</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        `;
 
-    async function selectRoom(roomId, roomName) {
-      activeRoomId = roomId;
-      document.getElementById('dmContainer').classList.add('room-active');
-      document.getElementById('chatEmptyState').style.display = 'none';
-      document.getElementById('chatHeader').style.display = 'flex';
-      document.getElementById('chatMessages').style.display = 'flex';
-      document.getElementById('chatInputArea').style.display = 'flex';
-      document.getElementById('activeRoomName').innerText = roomName;
-      
-      document.querySelectorAll('.room-item').forEach(el => el.classList.remove('active'));
-      loadMessages(roomId, true);
-      
-      // 폴링 주기 활성화
-      clearInterval(messagePollingInterval);
-      messagePollingInterval = setInterval(() => loadMessages(roomId, false), 3000);
-      
-      try {
-        const mems = await api(`/chat_room_members?room_id=eq.${roomId}&select=user_id`);
-        currentRoomMembers = mems.map(m => m.user_id);
-      } catch(e){}
-    }
-
-    function closeRoom() {
-      activeRoomId = null;
-      clearInterval(messagePollingInterval);
-      document.getElementById('dmContainer').classList.remove('room-active');
-      document.getElementById('chatEmptyState').style.display = 'flex';
-      document.getElementById('chatHeader').style.display = 'none';
-      document.getElementById('chatMessages').style.display = 'none';
-      document.getElementById('chatInputArea').style.display = 'none';
-    }
-
-    async function loadMessages(roomId, shouldScroll = false) {
-      if (activeRoomId !== roomId) return;
-      try {
-        const messages = await api(`/chat_messages?room_id=eq.${roomId}&order=created_at.asc`);
+        // 마이페이지 이동 링크 처리 (profile.html로 가정)
+        item.onclick = () => {
+          window.location.href = `profile.html?id=${u.id}`;
+        };
         
-        // 발신자 정보 가져오기용 맵 생성
-        const senderIds = [...new Set(messages.map(m => m.sender_id).filter(id => id))];
-        const sendersMap = {};
-        if(senderIds.length > 0) {
-          const users = await api(`/users?id=in.(${senderIds.join(',')})&select=id,nickname`);
-          users.forEach(u => sendersMap[u.id] = u);
-        }
-
-        const msgContainer = document.getElementById('chatMessages');
-        const isAtBottom = msgContainer.scrollHeight - msgContainer.scrollTop <= msgContainer.clientHeight + 60;
-        
-        msgContainer.innerHTML = '';
-        messages.forEach(msg => {
-          if (msg.is_system) {
-            msgContainer.innerHTML += `
-              <div class="system-message-container">
-                <div class="system-message-bubble">${escapeHtml(msg.message)}</div>
-              </div>`;
-          } else {
-            const isMe = msg.sender_id === currentUser.id;
-            const senderName = sendersMap[msg.sender_id]?.nickname || "알 수 없음";
-            const timeStr = new Date(msg.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
-            
-            msgContainer.innerHTML += `
-              <div class="message-wrapper ${isMe?'me':'other'}">
-                ${!isMe ? `<div class="message-sender">${escapeHtml(senderName)}</div>` : ''}
-                <div class="message-bubble">${escapeHtml(msg.message)}</div>
-                <div class="message-time">${timeStr}</div>
-              </div>`;
-          }
-        });
-
-        if (shouldScroll || isAtBottom) {
-          msgContainer.scrollTop = msgContainer.scrollHeight;
-        }
-      } catch(e) { console.error(e); }
+        container.appendChild(item);
+      });
     }
 
-    async function sendMessage() {
-      const input = document.getElementById('messageInput');
-      const text = input.value.trim();
-      if(!text || !activeRoomId) return;
-
-      input.value = '';
-      input.style.height = '44px';
+    async function leaveRoom() {
+      if(!activeRoomId) return;
+      if(!confirm("정말로 이 채팅방에서 나가시겠습니까?")) return;
       
+      NProgress.start();
       try {
-        await api("/chat_messages", {
+        // 나감 시스템 메시지 발송
+        const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 나갔습니다.`;
+        await api("/dm_messages", {
           method: "POST",
           body: JSON.stringify({
             room_id: activeRoomId,
             sender_id: currentUser.id,
-            message: text,
-            is_system: false,
+            content: sysMsg,
             created_at: new Date().toISOString()
           })
         });
-        loadMessages(activeRoomId, true);
-      } catch(e) {
-        showAlert("메시지 전송에 실패했습니다.");
-      }
-    }
-
-    async function leaveRoom() {
-      if(!confirm("정말 이 채팅방에서 나가시겠습니까?")) return;
-      try {
-        await api(`/chat_room_members?room_id=eq.${activeRoomId}&user_id=eq.${currentUser.id}`, { method: "DELETE" });
-        await api("/chat_messages", {
-          method: "POST",
-          body: JSON.stringify({ room_id: activeRoomId, sender_id: currentUser.id, message: `${currentUser.nickname}님이 퇴장했습니다.`, is_system: true, created_at: new Date().toISOString() })
+        
+        // 내 멤버 기록 삭제
+        await api(`/dm_room_members?room_id=eq.${activeRoomId}&user_id=eq.${currentUser.id}`, {
+          method: "DELETE"
         });
+
         closeModals();
         closeRoom();
-        loadRooms();
-      } catch(e) { showAlert("채팅방 나가기에 실패했습니다."); }
-    }
-
-    function escapeHtml(unsafe) {
-      if(!unsafe) return "";
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&gt;")
-        .replace(/>/g, "&lt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    // 초기 설정99
-    document.addEventListener('DOMContentLoaded', () => {
-      initCurrentUser();
-      updateSidebarMode();
-      window.addEventListener('resize', updateSidebarMode);
-      
-      if(currentUser) {
-        loadRooms();
-        roomsPollingInterval = setInterval(loadRooms, 7000);
-      }
-      
-      window.addEventListener('load', () => {
+        showAlert("채팅방에서 나갔습니다.");
+      } catch(e) {
+        showAlert("나가기 실패: " + e.message);
+      } finally {
         NProgress.done();
-        document.body.style.opacity = '1';
+      }
+    }
+
+    function renderUserSelectList(containerId, filterKeyword = '') {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      
+      const filteredUsers = Object.values(usersCache).filter(u => {
+        if (u.id === currentUser.id) return false; 
+        if (containerId === 'inviteUserList' && activeRoomId && roomMembersMap[activeRoomId]?.includes(u.id)) return false; // 이미 들어와 있는 유저 필터링
+        if (!filterKeyword) return true;
+        return u.nickname.toLowerCase().includes(filterKeyword.toLowerCase());
       });
-    });
+
+      if (filteredUsers.length === 0) {
+        container.innerHTML = '<div style="padding:20px; color:var(--t3); text-align:center; font-size:14px;">검색 결과가 없습니다.</div>';
+        return;
+      }
+
+      filteredUsers.forEach(u => {
+        const item = document.createElement('div');
+        item.className = 'user-select-item';
+        const isChecked = selectedUserIds.has(u.id);
+        
+        item.innerHTML = `
+          <div class="user-meta">
+            <span>${escapeHTML(u.nickname)}</span>
+          </div>
+          <button type="button" class="select-chk-btn ${isChecked ? 'checked' : ''}" data-id="${u.id}">
+            ${isChecked ? '선택됨' : '선택'}
+          </button>
+        `;
+
+        const toggleSelection = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (selectedUserIds.has(u.id)) {
+            selectedUserIds.delete(u.id);
+            btn.classList.remove('checked');
+            btn.textContent = '선택';
+          } else {
+            selectedUserIds.add(u.id);
+            btn.classList.add('checked');
+            btn.textContent = '선택됨';
+          }
+        };
+
+        const btn = item.querySelector('.select-chk-btn');
+        item.onclick = toggleSelection;
+        btn.onclick = toggleSelection;
+
+        container.appendChild(item);
+      });
+    }
+
+    function filterUserList(containerId, value) {
+      renderUserSelectList(containerId, value.trim());
+    }
+
+    async function createRoom() {
+      const name = document.getElementById('newRoomName').value.trim() || '새 채팅방';
+      const selectedIds = Array.from(selectedUserIds);
+      
+      const btn = document.getElementById('createRoomBtn');
+      btn.disabled = true;
+      NProgress.start();
+
+      try {
+        const roomPayload = { name: name, created_at: new Date().toISOString() };
+        roomPayload.id = crypto.randomUUID ? crypto.randomUUID() : 'room-' + Date.now(); 
+
+        const roomRes = await api("/dm_rooms", {
+          method: "POST",
+          headers: { "Prefer": "return=representation" },
+          body: JSON.stringify(roomPayload)
+        });
+        
+        const newRoomId = (roomRes && roomRes[0]) ? roomRes[0].id : roomPayload.id;
+
+        const membersData = [
+          { room_id: newRoomId, user_id: currentUser.id, joined_at: new Date().toISOString() }
+        ];
+
+        selectedIds.forEach(id => {
+          membersData.push({ room_id: newRoomId, user_id: id, joined_at: new Date().toISOString() });
+        });
+
+        await api("/dm_room_members", {
+          method: "POST",
+          body: JSON.stringify(membersData)
+        });
+
+        // 초대 완료 시스템 메시지 등록
+        if (selectedIds.length > 0) {
+          const invitedNames = selectedIds.map(id => getUserInfo(id).nickname).join(', ');
+          const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
+          await api("/dm_messages", {
+            method: "POST",
+            body: JSON.stringify({
+              room_id: newRoomId,
+              sender_id: currentUser.id,
+              content: sysMsg,
+              created_at: new Date().toISOString()
+            })
+          });
+        }
+
+        closeModals();
+        await loadRooms();
+        openRoom(newRoomId, name);
+        showAlert("새 채팅방이 개설되었습니다.");
+      } catch (e) {
+        showAlert("방 생성 실패: " + e.message);
+      } finally {
+        btn.disabled = false;
+        NProgress.done();
+      }
+    }
+
+    async function inviteUsers() {
+      if (!activeRoomId) return;
+      const selectedIds = Array.from(selectedUserIds);
+      if (selectedIds.length === 0) {
+        showAlert("초대할 사용자를 선택해주세요.");
+        return;
+      }
+
+      const btn = document.getElementById('inviteBtn');
+      btn.disabled = true;
+      NProgress.start();
+
+      try {
+        const membersData = selectedIds.map(id => ({
+          room_id: activeRoomId,
+          user_id: id,
+          joined_at: new Date().toISOString()
+        }));
+
+        await api("/dm_room_members", {
+          method: "POST",
+          body: JSON.stringify(membersData)
+        });
+
+        // 시스템 메시지 등록
+        const invitedNames = selectedIds.map(id => getUserInfo(id).nickname).join(', ');
+        const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
+        await api("/dm_messages", {
+          method: "POST",
+          body: JSON.stringify({
+            room_id: activeRoomId,
+            sender_id: currentUser.id,
+            content: sysMsg,
+            created_at: new Date().toISOString()
+          })
+        });
+
+        showAlert("성공적으로 사용자를 초대했습니다.");
+        closeModals();
+        await loadRooms();
+        
+        if (roomMembersMap[activeRoomId]) {
+          let displayRoomName = document.getElementById('activeRoomName').textContent;
+          openRoom(activeRoomId, displayRoomName);
+        }
+      } catch (e) {
+        showAlert("초대 실패: " + e.message);
+      } finally {
+        btn.disabled = false;
+        NProgress.done();
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    initPage();
   </script>
-  <script src="sharer-profile-sheet-host.js"></script>
 </body>
 </html>
