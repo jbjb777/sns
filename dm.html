@@ -1053,7 +1053,7 @@
           body: JSON.stringify(membersData)
         });
 
-        // 시스템 메시지 등록
+        // 시스템 메시지 등록sdsadsa
         const invitedNames = selectedIds.map(id => getUserInfo(id).nickname).join(', ');
         const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
         await api("/dm_messages", {
