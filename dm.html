@@ -333,7 +333,26 @@
       .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .sidebar-container iframe { width: 100% !important; height: 100% !important; }
       .main-wrapper { margin-left: 0; width: 100%; height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px)); }
-      .dm-container { flex-direction: column; }
+  .dm-container {
+    padding-bottom: 72px; /* 사이드바 높이만큼 */
+    box-sizing: border-box;
+  }
+  .message-input-container {
+    position: fixed;
+    bottom: 0;
+    left: 72px; /* 사이드바 너비만큼 띄움 */
+    right: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom)); /* iOS 하단바 대응 */
+    z-index: 101; /* 사이드바 z-index: 100보다 높게 */
+  }
+    .message-list {
+    padding-bottom: 80px; /* 입력창 높이 + 여유 */
+    height: calc(100dvh - 65px); /* 헤더 높이 빼기 */
+    overflow-y: auto;
+  }
       .room-list-pane { width: 100%; flex: 1; border-right: none; }
       .chat-pane { display: none; position: absolute; inset: 0; z-index: 60; }
       .dm-container.room-active .room-list-pane { display: none; }
