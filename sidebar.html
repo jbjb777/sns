@@ -1404,6 +1404,20 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
             else panel.classList.remove('open');
           });
         }
+        // iframe에 임베드 정보 전달 (모바일 오인식 방지)
+        const notiFrame = panel.querySelector('#notiPanelFrame');
+        if (notiFrame) {
+          const sendEmbedInfo = () => {
+            try {
+              const isDesktop = pw.innerWidth > 768;
+              notiFrame.contentWindow.postMessage({ type: 'sharerNotiEmbed', isEmbed: true, isDesktop: isDesktop, viaSidebarPanel: true }, '*');
+            } catch(e){}
+          };
+          notiFrame.addEventListener('load', sendEmbedInfo);
+          // 이미 로드된 경우 대비 200ms 후 재전송
+          setTimeout(sendEmbedInfo, 200);
+          setTimeout(sendEmbedInfo, 800);
+        }
         pw.toggleNotiPanel = function(forceOpen) {
           const p = pd.getElementById('notiPanel');
           const sp = pd.getElementById('searchPanel');
@@ -1417,6 +1431,16 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
               const sf = pd.getElementById('sidebarFrame');
               if (sf && sf.contentWindow) sf.contentWindow.postMessage({type:'activateNoti', active:true}, '*');
             } catch(e){}
+            // 열릴 때 iframe에 임베드 정보 재전송 (모바일 width 오인식 방지)
+            setTimeout(() => {
+              try {
+                const f = pd.getElementById('notiPanelFrame');
+                if (f && f.contentWindow) {
+                  const isDesktop = pw.innerWidth > 768;
+                  f.contentWindow.postMessage({ type: 'sharerNotiEmbed', isEmbed: true, isDesktop: isDesktop, viaSidebarPanel: true }, '*');
+                }
+              } catch(e){}
+            }, 80);
           } else {
             p.classList.remove('open');
             try {
@@ -1482,6 +1506,16 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
             searchNav.classList.remove('active');
             setNav.classList.remove('active');
             dmNav.classList.remove('active');
+            // iframe에 임베드 확정 메시지 전송 (중요: iframe width 380px라 matchMedia가 모바일로 오인되는 문제 해결)
+            setTimeout(() => {
+              try {
+                const f = pd.getElementById('notiPanelFrame');
+                if (f && f.contentWindow) {
+                  const isDesktop = window.parent.innerWidth > 768;
+                  f.contentWindow.postMessage({ type: 'sharerNotiEmbed', isEmbed: true, isDesktop: isDesktop, viaSidebarPanel: true }, '*');
+                }
+              } catch(e){}
+            }, 80);
           } else {
             panel.classList.remove('open');
             if (notiNav) notiNav.classList.remove('active');

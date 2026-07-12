@@ -14,7 +14,7 @@
     if (savedTheme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
     }
-    // 임베드(사이드 패널) 감지
+    // 임베드(사이드 패널) 감지 - 사이드바에서 메시지로 확정 전달받음
     const __notiUrlParams = new URLSearchParams(location.search);
     const __isEmbedQuery = __notiUrlParams.has('embed');
     let __isEmbedFrame = false;
@@ -23,6 +23,29 @@
     if (__isEmbedModeEarly) {
       document.documentElement.classList.add('embed');
     }
+    // 사이드바에서 오는 확정 임베드 정보 저장소
+    window.__sharerNotiEmbedInfo = {
+      isEmbed: __isEmbedModeEarly,
+      isDesktop: window.matchMedia('(min-width: 769px)').matches,
+      received: false,
+      viaSidebarPanel: false
+    };
+    window.addEventListener('message', function(e) {
+      const d = e.data;
+      if (!d || d.type !== 'sharerNotiEmbed') return;
+      // 사이드바 패널에서 보낸 확정 정보
+      window.__sharerNotiEmbedInfo = {
+        isEmbed: !!d.isEmbed,
+        isDesktop: !!d.isDesktop,
+        received: true,
+        viaSidebarPanel: !!d.viaSidebarPanel
+      };
+      if (d.isEmbed) {
+        document.documentElement.classList.add('embed');
+        document.body && document.body.classList.add('embed');
+      }
+      // 디버그: console.log('[noti] embed info received', window.__sharerNotiEmbedInfo);
+    });
   </script>
 
   <style>
@@ -570,17 +593,40 @@
         const open = async () => {
           try {
             await markAsRead(n);
-            // 낙관적 업데이트: 즉시 파란점 제거
             const dot = el.querySelector('.unread-dot');
             if (dot) dot.remove();
             el.classList.add('read');
           } catch (e) {}
           const rawLink = (n.link || '').trim();
           const link = rawLink ? rawLink : 'index.html';
-          const isDesktop = window.matchMedia('(min-width: 769px)').matches;
-          const isEmbedded = document.documentElement.classList.contains('embed') || (function(){ try { return window.self !== window.top; } catch(e){ return false; } })();
-          if (isEmbedded && isDesktop) {
-            // 데스크탑 임베드: 부모(사이드바 패널)로 링크 전달 -> 부모가 닫고 이동
+
+          // 사이드바에서 메시지로 전달된 확정 임베드 정보 우선 사용 (iframe width 380px라 matchMedia가 모바일로 오인되는 문제 해결)
+          const embedInfo = window.__sharerNotiEmbedInfo || {};
+          const hasConfirmedEmbed = !!embedInfo.received;
+          const isConfirmedEmbed = hasConfirmedEmbed && !!embedInfo.isEmbed;
+          const isConfirmedDesktop = hasConfirmedEmbed ? !!embedInfo.isDesktop : window.matchMedia('(min-width: 769px)').matches;
+          const isEmbeddedFallback = document.documentElement.classList.contains('embed') || (function(){ try { return window.self !== window.top; } catch(e){ return false; } })();
+
+          // 1) 사이드바가 보낸 확정 정보가 있으면 그걸 최우선으로 사용
+          if (isConfirmedEmbed) {
+            if (isConfirmedDesktop) {
+              // 데스크탑 패널: 부모로 링크 전달
+              try {
+                window.parent.postMessage({ type: 'notiLink', link }, '*');
+                return;
+              } catch (err) {
+                try { window.top.location.href = link; return; } catch(e2){}
+              }
+            } else {
+              // 모바일 패널: 직접 이동 (요청사항)
+              window.location.href = link;
+              return;
+            }
+          }
+
+          // 2) 확정 정보가 아직 안 왔으면 기존 fallback 로직
+          const isDesktopFallback = window.matchMedia('(min-width: 769px)').matches;
+          if (isEmbeddedFallback && isDesktopFallback) {
             try {
               window.parent.postMessage({ type: 'notiLink', link }, '*');
               return;
@@ -588,7 +634,7 @@
               try { window.top.location.href = link; return; } catch(e2){}
             }
           }
-          // 모바일이거나 단독 페이지: 직접 이동
+          // 모바일이거나 단독 페이지
           window.location.href = link;
         };
         el.onclick = open;
@@ -645,7 +691,8 @@
     const backBtnEl = document.getElementById('backBtn');
     if (backBtnEl) {
       backBtnEl.onclick = () => {
-        const isEmbedded = document.documentElement.classList.contains('embed') || (function(){ try { return window.self !== window.top; } catch(e){ return false; } })();
+        const embedInfo = window.__sharerNotiEmbedInfo || {};
+        const isEmbedded = (embedInfo.received && embedInfo.isEmbed) || document.documentElement.classList.contains('embed') || (function(){ try { return window.self !== window.top; } catch(e){ return false; } })();
         if (isEmbedded) {
           try { window.parent.postMessage({ type: 'closeNotiPanel' }, '*'); } catch(e){}
           return;
