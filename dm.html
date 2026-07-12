@@ -1678,5 +1678,15 @@ window.addEventListener('DOMContentLoaded', () => {
     initPage();
   </script>
   <script src="sharer-profile-sheet-host.js"></script>
+
+
+<script>
+  window.addEventListener('load', () => {
+    const iframe = document.getElementById('sidebarFrame');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: 'activateDm' }, '*');
+    }
+  });
+</script>
 </body>
 </html>

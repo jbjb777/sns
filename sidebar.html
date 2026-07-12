@@ -850,6 +850,14 @@
         exploreNav.classList.remove('active');
         searchNav.classList.remove('active');
         setNav.classList.add('active');
+        dmNav.classList.remove('active');
+        updateIcons();
+      }
+      if (data.type === 'activateDm') {
+        homeNav.classList.remove('active');
+        exploreNav.classList.remove('active');
+        searchNav.classList.remove('active');
+        setNav.classList.remove('active');
         dmNav.classList.add('active');
         updateIcons();
       }
