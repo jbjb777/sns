@@ -14,6 +14,15 @@
     if (savedTheme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
     }
+    // 임베드(사이드 패널) 감지
+    const __notiUrlParams = new URLSearchParams(location.search);
+    const __isEmbedQuery = __notiUrlParams.has('embed');
+    let __isEmbedFrame = false;
+    try { __isEmbedFrame = window.self !== window.top; } catch(e) {}
+    const __isEmbedModeEarly = __isEmbedQuery || __isEmbedFrame;
+    if (__isEmbedModeEarly) {
+      document.documentElement.classList.add('embed');
+    }
   </script>
 
   <style>
@@ -303,7 +312,34 @@
       .noti-item { padding: 14px 4px; }
       .no-posts-icon img { width: 64px; height: 64px; }
     }
-  </style>
+  
+    /* === 임베드(사이드바 패널) 전용 스타일 === */
+    html.embed, html.embed body {
+      background: var(--bg);
+      min-height: 100%;
+    }
+    html.embed .sidebar-container,
+    html.embed .header,
+    html.embed #backBtn {
+      display: none !important;
+    }
+    html.embed .main-wrapper {
+      margin-left: 0 !important;
+      width: 100% !important;
+      min-height: 100vh;
+    }
+    html.embed .container {
+      padding: 12px 12px 20px;
+      max-width: 100%;
+    }
+    html.embed .noti-list {
+      padding-top: 4px;
+    }
+    html.embed .noti-item {
+      padding: 14px 8px;
+    }
+    
+    </style>
 </head>
 <body>
   <div class="sidebar-container">
@@ -539,8 +575,21 @@
             if (dot) dot.remove();
             el.classList.add('read');
           } catch (e) {}
-          const link = (n.link || '').trim();
-          window.location.href = link ? link : 'index.html';
+          const rawLink = (n.link || '').trim();
+          const link = rawLink ? rawLink : 'index.html';
+          const isDesktop = window.matchMedia('(min-width: 769px)').matches;
+          const isEmbedded = document.documentElement.classList.contains('embed') || (function(){ try { return window.self !== window.top; } catch(e){ return false; } })();
+          if (isEmbedded && isDesktop) {
+            // 데스크탑 임베드: 부모(사이드바 패널)로 링크 전달 -> 부모가 닫고 이동
+            try {
+              window.parent.postMessage({ type: 'notiLink', link }, '*');
+              return;
+            } catch (err) {
+              try { window.top.location.href = link; return; } catch(e2){}
+            }
+          }
+          // 모바일이거나 단독 페이지: 직접 이동
+          window.location.href = link;
         };
         el.onclick = open;
         el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } };
@@ -593,7 +642,17 @@
       }
     }
 
-    document.getElementById('backBtn').onclick = () => history.length > 1 ? history.back() : (location.href = 'index.html');
+    const backBtnEl = document.getElementById('backBtn');
+    if (backBtnEl) {
+      backBtnEl.onclick = () => {
+        const isEmbedded = document.documentElement.classList.contains('embed') || (function(){ try { return window.self !== window.top; } catch(e){ return false; } })();
+        if (isEmbedded) {
+          try { window.parent.postMessage({ type: 'closeNotiPanel' }, '*'); } catch(e){}
+          return;
+        }
+        history.length > 1 ? history.back() : (location.href = 'index.html');
+      };
+    }
 
     document.getElementById('readAllBtn').onclick = async () => {
       try {
@@ -603,6 +662,9 @@
         // 즉시 UI 반영
         document.querySelectorAll('.unread-dot').forEach(d => d.remove());
         document.querySelectorAll('.noti-item').forEach(el => el.classList.add('read'));
+        // 부모 배지 즉시 갱신 요청
+        try { window.parent.postMessage({ type: 'forceNotiCheck' }, '*'); } catch(e){}
+        try { window.parent.postMessage({ type: 'forceDmUnreadCheck' }, '*'); } catch(e){}
       } catch (e) {
         console.error(e);
         toast('처리에 실패했습니다.');

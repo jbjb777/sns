@@ -125,6 +125,67 @@
       }
     }
 
+    /* ─── 알림 빨간 말풍선 배지 (헤더와 동일) ─── */
+    #notiNav {
+      position: relative;
+      overflow: visible;
+    }
+    .noti-bubble {
+      position: absolute;
+      top: -1px;
+      right: -4px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      background: #ff3040;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      border-radius: 11px;
+      border: 2px solid rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center bottom;
+      transform: scale(0) translateY(12px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+      will-change: transform, opacity;
+      box-shadow: 0 3px 10px rgba(255,48,64,0.38);
+    }
+    .noti-bubble.show { opacity: 1; }
+    .noti-bubble.pop-in { animation: notiBubblePopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .noti-bubble.pop-out { animation: notiBubblePopOut 0.4s cubic-bezier(0.4, 0, 0.7, 1) forwards; }
+    @keyframes notiBubblePopIn {
+      0% { transform: scale(0) translateY(14px); opacity: 0; }
+      40% { transform: scale(1.4) translateY(-8px); opacity: 1; }
+      65% { transform: scale(0.9) translateY(2px); opacity: 1; }
+      85% { transform: scale(1.08) translateY(-3px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    @keyframes notiBubblePopOut {
+      0% { transform: scale(1) translateY(0); opacity: 1; }
+      20% { transform: scale(1.15) translateY(-4px); opacity: 1; }
+      100% { transform: scale(0) translateY(-20px); opacity: 0; }
+    }
+    body.light-mode #notiNav .noti-bubble {
+      border-color: #ffffff;
+      box-shadow: 0 3px 10px rgba(255,48,64,0.32);
+    }
+    @media (min-width: 200px) {
+      #notiNav .noti-bubble {
+        top: 3px;
+        right: 4px;
+        min-width: 18px;
+        height: 18px;
+        font-size: 10px;
+        padding: 0 5px;
+      }
+    }
+
     /* ─── 만들기 버튼용 컨테이너 및 텍스처 시스템 ─── */
    .create-btn-container {
       position: relative;
@@ -499,8 +560,9 @@
       #homeNav { order: 1; }
       #exploreNav { order: 2; }
       #searchNav { order: 3; }
-      #dmNav { order: 4; }
-     .user-info { order: 5; }
+      #notiNav { order: 4; }
+      #dmNav { order: 5; }
+     .user-info { order: 6; }
      .create-btn-container { display: none!important; order: 99; }
      .nav-item[data-tooltip]::after,.create-btn-container[data-tooltip]::after,.user-info[data-tooltip]::after,
      .nav-item[data-tooltip]::before,.create-btn-container[data-tooltip]::before,.user-info[data-tooltip]::before {
@@ -562,6 +624,10 @@
 
       <div class="nav-item" id="searchNav" data-tooltip="검색">
         <img src="searchX.svg" alt="검색" class="nav-icon-img" id="searchIcon">
+      </div>
+      <div class="nav-item" id="notiNav" data-tooltip="알림">
+        <img src="bell.svg" alt="알림" class="nav-icon-img" id="notiIcon">
+        <span class="noti-bubble" id="notiBubble" aria-hidden="true">0</span>
       </div>
       <div class="nav-item" id="setNav" data-tooltip="채팅">
         <img src="setX.svg" alt="채팅" class="nav-icon-img" id="setIcon">
@@ -647,6 +713,9 @@
     const homeIcon = document.getElementById('homeIcon');
     const exploreIcon = document.getElementById('exploreIcon');
     const searchIcon = document.getElementById('searchIcon');
+    const notiNav = document.getElementById('notiNav');
+    const notiIcon = document.getElementById('notiIcon');
+    const notiBubble = document.getElementById('notiBubble');
     const setIcon = document.getElementById('setIcon');
     const dmIcon = document.getElementById('dmIcon');
     const profileSheetBackdrop = document.getElementById('profileSheetBackdrop');
@@ -748,6 +817,10 @@
       } else {
         setIcon.src = 'setX.svg';
       }
+      // 알림 아이콘은 bell.svg 단일 사용, 밝기는 CSS filter로 처리됨
+      if (notiIcon) {
+        notiIcon.src = 'bell.svg';
+      }
 if (dmNav.classList.contains('active')) {
 
 dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
@@ -789,6 +862,11 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
     searchNav.onclick = () => {
       parent.postMessage({ type: 'toggleSearch' }, '*');
     };
+    if (notiNav) {
+      notiNav.onclick = () => {
+        toggleNotiPanelFromSidebar();
+      };
+    }
     setNav.onclick = () => {
       window.top.location.href = 'https://sharer.r-e.kr/set.html';
     };
@@ -884,8 +962,28 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
       if (data.type === 'activateSearch') {
         if (data.active) {
           searchNav.classList.add('active');
+          // 검색이 열리면 알림 패널 닫기
+          try {
+            const pd = window.parent.document;
+            const np = pd && pd.getElementById('notiPanel');
+            if (np) np.classList.remove('open');
+          } catch(e){}
+          if (notiNav) notiNav.classList.remove('active');
         } else {
           searchNav.classList.remove('active');
+        }
+        updateIcons();
+      }
+      if (data.type === 'activateNoti') {
+        if (data.active) {
+          if (notiNav) notiNav.classList.add('active');
+          homeNav.classList.remove('active');
+          exploreNav.classList.remove('active');
+          searchNav.classList.remove('active');
+          setNav.classList.remove('active');
+          dmNav.classList.remove('active');
+        } else {
+          if (notiNav) notiNav.classList.remove('active');
         }
         updateIcons();
       }
@@ -1121,6 +1219,311 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
         setTimeout(() => { if (isLoggedIn) checkDmUnread(); }, 600);
       }
     });
+
+    // ===== 알림 배지 실시간 로직 (헤더와 동일, 사이드바 단독) =====
+    const NOTI_API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+    let notiPrevCount = -1;
+    let notiIsFirst = true;
+    let notiHideTimer = null;
+    let notiOutTimer = null;
+    let notiPollInterval = null;
+    let notiCheckInProgress = false;
+
+    function formatNotiCount(n) {
+      n = Number(n) || 0;
+      if (n > 99) return '99+';
+      if (n > 9) return '9+';
+      return String(n);
+    }
+    function hideNotiBubbleImmediate() {
+      if (!notiBubble) return;
+      if (notiHideTimer) { clearTimeout(notiHideTimer); notiHideTimer = null; }
+      if (notiOutTimer) { clearTimeout(notiOutTimer); notiOutTimer = null; }
+      notiBubble.classList.remove('show','pop-in','pop-out');
+    }
+    function showNotiBubble(count) {
+      if (!notiBubble) return;
+      count = Number(count) || 0;
+      if (count <= 0) { hideNotiBubbleImmediate(); return; }
+      if (notiHideTimer) { clearTimeout(notiHideTimer); notiHideTimer = null; }
+      if (notiOutTimer) { clearTimeout(notiOutTimer); notiOutTimer = null; }
+      notiBubble.textContent = formatNotiCount(count);
+      notiBubble.classList.remove('pop-out');
+      notiBubble.classList.add('show');
+      void notiBubble.offsetWidth;
+      notiBubble.classList.remove('pop-in');
+      void notiBubble.offsetWidth;
+      notiBubble.classList.add('pop-in');
+      notiHideTimer = setTimeout(() => {
+        notiBubble.classList.remove('pop-in');
+        notiBubble.classList.add('pop-out');
+        notiOutTimer = setTimeout(() => {
+          notiBubble.classList.remove('show','pop-out');
+        }, 400);
+      }, 2000);
+    }
+    function tryRestoreUserForNoti() {
+      try {
+        const raw = localStorage.getItem('snsUser');
+        if (!raw) return false;
+        const u = JSON.parse(raw);
+        if (u && u.id) {
+          if (!currentUserId) {
+            isLoggedIn = true;
+            currentUserId = u.id;
+            currentUserNickname = u.nickname || currentUserNickname;
+            currentUserProfileImage = u.profile_image || currentUserProfileImage;
+          }
+          return true;
+        }
+      } catch {}
+      return false;
+    }
+    async function checkNotiUnread() {
+      if (notiCheckInProgress) return;
+      if (!currentUserId) {
+        tryRestoreUserForNoti();
+      }
+      if (!isLoggedIn || !currentUserId) {
+        hideNotiBubbleImmediate();
+        return;
+      }
+      notiCheckInProgress = true;
+      try {
+        const or = encodeURIComponent('(isread.eq.0,isread.is.null)');
+        const res = await fetch(`${NOTI_API_BASE}/notification?user=eq.${encodeURIComponent(currentUserId)}&or=${or}&select=isread&limit=100`);
+        if (!res.ok) throw new Error('noti fetch failed');
+        const data = await res.json();
+        const count = Array.isArray(data) ? data.length : 0;
+        if (notiIsFirst) {
+          notiIsFirst = false;
+          notiPrevCount = count;
+          if (count > 0) showNotiBubble(count);
+          return;
+        }
+        if (count > notiPrevCount && count > 0) {
+          showNotiBubble(count);
+        } else if (count === 0 && notiPrevCount > 0) {
+          hideNotiBubbleImmediate();
+        }
+        notiPrevCount = count;
+      } catch (err) {
+        console.warn('[noti] check failed', err);
+      } finally {
+        notiCheckInProgress = false;
+      }
+    }
+    function startNotiPolling() {
+      stopNotiPolling();
+      checkNotiUnread();
+      notiPollInterval = setInterval(() => {
+        if (document.hidden) return;
+        checkNotiUnread();
+      }, 3000);
+    }
+    function stopNotiPolling() {
+      if (notiPollInterval) {
+        clearInterval(notiPollInterval);
+        notiPollInterval = null;
+      }
+    }
+
+    // ===== 알림 패널 부모 주입 (부모 수정 없이 사이드바 단독으로 검색처럼 옆으로 슬라이드) =====
+    function injectNotiPanelToParent() {
+      try {
+        if (window.self === window.top) return null;
+        const pd = window.parent.document;
+        const pw = window.parent;
+        if (!pd || !pw) return null;
+        if (pd.getElementById('notiPanel')) return pd.getElementById('notiPanel');
+        const style = pd.createElement('style');
+        style.id = 'notiPanelStyle';
+        style.textContent = `
+          .noti-panel {
+            position: fixed;
+            top: 0;
+            left: 72px;
+            width: 380px;
+            max-width: calc(100vw - 72px);
+            height: 100vh;
+            background: var(--bg, #000);
+            border-right: 1px solid var(--border, #1e1e1e);
+            z-index: 90;
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+          }
+          .noti-panel.open {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+          }
+          .noti-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border, #1e1e1e);
+            background: var(--bg2, #111);
+          }
+          .noti-panel-header h2 { font-size:16px; font-weight:600; margin:0; color:var(--t1, #fff); letter-spacing:-0.02em; }
+          .noti-close-btn { background:transparent; border:none; color:var(--t2, #888); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:color 0.2s, transform 0.2s; width:32px; height:32px; border-radius:50%; }
+          .noti-close-btn:hover { color:var(--t1, #fff); background:var(--bg3, #1a1a1a); transform:scale(1.05); }
+          .noti-panel iframe { width:100%; flex:1; border:none; background:var(--bg, #000); }
+          @media (max-width:768px) {
+            .noti-panel { left:0; width:100%; max-width:100%; height:calc(100vh - 64px - env(safe-area-inset-bottom,0px)); bottom:calc(64px + env(safe-area-inset-bottom,0px)); top:0; z-index:90; }
+          }
+          html[data-theme="light"] .noti-panel { background:#fafafa; border-right-color:#dbdbdb; box-shadow:4px 0 24px rgba(0,0,0,0.1); }
+          html[data-theme="light"] .noti-panel-header { background:#ffffff; border-bottom-color:#dbdbdb; }
+          html[data-theme="light"] .noti-panel-header h2 { color:#000; }
+          html[data-theme="light"] .noti-close-btn { color:#737373; }
+          html[data-theme="light"] .noti-close-btn:hover { color:#000; background:#f0f0f0; }
+        `;
+        pd.head.appendChild(style);
+        const panel = pd.createElement('div');
+        panel.id = 'notiPanel';
+        panel.className = 'noti-panel';
+        panel.innerHTML = `
+          <div class="noti-panel-header">
+            <h2>알림</h2>
+            <button class="noti-close-btn" id="notiPanelCloseBtn" aria-label="닫기">✕</button>
+          </div>
+          <iframe src="notification.html?embed=1" frameborder="0" id="notiPanelFrame" title="알림"></iframe>
+        `;
+        pd.body.appendChild(panel);
+        const closeBtn = panel.querySelector('#notiPanelCloseBtn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => {
+            if (pw.toggleNotiPanel) pw.toggleNotiPanel(false);
+            else panel.classList.remove('open');
+          });
+        }
+        pw.toggleNotiPanel = function(forceOpen) {
+          const p = pd.getElementById('notiPanel');
+          const sp = pd.getElementById('searchPanel');
+          if (!p) return;
+          const willOpen = typeof forceOpen === 'boolean' ? forceOpen : !p.classList.contains('open');
+          if (willOpen) {
+            if (sp) sp.classList.remove('open');
+            try { pw.postMessage && pw.postMessage({type:'activateSearch', active:false}, '*'); } catch(e){}
+            p.classList.add('open');
+            try {
+              const sf = pd.getElementById('sidebarFrame');
+              if (sf && sf.contentWindow) sf.contentWindow.postMessage({type:'activateNoti', active:true}, '*');
+            } catch(e){}
+          } else {
+            p.classList.remove('open');
+            try {
+              const sf = pd.getElementById('sidebarFrame');
+              if (sf && sf.contentWindow) sf.contentWindow.postMessage({type:'activateNoti', active:false}, '*');
+            } catch(e){}
+          }
+        };
+        pw.closeNotiPanel = function() {
+          const p = pd.getElementById('notiPanel');
+          if (p) p.classList.remove('open');
+        };
+        if (!pw._notiLinkListenerAdded) {
+          pw.addEventListener('message', function(e) {
+            const d = e.data;
+            if (!d || !d.type) return;
+            if (d.type === 'notiLink' && d.link) {
+              const p = pd.getElementById('notiPanel');
+              if (p) p.classList.remove('open');
+              try {
+                const sf = pd.getElementById('sidebarFrame');
+                if (sf && sf.contentWindow) sf.contentWindow.postMessage({type:'activateNoti', active:false}, '*');
+              } catch(e2){}
+              pw.location.href = d.link;
+            }
+            if (d.type === 'toggleNoti') {
+              if (pw.toggleNotiPanel) pw.toggleNotiPanel();
+            }
+            if (d.type === 'closeNotiPanel') {
+              if (pw.closeNotiPanel) pw.closeNotiPanel();
+            }
+          });
+          pw._notiLinkListenerAdded = true;
+        }
+        return panel;
+      } catch(err) {
+        console.warn('[notiPanel] inject failed', err);
+        return null;
+      }
+    }
+
+    function toggleNotiPanelFromSidebar() {
+      try {
+        if (window.self !== window.top) {
+          const pd = window.parent.document;
+          let panel = pd.getElementById('notiPanel');
+          if (!panel) {
+            panel = injectNotiPanelToParent();
+          }
+          if (!panel) {
+            window.top.location.href = 'notification.html';
+            return;
+          }
+          const isOpen = panel.classList.contains('open');
+          if (!isOpen) {
+            const sp = pd.getElementById('searchPanel');
+            if (sp) sp.classList.remove('open');
+            try { window.parent.postMessage({type:'activateSearch', active:false}, '*'); } catch(e){}
+            panel.classList.add('open');
+            if (notiNav) notiNav.classList.add('active');
+            homeNav.classList.remove('active');
+            exploreNav.classList.remove('active');
+            searchNav.classList.remove('active');
+            setNav.classList.remove('active');
+            dmNav.classList.remove('active');
+          } else {
+            panel.classList.remove('open');
+            if (notiNav) notiNav.classList.remove('active');
+          }
+          updateIcons();
+        } else {
+          window.location.href = 'notification.html';
+        }
+      } catch(e) {
+        console.warn('toggleNoti failed', e);
+        try { window.top.location.href = 'notification.html'; } catch(e2){}
+      }
+    }
+
+    // 가시성/포커스 시 알림 재체크
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && isLoggedIn) {
+        checkNotiUnread();
+      }
+    });
+    window.addEventListener('focus', () => {
+      if (isLoggedIn) checkNotiUnread();
+    });
+
+    // 부모 메시지에서도 알림 관련 트리거
+    // (기존 window.message 리스너에 activateNoti 추가는 위에서 처리, 여기서는 추가 poll 트리거)
+    window.addEventListener('message', (event) => {
+      const data = event.data;
+      if (!data || !data.type) return;
+      if (data.type === 'forceNotiCheck' || data.type === 'newNotification') {
+        if (isLoggedIn) checkNotiUnread();
+      }
+    });
+
+    // 초기 시도: localStorage에 유저가 있으면 바로 폴링 시작
+    setTimeout(() => {
+      if (tryRestoreUserForNoti()) {
+        startNotiPolling();
+      }
+      // 부모 패널 주입 시도 (데스크톱)
+      try { injectNotiPanelToParent(); } catch(e){}
+    }, 400);
 
     // 초기 시도: localStorage에 유저가 있으면 바로 폴링 시작
     setTimeout(() => {
