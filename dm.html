@@ -1101,14 +1101,32 @@ document.querySelector('.back-btn').addEventListener('click', () => {
         const msgs = await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
         if (!msgs) return;
         
-        // 폴링시에도 읽음수는 변할 수 있으므로 길이 같아도 읽음 맵은 갱신해야 함
-        // 단, 완전히 동일하면 렌더 스킵을 위해선 별도 처리하지만 여기선 항상 최신 읽음 반영
-        if (!isPolling || msgs.length !== currentMessages.length) {
-          currentMessages = msgs;
-        }
-
         const container = document.getElementById('chatMessages');
         const totalMembers = (roomMembersMap[roomId] || []).length || 1;
+
+        // ✅ 폴링 최적화: 메시지 개수가 동일하면 DOM 전체 재생성 스킵, 읽음 카운트만 조용히 갱신 (깜빡임 방지)
+        if (isPolling && msgs.length === currentMessages.length) {
+          const pollingIds = msgs.filter(m => !m.content.startsWith('[SYSTEM] ')).map(m => m.id);
+          if (pollingIds.length > 0) {
+            try {
+              const res = await getReadMapForMessages(pollingIds);
+              pollingIds.forEach(mid => {
+                const countSpan = document.getElementById(`unread-${mid}`);
+                if (countSpan) {
+                  const readCount = res.readCountMap[mid] || 0;
+                  const unreadCount = Math.max(0, totalMembers - readCount);
+                  countSpan.textContent = unreadCount > 0 ? unreadCount : '0';
+                  countSpan.style.opacity = unreadCount > 0 ? '1' : '0';
+                }
+              });
+            } catch (e) {
+              console.warn('폴링 읽음 갱신 실패', e);
+            }
+          }
+          return;
+        }
+
+        currentMessages = msgs;
 
         // 시스템 메시지 제외한 실제 메시지 ID만 추출
         const normalMessages = msgs.filter(m => !m.content.startsWith('[SYSTEM] '));
@@ -1229,7 +1247,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
             <div class="message-row ${isMe ? 'me' : 'other'}">
               <div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g, '<br>')}</div>
               <div class="msg-side">
-                ${unreadCount > 0 ? `<span class="unread-count">${unreadCount}</span>` : `<span class="unread-count" style="opacity:0;">0</span>`}
+                ${unreadCount > 0 ? `<span class="unread-count" id="unread-${msg.id}">${unreadCount}</span>` : `<span class="unread-count" id="unread-${msg.id}" style="opacity:0;">0</span>`}
                 <span class="message-time" style="margin:0;">${time}</span>
               </div>
             </div>
@@ -1297,7 +1315,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
         try {
           await api("/dm_read", {
             method: "POST",
-            body: JSON.stringify({ user_id: currentUser.id, message_id: newMessageId })
+            body: JSON.stringify([{ user_id: currentUser.id, message_id: newMessageId }])
           });
         } catch (readErr) {
           // 읽음 삽입 실패는 무시 (loadMessages에서 다시 처리됨)
