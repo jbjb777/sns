@@ -706,11 +706,12 @@
       } else {
         setIcon.src = 'setX.svg';
       }
-      if (dmNav.classList.contains('active')) {
-        dmIcon.src = isLight ? 'sendO.svg' : 'send.svg';
-      } else {
-        dmIcon.src = 'sendX.svg';
-      }
+if (dmNav.classList.contains('active')) {
+  console.log("DM ACTIVE");
+  dmIcon.src = "home.png";
+} else {
+  dmIcon.src = "homeX.png";
+}
       const sheetSetIcon = document.getElementById('sheetSetIcon');
       if (sheetSetIcon) {
         sheetSetIcon.src = isLight ? 'setX.svg' : 'set.svg'; 
