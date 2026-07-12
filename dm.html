@@ -29,7 +29,7 @@
       --t3: #444;
       --pink: #ff6b6b;
       --green: #4ade80;
-      --blue: #3b82f6;
+      --blue: #3e3bf6;
       --r1: 10px;
       --r2: 14px;
       --r3: 20px;
@@ -49,11 +49,9 @@
       --t3: #a8a8a8;
     }
 
-    html { scroll-behavior: smooth; }
-
-    #nprogress.bar { background: var(--t1)!important; height: 2px!important; }
-    #nprogress.peg { display: none!important; }
-    #nprogress.spinner { display: none!important; }
+    #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
+    #nprogress .peg { display: none !important; }
+    #nprogress .spinner { display: none !important; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -67,10 +65,9 @@
       overflow: hidden;
     }
     @keyframes fadeIn { to { opacity: 1; } }
-    @keyframes slideDown { from { opacity:0; transform: translateY(-10px); } to { opacity:1; transform: translateY(0); } }
-    @keyframes slideUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
 
-   .skeleton {
+    /* 스켈레톤 로딩 애니메이션 */
+    .skeleton {
       background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
       background-size: 300% 100%;
       animation: shimmer 1.6s ease-in-out infinite;
@@ -81,21 +78,56 @@
       100% { background-position: -100% 0; }
     }
 
-   .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
-   .sidebar-container iframe { width: 72px!important; height: 100%; border: none; }
+    /* 채팅방 전환 스켈레톤 */
+    .chat-skeleton { display:flex; flex-direction:column; gap:18px; width:100%; padding:8px 0; }
+    .chat-skel-row { display:flex; gap:10px; align-items:flex-end; animation: skelIn 0.25s ease; }
+    .chat-skel-row.me { justify-content:flex-end; }
+    .chat-skel-row.other { justify-content:flex-start; }
+    .chat-skel-avatar { width:32px; height:32px; border-radius:50%; flex-shrink:0; }
+    .chat-skel-content { display:flex; flex-direction:column; gap:6px; max-width:68%; }
+    .chat-skel-content.me { align-items:flex-end; }
+    .chat-skel-name { width:56px; height:12px; border-radius:4px; }
+    .chat-skel-bubble { height:42px; border-radius:18px; }
+    .chat-skel-bubble.short { width:110px; }
+    .chat-skel-bubble.mid { width:180px; }
+    .chat-skel-bubble.long { width:240px; }
+    .chat-skel-bubble.xlong { width:300px; max-width:100%; }
+    .chat-skel-time { width:32px; height:10px; border-radius:4px; margin-bottom:2px; }
+    @keyframes skelIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .chat-messages.skeleton-active { overflow:hidden; pointer-events:none; }
 
-   .main-wrapper {
-      margin-left: 72px;
-      width: calc(100% - 72px);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      opacity: 0;
-      transform: translateY(12px);
-      animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.15s forwards;
+
+    /* SIDEBAR */
+    .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
+
+    /* MAIN WRAPPER */
+    .main-wrapper { 
+      margin-left: 72px; 
+      width: calc(100% - 72px); 
+      display: flex; 
+      flex-direction: column; 
+      height: 100vh; 
     }
+@media (max-width: 768px) {
+  /* 채팅방 안에 있을 때만 사이드바 숨김 */
+  body.chat-room-active .sidebar-container {
+    display: none;
+  }
+  
+  /* 사이드바 없어지니까 메인도 전체 너비로 */
+  body.chat-room-active .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
 
-   .header {
+  /* 입력창도 왼쪽 끝부터 시작하게 */
+  body.chat-room-active .message-input-container {
+    left: 0; 
+  }
+}
+    /* HEADER */
+    .header {
       background: var(--bg);
       border-bottom: 1px solid var(--border);
       padding: 14px 20px;
@@ -104,12 +136,9 @@
       align-items: center;
       flex-shrink: 0;
       z-index: 50;
-      opacity: 0;
-      transform: translateY(-10px);
-      animation: slideDown 0.4s ease 0.08s forwards;
     }
-   .header-left { display: flex; align-items: center; gap: 14px; }
-   .back-btn {
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .back-btn {
       width: 36px; height: 36px;
       border-radius: 10px;
       border: none;
@@ -119,368 +148,489 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.15s, background 0.15s, transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+      transition: all 0.15s;
     }
-   .back-btn:hover { color: var(--t1); background: var(--bg3); }
-   .back-btn:active { transform: scale(0.82); }
-   .header-title { font-size: 16px; font-weight: 650; letter-spacing: -0.01em; }
-   .header-right { display: flex; align-items: center; gap: 10px; }
-   .header-right.action-btn {
+    .back-btn:hover { color: var(--t1); background: var(--bg3); }
+    .back-btn:active { transform: scale(0.82); }
+    .header-title { font-size: 16px; font-weight: 600; }
+
+    .header-right .action-btn {
       background: var(--t1);
       color: var(--bg);
       border: none;
-      padding: 9px 16px;
+      padding: 8px 16px;
       border-radius: 20px;
       font-size: 13px;
-      font-weight: 650;
+      font-weight: 600;
       cursor: pointer;
-      transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), opacity 0.15s, background 0.15s;
-      letter-spacing: -0.01em;
+      transition: transform 0.2s;
     }
-   .header-right.action-btn:hover { opacity: 0.92; transform: translateY(-1px); }
-   .header-right.action-btn:active { transform: scale(0.94); }
+    .header-right .action-btn:active { transform: scale(0.95); }
 
-   .dm-container {
+    /* DM LAYOUT */
+    .dm-container {
       display: flex;
       flex: 1;
       overflow: hidden;
       background: var(--bg);
     }
 
-   .room-list-pane {
-      width: 360px;
+    /* 왼쪽 패널 (목록) */
+    .room-list-pane {
+      width: 320px;
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
       background: var(--bg);
-      position: relative;
     }
-   .room-list-header {
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg);
-      flex-shrink: 0;
-    }
-   .room-list-header h2 { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
-   .room-list-header.count-badge {
-      font-size: 11px; font-weight: 600; color: var(--t2);
-      background: var(--bg3); border: 1px solid var(--border2);
-      padding: 4px 8px; border-radius: 20px;
-    }
-   .rooms-scroll-area { flex: 1; overflow-y: auto; scrollbar-width: thin; }
-   .rooms-scroll-area::-webkit-scrollbar { width: 6px; }
-   .rooms-scroll-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-   .rooms-scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .rooms-scroll-area { flex: 1; overflow-y: auto; }
+    .rooms-scroll-area::-webkit-scrollbar { width: 6px; }
+    .rooms-scroll-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-   .room-item {
+    .room-item {
       display: flex;
       align-items: center;
-      padding: 14px 18px;
-      gap: 13px;
+      padding: 16px 20px;
+      gap: 14px;
       cursor: pointer;
       border-bottom: 1px solid var(--border);
-      transition: background 0.22s cubic-bezier(0.22,1,0.36,1), transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
-      position: relative;
-      opacity: 0;
-      transform: translateX(-6px);
-      animation: roomIn 0.42s cubic-bezier(0.22,1,0.36,1) forwards;
+      transition: background 0.2s;
     }
-    @keyframes roomIn { to { opacity:1; transform: translateX(0); } }
-   .room-item:hover { background: var(--bg2); }
-   .room-item:active { transform: scale(0.99); }
-   .room-item.active { background: var(--bg3); }
-   .room-item.active::before {
-      content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-      width: 3px; height: 22px; background: var(--t1); border-radius: 0 3px 3px 0;
-    }
-   .room-item.new-room-enter {
-      opacity: 0; transform: translateX(-14px) scale(0.98);
-    }
-   .room-item.new-room-enter.enter-active {
-      opacity: 1; transform: translateX(0) scale(1);
-      transition: all 0.48s cubic-bezier(0.22,1,0.36,1);
-      background: var(--bg2);
-      border-left: 2px solid var(--blue);
-    }
+    .room-item:hover { background: var(--bg2); }
+    .room-item.active { background: var(--bg3); }
 
-   .room-avatar {
+    /* 카카오톡 스타일 멀티 프로필 아바타 */
+    .room-avatar {
       width: 48px; height: 48px;
-      border-radius: 16px;
+      border-radius: 18px;
       background: var(--bg4);
       position: relative;
       overflow: hidden;
       display: grid;
       gap: 1px;
       flex-shrink: 0;
-      border: 1px solid var(--border2);
-      transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
     }
-   .room-item:hover.room-avatar { transform: scale(1.03); }
-   .room-avatar.grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
-   .room-avatar.grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
-   .room-avatar.grid-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-   .room-avatar.grid-3 img:first-child,.room-avatar.grid-3.avatar-text:first-child { grid-column: 1 / span 2; }
-   .room-avatar.grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-   .room-avatar img { width: 100%; height: 100%; object-fit: cover; }
-   .room-avatar.avatar-text {
-      width: 100%; height: 100%; display: flex; align-items: center;
-      justify-content: center; font-size: 13px; font-weight: 700; color: var(--t1); background: var(--bg4);
-      letter-spacing: -0.02em;
+    .room-avatar.grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+    .room-avatar.grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+    .room-avatar.grid-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .room-avatar.grid-3 img:first-child, .room-avatar.grid-3 .avatar-text:first-child { grid-column: 1 / span 2; }
+    .room-avatar.grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+
+    .room-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .room-avatar .avatar-text {
+      width: 100%; height: 100%; display: flex; align-items: center; 
+      justify-content: center; font-size: 14px; font-weight: 600; color: var(--t1); background: var(--bg4);
     }
 
-   .room-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-   .room-name { font-size: 14.5px; font-weight: 620; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.01em; }
-   .room-last-msg { font-size: 12.8px; color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+    .room-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .room-name { font-size: 15px; font-weight: 600; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .room-last-msg { font-size: 13px; color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-   .chat-pane {
+    /* 오른쪽 패널 (채팅창) */
+    .chat-pane {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: var(--bg);
+      background: var(--bg2);
       position: relative;
-      overflow: hidden;
     }
-   .chat-empty-state {
+    .chat-empty-state {
       position: absolute; inset: 0; display: flex; flex-direction: column;
       align-items: center; justify-content: center; background: var(--bg); color: var(--t3); z-index: 10;
-      gap: 14px;
-      animation: fadeIn 0.4s ease forwards;
     }
-   .chat-empty-state.empty-icon {
-      width: 64px; height: 64px; border-radius: 20px;
-      background: var(--bg2); border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--t2);
-    }
-   .chat-empty-state p { font-size: 14px; font-weight: 500; color: var(--t2); letter-spacing: -0.01em; }
-   .chat-empty-state small { font-size: 12px; color: var(--t3); margin-top: -6px; }
+    .chat-empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
+    .chat-empty-state p { font-size: 15px; font-weight: 500; }
 
-   .chat-header {
-      padding: 14px 20px;
+    .chat-header {
+      padding: 16px 24px;
       border-bottom: 1px solid var(--border);
       background: var(--bg);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-shrink: 0;
-      backdrop-filter: saturate(1.1);
     }
-   .chat-header-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
-   .mobile-back-to-list { display: none; width: 32px; height: 32px; border-radius: 10px; border: none; background: none; color: var(--t1); cursor: pointer; align-items: center; justify-content: center; transition: all 0.18s; }
-   .mobile-back-to-list:hover { background: var(--bg3); }
-   .mobile-back-to-list:active { transform: scale(0.88); }
-   .chat-title { font-size: 15px; font-weight: 700; color: var(--t1); letter-spacing: -0.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-   .chat-header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-   .chat-header-actions button {
+    .chat-header-info { display: flex; align-items: center; gap: 12px; }
+    .mobile-back-to-list { display: none; }
+    .chat-title { font-size: 16px; font-weight: 700; color: var(--t1); }
+    
+    .chat-header-actions { display: flex; gap: 8px; align-items: center; }
+    .chat-header-actions button {
       background: var(--bg3); border: 1px solid var(--border2); color: var(--t1);
-      padding: 0 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; height: 34px; gap: 6px;
-      transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
-      letter-spacing: -0.01em; white-space: nowrap;
+      padding: 6px 12px; border-radius: var(--r1); font-size: 12px; cursor: pointer; transition: background 0.15s;
+      display: flex; align-items: center; justify-content: center; height: 32px;
     }
-   .chat-header-actions button:hover { background: var(--bg4); border-color: var(--border3); transform: translateY(-1px); }
-   .chat-header-actions button:active { transform: scale(0.94); }
-   .chat-header-actions button.primary {
-      background: var(--t1); color: var(--bg); border-color: var(--t1);
+    .chat-header-actions button:hover { background: var(--bg4); }
+
+    .chat-messages {
+      flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
     }
-   .chat-header-actions button.primary:hover { opacity: 0.92; background: var(--t1); }
+    .chat-messages::-webkit-scrollbar { width: 6px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-   .chat-messages {
-      flex: 1; padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
-      scroll-behavior: smooth; scrollbar-width: thin;
-      background: var(--bg);
+    .message-wrapper { display: flex; flex-direction: column; max-width: 70%; }
+    .message-wrapper.me { align-self: flex-end; align-items: flex-end; }
+    .message-wrapper.other { align-self: flex-start; align-items: flex-start; }
+
+    .message-sender { font-size: 11px; color: var(--t3); margin-bottom: 4px; margin-left: 4px; margin-right: 4px; }
+    .message-bubble { padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.5; word-break: break-all; }
+    
+    .message-wrapper.me .message-bubble { background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
+    .message-wrapper.other .message-bubble { background: var(--bg3); color: var(--t1); border: 1px solid var(--border2); border-bottom-left-radius: 4px; }
+    
+    .message-time { font-size: 10px; color: var(--t3); margin-top: 4px; margin-left: 4px; margin-right: 4px; display: flex; align-items: center; gap: 2px;}
+
+    /* 시스템 메시지 UI */
+    .system-message-container {
+      display: flex; justify-content: center; width: 100%; max-width: 100% !important; margin: 4px 0; align-self: center; align-items: center;
     }
-   .chat-messages::-webkit-scrollbar { width: 6px; }
-   .chat-messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-   .chat-messages::-webkit-scrollbar-track { background: transparent; }
-
-   .message-wrapper { display: flex; flex-direction: column; max-width: 72%; animation: messageIn 0.36s cubic-bezier(0.22,1,0.36,1) backwards; }
-    @keyframes messageIn { from { opacity:0; transform: translateY(10px) scale(0.98); } to { opacity:1; transform: translateY(0) scale(1); } }
-   .message-wrapper.me { align-self: flex-end; align-items: flex-end; }
-   .message-wrapper.other { align-self: flex-start; align-items: flex-start; }
-
-   .message-sender { font-size: 11px; font-weight: 550; color: var(--t2); margin-bottom: 6px; margin-left: 4px; margin-right: 4px; letter-spacing: -0.01em; }
-   .message-row { display: flex; align-items: flex-end; gap: 7px; }
-   .message-row.me { flex-direction: row-reverse; }
-   .message-row.other { flex-direction: row; }
-   .message-bubble { padding: 11px 16px; border-radius: 20px; font-size: 14px; line-height: 1.55; word-break: break-word; letter-spacing: -0.01em; transition: transform 0.16s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s; }
-   .message-wrapper.me.message-bubble { background: var(--t1); color: var(--bg); border-bottom-right-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    html[data-theme="light"].message-wrapper.me.message-bubble { box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
-   .message-wrapper.other.message-bubble { background: var(--bg3); color: var(--t1); border: 1px solid var(--border2); border-bottom-left-radius: 6px; }
-   .message-bubble:hover { transform: translateY(-1px); }
-
-   .msg-side { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; min-width: 28px; }
-   .message-wrapper.me.msg-side { align-items: flex-end; }
-   .message-wrapper.other.msg-side { align-items: flex-start; }
-   .message-time { font-size: 10.5px; color: var(--t3); line-height: 1; display: flex; align-items: center; gap: 3px; font-weight: 500; }
-   .unread-count { font-size: 11px; font-weight: 750; color: #ffcc00; line-height: 1; min-height: 11px; letter-spacing: -0.02em; }
-    html[data-theme="light"].unread-count { color: #ff8a00; }
-
-   .system-message-container { display: flex; justify-content: center; width: 100%; max-width: 100%!important; margin: 10px 0 6px; align-self: center; }
-   .system-message-bubble { background: var(--bg2); color: var(--t2); font-size: 12px; font-weight: 550; padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border); text-align: center; letter-spacing: -0.01em; animation: messageIn 0.36s ease backwards; }
-
-   .chat-input-area { padding: 14px 20px; border-top: 1px solid var(--border); background: var(--bg); display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; }
-   .chat-input {
-      flex: 1; background: var(--bg2); border: 1px solid var(--border2); border-radius: 22px;
-      padding: 12px 18px; color: var(--t1); font-size: 14px; font-family: inherit; resize: none;
-      outline: none; min-height: 44px; max-height: 120px; line-height: 1.45; transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
+    .system-message-bubble {
+      background: var(--bg3); color: var(--t2); font-size: 12px; font-weight: 500;
+      padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border2);
+      text-align: center;
     }
-   .chat-input::placeholder { color: var(--t3); }
-   .chat-input:focus { border-color: var(--border3); background: var(--bg3); box-shadow: 0 0 0 3px rgba(255,255,255,0.05); }
-    html[data-theme="light"].chat-input:focus { box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
 
-   .send-btn {
-      width: 42px; height: 42px; border-radius: 50%; background: var(--t1); border: none; color: var(--bg);
-      display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
-      transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), opacity 0.18s, background 0.18s, box-shadow 0.22s;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    .chat-input-area { padding: 16px 24px; border-top: 1px solid var(--border); background: var(--bg); display: flex; gap: 12px; align-items: flex-end; }
+    .chat-input {
+      flex: 1; background: var(--bg2); border: 1px solid var(--border2); border-radius: 24px;
+      padding: 12px 20px; color: var(--t1); font-size: 14px; font-family: inherit; resize: none;
+      outline: none; min-height: 44px; max-height: 120px; transition: border-color 0.2s;
     }
-   .send-btn:hover { transform: scale(1.04) translateY(-1px); opacity: 0.92; box-shadow: 0 4px 16px rgba(0,0,0,0.16); }
-   .send-btn:active { transform: scale(0.90); }
-   .send-btn:disabled { background: var(--bg3); color: var(--t3); cursor: not-allowed; box-shadow: none; transform: none; opacity: 1; }
+    .chat-input:focus { border-color: var(--border3); }
 
-   .chat-skeleton { display: flex; flex-direction: column; gap: 18px; padding: 6px 0; }
-   .skel-row { display: flex; gap: 10px; align-items: flex-end; animation: skelIn 0.42s cubic-bezier(0.22,1,0.36,1) backwards; }
-    @keyframes skelIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
-   .skel-row.me { flex-direction: row-reverse; }
-   .skel-avatar { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; }
-   .skel-bubble-wrap { display: flex; flex-direction: column; gap: 7px; }
-   .skel-bubble { height: 14px; border-radius: 12px; }
-   .skel-row.me.skel-bubble { border-bottom-right-radius: 4px; }
-   .skel-row.other.skel-bubble { border-bottom-left-radius: 4px; }
-   .skel-row.other.skel-bubble:first-child { width: 120px; height: 12px; border-radius: 8px; margin-bottom: 2px; opacity: 0.7; }
+    .send-btn {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--blue); border: none; color: #fff;
+      display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.15s, opacity 0.15s;
+    }
+    .send-btn:hover { opacity: 0.9; }
+    .send-btn:active { transform: scale(0.9); }
+    .send-btn:disabled { background: var(--bg3); color: var(--t3); cursor: not-allowed; }
 
-   .modal {
+    /* MODAL STYLE */
+    .modal {
       display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
-      justify-content: center; align-items: center; z-index: 200; pointer-events: none; visibility: hidden; transition: all 0.32s cubic-bezier(0.22,1,0.36,1);
-      padding: 20px;
+      justify-content: center; align-items: center; z-index: 200; pointer-events: none; visibility: hidden; transition: all 0.3s;
     }
-   .modal.open { pointer-events: auto; visibility: visible; background: rgba(0, 0, 0, 0.58); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-   .modal-content {
-      background: var(--bg2); border: 1px solid var(--border2); width: 100%; max-width: 420px;
-      border-radius: var(--r4); padding: 26px 24px; position: relative; box-shadow: 0 24px 64px rgba(0,0,0,0.48), 0 1px 0 rgba(255,255,255,0.06) inset;
-      opacity: 0; transform: scale(0.92) translateY(18px); transition: all 0.38s cubic-bezier(0.34,1.56,0.64,1);
+    .modal.open { 
+      pointer-events: auto; visibility: visible; background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
-   .modal.open.modal-content { opacity: 1; transform: scale(1) translateY(0); }
-   .modal-title { font-size: 17px; font-weight: 750; margin-bottom: 20px; letter-spacing: -0.02em; }
-   .modal-close { position: absolute; top: 18px; right: 18px; width: 32px; height: 32px; border-radius: 10px; background: none; border: none; color: var(--t2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
-   .modal-close:hover { background: var(--bg3); color: var(--t1); }
-   .modal-close:active { transform: scale(0.88); }
-   .form-group { margin-bottom: 18px; }
-   .form-group label { display: block; font-size: 12.5px; font-weight: 600; color: var(--t2); margin-bottom: 8px; letter-spacing: -0.01em; }
-   .form-group input { width: 100%; padding: 12px 16px; border-radius: var(--r2); border: 1px solid var(--border2); background: var(--bg); color: var(--t1); font-size: 14px; outline: none; transition: all 0.2s; font-family: inherit; }
-   .form-group input::placeholder { color: var(--t3); }
-   .form-group input:focus { border-color: var(--t1); background: var(--bg2); box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
-    html[data-theme="light"].form-group input:focus { box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
-   .form-group input[readonly] { background: var(--bg3); cursor: default; color: var(--t2); }
-   .form-group input[readonly]:focus { border-color: var(--border2); box-shadow: none; }
-
-   .modal-search-box { display: flex; align-items: center; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--r2); padding: 0 14px; height: 44px; margin-bottom: 12px; transition: all 0.2s; }
-   .modal-search-box:focus-within { border-color: var(--t1); background: var(--bg2); box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
-    html[data-theme="light"].modal-search-box:focus-within { box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
-   .modal-search-box input { flex: 1; background: transparent; border: none; outline: none; color: var(--t1); font-size: 14px; padding-left: 8px; font-family: inherit; }
-   .modal-search-box input::placeholder { color: var(--t3); }
-   .modal-search-box.search-icon { color: var(--t2); display: flex; align-items: center; }
-
-   .user-select-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border2); border-radius: var(--r2); background: var(--bg); scrollbar-width: thin; }
-   .user-select-list::-webkit-scrollbar { width: 6px; }
-   .user-select-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-   .user-select-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.18s; }
-   .user-select-item:last-child { border-bottom: none; }
-   .user-select-item:hover { background: var(--bg3); }
-   .user-select-item.user-meta { display: flex; align-items: center; gap: 10px; min-width: 0; }
-   .user-select-item.user-meta span { font-size: 14px; font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-   .select-chk-btn { background: var(--bg3); border: 1px solid var(--border2); color: var(--t2); padding: 6px 13px; border-radius: 20px; font-size: 12px; font-weight: 650; cursor: pointer; transition: all 0.22s cubic-bezier(0.22,1,0.36,1); flex-shrink: 0; }
-   .select-chk-btn:hover { border-color: var(--border3); transform: translateY(-1px); }
-   .select-chk-btn:active { transform: scale(0.92); }
-   .select-chk-btn.checked { background: var(--t1); border-color: var(--t1); color: var(--bg); }
-
-   .modal-btn { width: 100%; padding: 13px 16px; border-radius: var(--r2); background: var(--t1); color: var(--bg); border: none; font-size: 14px; font-weight: 680; cursor: pointer; margin-top: 8px; transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1); letter-spacing: -0.01em; }
-   .modal-btn:hover { transform: translateY(-1px); opacity: 0.92; }
-   .modal-btn:active { transform: scale(0.97); }
-   .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-   .modal-btn.danger { background: rgba(255,107,107,0.12); color: var(--pink); border: 1px solid rgba(255,107,107,0.24); }
-   .modal-btn.danger:hover { background: rgba(255,107,107,0.18); border-color: rgba(255,107,107,0.32); }
-
-   .custom-alert {
-      position: fixed; top: -80px; left: 50%; transform: translateX(-50%); background: var(--bg3); color: var(--t1);
-      border: 1px solid var(--border2); padding: 12px 20px; border-radius: var(--r3); font-size: 13px; font-weight: 600;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.44), 0 1px 0 rgba(255,255,255,0.06) inset; z-index: 9999; display: flex; align-items: center; justify-content: center;
-      transition: top 0.48s cubic-bezier(0.175, 0.885, 0.32, 1.275); letter-spacing: -0.01em; white-space: nowrap; max-width: calc(100vw - 32px);
+    .modal-content {
+      background: var(--bg2); border: 1px solid var(--border2); width: 90%; max-width: 400px;
+      border-radius: var(--r4); padding: 24px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      opacity: 0; transform: scale(0.9) translateY(20px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-   .custom-alert.show { top: 22px; }
+    .modal.open .modal-content { opacity: 1; transform: scale(1) translateY(0); }
+    
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--t2); cursor: pointer; padding: 4px; border-radius: 50%; }
+    .modal-close:hover { background: var(--bg3); color: var(--t1); }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 13px; color: var(--t2); margin-bottom: 8px; }
+    .form-group input { width: 100%; padding: 12px 16px; border-radius: var(--r2); border: 1px solid var(--border2); background: var(--bg); color: var(--t1); font-size: 14px; outline: none; }
+    .form-group input:focus { border-color: var(--blue); }
+    .form-group input[readonly] { background: var(--bg3); cursor: default; }
+    .form-group input[readonly]:focus { border-color: var(--border2); }
 
-   .room-item { position: relative; }
-   .unread-blue-dot {
-      width: 8px; height: 8px; background: var(--blue); border-radius: 50%; flex-shrink: 0; margin-left: 8px;
-      box-shadow: 0 0 10px rgba(59,130,246,0.6); display: none; animation: dotPulse 1.8s ease-in-out infinite;
+    .modal-search-box { display: flex; align-items: center; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--r2); padding: 0 14px; height: 44px; margin-bottom: 12px; transition: border-color 0.2s; }
+    .modal-search-box:focus-within { border-color: var(--blue); }
+    .modal-search-box input { flex: 1; background: transparent; border: none; outline: none; color: var(--t1); font-size: 14px; padding-left: 8px; }
+    .modal-search-box input::placeholder { color: var(--t3); }
+    .modal-search-box .search-icon { color: var(--t2); display: flex; align-items: center; }
+    
+    .user-select-list { max-height: 200px; overflow-y: auto; border: 1px solid var(--border2); border-radius: var(--r2); background: var(--bg); }
+    .user-select-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.2s; }
+    .user-select-item:last-child { border-bottom: none; }
+    .user-select-item:hover { background: var(--bg3); }
+    .user-select-item .user-meta { display: flex; align-items: center; gap: 10px; }
+    .user-select-item .user-meta span { font-size: 14px; font-weight: 500; }
+    
+    .select-chk-btn { background: var(--bg3); border: 1px solid var(--border2); color: var(--t2); padding: 6px 14px; border-radius: 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .select-chk-btn.checked { background: var(--blue); border-color: var(--blue); color: #fff; }
+    
+    .modal-btn { width: 100%; padding: 14px; border-radius: var(--r2); background: var(--t1); color: var(--bg); border: none; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .modal-btn.danger { background: rgba(255,107,107,0.15); color: var(--pink); border: 1px solid rgba(255,107,107,0.3); transition: background 0.2s; }
+    .modal-btn.danger:hover { background: rgba(255,107,107,0.25); }
+
+    /* 아이콘 없는 커스텀 알림 */
+    .custom-alert {
+      position: fixed; top: -70px; left: 50%; transform: translateX(-50%); background: var(--bg3); color: var(--t1);
+      border: 1px solid var(--border2); padding: 14px 24px; border-radius: var(--r3); font-size: 14px; font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    @keyframes dotPulse { 0%,100% { transform: scale(1); opacity:1; } 50% { transform: scale(1.25); opacity:0.85; } }
-   .unread-blue-dot.show { display: block; }
+    .custom-alert.show { top: 24px; }
 
     @media (max-width: 768px) {
-     .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
-     .sidebar-container iframe { width: 100%!important; height: 100%!important; }
-     .main-wrapper { margin-left: 0; width: 100%; height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px)); animation: none; opacity: 1; transform: none; }
-     .dm-container { padding-bottom: 0; box-sizing: border-box; }
-     .room-list-pane { width: 100%; flex: 1; border-right: none; }
-     .chat-pane { display: none; position: absolute; inset: 0; z-index: 60; background: var(--bg); }
-     .dm-container.room-active.room-list-pane { display: none; }
-     .dm-container.room-active.chat-pane { display: flex; }
-     .mobile-back-to-list { display: flex; }
-     .chat-header { padding: 12px 14px; }
-     .chat-messages { padding: 16px 14px; gap: 12px; padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
-     .chat-input-area { position: fixed; left: 0; right: 0; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); padding: 10px 12px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--bg); border-top: 1px solid var(--border); z-index: 61; }
-     .message-wrapper { max-width: 82%; }
-      body.chat-room-active.sidebar-container { display: none; }
-      body.chat-room-active.main-wrapper { margin-left: 0; width: 100%; height: 100vh; }
-      body.chat-room-active.chat-input-area { bottom: 0; left: 0; }
-      body.chat-room-active.chat-messages { height: calc(100dvh - 56px); padding-bottom: 90px; }
+      .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
+      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
+      .main-wrapper { margin-left: 0; width: 100%; height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px)); }
+  .dm-container {
+    padding-bottom: 72px; /* 사이드바 높이만큼 */
+    box-sizing: border-box;
+  }
+  .message-input-container {
+    position: fixed;
+    bottom: 0;
+    left: 72px; /* 사이드바 너비만큼 띄움 */
+    right: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom)); /* iOS 하단바 대응 */
+    z-index: 101; /* 사이드바 z-index: 100보다 높게 */
+  }
+    .message-list {
+    padding-bottom: 80px; /* 입력창 높이 + 여유 */
+    height: calc(100dvh - 65px); /* 헤더 높이 빼기 */
+    overflow-y: auto;
+  }
+      .room-list-pane { width: 100%; flex: 1; border-right: none; }
+      .chat-pane { display: none; position: absolute; inset: 0; z-index: 60; }
+      .dm-container.room-active .room-list-pane { display: none; }
+      .dm-container.room-active .chat-pane { display: flex; }
+      .mobile-back-to-list { display: flex; background: none; border: none; color: var(--t1); padding: 4px; cursor: pointer; align-items: center; justify-content: center; }
+      .chat-header { padding: 12px 16px; }
+      .chat-messages { padding: 16px; }
+      .chat-input-area { padding: 12px 16px; }
+    }
+  
+    /* === 사이드바 검색 패널 (index.html 동일) === */
+    .search-panel {
+      position: fixed;
+      top: 0;
+      left: 72px;
+      width: 380px;
+      max-width: calc(100vw - 72px);
+      height: 100vh;
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      z-index: 90;
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    html[data-theme="light"] .search-panel {
+      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+    }
+    .search-panel.open {
+      transform: translateX(0);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .search-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .search-panel-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--t1);
+    }
+    .search-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--t2);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .search-close-btn:hover {
+      color: var(--t1);
+      transform: scale(1.1);
+    }
+    .search-panel iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
     }
 
-   .search-panel {
-      position: fixed; top: 0; left: 72px; width: 380px; max-width: calc(100vw - 72px); height: 100vh;
-      background: var(--bg); border-right: 1px solid var(--border); z-index: 90;
-      transform: translateX(-100%); transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex; flex-direction: column; box-shadow: 4px 0 28px rgba(0,0,0,0.28);
-      opacity: 0; visibility: hidden; pointer-events: none;
+    /* === 프로필 시트 (index.html 동일) === */
+    .sharer-profile-sheet-host[hidden] { display: none !important; }
+    .sharer-profile-sheet-host {
+      position: fixed;
+      inset: 0;
+      z-index: 960;
     }
-    html[data-theme="light"].search-panel { box-shadow: 4px 0 24px rgba(0,0,0,0.10); }
-   .search-panel.open { transform: translateX(0); opacity: 1; visibility: visible; pointer-events: auto; }
-   .search-panel-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--bg2); }
-   .search-panel-header h2 { font-size: 15px; font-weight: 700; margin: 0; color: var(--t1); letter-spacing: -0.01em; }
-   .search-close-btn { background: transparent; border: none; color: var(--t2); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color 0.2s, transform 0.22s cubic-bezier(0.34,1.56,0.64,1); width: 32px; height: 32px; border-radius: 10px; }
-   .search-close-btn:hover { color: var(--t1); background: var(--bg3); transform: scale(1.06); }
-   .search-close-btn:active { transform: scale(0.9); }
-   .search-panel iframe { width: 100%; flex: 1; border: none; }
-
-   .sharer-profile-sheet-host[hidden] { display: none!important; }
-   .sharer-profile-sheet-host { position: fixed; inset: 0; z-index: 960; }
-   .sharer-profile-sheet-host.sps-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); opacity: 0; pointer-events: none; transition: opacity 0.34s ease; }
-   .sharer-profile-sheet-host.sps-host-open.sps-backdrop { opacity: 1; pointer-events: auto; }
-   .sharer-profile-sheet-host.sps-panel { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45); max-height: 44vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; will-change: transform; transform: translateY(100%); transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
-   .sharer-profile-sheet-host.sps-host-open.sps-panel { transform: translateY(0); }
-   .sharer-profile-sheet-host.sps-panel.sps-panel-expanded { max-height: 88vh; }
-   .sharer-profile-sheet-host.sps-panel.sps-panel-dragging { transition: none; }
-   .sharer-profile-sheet-host.sps-drag-area { touch-action: none; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px; padding: 6px 16px 14px; margin: -2px -16px 0 -16px; cursor: grab; user-select: none; -webkit-user-select: none; }
-   .sharer-profile-sheet-host.sps-drag-area:active { cursor: grabbing; }
-   .sharer-profile-sheet-host.sps-grab { width: 40px; height: 5px; border-radius: 5px; background: var(--border3); flex-shrink: 0; }
-   .sharer-profile-sheet-host.sps-profile { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--bg2); cursor: pointer; margin-bottom: 12px; }
-   .sharer-profile-sheet-host.sps-av { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #3478f6, #53b6f9); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; overflow: hidden; flex-shrink: 0; }
-   .sharer-profile-sheet-host.sps-av img { width: 100%; height: 100%; object-fit: cover; }
-   .sharer-profile-sheet-host.sps-name { font-size: 16px; font-weight: 600; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-   .sharer-profile-sheet-host.sps-logout { width: 100%; padding: 14px 16px; border: none; border-radius: 14px; background: rgba(255, 80, 80, 0.14); color: #ff8a8a; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .sharer-profile-sheet-host .sps-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.34s ease;
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sharer-profile-sheet-host .sps-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
+      max-height: 44vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      will-change: transform;
+      transform: translateY(100%);
+      transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .sharer-profile-sheet-host.sps-host-open .sps-panel {
+      transform: translateY(0);
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
+      max-height: 88vh;
+    }
+    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
+      transition: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area {
+      touch-action: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 6px 16px 14px;
+      margin: -2px -16px 0 -16px;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .sharer-profile-sheet-host .sps-drag-area:active {
+      cursor: grabbing;
+    }
+    .sharer-profile-sheet-host .sps-grab {
+      width: 40px;
+      height: 5px;
+      border-radius: 5px;
+      background: var(--border3);
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--bg2);
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .sharer-profile-sheet-host .sps-av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3478f6, #53b6f9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .sharer-profile-sheet-host .sps-av img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .sharer-profile-sheet-host .sps-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--t1);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .sharer-profile-sheet-host .sps-logout {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff8a8a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
 
     @media (max-width: 768px) {
-     .search-panel { left: 0; width: 100%; max-width: 100%; height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px)); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); top: 0; z-index: 90; }
+      .search-panel {
+        left: 0;
+        width: 100%;
+        max-width: 100%;
+        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
+        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+        top: 0;
+        z-index: 90;
+      }
     }
+  
+    /* === 읽음 처리 UI (추가) === */
+    .message-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .message-row.me { flex-direction: row-reverse; }
+    .message-row.other { flex-direction: row; }
+    .msg-side {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+      min-width: 28px;
+    }
+    .message-wrapper.me .msg-side { align-items: flex-end; }
+    .message-wrapper.other .msg-side { align-items: flex-start; }
+    .unread-count {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffcc00;
+      line-height: 1;
+      min-height: 11px;
+    }
+    html[data-theme="light"] .unread-count { color: #ff8a00; }
+    .room-item { position: relative; }
+    .unread-blue-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--blue);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-left: 8px;
+      box-shadow: 0 0 10px rgba(62,59,246,0.7);
+      display: none;
+    }
+    .unread-blue-dot.show { display: block; }
+
   </style>
 </head>
 <body>
@@ -491,84 +641,86 @@
   <div id="searchPanel" class="search-panel">
     <div class="search-panel-header">
       <h2>검색</h2>
-      <button class="search-close-btn" onclick="toggleSearchPanel()" aria-label="닫기">✕</button>
+      <button class="search-close-btn" onclick="toggleSearchPanel()">✕</button>
     </div>
-    <iframe src="search.html" id="searchFrame" title="검색"></iframe>
+    <iframe src="search.html" frameborder="0"></iframe>
+  </div>
+
+  <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
+
+  <div class="custom-alert" id="customAlert">
+    <span id="customAlertMsg">알림 메시지</span>
   </div>
 
   <div class="main-wrapper">
-    <header class="header">
+    <div class="header">
       <div class="header-left">
-        <button class="back-btn" onclick="goHome()" aria-label="뒤로가기">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        <button class="back-btn" onclick="window.location.href='index.html'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <div class="header-title">메시지</div>
+        <span class="header-title">다이렉트 메시지</span>
       </div>
       <div class="header-right">
-        <button class="action-btn" onclick="openCreateRoomModal()">+ 새 채팅</button>
+        <button class="action-btn" onclick="openCreateRoomModal()">+ 새 채팅방</button>
       </div>
-    </header>
+    </div>
 
     <div class="dm-container" id="dmContainer">
       <div class="room-list-pane">
-        <div class="room-list-header">
-          <h2>채팅</h2>
-          <span class="count-badge" id="roomCountBadge">0</span>
-        </div>
         <div class="rooms-scroll-area" id="roomList"></div>
       </div>
 
       <div class="chat-pane" id="chatPane">
         <div class="chat-empty-state" id="chatEmptyState">
-          <div class="empty-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 0 0 1-12.7 7.4L3 21l2.1-5.3A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
-          </div>
-          <p>채팅방을 선택해주세요</p>
-          <small>왼쪽에서 대화를 시작해보세요</small>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <p>채팅방을 선택하거나 새로 만들어보세요.</p>
         </div>
 
-        <div class="chat-header" id="chatHeader" style="display:none;">
+        <div class="chat-header" id="chatHeader" style="display: none;">
           <div class="chat-header-info">
-            <button class="mobile-back-to-list" onclick="closeRoom()" aria-label="목록으로">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            <button class="mobile-back-to-list" onclick="closeRoom()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <div class="chat-title" id="activeRoomName">채팅방</div>
+            <div class="chat-title" id="activeRoomName">채팅방 이름</div>
           </div>
           <div class="chat-header-actions">
-            <button class="primary" onclick="openInviteModal()">+ 초대</button>
-            <button onclick="openRoomInfoModal()" aria-label="정보">
+            <button onclick="openInviteModal()">+ 초대</button>
+            <button onclick="openRoomInfoModal()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
           </div>
         </div>
 
-        <div class="chat-messages" id="chatMessages" style="display:none;"></div>
+        <div class="chat-messages" id="chatMessages" style="display: none;"></div>
 
-        <div class="chat-input-area" id="chatInputArea" style="display:none;">
+        <div class="chat-input-area" id="chatInputArea" style="display: none;">
           <textarea class="chat-input" id="messageInput" placeholder="메시지를 입력하세요..." rows="1" oninput="resizeInput(this)" onkeydown="checkEnter(event)"></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="전송">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- 방 만들기 모달 -->
   <div class="modal" id="createRoomModal">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeModals()" aria-label="닫기">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button class="modal-close" onclick="closeModals()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="modal-title">새 채팅방 만들기</div>
       <div class="form-group">
         <label>채팅방 이름</label>
-        <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요" maxlength="32">
+        <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요">
       </div>
       <div class="form-group">
         <label>초대할 사용자 선택</label>
         <div class="modal-search-box">
           <span class="search-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </span>
           <input type="text" id="createRoomUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('newUserList', this.value)">
         </div>
@@ -578,17 +730,18 @@
     </div>
   </div>
 
+  <!-- 사용자 초대 모달 -->
   <div class="modal" id="inviteModal">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeModals()" aria-label="닫기">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button class="modal-close" onclick="closeModals()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="modal-title">사용자 초대하기</div>
       <div class="form-group">
         <label>초대할 사용자 선택</label>
         <div class="modal-search-box">
           <span class="search-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </span>
           <input type="text" id="inviteUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('inviteUserList', this.value)">
         </div>
@@ -598,10 +751,11 @@
     </div>
   </div>
 
+  <!-- 채팅방 정보 모달 (새로 추가) -->
   <div class="modal" id="roomInfoModal">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeModals()" aria-label="닫기">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button class="modal-close" onclick="closeModals()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="modal-title">채팅방 정보</div>
       <div class="form-group">
@@ -609,29 +763,25 @@
         <input type="text" id="infoRoomName" readonly>
       </div>
       <div class="form-group">
-        <label>참여 멤버</label>
+        <label>참여 멤버 리스트</label>
         <div class="user-select-list" id="roomMembersList"></div>
       </div>
       <button class="modal-btn danger" onclick="leaveRoom()">방 나가기</button>
     </div>
   </div>
 
-  <div class="custom-alert" id="customAlert"><span id="customAlertMsg"></span></div>
-
   <script>
     const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
     let currentUser = null;
-    let usersCache = {};
-    let roomMembersMap = {};
+    let usersCache = {}; 
+    let roomMembersMap = {}; 
     let activeRoomId = null;
     let messagePollInterval = null;
-    let roomPollInterval = null;
     let isSending = false;
     let selectedUserIds = new Set();
-    let knownRoomIds = new Set();
-    let isLoadingMessages = false;
-    let currentMessages = [];
+    let roomListPollInterval = null;
 
+    /* === 사이드바 연동 (index.html 동일 로직) === */
     function updateSidebar() {
       const iframe = document.getElementById('sidebarFrame');
       if (iframe?.contentWindow) iframe.contentWindow.postMessage({ type: 'updateUser', user: currentUser }, '*');
@@ -644,7 +794,7 @@
     let searchPanelOpen = false;
     window.toggleSearchPanel = function() {
       const panel = document.getElementById('searchPanel');
-      searchPanelOpen =!searchPanelOpen;
+      searchPanelOpen = !searchPanelOpen;
       const frame = document.getElementById('sidebarFrame');
       if (searchPanelOpen) {
         panel.classList.add('open');
@@ -656,7 +806,9 @@
     };
     window.addEventListener('message', (event) => {
       const { type, page } = event.data || {};
-      if (type === 'toggleSearch') window.toggleSearchPanel();
+      if (type === 'toggleSearch') {
+        window.toggleSearchPanel();
+      }
       if (type === 'navigate') {
         if (page === 'home') location.href = 'index.html';
         else if (page === 'explore') location.href = 'explore.html';
@@ -679,26 +831,30 @@
     NProgress.configure({ minimum: 0.08, trickleSpeed: 200, showSpinner: false });
     document.addEventListener('click', function(e) {
       const link = e.target.closest('a');
-      if (link && link.href &&!link.target &&!link.hasAttribute('download')) {
+      if (link && link.href && !link.target && !link.hasAttribute('download')) {
         try { NProgress.start(); } catch {}
       }
     });
     window.addEventListener('resize', updateSidebarMode);
+
+
 
     function showAlert(message) {
       const alertEl = document.getElementById('customAlert');
       const msgEl = document.getElementById('customAlertMsg');
       msgEl.textContent = message;
       alertEl.classList.add('show');
-      clearTimeout(alertEl._t);
-      alertEl._t = setTimeout(() => alertEl.classList.remove('show'), 2600);
+      setTimeout(() => alertEl.classList.remove('show'), 2500);
     }
 
     async function api(endpoint, options = {}) {
       const url = API_BASE + endpoint;
       const res = await fetch(url, {
-       ...options,
-        headers: { "Content-Type": "application/json",...(options.headers || {}) },
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        },
       });
       if (!res.ok) {
         let err = ""; try { err = await res.text(); } catch{}
@@ -708,22 +864,21 @@
       try { return await res.json(); } catch(e) { return null; }
     }
 
-    function goHome(){ NProgress.start(); location.href='index.html'; }
-
     async function initPage() {
       NProgress.start();
       const savedUser = localStorage.getItem('snsUser');
       if (!savedUser) {
         showAlert('로그인이 필요합니다.');
-        setTimeout(() => { window.location.href = 'login.html'; }, 1200);
+        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
         return;
       }
       currentUser = JSON.parse(savedUser);
       try { updateSidebar(); updateSidebarMode(); } catch {}
+
       try {
         await loadAllUsers();
         await loadRooms();
-        startRealtimeRoomPolling();
+        startRoomListPolling();
       } catch (e) {
         console.error("초기화 실패:", e);
       }
@@ -733,463 +888,793 @@
     async function loadAllUsers() {
       try {
         const users = await api("/users?select=id,nickname,profile_image");
-        if (users) users.forEach(u => usersCache[u.id] = u);
-      } catch (e) { console.warn("유저 목록 로드 실패", e); }
+        if (users) {
+          users.forEach(u => usersCache[u.id] = u);
+        }
+      } catch (e) {
+        console.warn("유저 목록 로드 실패", e);
+      }
     }
-    function getUserInfo(id) { return usersCache[id] || { id, nickname: '알 수 없음', profile_image: '' }; }
+
+    function getUserInfo(id) {
+      return usersCache[id] || { id, nickname: '알 수 없음', profile_image: '' };
+    }
 
     function generateMultiAvatarHTML(roomId) {
       const memberIds = roomMembersMap[roomId] || [];
-      const others = memberIds.filter(id => id!== currentUser.id);
-      if (others.length === 0) return `<div class="room-avatar grid-1"><div class="avatar-text">나</div></div>`;
+      const others = memberIds.filter(id => id !== currentUser.id);
+
+      if (others.length === 0) {
+        return `<div class="room-avatar grid-1"><div class="avatar-text">나</div></div>`;
+      }
       if (others.length === 1) {
         const u = getUserInfo(others[0]);
-        if (u.profile_image) return `<div class="room-avatar grid-1"><img src="${escapeHTML(u.profile_image)}" alt=""></div>`;
-        return `<div class="room-avatar grid-1"><div class="avatar-text">${escapeHTML((u.nickname||'?')[0])}</div></div>`;
+        if (u.profile_image) return `<div class="room-avatar grid-1"><img src="${u.profile_image}"></div>`;
+        return `<div class="room-avatar grid-1"><div class="avatar-text">${u.nickname[0]}</div></div>`;
       }
-      if (others.length === 2) return `<div class="room-avatar grid-2">${renderIndividualSlice(others[0])}${renderIndividualSlice(others[1])}</div>`;
-      if (others.length === 3) return `<div class="room-avatar grid-3">${renderIndividualSlice(others[0])}${renderIndividualSlice(others[1])}${renderIndividualSlice(others[2])}</div>`;
-      return `<div class="room-avatar grid-4">${renderIndividualSlice(others[0])}${renderIndividualSlice(others[1])}${renderIndividualSlice(others[2])}${renderIndividualSlice(others[3])}</div>`;
-    }
-    function renderIndividualSlice(userId) {
-      const u = getUserInfo(userId);
-      if (u.profile_image) return `<img src="${escapeHTML(u.profile_image)}" alt="">`;
-      return `<div class="avatar-text" style="font-size:10px;">${escapeHTML((u.nickname||'?')[0])}</div>`;
+      if (others.length === 2) {
+        return `
+          <div class="room-avatar grid-2">
+            ${renderIndividualSlice(others[0])}
+            ${renderIndividualSlice(others[1])}
+          </div>`;
+      }
+      if (others.length === 3) {
+        return `
+          <div class="room-avatar grid-3">
+            ${renderIndividualSlice(others[0])}
+            ${renderIndividualSlice(others[1])}
+            ${renderIndividualSlice(others[2])}
+          </div>`;
+      }
+      return `
+        <div class="room-avatar grid-4">
+          ${renderIndividualSlice(others[0])}
+          ${renderIndividualSlice(others[1])}
+          ${renderIndividualSlice(others[2])}
+          ${renderIndividualSlice(others[3])}
+        </div>`;
     }
 
+    function renderIndividualSlice(userId) {
+      const u = getUserInfo(userId);
+      if (u.profile_image) return `<img src="${u.profile_image}">`;
+      return `<div class="avatar-text" style="font-size:10px;">${u.nickname[0]}</div>`;
+    }
+
+    // 스켈레톤 로딩 렌더링 함수
     function renderRoomSkeleton() {
       const listEl = document.getElementById('roomList');
       let html = '';
-      for(let i=0;i<7;i++){
-        html += `<div class="room-item" style="pointer-events:none; animation-delay:${i*0.05}s">
-          <div class="skeleton" style="width:48px; height:48px; border-radius:16px; flex-shrink:0;"></div>
-          <div class="room-info" style="gap:8px; flex:1;">
-            <div class="skeleton" style="width:42%; height:14px; border-radius:6px;"></div>
-            <div class="skeleton" style="width:68%; height:12px; border-radius:6px;"></div>
+      for(let i=0; i<6; i++) {
+        html += `
+        <div class="room-item" style="pointer-events:none;">
+          <div class="skeleton" style="width:48px; height:48px; border-radius:18px; flex-shrink:0;"></div>
+          <div class="room-info" style="gap:8px;">
+            <div class="skeleton" style="width:50%; height:16px; border-radius:4px;"></div>
+            <div class="skeleton" style="width:70%; height:13px; border-radius:4px;"></div>
           </div>
-          <div class="skeleton" style="width:8px; height:8px; border-radius:50%;"></div>
         </div>`;
       }
       listEl.innerHTML = html;
-      const badge = document.getElementById('roomCountBadge'); if(badge) badge.textContent='…';
     }
 
-    function renderChatSkeleton() {
-      const patterns = [
-        {align:'other', widths:[140,200,160]},
-        {align:'me', widths:[180]},
-        {align:'other', widths:[120,170]},
-        {align:'me', widths:[220,130]},
-        {align:'other', widths:[160]},
-        {align:'me', widths:[150,190]},
-        {align:'other', widths:[200,140]},
-        {align:'me', widths:[165]},
-      ];
-      let html = '<div class="chat-skeleton">';
-      patterns.forEach((p, idx)=>{
-        html += `<div class="skel-row ${p.align}" style="animation-delay:${idx*0.06}s">`;
-        if(p.align==='other') html += `<div class="skeleton skel-avatar"></div>`;
-        html += `<div class="skel-bubble-wrap">`;
-        if(p.align==='other') html += `<div class="skeleton" style="width:54px; height:11px; border-radius:6px; margin-bottom:2px; opacity:0.65;"></div>`;
-        p.widths.forEach(w=>{ html += `<div class="skeleton skel-bubble" style="width:${w}px;"></div>`; });
-        html += `</div></div>`;
-      });
-      html += '</div>';
-      return html;
+    // 채팅 메시지 스켈레톤 HTML (방 전환 시 이전 내용 플리커 방지)
+    function getChatSkeletonHTML() {
+      return `
+        <div class="chat-skeleton">
+          <div class="chat-skel-row other">
+            <div class="skeleton chat-skel-avatar"></div>
+            <div class="chat-skel-content">
+              <div class="skeleton chat-skel-name"></div>
+              <div class="skeleton chat-skel-bubble mid"></div>
+            </div>
+          </div>
+          <div class="chat-skel-row other">
+            <div class="skeleton chat-skel-avatar"></div>
+            <div class="chat-skel-content">
+              <div class="skeleton chat-skel-bubble long"></div>
+              <div class="skeleton chat-skel-bubble short" style="margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="chat-skel-row me">
+            <div class="chat-skel-content me">
+              <div class="skeleton chat-skel-bubble mid"></div>
+            </div>
+          </div>
+          <div class="chat-skel-row other">
+            <div class="skeleton chat-skel-avatar"></div>
+            <div class="chat-skel-content">
+              <div class="skeleton chat-skel-bubble xlong"></div>
+            </div>
+          </div>
+          <div class="chat-skel-row me">
+            <div class="chat-skel-content me">
+              <div class="skeleton chat-skel-bubble long"></div>
+              <div class="skeleton chat-skel-bubble short" style="margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="chat-skel-row other">
+            <div class="skeleton chat-skel-avatar"></div>
+            <div class="chat-skel-content">
+              <div class="skeleton chat-skel-bubble mid"></div>
+            </div>
+          </div>
+        </div>`;
     }
 
-    async function loadRooms() {
-      renderRoomSkeleton();
+    // === 새로운 채팅방 초대 실시간 감지 ===
+    async function checkRoomInvites() {
+      if (!currentUser) return;
       try {
         const myMemberships = await api(`/dm_room_members?user_id=eq.${encodeURIComponent(currentUser.id)}&select=room_id`);
-        if (!myMemberships || myMemberships.length === 0) {
-          document.getElementById('roomList').innerHTML = '<div style="padding:32px 20px; color:var(--t3); text-align:center; font-size:13px; line-height:1.7;">참여중인 채팅방이 없습니다.<br><span style="color:var(--t2); font-size:12px;">새 채팅을 만들어 대화를 시작해보세요</span></div>';
-          const b=document.getElementById('roomCountBadge'); if(b) b.textContent='0';
-          knownRoomIds = new Set(); return;
+        if (!myMemberships) return;
+        const polledIds = myMemberships.map(m => m.room_id).sort();
+        const currentIds = Object.keys(roomMembersMap).sort();
+        const isDifferent = polledIds.length !== currentIds.length || polledIds.some((id, i) => id !== currentIds[i]);
+        if (isDifferent) {
+          const prevSet = new Set(currentIds);
+          const newIds = polledIds.filter(id => !prevSet.has(id));
+          await loadRooms(true); // silent: 스켈레톤 없이 조용히 갱신
+          if (newIds.length > 0) {
+            showAlert(`새 채팅방 ${newIds.length}개에 초대되었습니다`);
+          }
         }
+      } catch (e) {
+        // 폴링 오류는 조용히 무시 (네트워크 일시 오류 대응)
+      }
+    }
+
+    function startRoomListPolling() {
+      if (roomListPollInterval) clearInterval(roomListPollInterval);
+      roomListPollInterval = setInterval(() => {
+        checkRoomInvites();
+      }, 3000);
+    }
+
+
+    async function loadRooms(silent = false) {
+      if (!silent) renderRoomSkeleton(); // 최초 로딩에만 스켈레톤, 폴링(silent)時は 스켈레톤 생략
+      
+      try {
+        const myMemberships = await api(`/dm_room_members?user_id=eq.${encodeURIComponent(currentUser.id)}`);
+        if (!myMemberships || myMemberships.length === 0) {
+          document.getElementById('roomList').innerHTML = '<div style="padding:20px; color:var(--t3); text-align:center;">참여중인 채팅방이 없습니다.</div>';
+          return;
+        }
+
         const roomIds = myMemberships.map(m => m.room_id);
-        knownRoomIds = new Set(roomIds);
         const allMembers = await api(`/dm_room_members?room_id=in.(${roomIds.join(',')})`);
+        
         roomMembersMap = {};
-        if (allMembers) allMembers.forEach(m => { if (!roomMembersMap[m.room_id]) roomMembersMap[m.room_id]=[]; roomMembersMap[m.room_id].push(m.user_id); });
+        if (allMembers) {
+          allMembers.forEach(m => {
+            if (!roomMembersMap[m.room_id]) roomMembersMap[m.room_id] = [];
+            roomMembersMap[m.room_id].push(m.user_id);
+          });
+        }
+
         const rooms = await api(`/dm_rooms?id=in.(${roomIds.join(',')})&order=created_at.desc`);
         renderRoomList(rooms || []);
       } catch (e) {
         console.error("채팅방 로드 오류", e);
-        document.getElementById('roomList').innerHTML = '<div style="padding:20px; color:var(--pink); text-align:center; font-size:13px;">채팅방을 불러올 수 없습니다.</div>';
+        document.getElementById('roomList').innerHTML = '<div style="padding:20px; color:var(--pink); text-align:center;">채팅방을 불러올 수 없습니다.</div>';
       }
-    }
-
-    async function loadRoomsSilent() {
-      try {
-        const myMemberships = await api(`/dm_room_members?user_id=eq.${encodeURIComponent(currentUser.id)}&select=room_id`);
-        const listEl = document.getElementById('roomList');
-        if (!myMemberships || myMemberships.length === 0) {
-          listEl.innerHTML = '<div style="padding:32px 20px; color:var(--t3); text-align:center; font-size:13px; line-height:1.7;">참여중인 채팅방이 없습니다.<br><span style="color:var(--t2); font-size:12px;">새 채팅을 만들어 대화를 시작해보세요</span></div>';
-          const b=document.getElementById('roomCountBadge'); if(b) b.textContent='0';
-          knownRoomIds = new Set(); roomMembersMap={}; return;
-        }
-        const roomIds = myMemberships.map(m=>m.room_id);
-        knownRoomIds = new Set(roomIds);
-        const allMembers = await api(`/dm_room_members?room_id=in.(${roomIds.join(',')})`);
-        roomMembersMap = {};
-        if (allMembers) allMembers.forEach(m=>{ if(!roomMembersMap[m.room_id]) roomMembersMap[m.room_id]=[]; roomMembersMap[m.room_id].push(m.user_id); });
-        const rooms = await api(`/dm_rooms?id=in.(${roomIds.join(',')})&order=created_at.desc`);
-        renderRoomList(rooms||[]);
-      } catch(e){ console.warn('silent load 실패', e); }
     }
 
     function renderRoomList(rooms) {
       const listEl = document.getElementById('roomList');
       listEl.innerHTML = '';
-      const badge = document.getElementById('roomCountBadge'); if(badge) badge.textContent = String(rooms.length);
-      rooms.forEach((room, idx) => {
+
+      rooms.forEach(room => {
         const div = document.createElement('div');
-        div.className = 'room-item';
+        div.className = `room-item ${room.id === activeRoomId ? 'active' : ''}`;
         div.dataset.roomId = room.id;
-        div.style.animationDelay = `${idx*0.04}s`;
-        div.onclick = () => openRoom(room.id, room.name || '채팅방');
+        div.setAttribute('data-room-id', room.id);
+        
+        let displayRoomName = room.name || '채팅방';
+        const members = roomMembersMap[room.id] || [];
+        if (members.length === 2) {
+          const opponentId = members.find(id => id !== currentUser.id);
+          if (opponentId) displayRoomName = getUserInfo(opponentId).nickname;
+        }
+
+        div.onclick = () => openRoom(room.id, displayRoomName);
+
         div.innerHTML = `
-          <div id="avatarContainer-${room.id}">${generateMultiAvatarHTML(room.id)}</div>
+          <div id="avatarContainer-${room.id}"></div>
           <div class="room-info">
-            <div class="room-name">${escapeHTML(room.name || '채팅방')}</div>
-            <div class="room-last-msg" id="lastMsg-${room.id}">메시지 불러오는 중...</div>
+            <div class="room-name">${escapeHTML(displayRoomName)} <span style="font-size:12px; font-weight:400; color:var(--t3);">${members.length}</span></div>
+            <div class="room-last-msg" id="lastMsg-${room.id}">대화를 시작해보세요</div>
           </div>
           <div class="unread-blue-dot" id="unreadDot-${room.id}"></div>
         `;
         listEl.appendChild(div);
-        const av = document.getElementById(`avatarContainer-${room.id}`);
-        if(av) av.innerHTML = generateMultiAvatarHTML(room.id);
 
-        api(`/dm_messages?room_id=eq.${room.id}&order=created_at.desc&limit=1`).then(async msgs=>{
-          if(msgs && msgs.length>0){
-            const el=document.getElementById(`lastMsg-${room.id}`);
-            if(el){ let t=msgs[0].content; if(t.startsWith('[SYSTEM] ')) t=t.replace('[SYSTEM] ',''); el.textContent=t; }
-            const last=msgs[0];
-            if(last.sender_id===currentUser.id || last.content.startsWith('[SYSTEM] ')) return;
-            try{
-              const readCheck=await api(`/dm_read?message_id=eq.${last.id}&user_id=eq.${encodeURIComponent(currentUser.id)}`);
-              const isUnread=!readCheck || readCheck.length===0;
-              const dot=document.getElementById(`unreadDot-${room.id}`);
-              if(dot && isUnread){ dot.classList.add('show'); }
-            }catch(e){}
-          } else {
-            const el=document.getElementById(`lastMsg-${room.id}`); if(el) el.textContent='대화가 없습니다.';
-          }
-        }).catch(()=>{});
+        document.getElementById(`avatarContainer-${room.id}`).innerHTML = generateMultiAvatarHTML(room.id);
+
+        // 최신 메시지 + 안읽음 파란점 처리
+        api(`/dm_messages?room_id=eq.${room.id}&order=created_at.desc&limit=1`)
+          .then(async msgs => {
+            if (msgs && msgs.length > 0) {
+              const el = document.getElementById(`lastMsg-${room.id}`);
+              if (el) {
+                let text = msgs[0].content;
+                if(text.startsWith('[SYSTEM] ')) text = text.replace('[SYSTEM] ', '');
+                el.textContent = text;
+              }
+              const lastMsg = msgs[0];
+              // 내가 보낸 메시지거나 시스템 메시지는 안읽음 처리 안함
+              if (lastMsg.sender_id === currentUser.id || lastMsg.content.startsWith('[SYSTEM] ')) {
+                return;
+              }
+              try {
+                const readCheck = await api(`/dm_read?message_id=eq.${lastMsg.id}&user_id=eq.${encodeURIComponent(currentUser.id)}`);
+                const isUnread = !readCheck || readCheck.length === 0;
+                const dotEl = document.getElementById(`unreadDot-${room.id}`);
+                if (dotEl && isUnread) {
+                  dotEl.classList.add('show');
+                  dotEl.style.display = 'block';
+                }
+              } catch(e) {
+                // 조회 실패시 조용히 무시
+              }
+            }
+          }).catch(()=>{});
       });
-      if(activeRoomId){
-        const a=document.querySelector(`[data-room-id="${activeRoomId}"]`); if(a) a.classList.add('active');
-      }
     }
 
-    async function checkNewInvites(showToast=true){
-      if(!currentUser) return;
-      try{
-        const myMemberships = await api(`/dm_room_members?user_id=eq.${encodeURIComponent(currentUser.id)}&select=room_id,joined_at&order=joined_at.desc`);
-        if(!myMemberships) return;
-        const currentIds = myMemberships.map(m=>m.room_id);
-        const newIds = currentIds.filter(id=>!knownRoomIds.has(id));
-        const removedIds = [...knownRoomIds].filter(id=>!currentIds.includes(id));
+    function openRoom(roomId, roomName) {
+      const isSwitching = activeRoomId !== roomId;
 
-        if(newIds.length>0){
-          const newRooms = await api(`/dm_rooms?id=in.(${newIds.join(',')})`);
-          const newMembers = await api(`/dm_room_members?room_id=in.(${newIds.join(',')})`);
-          if(newMembers){
-            newMembers.forEach(m=>{
-              if(!roomMembersMap[m.room_id]) roomMembersMap[m.room_id]=[];
-              if(!roomMembersMap[m.room_id].includes(m.user_id)) roomMembersMap[m.room_id].push(m.user_id);
-            });
-          }
-          const listEl=document.getElementById('roomList');
-          if(listEl && listEl.innerHTML.includes('참여중인 채팅방이 없습니다')) listEl.innerHTML='';
-          (newRooms||[]).forEach(room=>{
-            const div=document.createElement('div');
-            div.className='room-item new-room-enter';
-            div.dataset.roomId=room.id;
-            div.onclick=()=>openRoom(room.id, room.name||'채팅방');
-            div.innerHTML=`
-              <div id="avatarContainer-${room.id}">${generateMultiAvatarHTML(room.id)}</div>
-              <div class="room-info"><div class="room-name">${escapeHTML(room.name||'새 채팅방')}</div><div class="room-last-msg" id="lastMsg-${room.id}">새로운 초대</div></div>
-              <div class="unread-blue-dot show" id="unreadDot-${room.id}" style="display:block;"></div>
-            `;
-            listEl.prepend(div);
-            requestAnimationFrame(()=>requestAnimationFrame(()=>div.classList.add('enter-active')));
-            api(`/dm_messages?room_id=eq.${room.id}&order=created_at.desc&limit=1`).then(msgs=>{
-              const el=document.getElementById(`lastMsg-${room.id}`);
-              if(msgs && msgs[0] && el){ let t=msgs[0].content; if(t.startsWith('[SYSTEM] ')) t=t.replace('[SYSTEM] ',''); el.textContent=t; }
-            }).catch(()=>{});
-          });
-          newIds.forEach(id=>knownRoomIds.add(id));
-          const badge=document.getElementById('roomCountBadge'); if(badge) badge.textContent=String(knownRoomIds.size);
-          if(showToast) showAlert(newIds.length===1? '새로운 채팅방에 초대되었습니다' : `${newIds.length}개의 새로운 채팅방`);
+      // 방 전환 시 이전 방 내용 플리커 방지: 즉시 스켈레톤으로 교체
+      if (isSwitching) {
+        currentMessages = [];
+        isLoadingMessages = false;
+        const skeletonContainer = document.getElementById('chatMessages');
+        if (skeletonContainer) {
+          skeletonContainer.innerHTML = getChatSkeletonHTML();
+          skeletonContainer.classList.add('skeleton-active');
+          skeletonContainer.style.display = 'flex';
+          skeletonContainer.scrollTop = 0;
         }
-
-        if(removedIds.length>0){
-          removedIds.forEach(id=>{
-            knownRoomIds.delete(id);
-            const el=document.querySelector(`[data-room-id="${id}"]`); if(el){ el.style.transition='all 0.32s ease'; el.style.opacity='0'; el.style.transform='translateX(-12px)'; setTimeout(()=>el.remove(),320); }
-            delete roomMembersMap[id];
-            if(activeRoomId===id) closeRoom();
-          });
-          const badge=document.getElementById('roomCountBadge'); if(badge) badge.textContent=String(knownRoomIds.size);
-        }
-      }catch(e){ console.warn('초대 체크 실패', e); }
-    }
-
-    function startRealtimeRoomPolling(){
-      if(roomPollInterval) clearInterval(roomPollInterval);
-      roomPollInterval = setInterval(()=>checkNewInvites(true), 3200);
-      document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkNewInvites(false); });
-      window.addEventListener('focus', ()=>checkNewInvites(false));
-    }
-
-    async function openRoom(roomId, roomName){
-      if(activeRoomId===roomId){
-        const pane=document.getElementById('dmContainer'); if(pane.classList.contains('room-active')) return;
       }
+
       activeRoomId = roomId;
       document.getElementById('dmContainer').classList.add('room-active');
       document.body.classList.add('chat-room-active');
-      document.getElementById('chatEmptyState').style.display='none';
-      const header=document.getElementById('chatHeader');
-      header.style.display='flex';
-      header.style.opacity='0'; header.style.transform='translateY(-8px)';
-      requestAnimationFrame(()=>{ header.style.transition='all 0.36s cubic-bezier(0.22,1,0.36,1)'; header.style.opacity='1'; header.style.transform='translateY(0)'; });
-      const msgContainer=document.getElementById('chatMessages');
-      const inputArea=document.getElementById('chatInputArea');
-      msgContainer.style.display='flex';
-      inputArea.style.display='flex';
-      document.getElementById('activeRoomName').textContent=roomName||'채팅방';
+      document.getElementById('chatEmptyState').style.display = 'none';
+      document.getElementById('chatHeader').style.display = 'flex';
+      document.getElementById('chatMessages').style.display = 'flex';
+      document.getElementById('chatInputArea').style.display = 'flex';
+      document.getElementById('activeRoomName').textContent = roomName;
 
-      msgContainer.innerHTML = renderChatSkeleton();
-      msgContainer.scrollTop = 0;
-      currentMessages = [];
-
-      document.querySelectorAll('.room-item').forEach(el=>el.classList.remove('active'));
-      const activeEl=document.querySelector(`[data-room-id="${roomId}"]`); if(activeEl) activeEl.classList.add('active');
-      const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){ dot.classList.remove('show'); dot.style.display='none'; }
-
-      if(messagePollInterval) clearInterval(messagePollInterval);
-      try{ await loadMessages(roomId,false); }
-      finally{ messagePollInterval=setInterval(()=>loadMessages(roomId,true), 2500); }
-    }
-
-    function closeRoom(){
-      document.body.classList.remove('chat-room-active');
-      activeRoomId=null;
-      document.getElementById('dmContainer').classList.remove('room-active');
-      if(messagePollInterval) clearInterval(messagePollInterval);
-      loadRoomsSilent();
-    }
-
-    async function getReadMapForMessages(messageIds){
-      const readMap={};
-      if(!messageIds || messageIds.length===0) return {readMap};
-      const chunkSize=60; let allReads=[];
-      for(let i=0;i<messageIds.length;i+=chunkSize){
-        const chunk=messageIds.slice(i,i+chunkSize);
-        try{ const reads=await api(`/dm_read?message_id=in.(${chunk.join(',')})`); if(reads&&reads.length) allReads=allReads.concat(reads); }catch(e){ console.warn('dm_read 조회 실패', e); }
+      // active 클래스 갱신 (data-room-id 기반, 기존 innerHTML 방식 fallback 유지)
+      document.querySelectorAll('.room-item').forEach(el => el.classList.remove('active'));
+      const activeByDataset = document.querySelector(`.room-item[data-room-id="${roomId}"]`);
+      if (activeByDataset) activeByDataset.classList.add('active');
+      else {
+        const activeEl = Array.from(document.querySelectorAll('.room-item')).find(el => el.innerHTML.includes(roomId));
+        if(activeEl) activeEl.classList.add('active');
       }
-      allReads.forEach(r=>{ if(!readMap[r.message_id]) readMap[r.message_id]=new Set(); readMap[r.message_id].add(r.user_id); });
-      return {readMap, allReads};
-    }
-    function calcUnreadIndependent(msgId, senderId, roomId, readMap){
-      const members=roomMembersMap[roomId]||[]; if(members.length===0) return 0;
-      const readers=new Set(readMap[msgId]?Array.from(readMap[msgId]):[]); if(senderId) readers.add(senderId);
-      let unread=0; for(let i=0;i<members.length;i++){ if(!readers.has(members[i])) unread++; } return unread;
-    }
-    async function markMessagesAsRead(messageIds){
-      if(!messageIds||messageIds.length===0) return;
-      const uniq=[...new Set(messageIds)]; const payload=uniq.map(mid=>({user_id:currentUser.id, message_id:mid}));
-      try{ await api("/dm_read",{method:"POST", body:JSON.stringify(payload)}); }catch(e){ const m=String(e.message||e).toLowerCase(); if(m.includes('409')||m.includes('duplicate')||m.includes('23505')) return; console.warn('markAsRead 실패', e); }
-    }
-    async function updateUnreadCountsOnlyIndependent(msgs, roomId, readMapOverride){
-      let readMap=readMapOverride;
-      if(!readMap){ const ids=msgs.filter(m=>!m.content.startsWith('[SYSTEM] ')).map(m=>m.id); if(ids.length===0) return; const res=await getReadMapForMessages(ids); readMap=res.readMap; }
-      msgs.forEach(m=>{ if(m.content.startsWith('[SYSTEM] ')) return; const el=document.getElementById(`unread-${m.id}`); if(!el) return; const uc=calcUnreadIndependent(m.id,m.sender_id,roomId,readMap); el.textContent=uc>0?String(uc):'0'; el.style.opacity=uc>0?'1':'0'; });
+
+      if (messagePollInterval) clearInterval(messagePollInterval);
+      loadMessages(roomId);
+      messagePollInterval = setInterval(() => {
+        loadMessages(roomId, true);
+      }, 3000); 
     }
 
-    async function loadMessages(roomId, isPolling=false){
-      if(isLoadingMessages && isPolling) return;
-      try{
-        if(isPolling) isLoadingMessages=true;
-        const msgs=await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
-        if(!msgs){ isLoadingMessages=false; return; }
-        const container=document.getElementById('chatMessages');
-        if(isPolling && currentMessages.length===msgs.length){
-          const prev=currentMessages.map(m=>m.id).join(','), next=msgs.map(m=>m.id).join(',');
-          if(prev===next){
-            const ids=msgs.filter(m=>!m.content.startsWith('[SYSTEM] ')).map(m=>m.id);
-            const {readMap}=await getReadMapForMessages(ids);
-            const need=[]; for(let i=0;i<msgs.length;i++){ const mm=msgs[i]; if(mm.content.startsWith('[SYSTEM] ')) continue; if(mm.sender_id===currentUser.id) continue; const s=readMap[mm.id]; if(!s||!s.has(currentUser.id)) need.push(mm.id); }
-            if(need.length>0){ await markMessagesAsRead(need); need.forEach(id=>{ if(!readMap[id]) readMap[id]=new Set(); readMap[id].add(currentUser.id); }); }
-            await updateUnreadCountsOnlyIndependent(msgs, roomId, readMap); isLoadingMessages=false; return;
+    function closeRoom() {
+      document.body.classList.remove('chat-room-active');
+      activeRoomId = null;
+      currentMessages = [];
+      document.getElementById('dmContainer').classList.remove('room-active');
+      if (messagePollInterval) clearInterval(messagePollInterval);
+      const cm = document.getElementById('chatMessages');
+      if (cm) { cm.classList.remove('skeleton-active'); cm.innerHTML = ''; }
+      loadRooms();
+    }
+// 채팅방 클릭 시
+function openChatRoom(roomId) {
+  document.body.classList.add('chat-room-active');
+  // 채팅방 여는 기존 로직...
+}
+
+// 뒤로가기 or 목록으로 돌아갈 때
+function closeChatRoom() {
+  document.body.classList.remove('chat-room-active');
+  // 목록 보여주는 기존 로직...
+}
+document.querySelector('.back-btn').addEventListener('click', () => {
+  document.body.classList.remove('chat-room-active');
+});
+
+
+    let currentMessages = [];
+    let isLoadingMessages = false;
+
+    async function getReadMapForMessages(messageIds) {
+      const readMap = {}; // messageId -> Set(userId)
+      if (!messageIds || messageIds.length === 0) return { readMap };
+      const chunkSize = 60;
+      let allReads = [];
+      for (let i = 0; i < messageIds.length; i += chunkSize) {
+        const chunk = messageIds.slice(i, i + chunkSize);
+        try {
+          const reads = await api(`/dm_read?message_id=in.(${chunk.join(',')})`);
+          if (reads && reads.length) allReads = allReads.concat(reads);
+        } catch (e) { console.warn('dm_read 조회 실패', e); }
+      }
+      allReads.forEach(r => {
+        if (!readMap[r.message_id]) readMap[r.message_id] = new Set();
+        readMap[r.message_id].add(r.user_id);
+      });
+      return { readMap, allReads };
+    }
+
+    // ✅ 각 메시지 독립 계산: 이 메시지 기준으로만 안읽은 사람 수 세기
+    function calcUnreadIndependent(msgId, senderId, roomId, readMap) {
+      const members = roomMembersMap[roomId] || [];
+      if (members.length === 0) return 0;
+      const readers = new Set(readMap[msgId] ? Array.from(readMap[msgId]) : []);
+      // 보낸 사람은 항상 읽음
+      if (senderId) readers.add(senderId);
+      // 멤버 중 readers에 없는 사람 수만 센다 (각 메시지 독립)
+      let unread = 0;
+      for (let i = 0; i < members.length; i++) {
+        if (!readers.has(members[i])) unread++;
+      }
+      return unread;
+    }
+
+    async function markMessagesAsRead(messageIds) {
+      if (!messageIds || messageIds.length === 0) return;
+      const uniq = [...new Set(messageIds)];
+      const payload = uniq.map(mid => ({ user_id: currentUser.id, message_id: mid }));
+      try { await api("/dm_read", { method: "POST", body: JSON.stringify(payload) }); }
+      catch (e) {
+        const m = String(e.message||e).toLowerCase();
+        if (m.includes('409') || m.includes('duplicate') || m.includes('23505')) return;
+        console.warn('markAsRead 실패', e);
+      }
+    }
+
+    async function updateUnreadCountsOnlyIndependent(msgs, roomId, readMapOverride) {
+      let readMap = readMapOverride;
+      if (!readMap) {
+        const ids = msgs.filter(m=>!m.content.startsWith('[SYSTEM] ')).map(m=>m.id);
+        if (ids.length===0) return;
+        const res = await getReadMapForMessages(ids);
+        readMap = res.readMap;
+      }
+      msgs.forEach(m=>{
+        if (m.content.startsWith('[SYSTEM] ')) return;
+        const el = document.getElementById(`unread-${m.id}`);
+        if (!el) return;
+        const uc = calcUnreadIndependent(m.id, m.sender_id, roomId, readMap);
+        el.textContent = uc>0? String(uc) : '0';
+        el.style.opacity = uc>0? '1' : '0';
+      });
+    }
+
+    async function loadMessages(roomId, isPolling = false) {
+      if (isLoadingMessages && isPolling) return;
+      try {
+        if (isPolling) isLoadingMessages = true;
+        const msgs = await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
+        if (!msgs) { isLoadingMessages=false; return; }
+        const container = document.getElementById('chatMessages');
+
+        // 폴링: ID가 완전히 같으면 DOM 재생성 없이 각 메시지 독립적으로 숫자만 갱신
+        if (isPolling && currentMessages.length === msgs.length) {
+          const prev = currentMessages.map(m=>m.id).join(',');
+          const next = msgs.map(m=>m.id).join(',');
+          if (prev === next) {
+            const ids = msgs.filter(m=>!m.content.startsWith('[SYSTEM] ')).map(m=>m.id);
+            const { readMap } = await getReadMapForMessages(ids);
+            // 내 읽음 필요하면 먼저 처리
+            const need = [];
+            for (let i=0;i<msgs.length;i++){
+              const mm = msgs[i];
+              if (mm.content.startsWith('[SYSTEM] ')) continue;
+              if (mm.sender_id === currentUser.id) continue;
+              const s = readMap[mm.id];
+              if (!s || !s.has(currentUser.id)) need.push(mm.id);
+            }
+            if (need.length>0){ await markMessagesAsRead(need); need.forEach(id=>{ if(!readMap[id]) readMap[id]=new Set(); readMap[id].add(currentUser.id); }); }
+            await updateUnreadCountsOnlyIndependent(msgs, roomId, readMap);
+            isLoadingMessages=false; return;
           }
         }
-        currentMessages=msgs;
-        const normal=msgs.filter(m=>!m.content.startsWith('[SYSTEM] ')); const ids=normal.map(m=>m.id); let readMap={};
-        if(ids.length>0){
-          const r=await getReadMapForMessages(ids); readMap=r.readMap;
-          if(!isPolling){
-            const missing=[]; normal.forEach(m=>{ const set=readMap[m.id]; if(!set||!set.has(m.sender_id)) missing.push({user_id:m.sender_id,message_id:m.id}); });
+
+        currentMessages = msgs;
+        const normal = msgs.filter(m=>!m.content.startsWith('[SYSTEM] '));
+        const ids = normal.map(m=>m.id);
+        let readMap = {};
+        if (ids.length>0){
+          const r = await getReadMapForMessages(ids);
+          readMap = r.readMap;
+          if (!isPolling){
+            const missing=[];
+            normal.forEach(m=>{ const set=readMap[m.id]; if(!set||!set.has(m.sender_id)) missing.push({user_id:m.sender_id,message_id:m.id}); });
             if(missing.length>0){ try{await api("/dm_read",{method:"POST",body:JSON.stringify(missing)});}catch(e){} missing.forEach(x=>{ if(!readMap[x.message_id]) readMap[x.message_id]=new Set(); readMap[x.message_id].add(x.user_id); }); }
           }
         }
+
         container.innerHTML='';
-        msgs.forEach((msg, idx)=>{
+        container.classList.remove('skeleton-active');
+        msgs.forEach(msg=>{
           const w=document.createElement('div');
-          if(msg.content.startsWith('[SYSTEM] ')){ w.className='system-message-container'; w.style.animationDelay=`${Math.min(idx*0.03,0.18)}s`; w.innerHTML=`<div class="system-message-bubble">${escapeHTML(msg.content.replace('[SYSTEM] ','').trim())}</div>`; container.appendChild(w); return; }
-          const isMe=msg.sender_id===currentUser.id; const time=new Date(msg.created_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}); const senderName=isMe?'':getUserInfo(msg.sender_id).nickname; const uc=calcUnreadIndependent(msg.id,msg.sender_id,roomId,readMap);
-          w.className=`message-wrapper ${isMe?'me':'other'}`; w.style.animationDelay=`${Math.min(idx*0.04,0.24)}s`;
+          if(msg.content.startsWith('[SYSTEM] ')){ w.className='system-message-container'; w.innerHTML=`<div class="system-message-bubble">${escapeHTML(msg.content.replace('[SYSTEM] ','').trim())}</div>`; container.appendChild(w); return; }
+          const isMe = msg.sender_id===currentUser.id;
+          const time = new Date(msg.created_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+          const senderName = isMe? '' : getUserInfo(msg.sender_id).nickname;
+          const uc = calcUnreadIndependent(msg.id, msg.sender_id, roomId, readMap);
+          w.className=`message-wrapper ${isMe?'me':'other'}`;
           let h=''; if(!isMe) h+=`<div class="message-sender">${escapeHTML(senderName)}</div>`;
-          h+=`<div class="message-row ${isMe?'me':'other'}"><div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g,'<br>')}</div><div class="msg-side">${uc>0?`<span class="unread-count" id="unread-${msg.id}">${uc}</span>`:`<span class="unread-count" id="unread-${msg.id}" style="opacity:0;">0</span>`}<span class="message-time">${time}</span></div></div>`;
+          h+=`<div class="message-row ${isMe?'me':'other'}"><div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g,'<br>')}</div><div class="msg-side">${uc>0?`<span class="unread-count" id="unread-${msg.id}">${uc}</span>`:`<span class="unread-count" id="unread-${msg.id}" style="opacity:0;">0</span>`}<span class="message-time" style="margin:0;">${time}</span></div></div>`;
           w.innerHTML=h; container.appendChild(w);
         });
         container.scrollTop=container.scrollHeight;
-        const unreadByMe=[]; normal.forEach(m=>{ if(m.sender_id===currentUser.id) return; const s=readMap[m.id]; if(!s||!s.has(currentUser.id)) unreadByMe.push(m.id); });
+
+        // 내가 안읽은 것들 독립적으로 읽음 처리 (각 메시지 독립)
+        const unreadByMe=[];
+        normal.forEach(m=>{ if(m.sender_id===currentUser.id) return; const s=readMap[m.id]; if(!s||!s.has(currentUser.id)) unreadByMe.push(m.id); });
         if(unreadByMe.length>0){
-          markMessagesAsRead(unreadByMe).then(async()=>{ unreadByMe.forEach(id=>{ if(!readMap[id]) readMap[id]=new Set(); readMap[id].add(currentUser.id); }); await updateUnreadCountsOnlyIndependent(msgs,roomId,readMap); const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){dot.classList.remove('show');dot.style.display='none';} });
-        }else{ const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){dot.classList.remove('show');dot.style.display='none';} }
-      }catch(e){ console.error("메시지 로드 오류",e); } finally{ isLoadingMessages=false; }
+          markMessagesAsRead(unreadByMe).then(async()=>{
+            // 읽은 후 각 메시지 독립 재계산해서 0으로
+            unreadByMe.forEach(id=>{ if(!readMap[id]) readMap[id]=new Set(); readMap[id].add(currentUser.id); });
+            await updateUnreadCountsOnlyIndependent(msgs, roomId, readMap);
+            const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){dot.classList.remove('show');dot.style.display='none';}
+          });
+        }else{
+          const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){dot.classList.remove('show');dot.style.display='none';}
+        }
+      }catch(e){ console.error("메시지 로드 오류",e); const _c=document.getElementById('chatMessages'); if(_c) _c.classList.remove('skeleton-active'); } finally{ isLoadingMessages=false; }
     }
 
-    async function sendMessage(){
-      if(!activeRoomId || isSending) return;
-      const input=document.getElementById('messageInput'); const content=input.value.trim(); if(!content) return;
-      isSending=true; document.getElementById('sendBtn').disabled=true;
-      const container=document.getElementById('chatMessages');
-      const time=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-      const tempWrapper=document.createElement('div'); tempWrapper.className='message-wrapper me temp-msg'; tempWrapper.style.opacity='0.78';
-      tempWrapper.innerHTML=`<div class="message-row me"><div class="message-bubble">${escapeHTML(content).replace(/\n/g,'<br>')}</div><div class="msg-side"><span class="message-time" style="margin:0; display:flex; align-items:center; gap:2px;">${time} <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></span></div></div>`;
-      container.appendChild(tempWrapper); container.scrollTop=container.scrollHeight;
-      input.value=''; input.style.height='44px';
-      const newMessageId=(crypto.randomUUID?crypto.randomUUID():'msg-'+Date.now()+'-'+Math.random().toString(36).slice(2));
-      try{
-        await api("/dm_messages",{method:"POST", headers:{"Prefer":"return=representation"}, body:JSON.stringify({id:newMessageId, room_id:activeRoomId, sender_id:currentUser.id, content:content, created_at:new Date().toISOString()})});
-        try{ await api("/dm_read",{method:"POST", body:JSON.stringify([{user_id:currentUser.id, message_id:newMessageId}])}); }catch(e){}
-        tempWrapper.remove(); await loadMessages(activeRoomId,false);
-        const lastEl=document.getElementById(`lastMsg-${activeRoomId}`); if(lastEl) lastEl.textContent=content;
-      }catch(e){ showAlert("메시지 전송에 실패했습니다."); tempWrapper.remove(); }
-      finally{ isSending=false; document.getElementById('sendBtn').disabled=false; input.focus(); }
+    async function sendMessage() {
+      if (!activeRoomId || isSending) return;
+      const input = document.getElementById('messageInput');
+      const content = input.value.trim();
+      if (!content) return;
+      isSending = true;
+      document.getElementById('sendBtn').disabled = true;
+      const container = document.getElementById('chatMessages');
+      const time = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+      const tempWrapper = document.createElement('div');
+      tempWrapper.className = 'message-wrapper me temp-msg';
+      tempWrapper.style.opacity = '0.7';
+      tempWrapper.innerHTML = `<div class="message-row me"><div class="message-bubble">${escapeHTML(content).replace(/\n/g, '<br>')}</div><div class="msg-side"><span class="message-time" style="margin:0; display:flex; align-items:center; gap:2px;">${time} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></span></div></div>`;
+      container.appendChild(tempWrapper);
+      container.scrollTop = container.scrollHeight;
+      input.value = ''; input.style.height = '44px';
+      const newMessageId = (crypto.randomUUID? crypto.randomUUID() : 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+      try {
+        await api("/dm_messages", { method: "POST", headers: { "Prefer": "return=representation" }, body: JSON.stringify({ id: newMessageId, room_id: activeRoomId, sender_id: currentUser.id, content: content, created_at: new Date().toISOString() }) });
+        try { await api("/dm_read", { method: "POST", body: JSON.stringify([{ user_id: currentUser.id, message_id: newMessageId }]) }); } catch (readErr) {}
+        tempWrapper.remove();
+        await loadMessages(activeRoomId, false);
+      } catch (e) { showAlert("메시지 전송에 실패했습니다."); tempWrapper.remove(); }
+      finally { isSending = false; document.getElementById('sendBtn').disabled = false; input.focus(); }
     }
 
-    function resizeInput(el){ el.style.height='44px'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
-    function checkEnter(e){ if(e.key==='Enter' &&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
 
-    function closeModals(){
+    function resizeInput(el) {
+      el.style.height = '44px';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    }
+
+    function checkEnter(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function closeModals() {
       document.getElementById('createRoomModal').classList.remove('open');
       document.getElementById('inviteModal').classList.remove('open');
       document.getElementById('roomInfoModal').classList.remove('open');
       selectedUserIds.clear();
-      document.getElementById('newRoomName').value='';
-      const s1=document.getElementById('createRoomUserSearch'); if(s1) s1.value='';
-      const s2=document.getElementById('inviteUserSearch'); if(s2) s2.value='';
     }
-    function openCreateRoomModal(){
-      selectedUserIds.clear();
-      document.getElementById('newRoomName').value='';
-      const s=document.getElementById('createRoomUserSearch'); if(s) s.value='';
-      renderUserSelectList('newUserList','');
+
+    function openCreateRoomModal() {
       document.getElementById('createRoomModal').classList.add('open');
-    }
-    function openInviteModal(){
-      if(!activeRoomId) return;
+      document.getElementById('newRoomName').value = '';
+      document.getElementById('createRoomUserSearch').value = '';
       selectedUserIds.clear();
-      const s=document.getElementById('inviteUserSearch'); if(s) s.value='';
-      const currentMembers=roomMembersMap[activeRoomId]||[];
-      const filtered=Object.values(usersCache).filter(u=>u.id!==currentUser.id &&!currentMembers.includes(u.id));
-      renderUserSelectList('inviteUserList','', filtered);
+      renderUserSelectList('newUserList');
+    }
+
+    function openInviteModal() {
       document.getElementById('inviteModal').classList.add('open');
+      document.getElementById('inviteUserSearch').value = '';
+      selectedUserIds.clear();
+      renderUserSelectList('inviteUserList');
     }
-    function openRoomInfoModal(){
-      if(!activeRoomId) return;
-      const roomName=document.getElementById('activeRoomName').textContent;
-      document.getElementById('infoRoomName').value=roomName;
-      const members=roomMembersMap[activeRoomId]||[];
-      const listEl=document.getElementById('roomMembersList'); listEl.innerHTML='';
-      members.forEach(uid=>{
-        const u=getUserInfo(uid);
-        const div=document.createElement('div'); div.className='user-select-item'; div.style.cursor='default';
-        div.innerHTML=`<div class="user-meta"><span>${escapeHTML(u.nickname)}${uid===currentUser.id?' (나)':''}</span></div>`;
-        listEl.appendChild(div);
-      });
+
+    // 채팅방 정보 모달 열기 함수 (멤버 표시 및 마이페이지 연결)
+    function openRoomInfoModal() {
+      if (!activeRoomId) return;
       document.getElementById('roomInfoModal').classList.add('open');
-    }
-    async function leaveRoom(){
-      if(!activeRoomId) return;
-      if(!confirm('정말 이 채팅방을 나가시겠습니까?')) return;
-      try{
-        NProgress.start();
-        await api(`/dm_room_members?room_id=eq.${activeRoomId}&user_id=eq.${encodeURIComponent(currentUser.id)}`,{method:"DELETE"});
-        showAlert('채팅방에서 나왔습니다.');
-        closeModals(); closeRoom();
-      }catch(e){ showAlert('나가기 실패: '+e.message); }
-      finally{ NProgress.done(); }
-    }
+      
+      const displayRoomName = document.getElementById('activeRoomName').textContent;
+      document.getElementById('infoRoomName').value = displayRoomName;
+      
+      const members = roomMembersMap[activeRoomId] || [];
+      const container = document.getElementById('roomMembersList');
+      container.innerHTML = '';
+      
+      members.forEach(id => {
+        const u = getUserInfo(id);
+        const item = document.createElement('div');
+        item.className = 'user-select-item';
+        item.title = '클릭하여 프로필로 이동';
+        
+        const avatarHTML = u.profile_image 
+          ? `<img src="${u.profile_image}" style="width:100%; height:100%; object-fit:cover;">`
+          : `<span style="font-size:12px;">${u.nickname[0]}</span>`;
 
-    function renderUserSelectList(containerId, filterText='', baseList=null){
-      const container=document.getElementById(containerId); container.innerHTML='';
-      let list = baseList || Object.values(usersCache).filter(u=>u.id!==currentUser.id);
-      if(containerId==='inviteUserList' &&!baseList){
-        const currentMembers=roomMembersMap[activeRoomId]||[];
-        list = list.filter(u=>!currentMembers.includes(u.id));
-      }
-      const q=filterText.toLowerCase();
-      const filteredUsers = q? list.filter(u=> (u.nickname||'').toLowerCase().includes(q)) : list;
-      if(filteredUsers.length===0){ container.innerHTML='<div style="padding:18px; color:var(--t3); text-align:center; font-size:13px;">검색 결과가 없습니다.</div>'; return; }
-      filteredUsers.forEach(u=>{
-        const item=document.createElement('div'); item.className='user-select-item'; const isChecked=selectedUserIds.has(u.id);
-        item.innerHTML=`<div class="user-meta"><span>${escapeHTML(u.nickname)}</span></div><button type="button" class="select-chk-btn ${isChecked?'checked':''}" data-id="${u.id}">${isChecked?'선택됨':'선택'}</button>`;
-        const toggleSelection=(e)=>{ e.preventDefault(); e.stopPropagation(); const btn=item.querySelector('.select-chk-btn'); if(selectedUserIds.has(u.id)){ selectedUserIds.delete(u.id); btn.classList.remove('checked'); btn.textContent='선택'; } else { selectedUserIds.add(u.id); btn.classList.add('checked'); btn.textContent='선택됨'; } };
-        const btn=item.querySelector('.select-chk-btn'); item.onclick=toggleSelection; btn.onclick=toggleSelection; container.appendChild(item);
+        item.innerHTML = `
+          <div class="user-meta">
+            <div style="width:32px; height:32px; border-radius:50%; background:var(--bg3); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+              ${avatarHTML}
+            </div>
+            <span>${escapeHTML(u.nickname)} ${id === currentUser.id ? '(나)' : ''}</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        `;
+
+        // 마이페이지 이동 링크 처리 (profile.html로 가정)
+        item.onclick = () => {
+          window.location.href = `user.html?id=${u.id}`;
+        };
+        
+        container.appendChild(item);
       });
     }
-    function filterUserList(containerId, value){ renderUserSelectList(containerId, value.trim()); }
 
-    async function createRoom(){
-      const name=document.getElementById('newRoomName').value.trim()||'새 채팅방';
-      const selectedIds=Array.from(selectedUserIds);
-      const btn=document.getElementById('createRoomBtn'); btn.disabled=true; NProgress.start();
-      try{
-        const roomPayload={name:name, created_at:new Date().toISOString()}; roomPayload.id=crypto.randomUUID?crypto.randomUUID():'room-'+Date.now();
-        const roomRes=await api("/dm_rooms",{method:"POST", headers:{"Prefer":"return=representation"}, body:JSON.stringify(roomPayload)});
-        const newRoomId=(roomRes && roomRes[0])?roomRes[0].id:roomPayload.id;
-        const membersData=[{room_id:newRoomId, user_id:currentUser.id, joined_at:new Date().toISOString()}];
-        selectedIds.forEach(id=>{ membersData.push({room_id:newRoomId, user_id:id, joined_at:new Date().toISOString()}); });
-        await api("/dm_room_members",{method:"POST", body:JSON.stringify(membersData)});
-        if(selectedIds.length>0){
-          const invitedNames=selectedIds.map(id=>getUserInfo(id).nickname).join(', ');
-          const sysMsg=`[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
-          await api("/dm_messages",{method:"POST", body:JSON.stringify({room_id:newRoomId, sender_id:currentUser.id, content:sysMsg, created_at:new Date().toISOString()})});
+    async function leaveRoom() {
+      if(!activeRoomId) return;
+      if(!confirm("정말로 이 채팅방에서 나가시겠습니까?")) return;
+      
+      NProgress.start();
+      try {
+        // 나감 시스템 메시지 발송
+        const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 나갔습니다.`;
+        await api("/dm_messages", {
+          method: "POST",
+          body: JSON.stringify({
+            room_id: activeRoomId,
+            sender_id: currentUser.id,
+            content: sysMsg,
+            created_at: new Date().toISOString()
+          })
+        });
+        
+        // 내 멤버 기록 삭제
+        await api(`/dm_room_members?room_id=eq.${activeRoomId}&user_id=eq.${currentUser.id}`, {
+          method: "DELETE"
+        });
+
+        closeModals();
+        closeRoom();
+        showAlert("채팅방에서 나갔습니다.");
+      } catch(e) {
+        showAlert("나가기 실패: " + e.message);
+      } finally {
+        NProgress.done();
+      }
+    }
+
+    function renderUserSelectList(containerId, filterKeyword = '') {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      
+      const filteredUsers = Object.values(usersCache).filter(u => {
+        if (u.id === currentUser.id) return false; 
+        if (containerId === 'inviteUserList' && activeRoomId && roomMembersMap[activeRoomId]?.includes(u.id)) return false; // 이미 들어와 있는 유저 필터링
+        if (!filterKeyword) return true;
+        return u.nickname.toLowerCase().includes(filterKeyword.toLowerCase());
+      });
+
+      if (filteredUsers.length === 0) {
+        container.innerHTML = '<div style="padding:20px; color:var(--t3); text-align:center; font-size:14px;">검색 결과가 없습니다.</div>';
+        return;
+      }
+
+      filteredUsers.forEach(u => {
+        const item = document.createElement('div');
+        item.className = 'user-select-item';
+        const isChecked = selectedUserIds.has(u.id);
+        
+        item.innerHTML = `
+          <div class="user-meta">
+            <span>${escapeHTML(u.nickname)}</span>
+          </div>
+          <button type="button" class="select-chk-btn ${isChecked ? 'checked' : ''}" data-id="${u.id}">
+            ${isChecked ? '선택됨' : '선택'}
+          </button>
+        `;
+
+        const toggleSelection = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (selectedUserIds.has(u.id)) {
+            selectedUserIds.delete(u.id);
+            btn.classList.remove('checked');
+            btn.textContent = '선택';
+          } else {
+            selectedUserIds.add(u.id);
+            btn.classList.add('checked');
+            btn.textContent = '선택됨';
+          }
+        };
+
+        const btn = item.querySelector('.select-chk-btn');
+        item.onclick = toggleSelection;
+        btn.onclick = toggleSelection;
+
+        container.appendChild(item);
+      });
+    }
+// 1. 로그인 성공 후
+function handleLogin() {
+  // ... 기존 로그인 로직
+  const user = res.user;
+  localStorage.setItem('snsUser', JSON.stringify(user));
+  
+  // 사이드바 iframe에 유저정보 전달
+  const sidebarFrame = document.querySelector('iframe[src*="sidebar"]');
+  if (sidebarFrame?.contentWindow) {
+    sidebarFrame.contentWindow.postMessage({ 
+      type: 'updateUser', 
+      user: user 
+    }, '*');
+  }
+}
+
+// 2. 페이지 새로고침해도 유지되게
+window.addEventListener('DOMContentLoaded', () => {
+  const savedUser = localStorage.getItem('snsUser');
+  if (savedUser) {
+    const user = JSON.parse(savedUser);
+    const sidebarFrame = document.querySelector('iframe[src*="sidebar"]');
+    // iframe 로드 완료 후 전송
+    sidebarFrame.onload = () => {
+      sidebarFrame.contentWindow.postMessage({ 
+        type: 'updateUser', 
+        user: user 
+      }, '*');
+    };
+  }
+});
+    function filterUserList(containerId, value) {
+      renderUserSelectList(containerId, value.trim());
+    }
+
+    async function createRoom() {
+      const name = document.getElementById('newRoomName').value.trim() || '새 채팅방';
+      const selectedIds = Array.from(selectedUserIds);
+      
+      const btn = document.getElementById('createRoomBtn');
+      btn.disabled = true;
+      NProgress.start();
+
+      try {
+        const roomPayload = { name: name, created_at: new Date().toISOString() };
+        roomPayload.id = crypto.randomUUID ? crypto.randomUUID() : 'room-' + Date.now(); 
+
+        const roomRes = await api("/dm_rooms", {
+          method: "POST",
+          headers: { "Prefer": "return=representation" },
+          body: JSON.stringify(roomPayload)
+        });
+        
+        const newRoomId = (roomRes && roomRes[0]) ? roomRes[0].id : roomPayload.id;
+
+        const membersData = [
+          { room_id: newRoomId, user_id: currentUser.id, joined_at: new Date().toISOString() }
+        ];
+
+        selectedIds.forEach(id => {
+          membersData.push({ room_id: newRoomId, user_id: id, joined_at: new Date().toISOString() });
+        });
+
+        await api("/dm_room_members", {
+          method: "POST",
+          body: JSON.stringify(membersData)
+        });
+
+        // 초대 완료 시스템 메시지 등록
+        if (selectedIds.length > 0) {
+          const invitedNames = selectedIds.map(id => getUserInfo(id).nickname).join(', ');
+          const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
+          await api("/dm_messages", {
+            method: "POST",
+            body: JSON.stringify({
+              room_id: newRoomId,
+              sender_id: currentUser.id,
+              content: sysMsg,
+              created_at: new Date().toISOString()
+            })
+          });
         }
-        closeModals(); await loadRoomsSilent(); openRoom(newRoomId, name); showAlert("새 채팅방이 개설되었습니다.");
-      }catch(e){ showAlert("방 생성 실패: "+e.message); }
-      finally{ btn.disabled=false; NProgress.done(); }
+
+        closeModals();
+        await loadRooms();
+        openRoom(newRoomId, name);
+        showAlert("새 채팅방이 개설되었습니다.");
+      } catch (e) {
+        showAlert("방 생성 실패: " + e.message);
+      } finally {
+        btn.disabled = false;
+        NProgress.done();
+      }
     }
 
-    async function inviteUsers(){
-      if(!activeRoomId) return; const selectedIds=Array.from(selectedUserIds);
-      if(selectedIds.length===0){ showAlert("초대할 사용자를 선택해주세요."); return; }
-      const btn=document.getElementById('inviteBtn'); btn.disabled=true; NProgress.start();
-      try{
-        const membersData=selectedIds.map(id=>({room_id:activeRoomId, user_id:id, joined_at:new Date().toISOString()}));
-        await api("/dm_room_members",{method:"POST", body:JSON.stringify(membersData)});
-        const invitedNames=selectedIds.map(id=>getUserInfo(id).nickname).join(', ');
-        const sysMsg=`[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
-        await api("/dm_messages",{method:"POST", body:JSON.stringify({room_id:activeRoomId, sender_id:currentUser.id, content:sysMsg, created_at:new Date().toISOString()})});
-        showAlert("성공적으로 사용자를 초대했습니다."); closeModals(); await loadRoomsSilent();
-        if(roomMembersMap[activeRoomId]){ let displayRoomName=document.getElementById('activeRoomName').textContent; openRoom(activeRoomId, displayRoomName); }
-      }catch(e){ showAlert("초대 실패: "+e.message); }
-      finally{ btn.disabled=false; NProgress.done(); }
+    async function inviteUsers() {
+      if (!activeRoomId) return;
+      const selectedIds = Array.from(selectedUserIds);
+      if (selectedIds.length === 0) {
+        showAlert("초대할 사용자를 선택해주세요.");
+        return;
+      }
+
+      const btn = document.getElementById('inviteBtn');
+      btn.disabled = true;
+      NProgress.start();
+
+      try {
+        const membersData = selectedIds.map(id => ({
+          room_id: activeRoomId,
+          user_id: id,
+          joined_at: new Date().toISOString()
+        }));
+
+        await api("/dm_room_members", {
+          method: "POST",
+          body: JSON.stringify(membersData)
+        });
+
+        // 시스템 메시지 등록sdsadsa
+        const invitedNames = selectedIds.map(id => getUserInfo(id).nickname).join(', ');
+        const sysMsg = `[SYSTEM] ${currentUser.nickname}님이 ${invitedNames}님을 초대했습니다.`;
+        await api("/dm_messages", {
+          method: "POST",
+          body: JSON.stringify({
+            room_id: activeRoomId,
+            sender_id: currentUser.id,
+            content: sysMsg,
+            created_at: new Date().toISOString()
+          })
+        });
+
+        showAlert("성공적으로 사용자를 초대했습니다.");
+        closeModals();
+        await loadRooms();
+        
+        if (roomMembersMap[activeRoomId]) {
+          let displayRoomName = document.getElementById('activeRoomName').textContent;
+          openRoom(activeRoomId, displayRoomName);
+        }
+      } catch (e) {
+        showAlert("초대 실패: " + e.message);
+      } finally {
+        btn.disabled = false;
+        NProgress.done();
+      }
     }
 
-    function escapeHTML(str){ if(!str) return ''; return str.replace(/[&<>'"]/g, tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag)); }
-
-    document.getElementById('createRoomModal').addEventListener('click', e=>{ if(e.target.id==='createRoomModal') closeModals(); });
-    document.getElementById('inviteModal').addEventListener('click', e=>{ if(e.target.id==='inviteModal') closeModals(); });
-    document.getElementById('roomInfoModal').addEventListener('click', e=>{ if(e.target.id==='roomInfoModal') closeModals(); });
-
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+//ㅇㅇㅇㅇㅇㅇㅇ
     initPage();
   </script>
   <script src="sharer-profile-sheet-host.js"></script>
