@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Header - Sharer</title>
+  <script>
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  </script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #000;
+      --bg2: #111;
+      --bg3: #1a1a1a;
+      --bg4: #222;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --border3: #333;
+      --t1: #fff;
+      --t2: #888;
+      --t3: #444;
+      --blue: #0095f6;
+      --r1: 10px;
+      --r2: 14px;
+    }
+
+    html[data-theme="light"] {
+      --bg: #fafafa;
+      --bg2: #ffffff;
+      --bg3: #f0f0f0;
+      --bg4: #e4e4e4;
+      --border: #dbdbdb;
+      --border2: #cccccc;
+      --border3: #a3a3a3;
+      --t1: #000000;
+      --t2: #737373;
+      --t3: #a8a8a8;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== Mobile Top Bar ===== */
+    .mobile-topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s ease;
+    }
+
+    html[data-theme="light"] .mobile-topbar {
+      background: rgba(250, 250, 250, 0.86);
+    }
+
+    /* 모바일에서만 표시, 스크롤해도 고정 */
+    @media (max-width: 768px) {
+      .mobile-topbar {
+        display: flex;
+      }
+    }
+
+    /* iframe으로 쓰일 때도 모바일에서만 보이게 하려면 iframe 자체를 부모에서 제어.
+       단독으로 열었을 때 확인용으로 768px 이하는 항상 보이게 처리됨 */
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .topbar-logo {
+      width: 28px;
+      height: 28px;
+      display: block;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
+    .topbar-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--t1);
+      line-height: 1;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .topbar-btn {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .topbar-btn:hover {
+      background: var(--bg3);
+    }
+
+    .topbar-btn:active {
+      transform: scale(0.92);
+    }
+
+    .topbar-btn .icon-img {
+      width: 20px;
+      height: 20px;
+      display: block;
+      object-fit: contain;
+      transition: filter 0.2s ease, opacity 0.2s ease;
+      /* 기본 흰색 아이콘 기준: 다크모드에서는 그대로 */
+      filter: none;
+    }
+
+    /* 라이트모드에서 흰색 아이콘을 검정으로 반전 (로고 제외) */
+    html[data-theme="light"] .topbar-btn .icon-img.icon-invert {
+      filter: invert(1);
+    }
+
+    /* 로고는 다크/라이트 상관없이 그대로 */
+    .topbar-logo {
+      filter: none !important;
+    }
+
+    /* 알림 배지 - 파란 점 */
+    .noti-dot {
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--blue);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
+      opacity: 0;
+      transform: scale(0);
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    html[data-theme="light"] .noti-dot {
+      border-color: #ffffff;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+    }
+
+    .noti-dot.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* 데모용: header.html을 단독으로 열었을 때 배경 확인 */
+    .demo-bg {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .demo-bg {
+        display: block;
+        height: 200vh;
+        background: var(--bg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="mobile-topbar" role="banner" aria-label="상단바">
+    <a class="topbar-left" href="index.html" target="_top" aria-label="Sharer 홈으로 이동">
+      <img src="logo.svg" alt="Sharer 로고" class="topbar-logo" width="28" height="28" />
+      <span class="topbar-title">Sharer</span>
+    </a>
+
+    <div class="topbar-actions">
+      <a class="topbar-btn" href="set.html" target="_top" aria-label="설정">
+        <img src="set.svg" alt="설정" class="icon-img icon-invert" width="20" height="20" />
+      </a>
+
+      <a class="topbar-btn" href="notification.html" target="_top" aria-label="알림" id="notiBtn">
+        <img src="bell.svg" alt="알림" class="icon-img icon-invert" width="20" height="20" />
+        <span class="noti-dot" id="topbarNotiDot" aria-hidden="true"></span>
+      </a>
+    </div>
+  </header>
+
+  <div class="demo-bg"></div>
+
+  <script>
+    const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
+    async function api(endpoint, options = {}) {
+      const url = API_BASE + endpoint;
+      const res = await fetch(url, {
+        ...options,
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      });
+      if (!res.ok) {
+        let t = "";
+        try { t = await res.text(); } catch {}
+        throw new Error(t || ("HTTP " + res.status));
+      }
+      if (res.status === 204) return null;
+      return res.json();
+    }
+
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem('snsUser');
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch { return null; }
+    }
+
+    function setDotVisible(show) {
+      const dot = document.getElementById('topbarNotiDot');
+      if (!dot) return;
+      if (show) dot.classList.add('show');
+      else dot.classList.remove('show');
+    }
+
+    async function checkUnread() {
+      const user = getCurrentUser();
+      if (!user || !user.id) {
+        setDotVisible(false);
+        return;
+      }
+      try {
+        const or = encodeURIComponent('(isread.eq.0,isread.is.null)');
+        // unread가 하나라도 있는지 최소 데이터로 확인
+        const data = await api(`/notification?user=eq.${user.id}&or=${or}&select=isread&limit=5`);
+        const hasUnread = Array.isArray(data) && data.length > 0;
+        setDotVisible(hasUnread);
+      } catch (e) {
+        // 네트워크 오류 시 배지 상태 유지, 콘솔만
+        console.debug('topbar noti check fail', e);
+      }
+    }
+
+    let realtimeTimer = null;
+
+    function startRealtime() {
+      if (realtimeTimer) clearInterval(realtimeTimer);
+      checkUnread();
+      // 3초마다 폴링 - notification.html 과 동일한 실시간 로직
+      realtimeTimer = setInterval(() => {
+        if (document.hidden) return;
+        checkUnread();
+      }, 3000);
+
+      window.addEventListener('focus', checkUnread);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) checkUnread();
+      });
+      // 다른 탭에서 모두 읽음 처리 시 즉시 반영
+      window.addEventListener('storage', (e) => {
+        if (!e.key) return;
+        if (e.key === 'snsUser' || e.key === 'noti-read' || e.key.startsWith('notification')) {
+          checkUnread();
+        }
+      });
+      window.addEventListener('beforeunload', () => {
+        if (realtimeTimer) clearInterval(realtimeTimer);
+      });
+    }
+
+    // 테마 변경 감지 (set.html에서 localStorage theme 변경 시)
+    const themeObserver = new MutationObserver(() => {
+      // CSS가 html[data-theme]를 기준으로 처리하므로 별도 JS 불필요
+      // 필요하면 여기서 아이콘 필터 재계산 가능
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'theme') {
+        const v = e.newValue || 'dark';
+        if (v === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        else document.documentElement.removeAttribute('data-theme');
+      }
+    });
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = getCurrentUser();
+      if (!user) {
+        setDotVisible(false);
+        return;
+      }
+      startRealtime();
+    });
+
+    // iframe이 아닌 단독 로드 시에도 바로 시작 (DOMContentLoaded 이전에 이미 파싱된 경우 대비)
+    if (document.readyState !== 'loading') {
+      const u = getCurrentUser();
+      if (u) startRealtime();
+    }
+  </script>
+</body>
+</html>
