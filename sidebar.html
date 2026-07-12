@@ -707,10 +707,10 @@
         setIcon.src = 'setX.svg';
       }
 if (dmNav.classList.contains('active')) {
-  console.log("DM ACTIVE");
-  dmIcon.src = "home.png";
+
+setIcon.src = isLight ? 'sendO.svg' : 'send.svg';
 } else {
-  dmIcon.src = "homeX.png";
+  dmIcon.src = "sendX.svg";
 }
       const sheetSetIcon = document.getElementById('sheetSetIcon');
       if (sheetSetIcon) {
