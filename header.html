@@ -24,8 +24,6 @@
       --t1: #fff;
       --t2: #888;
       --t3: #444;
-      --r1: 10px;
-      --r2: 14px;
     }
 
     html[data-theme="light"] {
@@ -50,9 +48,10 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       -webkit-font-smoothing: antialiased;
+      background: var(--bg);
     }
 
-    /* ===== Mobile Top Bar ===== */
+    /* ===== Mobile Top Bar - 항상 보이게 (테스트용), index.html에서 모바일 전용으로 제어됨 ===== */
     .mobile-topbar {
       position: fixed;
       top: 0;
@@ -60,23 +59,18 @@
       right: 0;
       height: 56px;
       z-index: 300;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 16px;
-      background: rgba(0, 0, 0, 0.82);
+      background: rgba(0, 0, 0, 0.84);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
-      transition: background 0.2s ease;
     }
 
     html[data-theme="light"] .mobile-topbar {
-      background: rgba(250, 250, 250, 0.86);
-    }
-
-    @media (max-width: 768px) {
-      .mobile-topbar { display: flex; }
+      background: rgba(250, 250, 250, 0.88);
     }
 
     .topbar-left {
@@ -114,8 +108,8 @@
 
     .topbar-btn {
       position: relative;
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -132,8 +126,8 @@
     .topbar-btn:active { transform: scale(0.92); }
 
     .topbar-btn .icon-img {
-      width: 20px;
-      height: 20px;
+      width: 21px;
+      height: 21px;
       display: block;
       object-fit: contain;
       transition: filter 0.2s ease;
@@ -144,121 +138,89 @@
       filter: invert(1);
     }
 
-    /* ===== 알림 말풍선 (빨간 카운트 배지) - 인스타 스타일 팝 효과 ===== */
+    /* ===== 빨간 말풍선 카운트 - 인스타 스타일 ===== */
     .noti-bubble {
       position: absolute;
-      top: 0px;
-      right: -2px;
-      min-width: 19px;
-      height: 19px;
-      padding: 0 5px;
+      top: -1px;
+      right: -4px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
       background: #ff3040;
       color: #fff;
       font-size: 11px;
       font-weight: 800;
       line-height: 1;
       letter-spacing: -0.02em;
-      border-radius: 10px;
+      border-radius: 11px;
       border: 2px solid var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
       transform-origin: center bottom;
-      transform: scale(0) translateY(10px);
+      transform: scale(0) translateY(12px);
       opacity: 0;
       pointer-events: none;
-      z-index: 2;
+      z-index: 5;
       will-change: transform, opacity;
-      box-shadow: 0 2px 8px rgba(255,48,64,0.35);
+      box-shadow: 0 3px 10px rgba(255,48,64,0.38);
     }
 
     html[data-theme="light"] .noti-bubble {
       border-color: #ffffff;
-      box-shadow: 0 2px 8px rgba(255,48,64,0.28);
+      box-shadow: 0 3px 10px rgba(255,48,64,0.32);
     }
 
-    .noti-bubble.show {
-      opacity: 1;
-    }
-
-    .noti-bubble.pop-in {
-      animation: bubblePopIn 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    .noti-bubble.pop-out {
-      animation: bubblePopOut 0.38s cubic-bezier(0.4, 0, 0.6, 1) forwards;
-    }
+    .noti-bubble.show { opacity: 1; }
+    .noti-bubble.pop-in { animation: bubblePopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .noti-bubble.pop-out { animation: bubblePopOut 0.4s cubic-bezier(0.4, 0, 0.7, 1) forwards; }
 
     @keyframes bubblePopIn {
-      0% {
-        transform: scale(0) translateY(10px);
-        opacity: 0;
-      }
-      35% {
-        transform: scale(1.35) translateY(-6px);
-        opacity: 1;
-      }
-      60% {
-        transform: scale(0.92) translateY(1px);
-        opacity: 1;
-      }
-      80% {
-        transform: scale(1.08) translateY(-2px);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
+      0% { transform: scale(0) translateY(14px); opacity: 0; }
+      40% { transform: scale(1.4) translateY(-8px); opacity: 1; }
+      65% { transform: scale(0.9) translateY(2px); opacity: 1; }
+      85% { transform: scale(1.08) translateY(-3px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
     @keyframes bubblePopOut {
-      0% {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
-      25% {
-        transform: scale(1.15) translateY(-3px);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(0) translateY(-18px);
-        opacity: 0;
-      }
+      0% { transform: scale(1) translateY(0); opacity: 1; }
+      20% { transform: scale(1.15) translateY(-4px); opacity: 1; }
+      100% { transform: scale(0) translateY(-20px); opacity: 0; }
     }
 
-    /* 데모 확인용 배경 */
-    .demo-bg { display: none; }
-    @media (max-width: 768px) {
-      .demo-bg {
-        display: block;
-        height: 200vh;
-        background: var(--bg);
-      }
+    .demo-info {
+      padding: 80px 16px 20px;
+      font-size: 13px;
+      color: var(--t2);
+      line-height: 1.6;
     }
+    .demo-info b { color: var(--t1); }
   </style>
 </head>
 <body>
   <header class="mobile-topbar" role="banner" aria-label="상단바">
-    <a class="topbar-left" href="index.html" target="_top" aria-label="Sharer 홈으로 이동">
+    <a class="topbar-left" href="index.html" target="_top" aria-label="Sharer 홈">
       <img src="logo.svg" alt="Sharer 로고" class="topbar-logo" width="28" height="28" />
       <span class="topbar-title">Sharer</span>
     </a>
 
     <div class="topbar-actions">
       <a class="topbar-btn" href="set.html" target="_top" aria-label="설정">
-        <img src="set.svg" alt="설정" class="icon-img icon-invert" width="20" height="20" />
+        <img src="set.svg" alt="설정" class="icon-img icon-invert" width="21" height="21" />
       </a>
 
       <a class="topbar-btn" href="notification.html" target="_top" aria-label="알림" id="notiBtn">
-        <img src="bell.svg" alt="알림" class="icon-img icon-invert" width="20" height="20" />
-        <!-- 빨간 말풍선 카운트 배지 -->
+        <img src="bell.svg" alt="알림" class="icon-img icon-invert" width="21" height="21" />
         <span class="noti-bubble" id="topbarNotiBubble" aria-hidden="true">0</span>
       </a>
     </div>
   </header>
 
-  <div class="demo-bg"></div>
+  <div class="demo-info">
+    <b>테스트 팁:</b> 콘솔에서 <code>testNotiBubble(5)</code> 실행하면 팝업이 강제로 뜹니다.<br>
+    실제 알림은 3초마다 체크해서 새 알림이 생기면 자동으로 팝업됩니다. (2초 후 위로 튀며 사라짐)
+  </div>
 
   <script>
     const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
@@ -286,32 +248,31 @@
       } catch { return null; }
     }
 
-    // ===== 인스타 스타일 말풍선 로직 =====
     const bubbleEl = document.getElementById('topbarNotiBubble');
-    let prevUnreadCount = -1; // -1 = 첫 로드 아직 안함
+    let prevCount = -1;
+    let isFirst = true;
     let hideTimer = null;
     let outTimer = null;
-    let isFirstCheck = true;
 
     function formatCount(n) {
+      n = Number(n) || 0;
       if (n > 99) return '99+';
       if (n > 9) return '9+';
       return String(n);
     }
 
-    function hideBubbleImmediate() {
+    function hideImmediate() {
       if (!bubbleEl) return;
       if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
       if (outTimer) { clearTimeout(outTimer); outTimer = null; }
-      bubbleEl.classList.remove('pop-in', 'pop-out', 'show');
-      bubbleEl.style.opacity = '0';
+      bubbleEl.classList.remove('show','pop-in','pop-out');
     }
 
     function showBubble(count) {
       if (!bubbleEl) return;
-      if (count <= 0) { hideBubbleImmediate(); return; }
+      count = Number(count) || 0;
+      if (count <= 0) { hideImmediate(); return; }
 
-      // 기존 타이머 정리
       if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
       if (outTimer) { clearTimeout(outTimer); outTimer = null; }
 
@@ -319,109 +280,105 @@
       bubbleEl.classList.remove('pop-out');
       bubbleEl.classList.add('show');
 
-      // 리플로우 강제 후 애니메이션 재시작
+      // 재시작을 위한 강제 리플로우
       void bubbleEl.offsetWidth;
       bubbleEl.classList.remove('pop-in');
       void bubbleEl.offsetWidth;
       bubbleEl.classList.add('pop-in');
 
-      // 2초 후 튀어오르며 사라짐
+      // 2초 유지 후 위로 튀며 사라짐
       hideTimer = setTimeout(() => {
         bubbleEl.classList.remove('pop-in');
         bubbleEl.classList.add('pop-out');
         outTimer = setTimeout(() => {
-          bubbleEl.classList.remove('show', 'pop-out');
-        }, 380);
+          bubbleEl.classList.remove('show','pop-out');
+        }, 400);
       }, 2000);
     }
 
     async function checkUnread() {
       const user = getCurrentUser();
       if (!user || !user.id) {
-        prevUnreadCount = 0;
-        hideBubbleImmediate();
+        // 로그인 안됐을 때는 테스트용으로 카운트 유지, 팝업 안뜨게
+        if (isFirst) {
+          isFirst = false;
+          prevCount = 0;
+        }
         return;
       }
       try {
         const or = encodeURIComponent('(isread.eq.0,isread.is.null)');
+        // notification.html과 동일한 쿼리
         const data = await api(`/notification?user=eq.${user.id}&or=${or}&select=isread&limit=100`);
         const count = Array.isArray(data) ? data.length : 0;
 
-        if (isFirstCheck) {
-          // 첫 로드: 안읽은게 있으면 한번 팝업 보여주기 (실시간 효과 체험)
-          isFirstCheck = false;
-          prevUnreadCount = count;
+        if (isFirst) {
+          isFirst = false;
+          prevCount = count;
           if (count > 0) {
+            // 첫 로드시 기존 안읽은게 있으면 바로 팝업 보여줌 (확인용)
             showBubble(count);
-          } else {
-            hideBubbleImmediate();
           }
           return;
         }
 
-        // 실시간으로 새로 생겼을 때만 팝업
-        if (count > 0 && count > prevUnreadCount) {
-          // 새로운 알림 도착!
+        if (count > prevCount && count > 0) {
+          // *** 새로운 알림이 실시간으로 도착한 경우 ***
           showBubble(count);
-        } else if (count === 0 && prevUnreadCount > 0) {
-          // 모두 읽음 처리됨 - 즉시 숨김
-          hideBubbleImmediate();
+        } else if (count === 0 && prevCount > 0) {
+          hideImmediate();
         }
-        // count가 그대로거나 감소했지만 0이 아닌 경우(일부 읽음)는
-        // 이미 떠있는 버블이 있으면 유지, 없으면 조용히 유지 (팝업 안함)
+        // count가 그대로면 팝업 재트리거 안함 (3초마다 깜빡이는 것 방지)
 
-        prevUnreadCount = count;
+        prevCount = count;
       } catch (e) {
-        console.debug('topbar noti check fail', e);
+        console.warn('[topbar] 알림 체크 실패', e);
       }
     }
 
-    let realtimeTimer = null;
-
-    function startRealtime() {
-      if (realtimeTimer) clearInterval(realtimeTimer);
+    let timer = null;
+    function start() {
+      if (timer) clearInterval(timer);
       checkUnread();
-      realtimeTimer = setInterval(() => {
+      timer = setInterval(() => {
         if (document.hidden) return;
         checkUnread();
       }, 3000);
-
       window.addEventListener('focus', checkUnread);
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) checkUnread();
-      });
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUnread(); });
       window.addEventListener('storage', (e) => {
         if (!e.key) return;
-        if (e.key === 'snsUser' || e.key === 'noti-read' || e.key.includes('notification')) {
-          checkUnread();
-        }
         if (e.key === 'theme') {
           const v = e.newValue || 'dark';
-          if (v === 'light') document.documentElement.setAttribute('data-theme', 'light');
+          if (v === 'light') document.documentElement.setAttribute('data-theme','light');
           else document.documentElement.removeAttribute('data-theme');
         }
-      });
-      window.addEventListener('beforeunload', () => {
-        if (realtimeTimer) clearInterval(realtimeTimer);
-        if (hideTimer) clearTimeout(hideTimer);
-        if (outTimer) clearTimeout(outTimer);
+        if (e.key === 'snsUser' || e.key.includes('noti')) checkUnread();
       });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const user = getCurrentUser();
-      if (!user) { hideBubbleImmediate(); return; }
-      startRealtime();
-    });
+    document.addEventListener('DOMContentLoaded', start);
+    if (document.readyState !== 'loading') start();
 
-    if (document.readyState !== 'loading') {
-      const u = getCurrentUser();
-      if (u) startRealtime();
-    }
-
-    // 외부에서 테스트용으로 호출 가능: window.testNotiBubble(3)
-    window.testNotiBubble = (n) => showBubble(n || 3);
+    // 콘솔 테스트용: testNotiBubble(3) 하면 강제 팝업
+    window.testNotiBubble = (n) => {
+      showBubble(n ?? 3);
+      console.log('[test] bubble pop!', n);
+    };
     window.refreshTopbarNoti = checkUnread;
+    window._hideBubble = hideImmediate;
+
+    // 로그인 없이도 테스트 가능하도록 1초 뒤 데모 팝업 (실제 알림 없을 때만)
+    setTimeout(() => {
+      if (prevCount === -1 || prevCount === 0) {
+        const u = getCurrentUser();
+        if (!u) {
+          // 로그인 안된 상태에서도 효과 확인용으로 1회 보여줌, 5초 뒤 자동 숨김은 showBubble 로직이 처리
+          // 원치 않으면 아래 두 줄 주석 처리
+          // showBubble(3);
+        }
+      }
+    }, 800);
   </script>
 </body>
 </html>
