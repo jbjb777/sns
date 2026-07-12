@@ -1070,162 +1070,147 @@ document.querySelector('.back-btn').addEventListener('click', () => {
   document.body.classList.remove('chat-room-active');
 });
 
+
     let currentMessages = [];
     let isLoadingMessages = false;
-    // === 읽음 처리 캐시 ===
+
     async function getReadMapForMessages(messageIds) {
-      const readMap = {};
-      const readCountMap = {};
-      if (!messageIds || messageIds.length === 0) return { readMap, readCountMap, allReads: [] };
-      const chunkSize = 80;
+      const readMap = {}; // messageId -> Set(userId)
+      if (!messageIds || messageIds.length === 0) return { readMap };
+      const chunkSize = 60;
       let allReads = [];
       for (let i = 0; i < messageIds.length; i += chunkSize) {
         const chunk = messageIds.slice(i, i + chunkSize);
         try {
-          // UUID는 in.() 에서 따옴표 없이도 동작하지만 안전하게 그대로 전달
           const reads = await api(`/dm_read?message_id=in.(${chunk.join(',')})`);
           if (reads && reads.length) allReads = allReads.concat(reads);
-        } catch (e) {
-          console.warn('dm_read 조회 실패', e);
-        }
+        } catch (e) { console.warn('dm_read 조회 실패', e); }
       }
       allReads.forEach(r => {
         if (!readMap[r.message_id]) readMap[r.message_id] = new Set();
         readMap[r.message_id].add(r.user_id);
       });
-      messageIds.forEach(id => { readCountMap[id] = readMap[id] ? readMap[id].size : 0; });
-      return { readMap, readCountMap, allReads };
+      return { readMap, allReads };
     }
 
-    // ✅ 읽음 insert 전담 (중복 무시, 배열 보장, 낙관적 업데이트)
+    // ✅ 각 메시지 독립 계산: 이 메시지 기준으로만 안읽은 사람 수 세기
+    function calcUnreadIndependent(msgId, senderId, roomId, readMap) {
+      const members = roomMembersMap[roomId] || [];
+      if (members.length === 0) return 0;
+      const readers = new Set(readMap[msgId] ? Array.from(readMap[msgId]) : []);
+      // 보낸 사람은 항상 읽음
+      if (senderId) readers.add(senderId);
+      // 멤버 중 readers에 없는 사람 수만 센다 (각 메시지 독립)
+      let unread = 0;
+      for (let i = 0; i < members.length; i++) {
+        if (!readers.has(members[i])) unread++;
+      }
+      return unread;
+    }
+
     async function markMessagesAsRead(messageIds) {
       if (!messageIds || messageIds.length === 0) return;
-      const uniqueIds = [...new Set(messageIds)];
-      const payload = uniqueIds.map(mid => ({ user_id: currentUser.id, message_id: mid }));
-      try {
-        await api("/dm_read", { method: "POST", body: JSON.stringify(payload) });
-      } catch (e) {
-        const msg = String(e.message || e);
-        // 409나 duplicate는 무시 - 이미 읽음으로 간주
-        if (msg.includes('409') || msg.toLowerCase().includes('duplicate') || msg.includes('23505')) {
-          return;
-        }
-        console.warn('markAsRead 실패, 재시도 없이 로컬 반영', e);
+      const uniq = [...new Set(messageIds)];
+      const payload = uniq.map(mid => ({ user_id: currentUser.id, message_id: mid }));
+      try { await api("/dm_read", { method: "POST", body: JSON.stringify(payload) }); }
+      catch (e) {
+        const m = String(e.message||e).toLowerCase();
+        if (m.includes('409') || m.includes('duplicate') || m.includes('23505')) return;
+        console.warn('markAsRead 실패', e);
       }
     }
 
-    // ✅ 폴링 중 숫자만 갱신 (DOM 재생성 없음)
-    async function updateUnreadCountsOnly(msgs, totalMembers) {
-      const normalIds = msgs.filter(m => !m.content.startsWith('[SYSTEM] ')).map(m => m.id);
-      if (normalIds.length === 0) return;
-      try {
-        const { readCountMap } = await getReadMapForMessages(normalIds);
-        normalIds.forEach(mid => {
-          const span = document.getElementById(`unread-${mid}`);
-          if (!span) return;
-          const rc = readCountMap[mid] || 0;
-          const uc = Math.max(0, totalMembers - rc);
-          span.textContent = uc > 0 ? String(uc) : '0';
-          span.style.opacity = uc > 0 ? '1' : '0';
-          span.dataset.readCount = String(rc);
-        });
-      } catch (e) {
-        console.warn('카운트만 갱신 실패', e);
+    async function updateUnreadCountsOnlyIndependent(msgs, roomId, readMapOverride) {
+      let readMap = readMapOverride;
+      if (!readMap) {
+        const ids = msgs.filter(m=>!m.content.startsWith('[SYSTEM] ')).map(m=>m.id);
+        if (ids.length===0) return;
+        const res = await getReadMapForMessages(ids);
+        readMap = res.readMap;
       }
+      msgs.forEach(m=>{
+        if (m.content.startsWith('[SYSTEM] ')) return;
+        const el = document.getElementById(`unread-${m.id}`);
+        if (!el) return;
+        const uc = calcUnreadIndependent(m.id, m.sender_id, roomId, readMap);
+        el.textContent = uc>0? String(uc) : '0';
+        el.style.opacity = uc>0? '1' : '0';
+      });
     }
 
     async function loadMessages(roomId, isPolling = false) {
-      if (isLoadingMessages && isPolling) return; // 폴링 겹침 방지
-      if (isPolling && !roomId) return;
+      if (isLoadingMessages && isPolling) return;
       try {
         if (isPolling) isLoadingMessages = true;
         const msgs = await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
-        if (!msgs) { isLoadingMessages = false; return; }
+        if (!msgs) { isLoadingMessages=false; return; }
         const container = document.getElementById('chatMessages');
-        const totalMembers = (roomMembersMap[roomId] || []).length || 1;
 
-        // --- 폴링 최적화: ID 시퀀스가 완전히 동일하면 렌더 스킵 ---
+        // 폴링: ID가 완전히 같으면 DOM 재생성 없이 각 메시지 독립적으로 숫자만 갱신
         if (isPolling && currentMessages.length === msgs.length) {
-          const prevIds = currentMessages.map(m => m.id).join(',');
-          const nextIds = msgs.map(m => m.id).join(',');
-          if (prevIds === nextIds) {
-            await updateUnreadCountsOnly(msgs, totalMembers);
-            // 내가 안읽은게 있다면 조용히 읽음 처리 (숫자 0으로 만드는 핵심)
-            const unreadMine = msgs.filter(m => !m.content.startsWith('[SYSTEM] ') && m.sender_id !== currentUser.id).map(m=>m.id);
-            if (unreadMine.length > 0) {
-              // 현재 readMap을 다시 조회해서 내가 안읽은 것만 필터링
-              const { readMap } = await getReadMapForMessages(unreadMine);
-              const need = unreadMine.filter(id => !(readMap[id] && readMap[id].has(currentUser.id)));
-              if (need.length > 0) {
-                await markMessagesAsRead(need);
-                await updateUnreadCountsOnly(msgs, totalMembers);
-                const dot = document.getElementById(`unreadDot-${roomId}`);
-                if (dot){ dot.classList.remove('show'); dot.style.display='none'; }
-              }
+          const prev = currentMessages.map(m=>m.id).join(',');
+          const next = msgs.map(m=>m.id).join(',');
+          if (prev === next) {
+            const ids = msgs.filter(m=>!m.content.startsWith('[SYSTEM] ')).map(m=>m.id);
+            const { readMap } = await getReadMapForMessages(ids);
+            // 내 읽음 필요하면 먼저 처리
+            const need = [];
+            for (let i=0;i<msgs.length;i++){
+              const mm = msgs[i];
+              if (mm.content.startsWith('[SYSTEM] ')) continue;
+              if (mm.sender_id === currentUser.id) continue;
+              const s = readMap[mm.id];
+              if (!s || !s.has(currentUser.id)) need.push(mm.id);
             }
-            isLoadingMessages = false;
-            return;
+            if (need.length>0){ await markMessagesAsRead(need); need.forEach(id=>{ if(!readMap[id]) readMap[id]=new Set(); readMap[id].add(currentUser.id); }); }
+            await updateUnreadCountsOnlyIndependent(msgs, roomId, readMap);
+            isLoadingMessages=false; return;
           }
         }
 
-        // 새 메시지 있음 -> 전체 렌더 필요
         currentMessages = msgs;
-        const normalMessages = msgs.filter(m => !m.content.startsWith('[SYSTEM] '));
-        const messageIds = normalMessages.map(m => m.id);
-        let readMap = {}; let readCountMap = {};
-        if (messageIds.length > 0) {
-          const res = await getReadMapForMessages(messageIds);
-          readMap = res.readMap; readCountMap = res.readCountMap;
-          // 보낸사람 본인 누락 보정 (최초 1회만, 폴링이 아닐 때만 보정 시도 - 중복 insert 방지)
-          if (!isPolling) {
-            const missing = [];
-            normalMessages.forEach(m => { if (!readMap[m.id] || !readMap[m.id].has(m.sender_id)) missing.push({ user_id: m.sender_id, message_id: m.id }); });
-            if (missing.length > 0) {
-              try { await api("/dm_read",{method:"POST",body:JSON.stringify(missing)}); } catch(e){}
-              missing.forEach(r=>{ if(!readMap[r.message_id]) readMap[r.message_id]=new Set(); readMap[r.message_id].add(r.user_id); readCountMap[r.message_id]=readMap[r.message_id].size; });
-            }
+        const normal = msgs.filter(m=>!m.content.startsWith('[SYSTEM] '));
+        const ids = normal.map(m=>m.id);
+        let readMap = {};
+        if (ids.length>0){
+          const r = await getReadMapForMessages(ids);
+          readMap = r.readMap;
+          if (!isPolling){
+            const missing=[];
+            normal.forEach(m=>{ const set=readMap[m.id]; if(!set||!set.has(m.sender_id)) missing.push({user_id:m.sender_id,message_id:m.id}); });
+            if(missing.length>0){ try{await api("/dm_read",{method:"POST",body:JSON.stringify(missing)});}catch(e){} missing.forEach(x=>{ if(!readMap[x.message_id]) readMap[x.message_id]=new Set(); readMap[x.message_id].add(x.user_id); }); }
           }
         }
 
-        container.innerHTML = '';
-        msgs.forEach(msg => {
-          const wrapper = document.createElement('div');
-          if (msg.content.startsWith('[SYSTEM] ')) {
-            wrapper.className = 'system-message-container';
-            wrapper.innerHTML = `<div class="system-message-bubble">${escapeHTML(msg.content.replace('[SYSTEM] ','').trim())}</div>`;
-            container.appendChild(wrapper); return;
-          }
-          const isMe = msg.sender_id === currentUser.id;
+        container.innerHTML='';
+        msgs.forEach(msg=>{
+          const w=document.createElement('div');
+          if(msg.content.startsWith('[SYSTEM] ')){ w.className='system-message-container'; w.innerHTML=`<div class="system-message-bubble">${escapeHTML(msg.content.replace('[SYSTEM] ','').trim())}</div>`; container.appendChild(w); return; }
+          const isMe = msg.sender_id===currentUser.id;
           const time = new Date(msg.created_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-          const senderName = isMe ? '' : getUserInfo(msg.sender_id).nickname;
-          const rc = readCountMap[msg.id] || 0;
-          const uc = Math.max(0, totalMembers - rc);
-          wrapper.className = `message-wrapper ${isMe ? 'me' : 'other'}`;
+          const senderName = isMe? '' : getUserInfo(msg.sender_id).nickname;
+          const uc = calcUnreadIndependent(msg.id, msg.sender_id, roomId, readMap);
+          w.className=`message-wrapper ${isMe?'me':'other'}`;
           let h=''; if(!isMe) h+=`<div class="message-sender">${escapeHTML(senderName)}</div>`;
-          h+=`<div class="message-row ${isMe?'me':'other'}"><div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g,'<br>')}</div><div class="msg-side">${uc>0?`<span class="unread-count" id="unread-${msg.id}" data-read-count="${rc}">${uc}</span>`:`<span class="unread-count" id="unread-${msg.id}" data-read-count="${rc}" style="opacity:0;">0</span>`}<span class="message-time" style="margin:0;">${time}</span></div></div>`;
-          wrapper.innerHTML = h; container.appendChild(wrapper);
+          h+=`<div class="message-row ${isMe?'me':'other'}"><div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g,'<br>')}</div><div class="msg-side">${uc>0?`<span class="unread-count" id="unread-${msg.id}">${uc}</span>`:`<span class="unread-count" id="unread-${msg.id}" style="opacity:0;">0</span>`}<span class="message-time" style="margin:0;">${time}</span></div></div>`;
+          w.innerHTML=h; container.appendChild(w);
         });
-        container.scrollTop = container.scrollHeight;
+        container.scrollTop=container.scrollHeight;
 
-        // 화면에 다 그려진 후 내가 안읽은 메시지 일괄 읽음 처리 (비동기, 렌더 블로킹 안함)
-        const unreadByMe = messageIds.filter(mid => { const m = normalMessages.find(x=>x.id===mid); if(!m) return false; if(m.sender_id===currentUser.id) return false; return !(readMap[mid] && readMap[mid].has(currentUser.id)); });
-        if (unreadByMe.length > 0) {
-          markMessagesAsRead(unreadByMe).then(async ()=>{
-            // 낙관적 UI: 내 화면에서는 즉시 0으로
-            unreadByMe.forEach(mid=>{
-              const el=document.getElementById(`unread-${mid}`);
-              if(el){ const curRC = parseInt(el.dataset.readCount||'0',10)+1; const newUC = Math.max(0,totalMembers-curRC); el.textContent=newUC>0?String(newUC):'0'; el.style.opacity=newUC>0?'1':'0'; el.dataset.readCount=String(curRC); }
-            });
-            const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){ dot.classList.remove('show'); dot.style.display='none'; }
+        // 내가 안읽은 것들 독립적으로 읽음 처리 (각 메시지 독립)
+        const unreadByMe=[];
+        normal.forEach(m=>{ if(m.sender_id===currentUser.id) return; const s=readMap[m.id]; if(!s||!s.has(currentUser.id)) unreadByMe.push(m.id); });
+        if(unreadByMe.length>0){
+          markMessagesAsRead(unreadByMe).then(async()=>{
+            // 읽은 후 각 메시지 독립 재계산해서 0으로
+            unreadByMe.forEach(id=>{ if(!readMap[id]) readMap[id]=new Set(); readMap[id].add(currentUser.id); });
+            await updateUnreadCountsOnlyIndependent(msgs, roomId, readMap);
+            const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){dot.classList.remove('show');dot.style.display='none';}
           });
-        } else {
-          const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){ dot.classList.remove('show'); dot.style.display='none'; }
+        }else{
+          const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){dot.classList.remove('show');dot.style.display='none';}
         }
-      } catch (e) {
-        console.error("메시지 로드 오류", e);
-      } finally {
-        isLoadingMessages = false;
-      }
+      }catch(e){ console.error("메시지 로드 오류",e); } finally{ isLoadingMessages=false; }
     }
 
     async function sendMessage() {
@@ -1244,17 +1229,14 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       container.appendChild(tempWrapper);
       container.scrollTop = container.scrollHeight;
       input.value = ''; input.style.height = '44px';
-      const newMessageId = (crypto.randomUUID ? crypto.randomUUID() : 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+      const newMessageId = (crypto.randomUUID? crypto.randomUUID() : 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2));
       try {
         await api("/dm_messages", { method: "POST", headers: { "Prefer": "return=representation" }, body: JSON.stringify({ id: newMessageId, room_id: activeRoomId, sender_id: currentUser.id, content: content, created_at: new Date().toISOString() }) });
-        // ✅ 핵심: 배열로 전송 + on_conflict 대응 (워커가 처리)
-        try { await api("/dm_read", { method: "POST", body: JSON.stringify([{ user_id: currentUser.id, message_id: newMessageId }]) }); } catch (readErr) { console.warn('보낸 메시지 읽음 처리 실패(무시)', readErr); }
-        // 낙관적 업데이트: temp 제거 대신 전체 다시 로드하되 깜빡임 없이
+        try { await api("/dm_read", { method: "POST", body: JSON.stringify([{ user_id: currentUser.id, message_id: newMessageId }]) }); } catch (readErr) {}
         tempWrapper.remove();
         await loadMessages(activeRoomId, false);
-      } catch (e) {
-        showAlert("메시지 전송에 실패했습니다."); tempWrapper.remove();
-      } finally { isSending = false; document.getElementById('sendBtn').disabled = false; input.focus(); }
+      } catch (e) { showAlert("메시지 전송에 실패했습니다."); tempWrapper.remove(); }
+      finally { isSending = false; document.getElementById('sendBtn').disabled = false; input.focus(); }
     }
 
 
