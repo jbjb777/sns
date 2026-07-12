@@ -32,6 +32,7 @@
       --t3: #444;
       --pink: #ff6b6b;
       --green: #4ade80;
+      --blue: #0095f6;
       --r1: 10px;
       --r2: 14px;
       --r3: 20px;
@@ -148,55 +149,87 @@
       flex: 1;
     }
 
-    .noti-list { display: flex; flex-direction: column; gap: 12px; }
+    /* Instagram style list */
+    .noti-list {
+      display: flex;
+      flex-direction: column;
+    }
 
     .noti-item {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--r3);
-      padding: 20px 22px;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1), border-color 0.15s;
-      opacity: 0;
-      transform: translateY(12px);
-      animation: postIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
-    }
-    @keyframes postIn { to { opacity: 1; transform: translateY(0); } }
-    
-    .noti-item:hover { background: var(--bg2); border-color: var(--border2); }
-    .noti-item:active { transform: scale(0.98); }
-    
-    .noti-item.read { opacity: 0.6; filter: saturate(0.8); }
-    .noti-item.read:hover { opacity: 0.8; }
-
-    .noti-detail {
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 1.5;
-      color: var(--t1);
-    }
-
-    .noti-meta {
-      margin-top: 12px;
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 14px;
+      padding: 16px 6px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+      cursor: pointer;
+      transition: background 0.15s ease, opacity 0.15s ease;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: postIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @keyframes postIn { to { opacity: 1; transform: translateY(0); } }
+    
+    .noti-item:last-child { border-bottom: none; }
+    .noti-item:hover { background: var(--bg2); }
+    .noti-item:active { background: var(--bg3); }
+    
+    .noti-item.read { opacity: 0.65; }
+    .noti-item.read:hover { opacity: 0.85; }
+
+    .noti-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .noti-time { font-size: 12px; color: var(--t3); font-weight: 500; }
-    
-    .noti-pill {
-      display: inline-flex;
+    .noti-detail {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--t1);
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .noti-time {
+      font-size: 12.5px;
+      color: var(--t2);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+
+    .noti-right {
+      display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--green);
-      color: #000;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      letter-spacing: 0.05em;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-left: 4px;
+    }
+
+    /* 파란 동그라미 - 읽지 않음 표시 */
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--blue);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(0,149,246,0.12);
+      flex-shrink: 0;
+    }
+    html[data-theme="light"] .unread-dot {
+      box-shadow: 0 0 0 4px rgba(0,149,246,0.14);
     }
 
     .no-posts {
@@ -208,12 +241,25 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
     .no-posts-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.8;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .no-posts-icon img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      opacity: 0.92;
       animation: floatIcon 3s ease-in-out infinite;
+      filter: grayscale(0.15);
+    }
+    html[data-theme="light"] .no-posts-icon img {
+      opacity: 0.85;
+      filter: grayscale(0.2) brightness(1.05);
     }
     @keyframes floatIcon {
       0%, 100% { transform: translateY(0); }
@@ -253,8 +299,9 @@
         padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); 
       }
       .header { padding: 14px 18px; }
-      .container { padding: 16px 20px 26px; }
-      .noti-item { padding: 16px 18px; }
+      .container { padding: 8px 16px 26px; }
+      .noti-item { padding: 14px 4px; }
+      .no-posts-icon img { width: 64px; height: 64px; }
     }
   </style>
 </head>
@@ -314,6 +361,10 @@
     const notiListEl = document.getElementById('notiList');
     const stateEl = document.getElementById('state');
     const toastEl = document.getElementById('toast');
+
+    let realtimeTimer = null;
+    let lastHash = '';
+    let isFirstLoad = true;
 
     function toast(msg) {
       toastEl.textContent = msg;
@@ -388,10 +439,18 @@
         stateEl.innerHTML = '';
         return;
       }
-      stateEl.innerHTML = `
-        <div class="no-posts-icon">🍃</div>
-        <div>${message.replace(/\n/g, '<br>')}</div>
-      `;
+      // 빈 상태일 때 🍃 대신 like1.svg 사용
+      const isEmptyState = message.includes('아직 알림이 없습니다');
+      if (isEmptyState) {
+        stateEl.innerHTML = `
+          <div class="no-posts-icon"><img src="like1.svg" alt="no notifications" /></div>
+          <div>${message.replace(/\n/g, '<br>')}</div>
+        `;
+      } else {
+        stateEl.innerHTML = `
+          <div>${message.replace(/\n/g, '<br>')}</div>
+        `;
+      }
       stateEl.style.display = 'flex';
     }
 
@@ -406,6 +465,11 @@
       const n = Number(v);
       if (Number.isNaN(n)) return 0;
       return n;
+    }
+
+    function getItemsHash(items) {
+      if (!items || !items.length) return 'empty';
+      return items.map(n => `${n.created_at}|${n.isread}|${n.detail?.slice(0,20)}`).join(';;');
     }
 
     async function markAsRead(n) {
@@ -434,10 +498,12 @@
       await api(endpoint, { method: "PATCH", body: JSON.stringify({ isread: 1 }) });
     }
 
-    function renderNotifications(items) {
+    function renderNotifications(items, options = {}) {
+      const { animate = true } = options;
       notiListEl.innerHTML = '';
       if (!items || items.length === 0) {
         setState('아직 알림이 없습니다.\n댓글이나 좋아요가 달리면 이곳에 표시됩니다.', true);
+        lastHash = 'empty';
         return;
       }
       setState('', false);
@@ -448,35 +514,82 @@
         el.className = 'noti-item' + (isRead ? ' read' : '');
         el.setAttribute('role', 'button');
         el.setAttribute('tabindex', '0');
-        el.style.animationDelay = `${Math.min(idx, 10) * 0.05}s`;
+        if (animate) {
+          el.style.animationDelay = `${Math.min(idx, 10) * 0.05}s`;
+        } else {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+          el.style.animation = 'none';
+        }
+        // 인스타 스타일: 텍스트 영역 + 오른쪽 파란 동그라미
         el.innerHTML = `
-          <div class="noti-detail">${escapeHtml(n.detail || '알림')}</div>
-          <div class="noti-meta">
+          <div class="noti-content">
+            <div class="noti-detail">${escapeHtml(n.detail || '알림')}</div>
             <div class="noti-time">${escapeHtml(formatTime(n.created_at))}</div>
-            ${isRead ? '' : '<div class="noti-pill">NEW</div>'}
+          </div>
+          <div class="noti-right">
+            ${isRead ? '' : '<span class="unread-dot" aria-label="읽지 않음"></span>'}
           </div>
         `;
         const open = async () => {
           try {
             await markAsRead(n);
+            // 낙관적 업데이트: 즉시 파란점 제거
+            const dot = el.querySelector('.unread-dot');
+            if (dot) dot.remove();
+            el.classList.add('read');
           } catch (e) {}
           const link = (n.link || '').trim();
           window.location.href = link ? link : 'index.html';
         };
         el.onclick = open;
-        el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') open(); };
+        el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } };
         notiListEl.appendChild(el);
+      });
+      lastHash = getItemsHash(items);
+    }
+
+    async function loadAndRender(showLoading = true) {
+      if (showLoading && isFirstLoad) {
+        setState('알림 불러오는 중...', true);
+      }
+      try {
+        const items = await fetchNotifications();
+        const newHash = getItemsHash(items || []);
+        // 첫 로드거나 데이터가 변경됐을 때만 리렌더
+        if (isFirstLoad || newHash !== lastHash) {
+          renderNotifications(items || [], { animate: isFirstLoad });
+          isFirstLoad = false;
+        }
+      } catch (e) {
+        console.error(e);
+        if (isFirstLoad) {
+          setState('알림을 불러오지 못했습니다.\n잠시 후 다시 시도해주세요.', true);
+        }
+      }
+    }
+
+    function startRealtime() {
+      if (realtimeTimer) clearInterval(realtimeTimer);
+      // 3초마다 폴링 - 실시간처럼 동작
+      realtimeTimer = setInterval(async () => {
+        if (document.hidden) return;
+        try {
+          await loadAndRender(false);
+        } catch (e) {}
+      }, 3000);
+
+      // 포커스 복귀 시 즉시 갱신
+      window.addEventListener('focus', () => loadAndRender(false));
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) loadAndRender(false);
       });
     }
 
-    async function loadAndRender() {
-      setState('알림 불러오는 중...', true);
-      try {
-        const items = await fetchNotifications();
-        renderNotifications(items || []);
-      } catch (e) {
-        console.error(e);
-        setState('알림을 불러오지 못했습니다.\n잠시 후 다시 시도해주세요.', true);
+    function stopRealtime() {
+      if (realtimeTimer) {
+        clearInterval(realtimeTimer);
+        realtimeTimer = null;
       }
     }
 
@@ -486,7 +599,10 @@
       try {
         await markAllRead();
         toast('모두 읽음 처리했습니다.');
-        await loadAndRender();
+        await loadAndRender(false);
+        // 즉시 UI 반영
+        document.querySelectorAll('.unread-dot').forEach(d => d.remove());
+        document.querySelectorAll('.noti-item').forEach(el => el.classList.add('read'));
       } catch (e) {
         console.error(e);
         toast('처리에 실패했습니다.');
@@ -500,7 +616,10 @@
       updateSidebar();
       updateSidebarMode();
       window.addEventListener('resize', updateSidebarMode);
-      loadAndRender();
+      loadAndRender(true).then(() => {
+        startRealtime();
+      });
+      window.addEventListener('beforeunload', stopRealtime);
     }
   </script>
 </body>
