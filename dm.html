@@ -994,6 +994,94 @@
       #reactionDetailModal .sheet-handle { display:block; }
       .reaction-detail-list { max-height:48vh; }
     }
+
+    /* ===== Bottom Sheet for Create / Invite / RoomInfo - Desktop은 팝업 유지, Mobile은 바텀시트 ===== */
+    .sheet-drag-area { display:none; }
+    @media (max-width:768px){
+      .sheet-drag-area{
+        display:flex; justify-content:center; align-items:center;
+        min-height:32px; padding:6px 0 10px; margin:-4px -4px 0;
+        touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none;
+      }
+      .sheet-drag-area:active{ cursor:grabbing; }
+
+      #createRoomModal.modal,
+      #inviteModal.modal,
+      #roomInfoModal.modal{
+        align-items:flex-end;
+        justify-content:center;
+        padding:0;
+      }
+      #createRoomModal .modal-content,
+      #inviteModal .modal-content,
+      #roomInfoModal .modal-content{
+        width:100%; max-width:100%;
+        border-radius:22px 22px 0 0;
+        padding:0 18px calc(20px + env(safe-area-inset-bottom, 0px));
+        max-height:78vh;
+        min-height:36vh;
+        transform:translateY(100%);
+        transition:transform 0.38s cubic-bezier(0.22,1,0.36,1), max-height 0.36s cubic-bezier(0.22,1,0.36,1);
+        opacity:1;
+        overflow:hidden;
+        display:flex;
+        flex-direction:column;
+        box-shadow:0 -12px 40px rgba(0,0,0,0.45);
+        border:1px solid var(--border2);
+        border-bottom:none;
+      }
+      #createRoomModal.open .modal-content,
+      #inviteModal.open .modal-content,
+      #roomInfoModal.open .modal-content{
+        transform:translateY(0);
+        opacity:1;
+      }
+      #createRoomModal .modal-content.sheet-dragging,
+      #inviteModal .modal-content.sheet-dragging,
+      #roomInfoModal .modal-content.sheet-dragging{
+        transition:none !important;
+      }
+      #createRoomModal .modal-content.sheet-expanded,
+      #inviteModal .modal-content.sheet-expanded,
+      #roomInfoModal .modal-content.sheet-expanded{
+        max-height:88vh;
+      }
+      #createRoomModal .sheet-handle,
+      #inviteModal .sheet-handle,
+      #roomInfoModal .sheet-handle{
+        display:block;
+      }
+      #createRoomModal .modal-close,
+      #inviteModal .modal-close,
+      #roomInfoModal .modal-close{
+        top:14px; right:16px;
+      }
+      #createRoomModal .modal-title,
+      #inviteModal .modal-title,
+      #roomInfoModal .modal-title{
+        padding-top:6px; margin-bottom:18px; flex-shrink:0;
+      }
+      #createRoomModal .form-group,
+      #inviteModal .form-group,
+      #roomInfoModal .form-group{
+        flex-shrink:0;
+      }
+      #createRoomModal .form-group:nth-of-type(2),
+      #inviteModal .form-group:nth-of-type(1),
+      #roomInfoModal .form-group:nth-of-type(2){
+        flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden;
+      }
+      #createRoomModal .user-select-list,
+      #inviteModal .user-select-list,
+      #roomInfoModal .user-select-list{
+        flex:1; max-height:none; min-height:140px; max-height:42vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+      }
+      #createRoomModal .modal-btn,
+      #inviteModal .modal-btn,
+      #roomInfoModal .modal-btn{
+        flex-shrink:0; margin-top:16px; padding:16px; border-radius:16px;
+      }
+    }
     .emotion-btn.my-reacted { background: rgba(62,59,246,0.18); border:1px solid var(--blue); box-shadow:0 0 0 1px rgba(62,59,246,0.25) inset; }
     .emotion-btn.my-reacted:hover { background: rgba(62,59,246,0.28); }
     html[data-theme="light"] .emotion-btn.my-reacted { background: rgba(62,59,246,0.12); border-color: var(--blue); }
@@ -1103,6 +1191,7 @@
   <!-- 방 만들기 모달 -->
   <div class="modal" id="createRoomModal">
     <div class="modal-content">
+      <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
       <button class="modal-close" onclick="closeModals()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -1128,6 +1217,7 @@
   <!-- 사용자 초대 모달 -->
   <div class="modal" id="inviteModal">
     <div class="modal-content">
+      <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
       <button class="modal-close" onclick="closeModals()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -1149,6 +1239,7 @@
   <!-- 채팅방 정보 모달 (새로 추가) -->
   <div class="modal" id="roomInfoModal">
     <div class="modal-content">
+      <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
       <button class="modal-close" onclick="closeModals()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -1939,6 +2030,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }catch(e){ console.error("메시지 로드 오류",e); const _c=document.getElementById('chatMessages'); if(_c) _c.classList.remove('skeleton-active'); } finally{ isLoadingMessages=false; }
     }
 
+
     async function sendMessage() {
       if (!activeRoomId || isSending) return;
       const input = document.getElementById('messageInput');
@@ -2368,15 +2460,123 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }
     }
 
+    // ===== Bottom Sheet generic close (desktop popup 유지, mobile bottom sheet) =====
+    const bottomSheetState = {};
+    function closeModalById(id){
+      const modal=document.getElementById(id);
+      if(!modal) return;
+      const content=modal.querySelector('.modal-content');
+      if(content){
+        content.style.transform='';
+        content.style.transition='';
+        content.style.maxHeight='';
+        content.classList.remove('sheet-dragging','sheet-expanded');
+      }
+      modal.classList.remove('open');
+      // body overflow는 모든 바텀시트가 닫혔을 때만 해제
+      const anyOpen = document.querySelector('#createRoomModal.open, #inviteModal.open, #roomInfoModal.open, #reactionDetailModal.open');
+      if(!anyOpen) document.body.style.overflow='';
+      if(bottomSheetState[id]) bottomSheetState[id].isExpanded=false;
+      if(id==='createRoomModal'||id==='inviteModal'||id==='roomInfoModal') selectedUserIds.clear();
+    }
     function closeModals() {
-      document.getElementById('createRoomModal').classList.remove('open');
-      document.getElementById('inviteModal').classList.remove('open');
-      document.getElementById('roomInfoModal').classList.remove('open');
-      selectedUserIds.clear();
+      closeModalById('createRoomModal');
+      closeModalById('inviteModal');
+      closeModalById('roomInfoModal');
+    }
+
+    function initBottomSheetDrag(modalId){
+      const modal=document.getElementById(modalId);
+      const content=modal && modal.querySelector('.modal-content');
+      const handleWrap=content && content.querySelector('.sheet-drag-area');
+      const handle=content && content.querySelector('.sheet-handle');
+      if(!content||!handleWrap) return;
+      if(content.dataset.bsInit) return;
+      content.dataset.bsInit='1';
+      bottomSheetState[modalId]={ dragging:false, startY:0, isExpanded:false };
+      const st=bottomSheetState[modalId];
+      const getY=e=> e.touches ? e.touches[0].clientY : e.clientY;
+      const onStart=e=>{
+        if(window.innerWidth>768) return;
+        st.dragging=true;
+        st.startY=getY(e);
+        content.classList.add('sheet-dragging');
+        content.style.transition='none';
+      };
+      const onMove=e=>{
+        if(!st.dragging) return;
+        const y=getY(e);
+        let dy=y-st.startY;
+        if(dy<0){
+          if(st.isExpanded){
+            dy=dy*0.22;
+            content.style.transform=`translateY(${dy}px)`;
+          }else{
+            // 위로 드래그시 살짝 따라오며 확장 암시
+            const t = dy*0.18;
+            content.style.transform=`translateY(${t}px)`;
+          }
+          if(e.cancelable && e.type==='touchmove') e.preventDefault();
+          return;
+        }
+        if(dy>=0){
+          content.style.transform=`translateY(${dy}px)`;
+          if(e.cancelable && e.type==='touchmove') e.preventDefault();
+        }
+      };
+      const onEnd=e=>{
+        if(!st.dragging) return;
+        st.dragging=false;
+        content.classList.remove('sheet-dragging');
+        content.style.transition='transform 0.38s cubic-bezier(0.22,1,0.36,1), max-height 0.36s cubic-bezier(0.22,1,0.36,1)';
+        const endY=e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+        const dy=endY-st.startY;
+        if(!st.isExpanded && dy < -68){
+          st.isExpanded=true;
+          content.classList.add('sheet-expanded');
+          content.style.transform='translateY(0)';
+          content.style.maxHeight='88vh';
+          return;
+        }
+        if(st.isExpanded && dy > 58){
+          st.isExpanded=false;
+          content.classList.remove('sheet-expanded');
+          content.style.maxHeight='78vh';
+          content.style.transform='translateY(0)';
+          return;
+        }
+        if(!st.isExpanded && dy > 115){
+          closeModalById(modalId);
+        }else{
+          content.style.transform='translateY(0)';
+        }
+      };
+      handleWrap.addEventListener('touchstart', onStart, {passive:true});
+      handleWrap.addEventListener('mousedown', onStart);
+      handle.addEventListener('touchstart', onStart, {passive:true});
+      const titleEl=content.querySelector('.modal-title');
+      if(titleEl){
+        titleEl.addEventListener('touchstart', onStart, {passive:true});
+        titleEl.addEventListener('mousedown', onStart);
+        titleEl.style.touchAction='none';
+      }
+      window.addEventListener('touchmove', onMove, {passive:false});
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('touchend', onEnd);
+      window.addEventListener('mouseup', onEnd);
+      modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModalById(modalId); });
+    }
+
+    function openSheetModal(modalId){
+      const modal=document.getElementById(modalId);
+      if(!modal) return;
+      modal.classList.add('open');
+      if(window.innerWidth<=768) document.body.style.overflow='hidden';
+      initBottomSheetDrag(modalId);
     }
 
     function openCreateRoomModal() {
-      document.getElementById('createRoomModal').classList.add('open');
+      openSheetModal('createRoomModal');
       document.getElementById('newRoomName').value = '';
       document.getElementById('createRoomUserSearch').value = '';
       selectedUserIds.clear();
@@ -2384,7 +2584,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
     }
 
     function openInviteModal() {
-      document.getElementById('inviteModal').classList.add('open');
+      openSheetModal('inviteModal');
       document.getElementById('inviteUserSearch').value = '';
       selectedUserIds.clear();
       renderUserSelectList('inviteUserList');
@@ -2393,7 +2593,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
     // 채팅방 정보 모달 열기 함수 (멤버 표시 및 마이페이지 연결)
     function openRoomInfoModal() {
       if (!activeRoomId) return;
-      document.getElementById('roomInfoModal').classList.add('open');
+      openSheetModal('roomInfoModal');
       
       const displayRoomName = document.getElementById('activeRoomName').textContent;
       document.getElementById('infoRoomName').value = displayRoomName;
