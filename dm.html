@@ -632,46 +632,119 @@
     .unread-blue-dot.show { display: block; }
 
   
-    /* ===== Reply Feature ===== */
-    .reply-preview-bar {
+        /* ===== Reply Feature - Kakao Style Integrated ===== */
+    .chat-input-area {
+      display:flex;
+      flex-direction:row;
+      gap:12px;
+      align-items:flex-end;
+      padding:12px 16px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      background: var(--bg);
+      border-top:1px solid var(--border);
+    }
+    .kakao-input-wrap {
+      flex:1;
+      background: #212121;
+      background: var(--bg3);
+      border:1px solid var(--border2);
+      border-radius:26px;
+      padding:6px 10px 6px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      transition: border-color 0.18s, background 0.18s;
+      overflow:hidden;
+    }
+    html[data-theme="light"] .kakao-input-wrap { background:#f1f1f1; border-color:#e2e2e2; }
+    .kakao-input-wrap:focus-within { border-color: var(--border3); }
+    .kakao-input-wrap.has-reply { border-radius:20px; }
+
+    .reply-preview-bar.kakaostyle {
       display:none;
-      align-items:center;
+      flex-direction:row;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
-      border-left: 3px solid var(--blue);
-      border-radius: 12px;
-      padding:10px 12px 10px 14px;
-      margin-bottom:10px;
+      background: transparent;
+      border:none;
+      border-bottom:1px solid var(--border);
+      border-left:none;
+      border-radius:0;
+      padding:10px 4px 12px 2px;
+      margin:0 0 2px 0;
       overflow:hidden;
-      transform-origin: bottom;
+      transform-origin: top;
     }
-    .reply-preview-bar.open {
+    .reply-preview-bar.kakaostyle.open {
       display:flex;
-      animation: replyUnfold 0.28s cubic-bezier(0.22,1,0.36,1) forwards;
+      animation: kakaoUnfold 0.32s cubic-bezier(0.22,1,0.36,1) forwards;
     }
-    .reply-preview-bar.closing {
+    .reply-preview-bar.kakaostyle.closing {
       display:flex;
-      animation: replyFold 0.20s ease forwards;
+      animation: kakaoFold 0.22s ease forwards;
     }
-    @keyframes replyUnfold {
-      0% { max-height:0; opacity:0; transform: translateY(10px) scaleY(0.92); }
-      100% { max-height:88px; opacity:1; transform: translateY(0) scaleY(1); }
+    @keyframes kakaoUnfold {
+      0% { max-height:0; opacity:0; transform: translateY(-6px); }
+      100% { max-height:88px; opacity:1; transform: translateY(0); }
     }
-    @keyframes replyFold {
-      0% { max-height:88px; opacity:1; transform: translateY(0) scaleY(1); }
-      100% { max-height:0; opacity:0; transform: translateY(8px) scaleY(0.92); }
+    @keyframes kakaoFold {
+      0% { max-height:88px; opacity:1; transform: translateY(0); }
+      100% { max-height:0; opacity:0; transform: translateY(-6px); }
     }
-    .reply-preview-left { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
-    .reply-preview-to { font-size:12px; font-weight:700; color: var(--blue); line-height:1.2; }
-    .reply-preview-content { font-size:12px; color: var(--t2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .reply-preview-close { width:28px; height:28px; border-radius:50%; border:none; background: var(--bg4); color: var(--t2); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition: background 0.15s, color 0.15s; }
-    .reply-preview-close:hover { background: var(--border2); color: var(--t1); }
+    .reply-preview-left { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; padding-top:2px; }
+    .reply-preview-to { font-size:14px; font-weight:600; color: var(--t1); line-height:1.25; }
+    .reply-preview-content { font-size:13px; color: var(--t2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2; max-width: 100%; }
+    html[data-theme="light"] .reply-preview-content { color:#666; }
 
-    .chat-input-area { flex-direction: column; gap:0; }
-    .chat-input-row { display:flex; gap:12px; align-items:flex-end; width:100%; }
+    .reply-preview-close {
+      width:30px; height:30px; border-radius:50%;
+      border:1px solid var(--border2);
+      background: #2a2a2a;
+      background: var(--bg4);
+      color: var(--t2);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; flex-shrink:0; margin-top:2px;
+      transition: background 0.15s, color 0.15s, transform 0.15s;
+    }
+    .reply-preview-close:hover { background: #333; color: var(--t1); }
+    .reply-preview-close:active { transform: scale(0.9); }
+    html[data-theme="light"] .reply-preview-close { background:#e6e6e6; border-color:#d6d6d6; }
 
+    .chat-input-row {
+      display:flex;
+      gap:8px;
+      align-items:flex-end;
+      width:100%;
+      min-height:38px;
+    }
+    .chat-input-row .chat-input {
+      flex:1;
+      background: transparent;
+      border:none;
+      border-radius:0;
+      padding:10px 0 10px 0;
+      min-height:24px;
+      max-height:110px;
+      font-size:14.5px;
+      line-height:1.4;
+      resize:none;
+      box-shadow:none;
+    }
+    .chat-input-row .chat-input:focus { border:none; outline:none; box-shadow:none; }
+    .chat-input-row .chat-input::placeholder { color: var(--t3); }
+
+    .emoji-btn {
+      width:32px; height:32px; border-radius:50%;
+      border:none; background: transparent;
+      color: var(--t2);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; flex-shrink:0; margin-bottom:4px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .emoji-btn:hover { background: var(--bg4); color: var(--t1); }
+
+    /* 기존 메시지 답장 버튼은 그대로 유지 */
     .message-wrapper { position:relative; transition: transform 0.22s cubic-bezier(0.22,1,0.36,1); will-change: transform; }
     .message-wrapper .reply-action { margin-top:6px; display:flex; opacity:0; transition: opacity 0.18s; pointer-events:none; }
     .message-wrapper:hover .reply-action, .message-wrapper:focus-within .reply-action { opacity:1; pointer-events:auto; }
@@ -683,6 +756,8 @@
 
     @media (max-width:768px){
       .message-wrapper .reply-action { opacity:0.92; pointer-events:auto; }
+      .chat-input-area { padding:10px 12px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+      .kakao-input-wrap { border-radius:22px; }
     }
 
     .message-bubble.has-reply { padding:0; overflow:hidden; border-radius:18px; }
@@ -712,6 +787,7 @@
     }
     .highlight-orig .message-bubble { box-shadow: 0 0 0 2px var(--blue); }
     .highlight-orig .message-bubble.has-reply { box-shadow: 0 0 0 2px var(--blue); }
+
 
 </style>
 </head>
@@ -777,12 +853,28 @@
 
         <div class="chat-messages" id="chatMessages" style="display: none;"></div>
 
-        <div class="chat-input-area" id="chatInputArea" style="display: none;">
-          <div id="replyPreviewBar" class="reply-preview-bar">
-            <div class="reply-preview-left">
-              <div class="reply-preview-to" id="replyPreviewTo"></div>
-              <div class="reply-preview-content" id="replyPreviewContent"></div>
+                <div class="chat-input-area" id="chatInputArea" style="display: none;">
+          <div class="kakao-input-wrap" id="kakaoInputWrap">
+            <div id="replyPreviewBar" class="reply-preview-bar kakaostyle">
+              <div class="reply-preview-left">
+                <div class="reply-preview-to" id="replyPreviewTo"></div>
+                <div class="reply-preview-content" id="replyPreviewContent"></div>
+              </div>
+              <button class="reply-preview-close" onclick="cancelReplyMode()" aria-label="취소">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
             </div>
+            <div class="chat-input-row">
+              <textarea class="chat-input" id="messageInput" placeholder="메시지를 입력하세요..." rows="1" oninput="resizeInput(this)" onkeydown="checkEnter(event)"></textarea>
+              <button class="emoji-btn" type="button" tabindex="-1" aria-label="이모지">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.12"/><path d="M8.5 14.5c1 1.4 4 1.4 5 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="10" r="1.25" fill="currentColor"/><circle cx="15" cy="10" r="1.25" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
             <button class="reply-preview-close" onclick="cancelReplyMode()" aria-label="취소">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -1573,20 +1665,26 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       if(originalMsg.content && originalMsg.content.startsWith('[SYSTEM] ')) return;
       replyTarget = originalMsg;
       const bar = document.getElementById('replyPreviewBar');
+      const wrap = document.getElementById('kakaoInputWrap');
       const toEl = document.getElementById('replyPreviewTo');
       const contentEl = document.getElementById('replyPreviewContent');
+      const input = document.getElementById('messageInput');
       if(!bar || !toEl || !contentEl) return;
       const senderName = getUserInfo(originalMsg.sender_id).nickname || '알 수 없음';
-      toEl.textContent = senderName + '님에게 답장하는중';
+      const isSelf = originalMsg.sender_id === currentUser.id;
+      toEl.textContent = (isSelf ? '나' : senderName) + '에게 답장';
       let preview = (originalMsg.content || '').replace(/\n/g,' ').trim();
       if(preview.length>50) preview = preview.slice(0,50)+'…';
       contentEl.textContent = preview;
+      if(input){
+        input.placeholder = '답장 메시지 입력';
+        input.focus();
+      }
+      if(wrap) wrap.classList.add('has-reply');
       bar.style.display='flex';
       bar.classList.remove('closing');
       void bar.offsetWidth;
       bar.classList.add('open');
-      const input = document.getElementById('messageInput');
-      if(input) input.focus();
     }
     function enterReplyModeById(msgId){
       const msg = currentMessages.find(m=>m.id===msgId);
@@ -1594,13 +1692,17 @@ document.querySelector('.back-btn').addEventListener('click', () => {
     }
     function cancelReplyMode(){
       const bar = document.getElementById('replyPreviewBar');
-      if(!bar) { replyTarget=null; return; }
-      if(bar.style.display==='none' || bar.style.display===''){ replyTarget=null; return; }
+      const wrap = document.getElementById('kakaoInputWrap');
+      const input = document.getElementById('messageInput');
+      if(input) input.placeholder = '메시지를 입력하세요...';
+      if(!bar) { replyTarget=null; if(wrap) wrap.classList.remove('has-reply'); return; }
+      if(bar.style.display==='none' || bar.style.display===''){ replyTarget=null; if(wrap) wrap.classList.remove('has-reply'); return; }
       bar.classList.remove('open');
       bar.classList.add('closing');
       setTimeout(()=>{
         bar.style.display='none';
         bar.classList.remove('closing');
+        if(wrap) wrap.classList.remove('has-reply');
       }, 200);
       replyTarget = null;
     }
