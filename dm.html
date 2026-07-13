@@ -943,6 +943,57 @@
     .message-wrapper.me .reply-main.is-emotion { justify-content:flex-end; }
     .message-wrapper.other .reply-main.is-emotion { justify-content:flex-start; }
     .message-bubble > .is-emotion-single { display:flex; align-items:center; justify-content:center; padding:2px; }
+
+    .message-wrapper { display:flex; flex-direction:column; }
+    .reaction-bar-wrap { display:flex; margin-top:6px; }
+    .message-wrapper.me .reaction-bar-wrap { justify-content:flex-end; padding-right:2px; }
+    .message-wrapper.other .reaction-bar-wrap { justify-content:flex-start; padding-left:2px; }
+    .reaction-bar {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:4px 9px 4px 7px;
+      background: var(--bg3);
+      border:1px solid var(--border2);
+      border-radius:999px;
+      cursor:pointer;
+      box-shadow:0 2px 10px rgba(0,0,0,0.28);
+      transition: transform 0.15s, background 0.15s;
+      user-select:none;
+      width:fit-content;
+    }
+    .reaction-bar:hover { transform:scale(1.04); background:var(--bg4); }
+    .reaction-bar:active { transform:scale(0.96); }
+    .reaction-bar-icons { display:flex; align-items:center; }
+    .reaction-bar-icons .reaction-emoji { width:16px; height:16px; margin-left:-4px; border:1.5px solid var(--bg3); border-radius:50%; background:var(--bg3); object-fit:contain; }
+    .reaction-bar-icons .reaction-emoji:first-child { margin-left:0; }
+    .reaction-bar-count { font-size:12px; font-weight:700; color:var(--t2); margin-left:4px; }
+    html[data-theme="light"] .reaction-bar { background:#f0f0f2; border-color:#e2e2e4; box-shadow:0 1px 6px rgba(0,0,0,0.08); }
+    html[data-theme="light"] .reaction-bar-icons .reaction-emoji { border-color:#f0f0f2; background:#f0f0f2; }
+
+    /* Reaction Detail Modal */
+    .reaction-modal-content { max-width:420px; }
+    .reaction-summary-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+    .reaction-summary-chip { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border-radius:999px; background:var(--bg3); border:1px solid var(--border2); cursor:pointer; font-size:13px; font-weight:600; color:var(--t2); transition:all 0.15s; }
+    .reaction-summary-chip.active { background:var(--blue); border-color:var(--blue); color:#fff; }
+    .reaction-summary-chip img { width:18px; height:18px; object-fit:contain; }
+    .reaction-detail-list { max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
+    .reaction-detail-list::-webkit-scrollbar { width:6px; }
+    .reaction-detail-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:4px; }
+    .reaction-detail-item { display:flex; align-items:center; justify-content:space-between; padding:10px 8px; border-radius:12px; transition:background 0.15s; }
+    .reaction-detail-item:hover { background:var(--bg3); }
+    .reaction-detail-user { display:flex; align-items:center; gap:11px; }
+    .reaction-detail-avatar { width:34px; height:34px; border-radius:50%; background:var(--bg4); border:1px solid var(--border2); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--t1); flex-shrink:0; }
+    .reaction-detail-name { font-size:14px; font-weight:500; color:var(--t1); }
+    .reaction-detail-emoji { width:28px; height:28px; object-fit:contain; flex-shrink:0; }
+    .sheet-handle { display:none; width:36px; height:4px; background:#3a3a3c; border-radius:2px; margin:0 auto 14px; }
+    html[data-theme="light"] .sheet-handle { background:#d1d1d6; }
+
+    @media (max-width:768px){
+      #reactionDetailModal.modal { align-items:flex-end; }
+      #reactionDetailModal .modal-content { width:100%; max-width:100%; border-radius:20px 20px 0 0; padding:12px 16px calc(16px + env(safe-area-inset-bottom)); max-height:78vh; transform:translateY(100%); transition:transform 0.34s cubic-bezier(0.22,1,0.36,1); }
+      #reactionDetailModal.open .modal-content { transform:translateY(0); }
+      #reactionDetailModal .sheet-handle { display:block; }
+      .reaction-detail-list { max-height:48vh; }
+    }
 </style>
 </head>
 <body>
@@ -1098,6 +1149,19 @@
     </div>
   </div>
 
+  <!-- 반응 상세 모달 / 바텀시트 -->
+  <div class="modal" id="reactionDetailModal">
+    <div class="modal-content reaction-modal-content">
+      <div class="sheet-handle"></div>
+      <button class="modal-close" onclick="closeReactionDetail()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="modal-title" id="reactionDetailTitle">반응</div>
+      <div class="reaction-summary-row" id="reactionSummaryRow"></div>
+      <div class="reaction-detail-list" id="reactionDetailList"></div>
+    </div>
+  </div>
+
   <script>
     const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
     let currentUser = null;
@@ -1121,8 +1185,11 @@
       '/emotion/heart.png'
     ];
     let activeEmotionPopup = null;
-    let activeEmotionOverlay = null;
     let activeEmotionMsgId = null;
+    let reactionMapGlobal = {};
+    let currentReactionTargetId = null;
+    // sheet drag state
+    let sheetDragState = { dragging:false, startY:0, content:null };
     let swipeState = { startX:0, startY:0, msgId:null, swiping:false };
 
     /* === 사이드바 연동 (index.html 동일 로직) === */
@@ -1606,7 +1673,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
     async function loadMessages(roomId, isPolling = false) {
       if (isLoadingMessages && isPolling) return;
-      closeEmotionPopupImmediately();
+      if (!isPolling) closeEmotionPopupImmediately();
       try {
         if (isPolling) isLoadingMessages = true;
         const msgs = await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
@@ -1618,25 +1685,67 @@ document.querySelector('.back-btn').addEventListener('click', () => {
           const prev = currentMessages.map(m=>m.id).join(',');
           const next = msgs.map(m=>m.id).join(',');
           if (prev === next) {
-            const ids = msgs.filter(m=>!m.content.startsWith('[SYSTEM] ')).map(m=>m.id);
+            const ids = msgs.filter(m=>!m.content.startsWith('[SYSTEM] ') && !(m.content && m.content.startsWith('[EMOTION]') && m.reply)).map(m=>m.id);
             const { readMap } = await getReadMapForMessages(ids);
-            // 내 읽음 필요하면 먼저 처리
             const need = [];
             for (let i=0;i<msgs.length;i++){
               const mm = msgs[i];
               if (mm.content.startsWith('[SYSTEM] ')) continue;
+              if (mm.content && mm.content.startsWith('[EMOTION]') && mm.reply) continue;
               if (mm.sender_id === currentUser.id) continue;
               const s = readMap[mm.id];
               if (!s || !s.has(currentUser.id)) need.push(mm.id);
             }
             if (need.length>0){ await markMessagesAsRead(need); need.forEach(id=>{ if(!readMap[id]) readMap[id]=new Set(); readMap[id].add(currentUser.id); }); }
-            await updateUnreadCountsOnlyIndependent(msgs, roomId, readMap);
-            isLoadingMessages=false; return;
+            await updateUnreadCountsOnlyIndependent(msgs.filter(m=>!(m.content && m.content.startsWith('[EMOTION]') && m.reply)), roomId, readMap);
+            // 반응만 추가된 경우도 감지해서 전체 리렌더 필요하면 리렌더
+            // reactionMap 비교
+            const newReactionMap = {};
+            msgs.forEach(m=>{
+              if(m.content && m.content.startsWith('[EMOTION]') && m.reply){
+                const n = parseInt(m.content.slice(9).trim(),10);
+                if(!(n>=1 && n<=9)) return;
+                if(!newReactionMap[m.reply]) newReactionMap[m.reply]=[];
+                newReactionMap[m.reply].push({ id:m.id, sender_id:m.sender_id, emotionNum:n, created_at:m.created_at });
+              }
+            });
+            const oldKeys = Object.keys(reactionMapGlobal).sort().join(',');
+            const newKeys = Object.keys(newReactionMap).sort().join(',');
+            let reactionChanged = oldKeys !== newKeys;
+            if(!reactionChanged){
+              for(const k in newReactionMap){
+                if((reactionMapGlobal[k]?.length||0) !== newReactionMap[k].length){ reactionChanged=true; break; }
+              }
+            }
+            if(reactionChanged){
+              // fallthrough to full render
+            } else {
+              isLoadingMessages=false; return;
+            }
           }
         }
 
         currentMessages = msgs;
-        const normal = msgs.filter(m=>!m.content.startsWith('[SYSTEM] '));
+        // Build map for reply lookup (include all msgs for orig lookup, but reaction msgs are hidden)
+        const msgMap = {};
+        msgs.forEach(m=>{ msgMap[m.id]=m; });
+
+        // Build reaction map
+        const reactionMap = {};
+        msgs.forEach(m=>{
+          if(m.content && m.content.startsWith('[EMOTION]') && m.reply){
+            const numStr = m.content.slice(9).trim();
+            const emotionNum = parseInt(numStr,10);
+            if(!(emotionNum>=1 && emotionNum<=9)) return;
+            if(!reactionMap[m.reply]) reactionMap[m.reply]=[];
+            reactionMap[m.reply].push({ id:m.id, sender_id:m.sender_id, emotionNum, created_at:m.created_at });
+          }
+        });
+        // sort reactions by time asc for stable display
+        Object.values(reactionMap).forEach(arr=> arr.sort((a,b)=> new Date(a.created_at)-new Date(b.created_at)));
+        reactionMapGlobal = reactionMap;
+
+        const normal = msgs.filter(m=>!m.content.startsWith('[SYSTEM] ') && !(m.content && m.content.startsWith('[EMOTION]') && m.reply));
         const ids = normal.map(m=>m.id);
         let readMap = {};
         if (ids.length>0){
@@ -1649,13 +1758,13 @@ document.querySelector('.back-btn').addEventListener('click', () => {
           }
         }
 
-        // Build map for reply lookup
-        const msgMap = {};
-        msgs.forEach(m=>{ msgMap[m.id]=m; });
-
         container.innerHTML='';
         container.classList.remove('skeleton-active');
-        msgs.forEach(msg=>{
+
+        // render only non-reaction messages
+        const msgsToRender = msgs.filter(m=> !(m.content && m.content.startsWith('[EMOTION]') && m.reply));
+
+        msgsToRender.forEach(msg=>{
           const w=document.createElement('div');
           w.id = 'msg-' + msg.id;
           w.dataset.msgId = msg.id;
@@ -1668,15 +1777,13 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
           let bubbleHTML = '';
           const hasReply = !!(msg.reply);
-          const isEmotionMsg = !!(msg.content && msg.content.startsWith('[EMOTION]'));
-          let emotionNum = 0;
-          let emotionSrc = '';
-          if(isEmotionMsg){
-            const numStr = msg.content.slice(9).trim();
-            emotionNum = parseInt(numStr, 10);
-            if(emotionNum >= 1 && emotionNum <= 9){
-              emotionSrc = EMOTION_ICONS[emotionNum - 1];
-            }
+          // isEmotionMsg는 이제 렌더 대상이 아니므로 false, 하지만 혹시 단독 [EMOTION] 메시지( reply 없는 )는 예외 처리
+          const isStandaloneEmotion = !!(msg.content && msg.content.startsWith('[EMOTION]') && !msg.reply);
+          let standaloneEmotionSrc = '';
+          let standaloneNum = 0;
+          if(isStandaloneEmotion){
+            standaloneNum = parseInt(msg.content.slice(9).trim(),10);
+            if(standaloneNum>=1 && standaloneNum<=9) standaloneEmotionSrc = EMOTION_ICONS[standaloneNum-1];
           }
 
           if(hasReply){
@@ -1698,12 +1805,12 @@ document.querySelector('.back-btn').addEventListener('click', () => {
             const replyLabel = `${escapeHTML(origAuthor)}님에게 답장`;
             const replyContent = escapeHTML(origPreview);
             let mainInner = '';
-            if(isEmotionMsg && emotionSrc){
-              mainInner = `<img src="${emotionSrc}" alt="emotion ${emotionNum}" class="emotion-display-img" loading="eager" onerror="this.style.display='none'">`;
+            if(isStandaloneEmotion && standaloneEmotionSrc){
+              mainInner = `<img src="${standaloneEmotionSrc}" alt="emotion ${standaloneNum}" class="emotion-display-img" loading="eager">`;
             } else {
               mainInner = escapeHTML(msg.content).replace(/\n/g,'<br>');
             }
-            const isEmCls = (isEmotionMsg && emotionSrc) ? ' is-emotion' : '';
+            const isEmCls = (isStandaloneEmotion && standaloneEmotionSrc) ? ' is-emotion' : '';
             bubbleHTML = `<div class="message-bubble has-reply">
               <div class="reply-origin" onclick="jumpToOriginal('${msg.reply}')">
                 <div class="reply-to-label">${replyLabel}</div>
@@ -1712,15 +1819,27 @@ document.querySelector('.back-btn').addEventListener('click', () => {
               <div class="reply-main${isEmCls}">${mainInner}</div>
             </div>`;
           } else {
-            if(isEmotionMsg && emotionSrc){
-              bubbleHTML = `<div class="message-bubble" style="padding:8px 12px; display:flex; align-items:center; justify-content:center; min-width:56px; min-height:48px;"><img src="${emotionSrc}" alt="emotion ${emotionNum}" class="emotion-display-img" style="width:32px;height:32px;" loading="eager" onerror="this.style.display='none'"></div>`;
+            if(isStandaloneEmotion && standaloneEmotionSrc){
+              bubbleHTML = `<div class="message-bubble" style="padding:8px 12px; display:flex; align-items:center; justify-content:center; min-width:56px; min-height:48px;"><img src="${standaloneEmotionSrc}" alt="emotion ${standaloneNum}" class="emotion-display-img" style="width:32px;height:32px;"></div>`;
             } else {
               bubbleHTML = `<div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g,'<br>')}</div>`;
             }
           }
 
+          // reaction bar
+          const reactions = reactionMap[msg.id] || [];
+          let reactionBarHTML = '';
+          if(reactions.length>0){
+            const counts = {};
+            reactions.forEach(r=>{ counts[r.emotionNum]=(counts[r.emotionNum]||0)+1; });
+            const distinct = Object.keys(counts).map(k=>parseInt(k,10)).sort((a,b)=> counts[b]-counts[a]);
+            const iconsHTML = distinct.slice(0,5).map(num=>`<img src="${EMOTION_ICONS[num-1]}" class="reaction-emoji" alt="">`).join('');
+            reactionBarHTML = `<div class="reaction-bar-wrap ${isMe?'me':'other'}"><div class="reaction-bar" onclick="event.stopPropagation(); openReactionDetail('${msg.id}')"><div class="reaction-bar-icons">${iconsHTML}</div><span class="reaction-bar-count">${reactions.length}</span></div></div>`;
+          }
+
           let h=''; if(!isMe) h+=`<div class="message-sender">${escapeHTML(senderName)}</div>`;
           h+=`<div class="message-row ${isMe?'me':'other'}">${bubbleHTML}<div class="msg-side">${uc>0?`<span class="unread-count" id="unread-${msg.id}">${uc}</span>`:`<span class="unread-count" id="unread-${msg.id}" style="opacity:0;">0</span>`}<span class="message-time" style="margin:0;">${time}</span></div></div>`;
+          if(reactionBarHTML) h+=reactionBarHTML;
           h+=`<div class="reply-action"><button class="reply-trigger-btn" onclick="enterReplyModeById('${msg.id}')" aria-label="답장"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button><button class="emotion-trigger-btn" onclick="event.stopPropagation(); toggleEmotionPopup('${msg.id}', this)" aria-label="반응"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></button></div>`;
           w.innerHTML=h;
 
@@ -1756,7 +1875,6 @@ document.querySelector('.back-btn').addEventListener('click', () => {
             swipeState.msgId=null; swipeState.swiping=false;
           }, {passive:true});
 
-          // mouse drag for desktop swipe simulation (right drag)
           w.addEventListener('mousedown', (e)=>{
             swipeState.startX = e.clientX;
             swipeState.startY = e.clientY;
@@ -1791,14 +1909,12 @@ document.querySelector('.back-btn').addEventListener('click', () => {
         });
         container.scrollTop=container.scrollHeight;
 
-        // 내가 안읽은 것들 독립적으로 읽음 처리 (각 메시지 독립)
         const unreadByMe=[];
         normal.forEach(m=>{ if(m.sender_id===currentUser.id) return; const s=readMap[m.id]; if(!s||!s.has(currentUser.id)) unreadByMe.push(m.id); });
         if(unreadByMe.length>0){
           markMessagesAsRead(unreadByMe).then(async()=>{
-            // 읽은 후 각 메시지 독립 재계산해서 0으로
             unreadByMe.forEach(id=>{ if(!readMap[id]) readMap[id]=new Set(); readMap[id].add(currentUser.id); });
-            await updateUnreadCountsOnlyIndependent(msgs, roomId, readMap);
+            await updateUnreadCountsOnlyIndependent(msgs.filter(m=>!(m.content && m.content.startsWith('[EMOTION]') && m.reply)), roomId, readMap);
             const dot=document.getElementById(`unreadDot-${roomId}`); if(dot){dot.classList.remove('show');dot.style.display='none';}
           });
         }else{
@@ -1807,6 +1923,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }catch(e){ console.error("메시지 로드 오류",e); const _c=document.getElementById('chatMessages'); if(_c) _c.classList.remove('skeleton-active'); } finally{ isLoadingMessages=false; }
     }
 
+    async function sendMessage()
     async function sendMessage() {
       if (!activeRoomId || isSending) return;
       const input = document.getElementById('messageInput');
@@ -1907,7 +2024,15 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }, 1800);
     }
 
-    // ===== Emotion Popup Logic =====
+    // ===== Emotion Popup Logic (Fixed: no overlay blocking, no auto-close on poll) =====
+    function handleDocClickForEmotion(e){
+      if(!activeEmotionPopup) return;
+      if(activeEmotionPopup.contains(e.target)) return;
+      const btn = e.target.closest && e.target.closest('.emotion-trigger-btn');
+      if(btn && btn.closest && btn.closest(`#msg-${activeEmotionMsgId}`)) return;
+      closeEmotionPopup();
+    }
+
     function toggleEmotionPopup(msgId, btn){
       if(activeEmotionMsgId === msgId && activeEmotionPopup){
         closeEmotionPopup();
@@ -1920,12 +2045,6 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       closeEmotionPopupImmediately();
       const wrapper = document.getElementById('msg-' + msgId);
       if(!wrapper) return;
-      const overlay = document.createElement('div');
-      overlay.className = 'emotion-overlay';
-      overlay.addEventListener('click', ()=> closeEmotionPopup());
-      document.body.appendChild(overlay);
-      activeEmotionOverlay = overlay;
-
       const popup = document.createElement('div');
       popup.className = 'emotion-popup';
       popup.dataset.msgId = msgId;
@@ -1936,42 +2055,63 @@ document.querySelector('.back-btn').addEventListener('click', () => {
         b.className = 'emotion-btn';
         b.innerHTML = `<img src="${src}" alt="emotion ${idx+1}" loading="eager" draggable="false" onerror="this.style.opacity='0.25'">`;
         b.addEventListener('click', (e)=>{
+          e.preventDefault();
           e.stopPropagation();
           selectEmotion(msgId, idx+1);
         });
+        // prevent doc click from firing before our click
+        b.addEventListener('mousedown', (e)=>{ e.stopPropagation(); });
         popup.appendChild(b);
       });
 
       wrapper.appendChild(popup);
+      wrapper.style.zIndex = '40';
       activeEmotionPopup = popup;
       activeEmotionMsgId = msgId;
       void popup.offsetWidth;
       popup.classList.add('open');
+
+      setTimeout(()=>{
+        document.addEventListener('click', handleDocClickForEmotion);
+        document.addEventListener('touchstart', handleDocClickForEmotion, {passive:true});
+      }, 15);
     }
 
     function closeEmotionPopup(){
       if(!activeEmotionPopup) return;
       const pop = activeEmotionPopup;
+      const msgId = activeEmotionMsgId;
       pop.classList.remove('open');
       pop.classList.add('closing');
-      if(activeEmotionOverlay){ activeEmotionOverlay.remove(); activeEmotionOverlay = null; }
+      document.removeEventListener('click', handleDocClickForEmotion);
+      document.removeEventListener('touchstart', handleDocClickForEmotion);
       setTimeout(()=>{
         if(pop && pop.parentNode) pop.remove();
+        const w = document.getElementById('msg-' + msgId);
+        if(w) w.style.zIndex = '';
         if(activeEmotionPopup === pop){ activeEmotionPopup = null; activeEmotionMsgId = null; }
       }, 200);
     }
 
     function closeEmotionPopupImmediately(){
-      if(activeEmotionPopup){ activeEmotionPopup.remove(); activeEmotionPopup = null; activeEmotionMsgId = null; }
-      if(activeEmotionOverlay){ activeEmotionOverlay.remove(); activeEmotionOverlay = null; }
+      if(activeEmotionPopup){ activeEmotionPopup.remove(); }
+      activeEmotionPopup = null;
+      activeEmotionMsgId = null;
+      document.removeEventListener('click', handleDocClickForEmotion);
+      document.removeEventListener('touchstart', handleDocClickForEmotion);
+      document.querySelectorAll('.message-wrapper').forEach(w=>{ w.style.zIndex=''; });
     }
 
     async function selectEmotion(msgId, emotionNumber){
       const pop = activeEmotionPopup;
+      const curId = activeEmotionMsgId;
       if(pop){ pop.classList.remove('open'); pop.classList.add('closing'); }
-      if(activeEmotionOverlay){ activeEmotionOverlay.remove(); activeEmotionOverlay = null; }
+      document.removeEventListener('click', handleDocClickForEmotion);
+      document.removeEventListener('touchstart', handleDocClickForEmotion);
       setTimeout(async ()=>{
         if(pop && pop.parentNode) pop.remove();
+        const w = document.getElementById('msg-' + curId);
+        if(w) w.style.zIndex = '';
         activeEmotionPopup = null;
         activeEmotionMsgId = null;
         await sendEmotionReaction(msgId, emotionNumber);
@@ -2001,6 +2141,126 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }
     }
 
+    // ===== Reaction Detail Modal / Bottom Sheet =====
+    function openReactionDetail(msgId){
+      const reactions = reactionMapGlobal[msgId] || [];
+      if(!reactions.length) return;
+      currentReactionTargetId = msgId;
+      const modal = document.getElementById('reactionDetailModal');
+      const titleEl = document.getElementById('reactionDetailTitle');
+      const summaryRow = document.getElementById('reactionSummaryRow');
+      titleEl.textContent = `반응 ${reactions.length}개`;
+
+      const counts = {};
+      reactions.forEach(r=>{ counts[r.emotionNum]=(counts[r.emotionNum]||0)+1; });
+      const distinct = Object.keys(counts).map(k=>parseInt(k,10)).sort((a,b)=> counts[b]-counts[a]);
+
+      summaryRow.innerHTML = '';
+      const allChip = document.createElement('button');
+      allChip.type='button';
+      allChip.className='reaction-summary-chip active';
+      allChip.dataset.filter='all';
+      allChip.innerHTML = `전체 <span style="opacity:0.85;font-weight:800;margin-left:2px;">${reactions.length}</span>`;
+      allChip.addEventListener('click', ()=> filterReactionDetail('all'));
+      summaryRow.appendChild(allChip);
+      distinct.forEach(num=>{
+        const chip=document.createElement('button');
+        chip.type='button';
+        chip.className='reaction-summary-chip';
+        chip.dataset.filter=String(num);
+        chip.innerHTML = `<img src="${EMOTION_ICONS[num-1]}" alt=""><span>${counts[num]}</span>`;
+        chip.addEventListener('click', ()=> filterReactionDetail(String(num)));
+        summaryRow.appendChild(chip);
+      });
+
+      renderReactionDetailList(reactions, 'all');
+      modal.classList.add('open');
+      document.body.style.overflow='hidden';
+      initReactionSheetDrag();
+    }
+
+    function renderReactionDetailList(reactions, filter){
+      const listEl=document.getElementById('reactionDetailList');
+      if(!listEl) return;
+      listEl.innerHTML='';
+      const filtered = filter==='all' ? reactions : reactions.filter(r=> String(r.emotionNum)===filter);
+      filtered.forEach(r=>{
+        const user = getUserInfo(r.sender_id);
+        const nick = user.nickname || '알 수 없음';
+        const initial = nick.charAt(0).toUpperCase();
+        const item=document.createElement('div');
+        item.className='reaction-detail-item';
+        item.innerHTML = `<div class="reaction-detail-user"><div class="reaction-detail-avatar">${escapeHTML(initial)}</div><div class="reaction-detail-name">${escapeHTML(nick)}</div></div><img src="${EMOTION_ICONS[r.emotionNum-1]}" class="reaction-detail-emoji" alt="" loading="eager">`;
+        listEl.appendChild(item);
+      });
+    }
+
+    function filterReactionDetail(filter){
+      document.querySelectorAll('#reactionSummaryRow .reaction-summary-chip').forEach(c=>{ c.classList.toggle('active', c.dataset.filter===filter); });
+      const reactions = reactionMapGlobal[currentReactionTargetId] || [];
+      renderReactionDetailList(reactions, filter);
+    }
+
+    function closeReactionDetail(){
+      const modal=document.getElementById('reactionDetailModal');
+      if(!modal) return;
+      modal.classList.remove('open');
+      document.body.style.overflow='';
+      currentReactionTargetId=null;
+      const content=modal.querySelector('.modal-content');
+      if(content){ content.style.transform=''; content.style.transition=''; }
+    }
+
+    function initReactionSheetDrag(){
+      const modal=document.getElementById('reactionDetailModal');
+      const content=modal && modal.querySelector('.modal-content');
+      const handle=content && content.querySelector('.sheet-handle');
+      if(!content || !handle) return;
+      if(content.dataset.dragInit) return;
+      content.dataset.dragInit='1';
+      const getY = (e)=> e.touches ? e.touches[0].clientY : e.clientY;
+      const onStart = (e)=>{
+        if(window.innerWidth>768) return;
+        sheetDragState.dragging=true;
+        sheetDragState.startY=getY(e);
+        sheetDragState.content=content;
+        content.style.transition='none';
+      };
+      const onMove = (e)=>{
+        if(!sheetDragState.dragging) return;
+        const y=getY(e);
+        let dy=y-sheetDragState.startY;
+        if(dy<0) dy=dy*0.25;
+        if(dy>0){
+          content.style.transform=`translateY(${dy}px)`;
+          if(e.cancelable && e.type==='touchmove') e.preventDefault();
+        }
+      };
+      const onEnd = (e)=>{
+        if(!sheetDragState.dragging) return;
+        sheetDragState.dragging=false;
+        content.style.transition='transform 0.34s cubic-bezier(0.22,1,0.36,1)';
+        const endY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+        const dy = endY - sheetDragState.startY;
+        if(dy>110){
+          closeReactionDetail();
+        }else{
+          content.style.transform='translateY(0)';
+        }
+      };
+      handle.addEventListener('touchstart', onStart, {passive:true});
+      handle.addEventListener('mousedown', onStart);
+      content.addEventListener('touchstart', onStart, {passive:true});
+      window.addEventListener('touchmove', onMove, {passive:false});
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('touchend', onEnd);
+      window.addEventListener('mouseup', onEnd);
+      // close when clicking backdrop
+      modal.addEventListener('click', (e)=>{
+        if(e.target===modal) closeReactionDetail();
+      });
+    }
+
 
 
     function checkEnter(e) {
@@ -2014,8 +2274,12 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       document.getElementById('createRoomModal').classList.remove('open');
       document.getElementById('inviteModal').classList.remove('open');
       document.getElementById('roomInfoModal').classList.remove('open');
+      const rdm = document.getElementById('reactionDetailModal');
+      if(rdm) rdm.classList.remove('open');
+      document.body.style.overflow='';
       selectedUserIds.clear();
     }
+    function closeReactionDetailWrapper(){ closeReactionDetail(); }
 
     function openCreateRoomModal() {
       document.getElementById('createRoomModal').classList.add('open');
