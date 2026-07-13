@@ -1328,7 +1328,44 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
       }
     }
 
+    
+    // ===== 데스크탑 신호 로직 (추가됨) =====
+    function getDesktopStateForNoti() {
+      try {
+        if (window.top && window.top.innerWidth) return window.top.innerWidth >= 769;
+      } catch(e){}
+      try {
+        if (window.parent && window.parent.innerWidth) return window.parent.innerWidth >= 769;
+      } catch(e){}
+      return window.innerWidth >= 769;
+    }
+    function sendEmbedSignalToNotiFrame() {
+      try {
+        const isDesktop = getDesktopStateForNoti();
+        const payload = { type: 'sharerNotiEmbed', isEmbed: true, isDesktop, viaSidebarPanel: true };
+        // Case A: 부모(index)에 주입된 notiPanelFrame
+        try {
+          if (window.self !== window.top) {
+            const pd = window.parent.document;
+            const frame = pd && pd.getElementById('notiPanelFrame');
+            if (frame && frame.contentWindow) {
+              frame.contentWindow.postMessage(payload, '*');
+            }
+          }
+        } catch(e){}
+        // Case B: 사이드바 자신이 직접 notification iframe을 가지고 있는 구조 대비
+        try {
+          const directFrames = document.querySelectorAll('iframe[src*="notification"]');
+          directFrames.forEach(f => { if (f.contentWindow) f.contentWindow.postMessage(payload, '*'); });
+        } catch(e){}
+      } catch(err) {
+        console.warn('[noti] sendEmbedSignal failed', err);
+      }
+    }
+    // ===== 데스크탑 신호 로직 끝 =====
+
     // ===== 알림 패널 부모 주입 (부모 수정 없이 사이드바 단독으로 검색처럼 옆으로 슬라이드) =====
+
     function injectNotiPanelToParent() {
       try {
         if (window.self === window.top) return null;
@@ -1397,6 +1434,26 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
           <iframe src="notification.html?embed=1" frameborder="0" id="notiPanelFrame" title="알림"></iframe>
         `;
         pd.body.appendChild(panel);
+        // 추가: iframe 로드 시 데스크탑 신호 전송 (iframe width 380px 오판 방지)
+        try {
+          const notiFrameEl = panel.querySelector('#notiPanelFrame');
+          if (notiFrameEl) {
+            const sendFromParentContext = () => {
+              try {
+                const isDesktop = pw.innerWidth >= 769;
+                notiFrameEl.contentWindow && notiFrameEl.contentWindow.postMessage({ type:'sharerNotiEmbed', isEmbed:true, isDesktop, viaSidebarPanel:true }, '*');
+              } catch(e){}
+            };
+            notiFrameEl.addEventListener('load', sendFromParentContext);
+            // 로드가 이미 끝났거나 빠른 재전송 대비
+            setTimeout(sendFromParentContext, 100);
+            setTimeout(sendFromParentContext, 500);
+            setTimeout(sendFromParentContext, 1000);
+          }
+        } catch(e){}
+        // 사이드바 컨텍스트에서도 재전송 시도
+        try { setTimeout(() => { try { sendEmbedSignalToNotiFrame(); } catch(e){} }, 150); } catch(e){}
+
         const closeBtn = panel.querySelector('#notiPanelCloseBtn');
         if (closeBtn) {
           closeBtn.addEventListener('click', () => {
@@ -1416,6 +1473,16 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
             try {
               const sf = pd.getElementById('sidebarFrame');
               if (sf && sf.contentWindow) sf.contentWindow.postMessage({type:'activateNoti', active:true}, '*');
+            } catch(e){}
+            // 추가: 열릴 때 데스크탑 신호 전송
+            try {
+              const nf = pd.getElementById('notiPanelFrame');
+              if (nf && nf.contentWindow) {
+                const isDesktop = pw.innerWidth >= 769;
+                nf.contentWindow.postMessage({ type:'sharerNotiEmbed', isEmbed:true, isDesktop, viaSidebarPanel:true }, '*');
+                // 이중 보장: 약간 늦게 한번 더
+                setTimeout(() => { try { nf.contentWindow.postMessage({ type:'sharerNotiEmbed', isEmbed:true, isDesktop, viaSidebarPanel:true }, '*'); } catch(e){} }, 120);
+              }
             } catch(e){}
           } else {
             p.classList.remove('open');
@@ -1447,6 +1514,16 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
             }
             if (d.type === 'closeNotiPanel') {
               if (pw.closeNotiPanel) pw.closeNotiPanel();
+            }
+            // 추가: 알림 iframe이 신호를 재요청했을 때 데스크탑 여부 알려줌
+            if (d.type === 'requestNotiEmbedInfo') {
+              try {
+                const nf = pd.getElementById('notiPanelFrame');
+                if (nf && nf.contentWindow) {
+                  const isDesktop = pw.innerWidth >= 769;
+                  nf.contentWindow.postMessage({ type:'sharerNotiEmbed', isEmbed:true, isDesktop, viaSidebarPanel:true }, '*');
+                }
+              } catch(err){}
             }
           });
           pw._notiLinkListenerAdded = true;
@@ -1482,6 +1559,17 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
             searchNav.classList.remove('active');
             setNav.classList.remove('active');
             dmNav.classList.remove('active');
+            // 추가: 사이드바에서 직접 신호 전송 (두 구조 모두 대응)
+            try { sendEmbedSignalToNotiFrame(); } catch(e){}
+            try {
+              const nf2 = pd.getElementById('notiPanelFrame');
+              if (nf2 && nf2.contentWindow) {
+                let isDesktop = true;
+                try { isDesktop = window.top.innerWidth >= 769; } catch(e){ try { isDesktop = window.parent.innerWidth >= 769; } catch(e2){ isDesktop = true; } }
+                nf2.contentWindow.postMessage({ type:'sharerNotiEmbed', isEmbed:true, isDesktop, viaSidebarPanel:true }, '*');
+                setTimeout(() => { try { nf2.contentWindow.postMessage({ type:'sharerNotiEmbed', isEmbed:true, isDesktop, viaSidebarPanel:true }, '*'); } catch(e){} }, 150);
+              }
+            } catch(e){}
           } else {
             panel.classList.remove('open');
             if (notiNav) notiNav.classList.remove('active');
@@ -1513,6 +1601,10 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
       if (!data || !data.type) return;
       if (data.type === 'forceNotiCheck' || data.type === 'newNotification') {
         if (isLoggedIn) checkNotiUnread();
+      }
+      // 추가: 알림 iframe이 신호 요청 시 응답 (사이드바가 알림을 직접 품은 구조 대비)
+      if (data.type === 'requestNotiEmbedInfo') {
+        try { sendEmbedSignalToNotiFrame(); } catch(e){}
       }
     });
 
