@@ -870,6 +870,79 @@
     }
     .highlight-orig .message-bubble { box-shadow: 0 0 0 2px var(--blue); }
     .highlight-orig .message-bubble.has-reply { box-shadow: 0 0 0 2px var(--blue); }
+
+    /* ===== Emotion Reaction Feature ===== */
+    .reply-action { gap: 6px; }
+    .emotion-trigger-btn {
+      width:28px; height:28px; border-radius:50%;
+      background: var(--bg3); border:1px solid var(--border2); color: var(--t2);
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      transition: all 0.18s;
+    }
+    .emotion-trigger-btn:hover { background: var(--bg4); color: var(--t1); transform: scale(1.06); border-color: var(--border3); }
+    .emotion-trigger-btn:active { transform: scale(0.92); }
+
+    .emotion-popup {
+      position: absolute;
+      bottom: 44px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 8px 10px;
+      background: #232328;
+      border: 1px solid #2f2f33;
+      border-radius: 999px;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.35);
+      transform-origin: bottom center;
+      opacity: 0;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+    .message-wrapper.other .emotion-popup { left: 6px; right:auto; transform-origin: bottom left; --tx: 0px; }
+    .message-wrapper.me .emotion-popup { right: 6px; left:auto; transform-origin: bottom right; --tx: 0px; }
+
+    .emotion-popup.open {
+      animation: emotionPopIn 0.34s cubic-bezier(0.22,1,0.36,1) forwards;
+      pointer-events: auto;
+    }
+    .emotion-popup.closing {
+      animation: emotionPopOut 0.2s ease forwards;
+      pointer-events: none;
+    }
+    @keyframes emotionPopIn {
+      0% { transform: translateX(var(--tx)) scale(0.18); opacity:0; }
+      45% { transform: translateX(var(--tx)) scale(1.08); opacity:1; }
+      100% { transform: translateX(var(--tx)) scale(1); opacity:1; }
+    }
+    @keyframes emotionPopOut {
+      0% { transform: translateX(var(--tx)) scale(1); opacity:1; }
+      100% { transform: translateX(var(--tx)) scale(0.22); opacity:0; }
+    }
+    html[data-theme="light"] .emotion-popup {
+      background: #ffffff;
+      border-color: #e5e5e7;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .emotion-btn {
+      width: 40px; height:40px; border-radius:50%; border:none; background:transparent;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), background 0.15s;
+      flex-shrink:0;
+    }
+    .emotion-btn:hover { transform: scale(1.28) translateY(-4px); background: rgba(255,255,255,0.08); }
+    html[data-theme="light"] .emotion-btn:hover { background: rgba(0,0,0,0.06); }
+    .emotion-btn:active { transform: scale(0.94) translateY(0); }
+    .emotion-btn img { width:28px; height:28px; object-fit:contain; pointer-events:none; user-select:none; }
+
+    .emotion-overlay { position: fixed; inset:0; z-index:15; background: transparent; }
+
+    .emotion-display-img { width:32px; height:32px; object-fit:contain; vertical-align:middle; display:block; }
+    .reply-main.is-emotion { display:flex; align-items:center; min-width:48px; min-height:44px; }
+    .message-wrapper.me .reply-main.is-emotion { justify-content:flex-end; }
+    .message-wrapper.other .reply-main.is-emotion { justify-content:flex-start; }
+    .message-bubble > .is-emotion-single { display:flex; align-items:center; justify-content:center; padding:2px; }
 </style>
 </head>
 <body>
@@ -1036,6 +1109,20 @@
     let selectedUserIds = new Set();
     let roomListPollInterval = null;
     let replyTarget = null; // {id, sender_id, content}
+    const EMOTION_ICONS = [
+      '/emotion/smile.png',
+      '/emotion/angry.png',
+      '/emotion/scared.png',
+      '/emotion/good.png',
+      '/emotion/bad.png',
+      '/emotion/md_finger.png',
+      '/emotion/congratulation.png',
+      '/emotion/okay.png',
+      '/emotion/heart.png'
+    ];
+    let activeEmotionPopup = null;
+    let activeEmotionOverlay = null;
+    let activeEmotionMsgId = null;
     let swipeState = { startX:0, startY:0, msgId:null, swiping:false };
 
     /* === 사이드바 연동 (index.html 동일 로직) === */
@@ -1519,6 +1606,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
     async function loadMessages(roomId, isPolling = false) {
       if (isLoadingMessages && isPolling) return;
+      closeEmotionPopupImmediately();
       try {
         if (isPolling) isLoadingMessages = true;
         const msgs = await api(`/dm_messages?room_id=eq.${roomId}&order=created_at.asc`);
@@ -1580,6 +1668,17 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
           let bubbleHTML = '';
           const hasReply = !!(msg.reply);
+          const isEmotionMsg = !!(msg.content && msg.content.startsWith('[EMOTION]'));
+          let emotionNum = 0;
+          let emotionSrc = '';
+          if(isEmotionMsg){
+            const numStr = msg.content.slice(9).trim();
+            emotionNum = parseInt(numStr, 10);
+            if(emotionNum >= 1 && emotionNum <= 9){
+              emotionSrc = EMOTION_ICONS[emotionNum - 1];
+            }
+          }
+
           if(hasReply){
             const orig = msgMap[msg.reply];
             let origAuthor = '알 수 없음';
@@ -1590,24 +1689,39 @@ document.querySelector('.back-btn').addEventListener('click', () => {
               if(origContentFull.startsWith('[SYSTEM] ')) origContentFull = origContentFull.replace('[SYSTEM] ','');
             }
             let origPreview = origContentFull.replace(/\n/g,' ').trim();
+            if(origContentFull.startsWith('[EMOTION]')){
+              const on = parseInt(origContentFull.slice(9).trim(),10);
+              if(on>=1 && on<=9) origPreview = '이모티콘 반응';
+              else origPreview = '이모티콘';
+            }
             if(origPreview.length>60) origPreview = origPreview.slice(0,60)+'…';
             const replyLabel = `${escapeHTML(origAuthor)}님에게 답장`;
             const replyContent = escapeHTML(origPreview);
-            const mainContent = escapeHTML(msg.content).replace(/\n/g,'<br>');
+            let mainInner = '';
+            if(isEmotionMsg && emotionSrc){
+              mainInner = `<img src="${emotionSrc}" alt="emotion ${emotionNum}" class="emotion-display-img" loading="eager" onerror="this.style.display='none'">`;
+            } else {
+              mainInner = escapeHTML(msg.content).replace(/\n/g,'<br>');
+            }
+            const isEmCls = (isEmotionMsg && emotionSrc) ? ' is-emotion' : '';
             bubbleHTML = `<div class="message-bubble has-reply">
               <div class="reply-origin" onclick="jumpToOriginal('${msg.reply}')">
                 <div class="reply-to-label">${replyLabel}</div>
                 <div class="reply-to-content">${replyContent}</div>
               </div>
-              <div class="reply-main">${mainContent}</div>
+              <div class="reply-main${isEmCls}">${mainInner}</div>
             </div>`;
           } else {
-            bubbleHTML = `<div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g,'<br>')}</div>`;
+            if(isEmotionMsg && emotionSrc){
+              bubbleHTML = `<div class="message-bubble" style="padding:8px 12px; display:flex; align-items:center; justify-content:center; min-width:56px; min-height:48px;"><img src="${emotionSrc}" alt="emotion ${emotionNum}" class="emotion-display-img" style="width:32px;height:32px;" loading="eager" onerror="this.style.display='none'"></div>`;
+            } else {
+              bubbleHTML = `<div class="message-bubble">${escapeHTML(msg.content).replace(/\n/g,'<br>')}</div>`;
+            }
           }
 
           let h=''; if(!isMe) h+=`<div class="message-sender">${escapeHTML(senderName)}</div>`;
           h+=`<div class="message-row ${isMe?'me':'other'}">${bubbleHTML}<div class="msg-side">${uc>0?`<span class="unread-count" id="unread-${msg.id}">${uc}</span>`:`<span class="unread-count" id="unread-${msg.id}" style="opacity:0;">0</span>`}<span class="message-time" style="margin:0;">${time}</span></div></div>`;
-          h+=`<div class="reply-action"><button class="reply-trigger-btn" onclick="enterReplyModeById('${msg.id}')" aria-label="답장"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button></div>`;
+          h+=`<div class="reply-action"><button class="reply-trigger-btn" onclick="enterReplyModeById('${msg.id}')" aria-label="답장"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg></button><button class="emotion-trigger-btn" onclick="event.stopPropagation(); toggleEmotionPopup('${msg.id}', this)" aria-label="반응"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></button></div>`;
           w.innerHTML=h;
 
           // touch swipe to reply
@@ -1792,6 +1906,101 @@ document.querySelector('.back-btn').addEventListener('click', () => {
         target.classList.remove('shake-anim','highlight-orig');
       }, 1800);
     }
+
+    // ===== Emotion Popup Logic =====
+    function toggleEmotionPopup(msgId, btn){
+      if(activeEmotionMsgId === msgId && activeEmotionPopup){
+        closeEmotionPopup();
+        return;
+      }
+      openEmotionPopup(msgId, btn);
+    }
+
+    function openEmotionPopup(msgId, btn){
+      closeEmotionPopupImmediately();
+      const wrapper = document.getElementById('msg-' + msgId);
+      if(!wrapper) return;
+      const overlay = document.createElement('div');
+      overlay.className = 'emotion-overlay';
+      overlay.addEventListener('click', ()=> closeEmotionPopup());
+      document.body.appendChild(overlay);
+      activeEmotionOverlay = overlay;
+
+      const popup = document.createElement('div');
+      popup.className = 'emotion-popup';
+      popup.dataset.msgId = msgId;
+
+      EMOTION_ICONS.forEach((src, idx)=>{
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'emotion-btn';
+        b.innerHTML = `<img src="${src}" alt="emotion ${idx+1}" loading="eager" draggable="false" onerror="this.style.opacity='0.25'">`;
+        b.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          selectEmotion(msgId, idx+1);
+        });
+        popup.appendChild(b);
+      });
+
+      wrapper.appendChild(popup);
+      activeEmotionPopup = popup;
+      activeEmotionMsgId = msgId;
+      void popup.offsetWidth;
+      popup.classList.add('open');
+    }
+
+    function closeEmotionPopup(){
+      if(!activeEmotionPopup) return;
+      const pop = activeEmotionPopup;
+      pop.classList.remove('open');
+      pop.classList.add('closing');
+      if(activeEmotionOverlay){ activeEmotionOverlay.remove(); activeEmotionOverlay = null; }
+      setTimeout(()=>{
+        if(pop && pop.parentNode) pop.remove();
+        if(activeEmotionPopup === pop){ activeEmotionPopup = null; activeEmotionMsgId = null; }
+      }, 200);
+    }
+
+    function closeEmotionPopupImmediately(){
+      if(activeEmotionPopup){ activeEmotionPopup.remove(); activeEmotionPopup = null; activeEmotionMsgId = null; }
+      if(activeEmotionOverlay){ activeEmotionOverlay.remove(); activeEmotionOverlay = null; }
+    }
+
+    async function selectEmotion(msgId, emotionNumber){
+      const pop = activeEmotionPopup;
+      if(pop){ pop.classList.remove('open'); pop.classList.add('closing'); }
+      if(activeEmotionOverlay){ activeEmotionOverlay.remove(); activeEmotionOverlay = null; }
+      setTimeout(async ()=>{
+        if(pop && pop.parentNode) pop.remove();
+        activeEmotionPopup = null;
+        activeEmotionMsgId = null;
+        await sendEmotionReaction(msgId, emotionNumber);
+      }, 180);
+    }
+
+    async function sendEmotionReaction(origId, emotionNumber){
+      if(!activeRoomId || isSending) return;
+      isSending = true;
+      try{
+        const newMessageId = (crypto.randomUUID ? crypto.randomUUID() : 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+        const payload = {
+          id: newMessageId,
+          room_id: activeRoomId,
+          sender_id: currentUser.id,
+          content: `[EMOTION]${emotionNumber}`,
+          reply: origId,
+          created_at: new Date().toISOString()
+        };
+        await api("/dm_messages", { method: "POST", headers: { "Prefer": "return=representation" }, body: JSON.stringify(payload) });
+        try{ await api("/dm_read", { method: "POST", body: JSON.stringify([{ user_id: currentUser.id, message_id: newMessageId }]) }); }catch(e){}
+        await loadMessages(activeRoomId, false);
+      }catch(e){
+        showAlert("반응 전송 실패: " + e.message);
+      }finally{
+        isSending = false;
+      }
+    }
+
 
 
     function checkEnter(e) {
