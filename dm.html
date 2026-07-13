@@ -1923,7 +1923,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }catch(e){ console.error("메시지 로드 오류",e); const _c=document.getElementById('chatMessages'); if(_c) _c.classList.remove('skeleton-active'); } finally{ isLoadingMessages=false; }
     }
 
-    async function sendMessage()
+
     async function sendMessage() {
       if (!activeRoomId || isSending) return;
       const input = document.getElementById('messageInput');
