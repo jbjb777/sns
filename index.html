@@ -117,7 +117,7 @@
       -webkit-font-smoothing: antialiased;
       opacity: 0;
       animation: bodyReveal 0.4s ease forwards;
-      padding-top: 45px;
+      padding-top: 0;
       transition: padding-top 0.3s ease;
     }
     @keyframes bodyReveal { to { opacity: 1; } }
@@ -1063,174 +1063,50 @@ opacity: 1;
     }
   
 
-    /* ===== Mobile Top Bar - 항상 보이게 (테스트용), index.html에서 모바일 전용으로 제어됨 ===== */
-    .mobile-topbar {
+        /* ===== Mobile Top Bar - iframe wrapper (모바일 전용) ===== */
+    .mobile-topbar-iframe-wrap {
+      display: none; /* 데스크탑에서는 숨김 - 버그 수정 */
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       height: 56px;
       z-index: 300;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      background: rgba(0, 0, 0, 0.84);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    html[data-theme="light"] .mobile-topbar {
-      background: rgba(250, 250, 250, 0.88);
-    }
-
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .topbar-logo {
-      width: 28px;
-      height: 28px;
-      display: block;
-      flex-shrink: 0;
-      object-fit: contain;
-      filter: none !important;
-    }
-
-    .topbar-title {
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--t1);
-      line-height: 1;
-    }
-
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .topbar-btn {
-      position: relative;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background: transparent;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .topbar-btn:hover { background: var(--bg3); }
-    .topbar-btn:active { transform: scale(0.92); }
-
-    .topbar-btn .icon-img {
-      width: 21px;
-      height: 21px;
-      display: block;
-      object-fit: contain;
-      transition: filter 0.2s ease;
-      filter: none;
-    }
-
-    html[data-theme="light"] .topbar-btn .icon-img.icon-invert {
-      filter: invert(1);
-    }
-
-    /* ===== 빨간 말풍선 카운트 - 인스타 스타일 ===== */
-    .noti-bubble {
-      position: absolute;
-      top: -1px;
-      right: -4px;
-      min-width: 20px;
-      height: 20px;
-      padding: 0 6px;
-      background: #ff3040;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.02em;
-      border-radius: 11px;
-      border: 2px solid var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform-origin: center bottom;
-      transform: scale(0) translateY(12px);
-      opacity: 0;
       pointer-events: none;
-      z-index: 5;
-      will-change: transform, opacity;
-      box-shadow: 0 3px 10px rgba(255,48,64,0.38);
+    }
+    .mobile-topbar-iframe-wrap iframe {
+      width: 100%;
+      height: 56px;
+      border: none;
+      display: block;
+      pointer-events: auto;
+      overflow: hidden;
+    }
+    @media (max-width: 768px) {
+      .mobile-topbar-iframe-wrap {
+        display: block;
+      }
+      body {
+        padding-top: 56px !important;
+      }
+    }
+    @media (min-width: 769px) {
+      body {
+        padding-top: 0 !important;
+      }
+      .mobile-topbar-iframe-wrap {
+        display: none !important;
+      }
     }
 
-    html[data-theme="light"] .noti-bubble {
-      border-color: #ffffff;
-      box-shadow: 0 3px 10px rgba(255,48,64,0.32);
-    }
-
-    .noti-bubble.show { opacity: 1; }
-    .noti-bubble.pop-in { animation: bubblePopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    .noti-bubble.pop-out { animation: bubblePopOut 0.4s cubic-bezier(0.4, 0, 0.7, 1) forwards; }
-
-    @keyframes bubblePopIn {
-      0% { transform: scale(0) translateY(14px); opacity: 0; }
-      40% { transform: scale(1.4) translateY(-8px); opacity: 1; }
-      65% { transform: scale(0.9) translateY(2px); opacity: 1; }
-      85% { transform: scale(1.08) translateY(-3px); opacity: 1; }
-      100% { transform: scale(1) translateY(0); opacity: 1; }
-    }
-
-    @keyframes bubblePopOut {
-      0% { transform: scale(1) translateY(0); opacity: 1; }
-      20% { transform: scale(1.15) translateY(-4px); opacity: 1; }
-      100% { transform: scale(0) translateY(-20px); opacity: 0; }
-    }
-
-    .demo-info {
-      padding: 80px 16px 20px;
-      font-size: 13px;
-      color: var(--t2);
-      line-height: 1.6;
-    }
-    .demo-info b { color: var(--t1); }
-
-  </style>
+</style>
 </head>
 <body>
 
-  <header class="mobile-topbar" role="banner" aria-label="상단바">
-    <a class="topbar-left" href="index.html" target="_top" aria-label="Sharer 홈">
-      <img src="logo.svg" alt="Sharer 로고" class="topbar-logo" width="28" height="28" />
-      <span class="topbar-title">Sharer</span>
-    </a>
-
-    <div class="topbar-actions">
-      <a class="topbar-btn" href="set.html" target="_top" aria-label="설정">
-        <img src="set.svg" alt="설정" class="icon-img icon-invert" width="21" height="21" />
-      </a>
-
-      <a class="topbar-btn" href="notification.html" target="_top" aria-label="알림" id="notiBtn">
-        <img src="bell.svg" alt="알림" class="icon-img icon-invert" width="21" height="21" />
-        <span class="noti-bubble" id="topbarNotiBubble" aria-hidden="true">0</span>
-      </a>
-    </div>
-  </header>
-
+  <div class="mobile-topbar-iframe-wrap">
+  <iframe src="header.html" id="mobileTopbarFrame" title="상단바" frameborder="0" scrolling="no"></iframe>
+</div>
 
 <div id="pullRefresh">
   <svg class="material-spinner" viewBox="0 0 110 110" id="pullSpinnerSvg">
