@@ -960,7 +960,6 @@
       user-select:none;
       width:fit-content;
     }
-
     .reaction-bar:hover { transform:scale(1.04); background:var(--bg4); }
     .reaction-bar:active { transform:scale(0.96); }
     .reaction-bar-icons { display:flex; align-items:center; }
@@ -995,6 +994,22 @@
       #reactionDetailModal .sheet-handle { display:block; }
       .reaction-detail-list { max-height:48vh; }
     }
+    .emotion-btn.my-reacted { background: rgba(62,59,246,0.18); border:1px solid var(--blue); box-shadow:0 0 0 1px rgba(62,59,246,0.25) inset; }
+    .emotion-btn.my-reacted:hover { background: rgba(62,59,246,0.28); }
+    html[data-theme="light"] .emotion-btn.my-reacted { background: rgba(62,59,246,0.12); border-color: var(--blue); }
+
+    .reaction-cancel-btn {
+      width:24px; height:24px; border-radius:50%; border:none; background: var(--bg4);
+      color: var(--t2); display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition: all 0.15s; flex-shrink:0;
+    }
+    .reaction-cancel-btn:hover { background: rgba(255,107,107,0.18); color: #ff6b6b; transform: scale(1.08); }
+    .reaction-cancel-btn:active { transform: scale(0.92); }
+    html[data-theme="light"] .reaction-cancel-btn { background:#ececef; }
+    html[data-theme="light"] .reaction-cancel-btn:hover { background:#ffe0e0; }
+
+    .reaction-detail-item.has-cancel { padding-right:4px; }
+    .reaction-detail-right { display:flex; align-items:center; gap:8px; }
 </style>
 </head>
 <body>
@@ -1085,7 +1100,7 @@
     </div>
   </div>
 
-  <!-- 방 만들기 모달 ㅇ-->
+  <!-- 방 만들기 모달 -->
   <div class="modal" id="createRoomModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModals()">
@@ -1110,7 +1125,7 @@
     </div>
   </div>
 
-  <!-- 사용자 초대 모달ㅇ -->
+  <!-- 사용자 초대 모달 -->
   <div class="modal" id="inviteModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModals()">
@@ -1131,7 +1146,7 @@
     </div>
   </div>
 
-  <!-- 채팅방 정보 모달 (새로 추가ㄹ) -->
+  <!-- 채팅방 정보 모달 (새로 추가) -->
   <div class="modal" id="roomInfoModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModals()">
@@ -1924,7 +1939,6 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }catch(e){ console.error("메시지 로드 오류",e); const _c=document.getElementById('chatMessages'); if(_c) _c.classList.remove('skeleton-active'); } finally{ isLoadingMessages=false; }
     }
 
-
     async function sendMessage() {
       if (!activeRoomId || isSending) return;
       const input = document.getElementById('messageInput');
@@ -2034,6 +2048,11 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       closeEmotionPopup();
     }
 
+    function getMyReactionForMessage(msgId, emotionNum){
+      const arr = reactionMapGlobal[msgId] || [];
+      return arr.find(r=> r.sender_id===currentUser.id && r.emotionNum===emotionNum) || null;
+    }
+
     function toggleEmotionPopup(msgId, btn){
       if(activeEmotionMsgId === msgId && activeEmotionPopup){
         closeEmotionPopup();
@@ -2050,17 +2069,21 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       popup.className = 'emotion-popup';
       popup.dataset.msgId = msgId;
 
+      const myReactions = reactionMapGlobal[msgId] || [];
+      const myEmotionSet = new Set(myReactions.filter(r=>r.sender_id===currentUser.id).map(r=>r.emotionNum));
+
       EMOTION_ICONS.forEach((src, idx)=>{
+        const emotionNum = idx+1;
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'emotion-btn';
-        b.innerHTML = `<img src="${src}" alt="emotion ${idx+1}" loading="eager" draggable="false" onerror="this.style.opacity='0.25'">`;
+        b.className = 'emotion-btn' + (myEmotionSet.has(emotionNum) ? ' my-reacted' : '');
+        b.title = myEmotionSet.has(emotionNum) ? '내 반응 (클릭하면 취소)' : '';
+        b.innerHTML = `<img src="${src}" alt="emotion ${emotionNum}" loading="eager" draggable="false" onerror="this.style.opacity='0.25'">`;
         b.addEventListener('click', (e)=>{
           e.preventDefault();
           e.stopPropagation();
-          selectEmotion(msgId, idx+1);
+          selectEmotion(msgId, emotionNum);
         });
-        // prevent doc click from firing before our click
         b.addEventListener('mousedown', (e)=>{ e.stopPropagation(); });
         popup.appendChild(b);
       });
@@ -2104,6 +2127,24 @@ document.querySelector('.back-btn').addEventListener('click', () => {
     }
 
     async function selectEmotion(msgId, emotionNumber){
+      const existing = getMyReactionForMessage(msgId, emotionNumber);
+      if(existing){
+        const pop = activeEmotionPopup;
+        const curId = activeEmotionMsgId;
+        if(pop){ pop.classList.remove('open'); pop.classList.add('closing'); }
+        document.removeEventListener('click', handleDocClickForEmotion);
+        document.removeEventListener('touchstart', handleDocClickForEmotion);
+        setTimeout(async ()=>{
+          if(pop && pop.parentNode) pop.remove();
+          const w = document.getElementById('msg-' + curId);
+          if(w) w.style.zIndex = '';
+          activeEmotionPopup = null;
+          activeEmotionMsgId = null;
+          await cancelReactionById(existing.id, msgId);
+        }, 160);
+        return;
+      }
+
       const pop = activeEmotionPopup;
       const curId = activeEmotionMsgId;
       if(pop){ pop.classList.remove('open'); pop.classList.add('closing'); }
@@ -2140,6 +2181,60 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }finally{
         isSending = false;
       }
+    }
+
+    async function cancelReactionById(reactionMsgId, originalMsgId){
+      try{
+        await api(`/dm_messages?id=eq.${reactionMsgId}`, { method: "DELETE" });
+        if(reactionMapGlobal[originalMsgId]){
+          reactionMapGlobal[originalMsgId] = reactionMapGlobal[originalMsgId].filter(r=> r.id !== reactionMsgId);
+          if(reactionMapGlobal[originalMsgId].length===0) delete reactionMapGlobal[originalMsgId];
+        }
+        if(currentReactionTargetId === originalMsgId){
+          const reactions = reactionMapGlobal[originalMsgId] || [];
+          if(reactions.length===0){
+            closeReactionDetail();
+          }else{
+            const titleEl = document.getElementById('reactionDetailTitle');
+            if(titleEl) titleEl.textContent = `반응 ${reactions.length}개`;
+            const summaryRow = document.getElementById('reactionSummaryRow');
+            const counts = {};
+            reactions.forEach(r=>{ counts[r.emotionNum]=(counts[r.emotionNum]||0)+1; });
+            const distinct = Object.keys(counts).map(k=>parseInt(k,10)).sort((a,b)=> counts[b]-counts[a]);
+            const activeFilterEl = summaryRow ? summaryRow.querySelector('.reaction-summary-chip.active') : null;
+            const activeFilter = activeFilterEl ? activeFilterEl.dataset.filter : 'all';
+            if(summaryRow){
+              summaryRow.innerHTML='';
+              const allChip=document.createElement('button');
+              allChip.type='button';
+              allChip.className='reaction-summary-chip' + (activeFilter==='all' ? ' active' : '');
+              allChip.dataset.filter='all';
+              allChip.innerHTML = `전체 <span style="opacity:0.85;font-weight:800;margin-left:2px;">${reactions.length}</span>`;
+              allChip.addEventListener('click', ()=> filterReactionDetail('all'));
+              summaryRow.appendChild(allChip);
+              distinct.forEach(num=>{
+                const chip=document.createElement('button');
+                chip.type='button';
+                chip.className='reaction-summary-chip' + (String(num)===activeFilter ? ' active' : '');
+                chip.dataset.filter=String(num);
+                chip.innerHTML = `<img src="${EMOTION_ICONS[num-1]}" alt=""><span>${counts[num]}</span>`;
+                chip.addEventListener('click', ()=> filterReactionDetail(String(num)));
+                summaryRow.appendChild(chip);
+              });
+            }
+            let filterToUse = activeFilter;
+            if(filterToUse!=='all' && !counts[parseInt(filterToUse,10)]) filterToUse='all';
+            renderReactionDetailList(reactions, filterToUse);
+          }
+        }
+        await loadMessages(activeRoomId, false);
+      }catch(e){
+        showAlert("반응 취소 실패: " + e.message);
+      }
+    }
+
+    function cancelReactionFromDetail(reactionId, originalMsgId){
+      cancelReactionById(reactionId, originalMsgId);
     }
 
     // ===== Reaction Detail Modal / Bottom Sheet =====
@@ -2189,9 +2284,11 @@ document.querySelector('.back-btn').addEventListener('click', () => {
         const user = getUserInfo(r.sender_id);
         const nick = user.nickname || '알 수 없음';
         const initial = nick.charAt(0).toUpperCase();
+        const isMe = r.sender_id === currentUser.id;
         const item=document.createElement('div');
-        item.className='reaction-detail-item';
-        item.innerHTML = `<div class="reaction-detail-user"><div class="reaction-detail-avatar">${escapeHTML(initial)}</div><div class="reaction-detail-name">${escapeHTML(nick)}</div></div><img src="${EMOTION_ICONS[r.emotionNum-1]}" class="reaction-detail-emoji" alt="" loading="eager">`;
+        item.className='reaction-detail-item' + (isMe ? ' has-cancel' : '');
+        const cancelBtn = isMe ? `<button type="button" class="reaction-cancel-btn" onclick="event.stopPropagation(); cancelReactionFromDetail('${r.id}','${currentReactionTargetId}')" aria-label="취소"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>` : '';
+        item.innerHTML = `<div class="reaction-detail-user"><div class="reaction-detail-avatar">${escapeHTML(initial)}</div><div class="reaction-detail-name">${escapeHTML(nick)}${isMe ? ' <span style="font-size:11px;color:var(--t2);font-weight:600;margin-left:4px;">(나)</span>' : ''}</div></div><div class="reaction-detail-right"><img src="${EMOTION_ICONS[r.emotionNum-1]}" class="reaction-detail-emoji" alt="" loading="eager">${cancelBtn}</div>`;
         listEl.appendChild(item);
       });
     }
@@ -2256,11 +2353,11 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       window.addEventListener('mousemove', onMove);
       window.addEventListener('touchend', onEnd);
       window.addEventListener('mouseup', onEnd);
-      // close when clicking backdrop
       modal.addEventListener('click', (e)=>{
         if(e.target===modal) closeReactionDetail();
       });
     }
+
 
 
 
@@ -2275,12 +2372,8 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       document.getElementById('createRoomModal').classList.remove('open');
       document.getElementById('inviteModal').classList.remove('open');
       document.getElementById('roomInfoModal').classList.remove('open');
-      const rdm = document.getElementById('reactionDetailModal');
-      if(rdm) rdm.classList.remove('open');
-      document.body.style.overflow='';
       selectedUserIds.clear();
     }
-    function closeReactionDetailWrapper(){ closeReactionDetail(); }
 
     function openCreateRoomModal() {
       document.getElementById('createRoomModal').classList.add('open');
