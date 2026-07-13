@@ -293,114 +293,41 @@ opacity: 1;
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    /* ===== Mobile Top Bar - injected ===== */
-    .mobile-topbar {
+        /* ===== Mobile Top Bar - iframe wrapper (모바일 전용) ===== */
+    .mobile-topbar-iframe-wrap {
+      display: none; /* 데스크탑에서는 숨김 - 버그 수정 */
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       height: 56px;
       z-index: 300;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      background: rgba(0, 0, 0, 0.82);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      transition: background 0.2s ease;
-    }
-    html[data-theme="light"] .mobile-topbar {
-      background: rgba(250, 250, 250, 0.86);
-    }
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .topbar-logo {
-      width: 28px;
-      height: 28px;
-      display: block;
-      flex-shrink: 0;
-      object-fit: contain;
-      filter: none !important;
-    }
-    .topbar-title {
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--t1);
-      line-height: 1;
-    }
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-    .topbar-btn {
-      position: relative;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background: transparent;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.15s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .topbar-btn:hover { background: var(--bg3); }
-    .topbar-btn:active { transform: scale(0.92); }
-    .topbar-btn .icon-img {
-      width: 20px;
-      height: 20px;
-      display: block;
-      object-fit: contain;
-      transition: filter 0.2s ease;
-      filter: none;
-    }
-    html[data-theme="light"] .topbar-btn .icon-img.icon-invert {
-      filter: invert(1);
-    }
-    .noti-dot {
-      position: absolute;
-      top: 5px;
-      right: 6px;
-      width: 8px;
-      height: 8px;
-      background: #0095f6;
-      border-radius: 50%;
-      border: 2px solid var(--bg);
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
-      opacity: 0;
-      transform: scale(0);
       pointer-events: none;
-      transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
     }
-    html[data-theme="light"] .noti-dot {
-      border-color: #ffffff;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
-    }
-    .noti-dot.show {
-      opacity: 1;
-      transform: scale(1);
+    .mobile-topbar-iframe-wrap iframe {
+      width: 100%;
+      height: 56px;
+      border: none;
+      display: block;
+      pointer-events: auto;
+      overflow: hidden;
     }
     @media (max-width: 768px) {
-      .mobile-topbar { display: flex; }
-      body { padding-top: 56px !important; }
+      .mobile-topbar-iframe-wrap {
+        display: block;
+      }
+      body {
+        padding-top: 56px !important;
+      }
     }
-    /* 데스크톱에서는 완전히 숨김 (공간 차지 안함) */
     @media (min-width: 769px) {
-      .mobile-topbar { display: none !important; }
+      body {
+        padding-top: 0 !important;
+      }
+      .mobile-topbar-iframe-wrap {
+        display: none !important;
+      }
     }
 
 
@@ -1278,21 +1205,9 @@ opacity: 1;
   </style>
 </head>
 <body>
-<header class="mobile-topbar" role="banner" aria-label="상단바">
-  <a class="topbar-left" href="index.html" aria-label="Sharer 홈">
-    <img src="logo.svg" alt="Sharer 로고" class="topbar-logo" width="28" height="28" />
-    <span class="topbar-title">Sharer</span>
-  </a>
-  <div class="topbar-actions">
-    <a class="topbar-btn" href="set.html" aria-label="설정">
-      <img src="set.svg" alt="설정" class="icon-img icon-invert" width="20" height="20" />
-    </a>
-    <a class="topbar-btn" href="notification.html" aria-label="알림" id="topbarNotiBtn">
-      <img src="bell.svg" alt="알림" class="icon-img icon-invert" width="20" height="20" />
-      <span class="noti-dot" id="topbarNotiDot" aria-hidden="true"></span>
-    </a>
-  </div>
-</header>
+  <div class="mobile-topbar-iframe-wrap">
+  <iframe src="header.html" id="mobileTopbarFrame" title="상단바" frameborder="0" scrolling="no"></iframe>
+</div>
   <div id="pullRefresh">
     <svg class="material-spinner" viewBox="0 0 110 110" id="pullSpinnerSvg">
       <defs>
@@ -2425,72 +2340,163 @@ window.toggleSearchPanel = function() {
   })();
 </script>
 <script src="sharer-profile-sheet-host.js"></script>
-<script>
-/* ===== Topbar Notification Badge - realtime (notification.html 기반) ===== */
-(function() {
-  const DOT_ID = 'topbarNotiDot';
-  function getDot() { return document.getElementById(DOT_ID); }
-  function setDot(show) {
-    const d = getDot();
-    if (!d) return;
-    if (show) d.classList.add('show');
-    else d.classList.remove('show');
-  }
-  async function checkTopbarUnread() {
-    try {
-      const raw = localStorage.getItem('snsUser');
-      if (!raw) { setDot(false); return; }
-      const u = JSON.parse(raw);
-      if (!u || !u.id) { setDot(false); return; }
-      // api 함수는 본문 스크립트에서 정의됨. 아직 로드 전이면 대기
-      if (typeof api !== 'function') { setDot(false); return; }
-      const or = encodeURIComponent('(isread.eq.0,isread.is.null)');
-      const data = await api(`/notification?user=eq.${u.id}&or=${or}&select=isread&limit=5`);
-      const hasUnread = Array.isArray(data) && data.length > 0;
-      setDot(hasUnread);
-    } catch (e) {
-      // 조용히 무시 - 네트워크 일시 오류
-    }
-  }
+  <script>
+  
 
-  let topbarTimer = null;
-  function startTopbarRealtime() {
-    if (topbarTimer) clearInterval(topbarTimer);
-    checkTopbarUnread();
-    topbarTimer = setInterval(() => {
-      if (document.hidden) return;
-      checkTopbarUnread();
-    }, 3000);
-    window.addEventListener('focus', checkTopbarUnread);
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) checkTopbarUnread();
-    });
-    window.addEventListener('storage', (e) => {
-      if (!e.key) return;
-      if (e.key === 'snsUser' || e.key === 'theme' || e.key.includes('noti')) {
-        checkTopbarUnread();
+    async function api(endpoint, options = {}) {
+      const url = API_BASE + endpoint;
+      const res = await fetch(url, {
+        ...options,
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      });
+      if (!res.ok) {
+        let t = "";
+        try { t = await res.text(); } catch {}
+        throw new Error(t || ("HTTP " + res.status));
       }
-    });
-  }
-
-  // initCurrentUser 이후에 실행되도록 지연
-  function tryInit() {
-    if (typeof api === 'function') {
-      startTopbarRealtime();
-    } else {
-      setTimeout(tryInit, 300);
+      if (res.status === 204) return null;
+      return res.json();
     }
-  }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryInit);
-  } else {
-    tryInit();
-  }
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem('snsUser');
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch { return null; }
+    }
 
-  // 외부에서 강제 갱신할 수 있게 노출
-  window.refreshTopbarNoti = checkTopbarUnread;
-})();
-</script>
+    const bubbleEl = document.getElementById('topbarNotiBubble');
+    let prevCount = -1;
+    let isFirst = true;
+    let hideTimer = null;
+    let outTimer = null;
+
+    function formatCount(n) {
+      n = Number(n) || 0;
+      if (n > 99) return '99+';
+      if (n > 9) return '9+';
+      return String(n);
+    }
+
+    function hideImmediate() {
+      if (!bubbleEl) return;
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+      if (outTimer) { clearTimeout(outTimer); outTimer = null; }
+      bubbleEl.classList.remove('show','pop-in','pop-out');
+    }
+
+    function showBubble(count) {
+      if (!bubbleEl) return;
+      count = Number(count) || 0;
+      if (count <= 0) { hideImmediate(); return; }
+
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+      if (outTimer) { clearTimeout(outTimer); outTimer = null; }
+
+      bubbleEl.textContent = formatCount(count);
+      bubbleEl.classList.remove('pop-out');
+      bubbleEl.classList.add('show');
+
+      // 재시작을 위한 강제 리플로
+      void bubbleEl.offsetWidth;
+      bubbleEl.classList.remove('pop-in');
+      void bubbleEl.offsetWidth;
+      bubbleEl.classList.add('pop-in');
+
+      // 2초 유지 후 위로 튀며 사라짐
+      hideTimer = setTimeout(() => {
+        bubbleEl.classList.remove('pop-in');
+        bubbleEl.classList.add('pop-out');
+        outTimer = setTimeout(() => {
+          bubbleEl.classList.remove('show','pop-out');
+        }, 400);
+      }, 2000);
+    }
+
+    async function checkUnread() {
+      const user = getCurrentUser();
+      if (!user || !user.id) {
+        // 로그인 안됐을 때는 테스트용으로 카운트 유지, 팝업 안뜨게
+        if (isFirst) {
+          isFirst = false;
+          prevCount = 0;
+        }
+        return;
+      }
+      try {
+        const or = encodeURIComponent('(isread.eq.0,isread.is.null)');
+        // notification.html과 동일한 쿼리
+        const data = await api(`/notification?user=eq.${user.id}&or=${or}&select=isread&limit=100`);
+        const count = Array.isArray(data) ? data.length : 0;
+
+        if (isFirst) {
+          isFirst = false;
+          prevCount = count;
+          if (count > 0) {
+            // 첫 로드시 기존 안읽은게 있으면 바로 팝업 보여줌 (확인용)
+            showBubble(count);
+          }
+          return;
+        }
+
+        if (count > prevCount && count > 0) {
+          // *** 새로운 알림이 실시간으로 도착한 경우 ***
+          showBubble(count);
+        } else if (count === 0 && prevCount > 0) {
+          hideImmediate();
+        }
+        // count가 그대로면 팝업 재트리거 안함 (3초마다 깜빡이는 것 방지)
+
+        prevCount = count;
+      } catch (e) {
+        console.warn('[topbar] 알림 체크 실패', e);
+      }
+    }
+
+    let timer = null;
+    function start() {
+      if (timer) clearInterval(timer);
+      checkUnread();
+      timer = setInterval(() => {
+        if (document.hidden) return;
+        checkUnread();
+      }, 3000);
+      window.addEventListener('focus', checkUnread);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUnread(); });
+      window.addEventListener('storage', (e) => {
+        if (!e.key) return;
+        if (e.key === 'theme') {
+          const v = e.newValue || 'dark';
+          if (v === 'light') document.documentElement.setAttribute('data-theme','light');
+          else document.documentElement.removeAttribute('data-theme');
+        }
+        if (e.key === 'snsUser' || e.key.includes('noti')) checkUnread();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', start);
+    if (document.readyState !== 'loading') start();
+
+    // 콘솔 테스트용: testNotiBubble(3) 하면 강제 팝업
+    window.testNotiBubble = (n) => {
+      showBubble(n ?? 3);
+      console.log('[test] bubble pop!', n);
+    };
+    window.refreshTopbarNoti = checkUnread;
+    window._hideBubble = hideImmediate;
+
+    // 로그인 없이도 테스트 가능하도록 1초 뒤 데모 팝업 (실제 알림 없을 때만)
+    setTimeout(() => {
+      if (prevCount === -1 || prevCount === 0) {
+        const u = getCurrentUser();
+        if (!u) {
+          // 로그인 안된 상태에서도 효과 확인용으로 1회 보여줌, 5초 뒤 자동 숨김은 showBubble 로직이 처리
+          // 원치 않으면 아래 두 줄 주석 처리f
+          // showBubble(3);
+        }
+      }
+    }, 800);
+  </script>
 </body>
 </html>
