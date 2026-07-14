@@ -1209,7 +1209,7 @@ opacity: 1;
       position: absolute;
       left: 0; top: 0; bottom: 0;
       width: 3px;
-      background: linear-gradient(180deg, #5a7cff 0%, #9b6cff 100%);
+      background: linear-gradient(180deg, #00E57D 0%, #270FFF 100%);
       opacity: 0.95;
     }
     html[data-theme="light"] .post-card.admin-post {
@@ -1614,23 +1614,9 @@ function renderHomeCreateAvatar() {
 }
 
 function handleHomeCreateClick() {
-  if (!currentUser) {
-    const lm = document.getElementById('loginModal');
-    if (lm) lm.classList.add('active');
-    else window.location.href = 'login.html';
-    return;
-  }
-  const cm = document.getElementById('createModal');
-  if (cm) {
-    cm.classList.add('active');
-    const ta = document.getElementById('postContent');
-    if (ta) { ta.value = ''; ta.focus(); }
-    const pv = document.getElementById('imagePreview');
-    if (pv) pv.classList.remove('show');
-    selectedImage = null;
-  } else {
-    window.location.href = 'make.html';
-  }
+    window.location.href = "make.html";
+  
+
 }
 
 // 기존 initCurrentUser 이후 아바타 갱신 훅
