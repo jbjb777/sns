@@ -98,7 +98,7 @@
 
 
     /* SIDEBAR */
-    .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-container { width: 72px; min-width: 72px; height: 100dvh; position: fixed; left: 0; top: 0; z-index: 100; }
     .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
     /* MAIN WRAPPER */
@@ -107,7 +107,7 @@
       width: calc(100% - 72px); 
       display: flex; 
       flex-direction: column; 
-      height: 100vh; 
+      height: 100dvh; 
     }
 @media (max-width: 768px) {
   /* 채팅방 안에 있을 때만 사이드바 숨김 */
@@ -367,7 +367,7 @@
     @media (max-width: 768px) {
       .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .sidebar-container iframe { width: 100% !important; height: 100% !important; }
-      .main-wrapper { margin-left: 0; width: 100%; height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px)); }
+      .main-wrapper { margin-left: 0; width: 100%; height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px)); }
   .dm-container {
     padding-bottom: 72px; /* 사이드바 높이만큼 */
     box-sizing: border-box;
@@ -405,7 +405,7 @@
       left: 72px;
       width: 380px;
       max-width: calc(100vw - 72px);
-      height: 100vh;
+      height: 100dvh;
       background: var(--bg);
       border-right: 1px solid var(--border);
       z-index: 90;
@@ -492,7 +492,7 @@
       border-radius: 20px 20px 0 0;
       padding: 4px 16px calc(20px + env(safe-area-inset-bottom, 0px));
       box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
-      max-height: 44vh;
+      max-height: 44dvh;
       overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
@@ -2535,13 +2535,13 @@ document.querySelector('.back-btn').addEventListener('click', () => {
           st.isExpanded=true;
           content.classList.add('sheet-expanded');
           content.style.transform='translateY(0)';
-          content.style.maxHeight='88vh';
+          content.style.maxHeight='88dvh';
           return;
         }
         if(st.isExpanded && dy > 58){
           st.isExpanded=false;
           content.classList.remove('sheet-expanded');
-          content.style.maxHeight='78vh';
+          content.style.maxHeight='78dvh';
           content.style.transform='translateY(0)';
           return;
         }
