@@ -1011,7 +1011,7 @@
   async function initPage() {
     const savedUser = localStorage.getItem('snsUser');
     if (!savedUser) {
-      alert('로그인이 필요합니다.');
+
       window.location.href = 'login.html';
       return;
     }
