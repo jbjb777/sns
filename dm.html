@@ -3032,7 +3032,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       if(countEl) countEl.textContent = `${ids.length}명`;
       if(ids.length===0){
         box.classList.remove('has-users');
-        box.innerHTML = `<div class="empty-placeholder">선택된 사용자가 없습니다<br>아래 버튼으로 사용자를 추가해보세요</div>`;
+        box.innerHTML = `<div class="empty-placeholder"><b>선택된 사용자가 없어요</b><br>아래 버튼을 눌러 추가해보아요</div>`;
         return;
       }
       box.classList.add('has-users');
