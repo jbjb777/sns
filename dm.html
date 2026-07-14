@@ -1098,6 +1098,217 @@
 
     .reaction-detail-item.has-cancel { padding-right:4px; }
     .reaction-detail-right { display:flex; align-items:center; gap:8px; }
+
+    /* ===== NEW: 선택된 사용자 표시 박스 + 칩 ===== */
+    .selected-users-box {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 12px;
+      min-height: 88px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-content: flex-start;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+    .selected-users-box.has-users { border-color: var(--border3); }
+    .selected-users-box .empty-placeholder {
+      width: 100%;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--t3);
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      padding: 4px 10px 4px 4px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--t1);
+      max-width: 100%;
+      animation: chipIn 0.24s cubic-bezier(0.22,1,0.36,1);
+      white-space: nowrap;
+    }
+    @keyframes chipIn { from { opacity:0; transform:scale(0.88) translateY(4px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .user-chip .chip-avatar {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .user-chip .chip-avatar img { width:100%; height:100%; object-fit:cover; }
+    .user-chip .chip-name { max-width: 96px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .user-chip .chip-remove {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.12);
+      color: var(--t2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 2px;
+      transition: all 0.16s;
+      flex-shrink: 0;
+    }
+    html[data-theme="light"] .user-chip .chip-remove { background: rgba(0,0,0,0.08); }
+    .user-chip .chip-remove:hover { background: rgba(255,107,107,0.18); color: #ff6b6b; transform: scale(1.1); }
+    .user-chip .chip-remove:active { transform: scale(0.92); }
+
+    .user-search-trigger-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px 14px;
+      border: 1px dashed var(--border3);
+      background: var(--bg);
+      color: var(--t2);
+      border-radius: var(--r2);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+    .user-search-trigger-btn:hover { border-color: var(--t2); color: var(--t1); background: var(--bg2); }
+    .user-search-trigger-btn:active { transform: scale(0.98); }
+
+    /* ===== NEW: 사용자 검색 2차 팝업 (search.html 스타일 차용) ===== */
+    #userSearchModal.modal { z-index: 360; }
+    #userSearchModal.modal.open { background: rgba(0,0,0,0.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    #userSearchModal .modal-content {
+      max-width: 440px;
+      width: 92%;
+      max-height: 84vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-bottom: 0;
+    }
+    #userSearchModal .modal-title { margin-bottom: 14px; }
+
+    .us-search-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      padding: 0 12px;
+      height: 46px;
+      flex-shrink: 0;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .us-search-box:focus-within { border-color: #5a5a5a; box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+    html[data-theme="light"] .us-search-box:focus-within { border-color: #9a9a9a; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+    .us-search-box input {
+      flex:1; background: transparent; border: none; outline: none;
+      color: var(--t1); font-size: 15px; padding-left: 10px; font-family: inherit;
+    }
+    .us-search-box input::placeholder { color: var(--t3); }
+    .us-search-box .search-icon, .us-search-box .clear-icon {
+      color: var(--t2); cursor: pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .us-search-box .clear-icon { width:22px; height:22px; border-radius:50%; background: var(--bg3); transition: all 0.15s; }
+    .us-search-box .clear-icon:hover { background: var(--bg4); color: var(--t1); }
+
+    .us-meta-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 12px 2px 8px;
+      font-size: 12px; color: var(--t2); flex-shrink:0;
+    }
+    .us-result-count { font-weight: 600; color: var(--t1); }
+    .us-results-list {
+      flex:1;
+      overflow-y: auto;
+      min-height: 280px;
+      max-height: 48vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin: 0 -24px;
+      padding: 0 24px 8px;
+      background: transparent;
+    }
+    .us-results-list::-webkit-scrollbar { width: 6px; }
+    .us-results-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+    .us-user-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 12px 10px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: background 0.18s;
+      gap: 10px;
+    }
+    .us-user-item:hover { background: var(--bg3); }
+    .us-user-item.selected { background: rgba(62,59,246,0.10); }
+    html[data-theme="light"] .us-user-item.selected { background: rgba(62,59,246,0.08); }
+    .us-user-meta { display:flex; align-items:center; gap: 12px; flex:1; min-width:0; }
+    .us-avatar {
+      width: 40px; height:40px; border-radius:50%; background: var(--bg4);
+      border:1px solid var(--border2); overflow:hidden; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:var(--t1);
+    }
+    .us-avatar img { width:100%; height:100%; object-fit:cover; }
+    .us-info { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+    .us-nickname { font-size:14px; font-weight:600; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .us-id { font-size:12.5px; color:var(--t2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    .us-skeleton-item {
+      display:flex; align-items:center; gap:12px; padding:12px 10px;
+    }
+    .us-skel-avatar { width:40px; height:40px; border-radius:50%; flex-shrink:0; }
+    .us-skel-lines { flex:1; display:flex; flex-direction:column; gap:7px; }
+    .us-skel-line { height:12px; border-radius:6px; }
+    .us-skel-line.w1 { width:92px; } .us-skel-line.w2 { width:64px; }
+    .us-skel-btn { width:58px; height:28px; border-radius:14px; flex-shrink:0; }
+
+    @media (max-width:768px){
+      #userSearchModal.modal { align-items:flex-end; justify-content:center; padding:0; }
+      #userSearchModal .modal-content {
+        width:100%; max-width:100%;
+        border-radius:22px 22px 0 0;
+        padding:0 18px calc(16px + env(safe-area-inset-bottom, 0px));
+        max-height:88vh; min-height:52vh;
+        transform:translateY(100%);
+        transition:transform 0.38s cubic-bezier(0.22,1,0.36,1), max-height 0.36s cubic-bezier(0.22,1,0.36,1);
+        opacity:1; display:flex; flex-direction:column;
+        box-shadow:0 -12px 40px rgba(0,0,0,0.45);
+        border:1px solid var(--border2); border-bottom:none;
+      }
+      #userSearchModal.open .modal-content { transform:translateY(0); }
+      #userSearchModal .modal-content.sheet-dragging { transition:none !important; }
+      #userSearchModal .modal-content.sheet-expanded { max-height:92vh; }
+      #userSearchModal .sheet-handle { display:block; }
+      #userSearchModal .modal-close { top:14px; right:16px; }
+      #userSearchModal .modal-title { padding-top:6px; margin-bottom:12px; flex-shrink:0; }
+      #userSearchModal .us-search-box { flex-shrink:0; }
+      #userSearchModal .us-meta-row { flex-shrink:0; }
+      #userSearchModal .us-results-list { flex:1; max-height:none; min-height:200px; max-height:52vh; margin:0 -18px; padding:0 18px 8px; }
+      #userSearchModal .modal-btn { flex-shrink:0; margin-top:12px; border-radius:16px; padding:16px; }
+    }
+
 </style>
 </head>
 <body>
@@ -1188,7 +1399,7 @@
     </div>
   </div>
 
-  <!-- 방 만들기 모달 -->
+    <!-- 방 만들기 모달 - 개선된 사용자 선택 UI -->
   <div class="modal" id="createRoomModal">
     <div class="modal-content">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
@@ -1200,21 +1411,21 @@
         <label>채팅방 이름</label>
         <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요">
       </div>
-      <div class="form-group">
-        <label>초대할 사용자 선택</label>
-        <div class="modal-search-box">
-          <span class="search-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </span>
-          <input type="text" id="createRoomUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('newUserList', this.value)">
+      <div class="form-group" style="flex:1; min-height:0; display:flex; flex-direction:column;">
+        <label>초대할 사용자 <span id="createSelectedCount" style="color:var(--t2); font-weight:400; font-size:12px; margin-left:4px;">0명</span></label>
+        <div class="selected-users-box" id="createSelectedBox">
+          <div class="empty-placeholder">선택된 사용자가 없습니다<br>아래 버튼으로 사용자를 추가해보세요</div>
         </div>
-        <div class="user-select-list" id="newUserList"></div>
+        <button type="button" class="user-search-trigger-btn" onclick="openUserSearch('create')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          사용자 검색하기
+        </button>
       </div>
       <button class="modal-btn" id="createRoomBtn" onclick="createRoom()">만들기</button>
     </div>
   </div>
 
-  <!-- 사용자 초대 모달 -->
+  <!-- 사용자 초대 모달 - 개선된 사용자 선택 UI -->
   <div class="modal" id="inviteModal">
     <div class="modal-content">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
@@ -1222,19 +1433,52 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="modal-title">사용자 초대하기</div>
-      <div class="form-group">
-        <label>초대할 사용자 선택</label>
-        <div class="modal-search-box">
-          <span class="search-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </span>
-          <input type="text" id="inviteUserSearch" placeholder="사용자 닉네임 검색..." oninput="filterUserList('inviteUserList', this.value)">
+      <div class="form-group" style="flex:1; min-height:0; display:flex; flex-direction:column;">
+        <label>초대할 사용자 <span id="inviteSelectedCount" style="color:var(--t2); font-weight:400; font-size:12px; margin-left:4px;">0명</span></label>
+        <div class="selected-users-box" id="inviteSelectedBox">
+          <div class="empty-placeholder">선택된 사용자가 없습니다<br>아래 버튼으로 사용자를 추가해보세요</div>
         </div>
-        <div class="user-select-list" id="inviteUserList"></div>
+        <button type="button" class="user-search-trigger-btn" onclick="openUserSearch('invite')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          사용자 검색하기
+        </button>
       </div>
       <button class="modal-btn" id="inviteBtn" onclick="inviteUsers()">초대하기</button>
     </div>
   </div>
+
+  <!-- 2차 팝업: 사용자 검색 (search.html 로직 차용) -->
+  <div class="modal user-search-modal" id="userSearchModal">
+    <div class="modal-content">
+      <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
+      <button class="modal-close" onclick="closeUserSearchModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="modal-title">사용자 검색</div>
+
+      <div class="us-search-box">
+        <span class="search-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        <input type="text" id="userSearchInput" placeholder="아이디, 닉네임으로 검색" autocomplete="off" oninput="handleUserSearchInput(this.value)">
+        <span class="clear-icon" id="usClearBtn" style="display:none;" onclick="clearUserSearchInput()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </span>
+      </div>
+
+      <div class="us-meta-row">
+        <span class="us-result-count" id="usResultCount">전체 사용자</span>
+        <span class="us-hint">아이디 · 닉네임 모두 검색</span>
+      </div>
+
+      <div class="us-results-list" id="userSearchResults"></div>
+
+      <button class="modal-btn" id="usConfirmBtn" onclick="confirmUserSearch()">
+        완료 <span id="usSelectedCountBadge" style="opacity:0.7; font-weight:400;"></span>
+      </button>
+    </div>
+  </div>
+
 
   <!-- 채팅방 정보 모달 (새로 추가) -->
   <div class="modal" id="roomInfoModal">
@@ -2462,6 +2706,10 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
     // ===== Bottom Sheet generic close (desktop popup 유지, mobile bottom sheet) =====
     const bottomSheetState = {};
+    let tempSelectedIds = new Set();
+    let currentSearchCaller = null; // 'create' | 'invite'
+    let userSearchDebounce = null;
+
     function closeModalById(id){
       const modal=document.getElementById(id);
       if(!modal) return;
@@ -2474,12 +2722,29 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       }
       modal.classList.remove('open');
       // body overflow는 모든 바텀시트가 닫혔을 때만 해제
-      const anyOpen = document.querySelector('#createRoomModal.open, #inviteModal.open, #roomInfoModal.open, #reactionDetailModal.open');
+      const anyOpen = document.querySelector('#createRoomModal.open, #inviteModal.open, #roomInfoModal.open, #reactionDetailModal.open, #userSearchModal.open');
       if(!anyOpen) document.body.style.overflow='';
       if(bottomSheetState[id]) bottomSheetState[id].isExpanded=false;
-      if(id==='createRoomModal'||id==='inviteModal'||id==='roomInfoModal') selectedUserIds.clear();
+      if(id==='createRoomModal'||id==='inviteModal'||id==='roomInfoModal'){
+        selectedUserIds.clear();
+        // 선택 표시 초기화
+        if(id==='createRoomModal') updateSelectedDisplay('create');
+        if(id==='inviteModal') updateSelectedDisplay('invite');
+        // 검색 모달도 닫혀있게
+        const usModal = document.getElementById('userSearchModal');
+        if(usModal && usModal.classList.contains('open')) {
+          usModal.classList.remove('open');
+        }
+      }
+      if(id==='userSearchModal'){
+        // 검색 모달만 닫을 때는 temp 초기화만 하고 메인 selected는 유지 (완료 전 취소)
+        tempSelectedIds = new Set(selectedUserIds);
+      }
     }
     function closeModals() {
+      // 검색 모달이 열려있으면 먼저 닫고, 아니면 메인 모달 닫기
+      const usOpen = document.getElementById('userSearchModal')?.classList.contains('open');
+      if(usOpen) { closeUserSearchModal(true); return; }
       closeModalById('createRoomModal');
       closeModalById('inviteModal');
       closeModalById('roomInfoModal');
@@ -2512,7 +2777,6 @@ document.querySelector('.back-btn').addEventListener('click', () => {
             dy=dy*0.22;
             content.style.transform=`translateY(${dy}px)`;
           }else{
-            // 위로 드래그시 살짝 따라오며 확장 암시
             const t = dy*0.18;
             content.style.transform=`translateY(${t}px)`;
           }
@@ -2535,13 +2799,13 @@ document.querySelector('.back-btn').addEventListener('click', () => {
           st.isExpanded=true;
           content.classList.add('sheet-expanded');
           content.style.transform='translateY(0)';
-          content.style.maxHeight='88dvh';
+          content.style.maxHeight= modalId==='userSearchModal' ? '92vh' : '88dvh';
           return;
         }
         if(st.isExpanded && dy > 58){
           st.isExpanded=false;
           content.classList.remove('sheet-expanded');
-          content.style.maxHeight='78dvh';
+          content.style.maxHeight= modalId==='userSearchModal' ? '88vh' : '78dvh';
           content.style.transform='translateY(0)';
           return;
         }
@@ -2578,17 +2842,240 @@ document.querySelector('.back-btn').addEventListener('click', () => {
     function openCreateRoomModal() {
       openSheetModal('createRoomModal');
       document.getElementById('newRoomName').value = '';
-      document.getElementById('createRoomUserSearch').value = '';
       selectedUserIds.clear();
-      renderUserSelectList('newUserList');
+      updateSelectedDisplay('create');
     }
 
     function openInviteModal() {
       openSheetModal('inviteModal');
-      document.getElementById('inviteUserSearch').value = '';
       selectedUserIds.clear();
-      renderUserSelectList('inviteUserList');
+      updateSelectedDisplay('invite');
     }
+
+    // ===== NEW: 사용자 검색 2차 팝업 로직 (search.html 방식 차용) =====
+    function openUserSearch(caller){
+      currentSearchCaller = caller; // 'create' or 'invite'
+      tempSelectedIds = new Set(selectedUserIds);
+      const modal = document.getElementById('userSearchModal');
+      const input = document.getElementById('userSearchInput');
+      const clearBtn = document.getElementById('usClearBtn');
+      modal.classList.add('open');
+      document.body.style.overflow='hidden';
+      initBottomSheetDrag('userSearchModal');
+      input.value = '';
+      if(clearBtn) clearBtn.style.display='none';
+      renderUserSearchSkeleton(6);
+      // 살짝 딜레이 후 전체 리스트 표시 (skeleton UX)
+      setTimeout(()=>{ renderUserSearchResults(''); }, 260);
+      updateSearchBadge();
+      setTimeout(()=>{ input.focus(); }, 80);
+    }
+
+    function closeUserSearchModal(isCancel=false){
+      const modal=document.getElementById('userSearchModal');
+      if(!modal) return;
+      const content=modal.querySelector('.modal-content');
+      if(content){
+        content.style.transform='';
+        content.style.transition='';
+        content.style.maxHeight='';
+        content.classList.remove('sheet-dragging','sheet-expanded');
+      }
+      modal.classList.remove('open');
+      const anyMainOpen = document.querySelector('#createRoomModal.open, #inviteModal.open, #roomInfoModal.open');
+      if(!anyMainOpen) document.body.style.overflow='';
+      if(bottomSheetState['userSearchModal']) bottomSheetState['userSearchModal'].isExpanded=false;
+      // 취소 시 temp를 버리고, 완료가 아닌 닫기면 selected 유지
+      if(isCancel){
+        tempSelectedIds = new Set(selectedUserIds);
+      }
+      const input = document.getElementById('userSearchInput');
+      if(input) input.value='';
+      const clearBtn = document.getElementById('usClearBtn');
+      if(clearBtn) clearBtn.style.display='none';
+    }
+
+    function confirmUserSearch(){
+      selectedUserIds = new Set(tempSelectedIds);
+      const caller = currentSearchCaller || 'create';
+      updateSelectedDisplay(caller);
+      closeUserSearchModal(false);
+    }
+
+    function clearUserSearchInput(){
+      const input = document.getElementById('userSearchInput');
+      const clearBtn = document.getElementById('usClearBtn');
+      if(!input) return;
+      input.value='';
+      if(clearBtn) clearBtn.style.display='none';
+      renderUserSearchSkeleton(5);
+      setTimeout(()=> renderUserSearchResults(''), 180);
+      input.focus();
+    }
+
+    function handleUserSearchInput(value){
+      const clearBtn = document.getElementById('usClearBtn');
+      if(clearBtn) clearBtn.style.display = value.trim() ? 'flex' : 'none';
+      if(userSearchDebounce) clearTimeout(userSearchDebounce);
+      // 입력 즉시 스켈레톤 노출 (search.html UX)
+      renderUserSearchSkeleton(5);
+      userSearchDebounce = setTimeout(()=>{
+        renderUserSearchResults(value.trim());
+      }, 280);
+    }
+
+    function getFilteredUsersForSearch(keyword){
+      const kw = (keyword||'').toLowerCase();
+      const caller = currentSearchCaller;
+      const activeMembers = (caller==='invite' && activeRoomId && roomMembersMap[activeRoomId]) ? roomMembersMap[activeRoomId] : [];
+      return Object.values(usersCache).filter(u=>{
+        if(!u || !u.id) return false;
+        if(u.id === currentUser.id) return false;
+        if(activeMembers.includes(u.id)) return false;
+        if(!kw) return true;
+        const nick = (u.nickname||'').toLowerCase();
+        const uid = (u.id||'').toLowerCase();
+        return nick.includes(kw) || uid.includes(kw);
+      }).sort((a,b)=> (a.nickname||'').localeCompare(b.nickname||''));
+    }
+
+    function renderUserSearchSkeleton(count=5){
+      const container = document.getElementById('userSearchResults');
+      const countEl = document.getElementById('usResultCount');
+      if(!container) return;
+      if(countEl) countEl.textContent = '검색 중...';
+      let html='';
+      for(let i=0;i<count;i++){
+        html+=`
+          <div class="us-skeleton-item">
+            <div class="skeleton us-skel-avatar"></div>
+            <div class="us-skel-lines">
+              <div class="skeleton us-skel-line w1"></div>
+              <div class="skeleton us-skel-line w2"></div>
+            </div>
+            <div class="skeleton us-skel-btn"></div>
+          </div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function renderUserSearchResults(keyword){
+      const container = document.getElementById('userSearchResults');
+      const countEl = document.getElementById('usResultCount');
+      if(!container) return;
+      const users = getFilteredUsersForSearch(keyword);
+      if(countEl){
+        if(!keyword) countEl.textContent = `전체 사용자 ${users.length}명`;
+        else countEl.textContent = users.length ? `검색 결과 ${users.length}명` : '검색 결과 없음';
+      }
+      if(users.length===0){
+        container.innerHTML = `<div style="padding:48px 20px; text-align:center; color:var(--t3); font-size:13.5px; line-height:1.6;">
+          <div style="font-size:28px; margin-bottom:10px; opacity:0.5;">🔍</div>
+          ${keyword ? `'${escapeHTML(keyword)}'에 대한 결과가 없습니다<br><span style="font-size:12px;">아이디, 닉네임을 모두 검색합니다</span>` : '표시할 사용자가 없습니다'}
+        </div>`;
+        return;
+      }
+      container.innerHTML='';
+      users.forEach(u=>{
+        const isSelected = tempSelectedIds.has(u.id);
+        const item = document.createElement('div');
+        item.className = 'us-user-item' + (isSelected ? ' selected' : '');
+        const avatarHTML = u.profile_image ? `<img src="${u.profile_image}" alt="">` : `${escapeHTML((u.nickname||'?')[0])}`;
+        item.innerHTML = `
+          <div class="us-user-meta">
+            <div class="us-avatar">${avatarHTML}</div>
+            <div class="us-info">
+              <div class="us-nickname">${escapeHTML(u.nickname||'이름 없음')}</div>
+              <div class="us-id">@${escapeHTML(u.id)}</div>
+            </div>
+          </div>
+          <button type="button" class="select-chk-btn ${isSelected ? 'checked' : ''}">${isSelected ? '선택됨' : '선택'}</button>
+        `;
+        const btn = item.querySelector('.select-chk-btn');
+        const toggle = (e)=>{
+          e.preventDefault(); e.stopPropagation();
+          if(tempSelectedIds.has(u.id)){
+            tempSelectedIds.delete(u.id);
+            item.classList.remove('selected');
+            btn.classList.remove('checked');
+            btn.textContent='선택';
+          }else{
+            tempSelectedIds.add(u.id);
+            item.classList.add('selected');
+            btn.classList.add('checked');
+            btn.textContent='선택됨';
+          }
+          updateSearchBadge();
+        };
+        item.addEventListener('click', toggle);
+        btn.addEventListener('click', toggle);
+        container.appendChild(item);
+      });
+    }
+
+    function updateSearchBadge(){
+      const badge = document.getElementById('usSelectedCountBadge');
+      const btn = document.getElementById('usConfirmBtn');
+      const n = tempSelectedIds.size;
+      if(badge) badge.textContent = n ? `(${n}명)` : '';
+      if(btn) btn.disabled = false;
+    }
+
+    function updateSelectedDisplay(caller){
+      const boxId = caller==='create' ? 'createSelectedBox' : 'inviteSelectedBox';
+      const countId = caller==='create' ? 'createSelectedCount' : 'inviteSelectedCount';
+      const box = document.getElementById(boxId);
+      const countEl = document.getElementById(countId);
+      if(!box) return;
+      box.innerHTML='';
+      const ids = Array.from(selectedUserIds);
+      if(countEl) countEl.textContent = `${ids.length}명`;
+      if(ids.length===0){
+        box.classList.remove('has-users');
+        box.innerHTML = `<div class="empty-placeholder">선택된 사용자가 없습니다<br>아래 버튼으로 사용자를 추가해보세요</div>`;
+        return;
+      }
+      box.classList.add('has-users');
+      ids.forEach(uid=>{
+        const u = getUserInfo(uid);
+        const chip = document.createElement('div');
+        chip.className='user-chip';
+        const avatarInner = u.profile_image ? `<img src="${u.profile_image}" alt="">` : `${escapeHTML((u.nickname||'?')[0])}`;
+        chip.innerHTML = `
+          <div class="chip-avatar">${avatarInner}</div>
+          <span class="chip-name">${escapeHTML(u.nickname||u.id)}</span>
+          <button type="button" class="chip-remove" aria-label="제거">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        `;
+        chip.querySelector('.chip-remove').addEventListener('click', (e)=>{
+          e.stopPropagation();
+          removeSelectedUser(uid, caller);
+        });
+        box.appendChild(chip);
+      });
+    }
+
+    function removeSelectedUser(userId, caller){
+      if(selectedUserIds.has(userId)) selectedUserIds.delete(userId);
+      if(tempSelectedIds.has(userId)) tempSelectedIds.delete(userId);
+      updateSelectedDisplay(caller);
+      updateSearchBadge();
+      // 검색 결과가 열려있으면 해당 아이템 상태도 갱신
+      const results = document.getElementById('userSearchResults');
+      if(results){
+        const items = results.querySelectorAll('.us-user-item');
+        // 간단히 재렌더 대신 해당 유저가 보이면 버튼 상태만 갱신하려면 전체 리렌더가 안전
+        const input = document.getElementById('userSearchInput');
+        const kw = input ? input.value.trim() : '';
+        // 검색 모달이 열려있을 때만 리렌더
+        if(document.getElementById('userSearchModal')?.classList.contains('open')){
+          renderUserSearchResults(kw);
+        }
+      }
+    }
+
+
 
     // 채팅방 정보 모달 열기 함수 (멤버 표시 및 마이페이i지 연결)
     function openRoomInfoModal() {
