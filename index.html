@@ -1100,6 +1100,151 @@ opacity: 1;
       }
     }
 
+
+    /* === Home Create Trigger - screenshot style === */
+    .create-trigger {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 4px 18px;
+      cursor: pointer;
+      border-bottom: 1px solid #222;
+      margin-bottom: 2px;
+      transition: opacity 0.15s;
+      user-select: none;
+    }
+    .create-trigger:hover { opacity: 0.9; }
+    .create-trigger:active { transform: scale(0.99); }
+    .create-trigger-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2d8cff, #53b6ff);
+      border: 1px solid #2a2a2a;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: #fff;
+      flex-shrink: 0;
+      object-fit: cover;
+      overflow: hidden;
+    }
+    .create-trigger-avatar img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .create-trigger-text {
+      color: #6b6b6b;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    html[data-theme="light"] .create-trigger-text { color: #8a8a8a; }
+    html[data-theme="light"] .create-trigger { border-bottom-color: #e9e9e9; }
+    .create-trigger:hover .create-trigger-text { color: var(--t2); }
+
+    /* === Clean post divider === */
+    .post-card {
+      padding: 22px 2px 18px;
+      border-bottom: 1px solid #1e1e1e;
+      background: transparent !important;
+    }
+    .post-card:hover { background: transparent !important; }
+    html[data-theme="light"] .post-card { border-bottom-color: #ececec; }
+    .post-card:last-child { border-bottom: none; }
+
+    /* === Post actions with comment icon === */
+    .post-actions {
+      margin: 14px 0 2px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 2px;
+    }
+    .like-button, .comment-button {
+      background: none;
+      border: none;
+      padding: 6px 2px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #5a5a5a;
+      transition: color 0.15s, transform 0.15s;
+      font-size: 14px;
+      font-family: inherit;
+      line-height: 1;
+      user-select: none;
+    }
+    html[data-theme="light"] .like-button,
+    html[data-theme="light"] .comment-button { color: #8a8a8a; }
+    .like-button:hover { color: #ff6b7a; }
+    .comment-button:hover { color: var(--t1); }
+    .like-button.liked { color: #ff4d6d; }
+    .like-heart, .comment-icon {
+      width: 22px; height: 22px;
+      flex-shrink: 0;
+      transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .like-button:hover .like-heart,
+    .comment-button:hover .comment-icon { transform: scale(1.12); }
+    .like-button:active .like-heart,
+    .comment-button:active .comment-icon { transform: scale(0.94); }
+    .like-count, .comment-count {
+      font-weight: 600;
+      font-size: 14px;
+      min-width: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    /* === Admin / Notice highlight - clean & subtle === */
+    .post-card.admin-post {
+      background: #0f0f10 !important;
+      border: 1px solid #242428;
+      border-radius: 16px;
+      padding: 20px 18px 16px;
+      margin: 12px 2px 18px;
+      box-shadow: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .post-card.admin-post::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, #5a7cff 0%, #9b6cff 100%);
+      opacity: 0.95;
+    }
+    html[data-theme="light"] .post-card.admin-post {
+      background: #ffffff !important;
+      border-color: #e6e6ea;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    html[data-theme="light"] .post-card.admin-post::before {
+      opacity: 0.85;
+    }
+    .post-card.admin-post:hover { background: #141416 !important; }
+    html[data-theme="light"] .post-card.admin-post:hover { background: #fafafb !important; }
+    .post-card.admin-post .post-content { color: var(--t1); }
+    .post-card.admin-post:last-child {
+      border-bottom: 1px solid #242428;
+    }
+    html[data-theme="light"] .post-card.admin-post:last-child { border-bottom-color: #e6e6ea; }
+
+    /* notice badge tweak for clean look */
+    .notice-badge {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #cfd2ff !important;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 999px;
+      letter-spacing: -0.01em;
+    }
+    html[data-theme="light"] .notice-badge {
+      background: #eef0ff;
+      border-color: #dfe2ff;
+      color: #4a56ff !important;
+    }
+
 </style>
 </head>
 <body>
@@ -1211,7 +1356,11 @@ opacity: 1;
 
   <div class="main-content">
     <div class="feed-container">
-      <div id="postsFeed">
+          <div class="create-trigger" id="homeCreateTrigger" onclick="handleHomeCreateClick()">
+      <div id="homeCreateAvatarWrap" class="create-trigger-avatar">JB</div>
+      <span class="create-trigger-text">나의 생각을 입력해봐요</span>
+    </div>
+    <div id="postsFeed">
         <div class="skeleton-post">
           <div class="skeleton-post-header">
             <div class="skeleton skeleton-avatar"></div>
@@ -1439,6 +1588,60 @@ window.onSharerProfileLogout = function () {
   currentUser = null;
   location.reload();
 };
+
+function renderHomeCreateAvatar() {
+  const wrap = document.getElementById('homeCreateAvatarWrap');
+  if (!wrap) return;
+  try {
+    const raw = localStorage.getItem('snsUser');
+    const u = raw ? JSON.parse(raw) : currentUser;
+    if (u && u.profile_image) {
+      wrap.innerHTML = `<img src="${escapeHtml(u.profile_image)}" alt="내 프로필">`;
+      wrap.style.background = 'var(--bg3)';
+      wrap.style.border = '1px solid var(--border2)';
+    } else if (u && u.nickname) {
+      const initial = (u.nickname[0] || 'U').toUpperCase();
+      wrap.textContent = initial;
+      wrap.style.background = 'linear-gradient(135deg, #2d8cff, #53b6ff)';
+      wrap.style.color = '#fff';
+    } else {
+      wrap.textContent = 'JB';
+      wrap.style.background = 'linear-gradient(135deg, #2d8cff, #53b6ff)';
+    }
+  } catch (e) {
+    wrap.textContent = 'JB';
+  }
+}
+
+function handleHomeCreateClick() {
+  if (!currentUser) {
+    const lm = document.getElementById('loginModal');
+    if (lm) lm.classList.add('active');
+    else window.location.href = 'login.html';
+    return;
+  }
+  const cm = document.getElementById('createModal');
+  if (cm) {
+    cm.classList.add('active');
+    const ta = document.getElementById('postContent');
+    if (ta) { ta.value = ''; ta.focus(); }
+    const pv = document.getElementById('imagePreview');
+    if (pv) pv.classList.remove('show');
+    selectedImage = null;
+  } else {
+    window.location.href = 'make.html';
+  }
+}
+
+// 기존 initCurrentUser 이후 아바타 갱신 훅
+const _origInitCurrentUser = initCurrentUser;
+initCurrentUser = function() {
+  _origInitCurrentUser();
+  renderHomeCreateAvatar();
+};
+document.addEventListener('DOMContentLoaded', renderHomeCreateAvatar);
+window.addEventListener('storage', (e) => { if (!e.key || e.key === 'snsUser') renderHomeCreateAvatar(); });
+
 // 1. 로그인 성공 후
 function handleLogin() {
   // ... 기존 로그인 로직
@@ -1683,6 +1886,29 @@ async function loadPosts() {
     (allLikes || []).forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
     const myLikeSet = new Set((myLikes || []).map(l => l.post_id));
 
+    // 댓글 수 맵 - 게시물 페이지와 동일한 방식으로 집계
+    let allComments = [];
+    try {
+      allComments = await api(`/comments?post_id=in.(${postIdFilter})&select=post_id`).catch(() => null) || [];
+      if (!Array.isArray(allComments)) throw new Error('invalid');
+    } catch (e1) {
+      try {
+        allComments = await api(`/post_comments?post_id=in.(${postIdFilter})&select=post_id`).catch(() => []) || [];
+      } catch (e2) {
+        try {
+          allComments = await api(`/replies?post_id=in.(${postIdFilter})&select=post_id`).catch(() => []) || [];
+        } catch (e3) {
+          allComments = [];
+        }
+      }
+    }
+    const commentCountMap = {};
+    (allComments || []).forEach(c => {
+      const pid = c.post_id;
+      if (!pid) return;
+      commentCountMap[pid] = (commentCountMap[pid] || 0) + 1;
+    });
+
     feedDiv.innerHTML = '';
     posts.forEach((post, idx) => {
       const userInfo = usersMap[post.author_id] || null;
@@ -1693,6 +1919,7 @@ async function loadPosts() {
       const canDelete = currentUser?.nickname === "JB777";
       const likeCount = likeCountMap[post.id] || 0;
       const liked = myLikeSet.has(post.id);
+      const commentCount = commentCountMap[post.id] || 0;
       
       const hasStory = recentStoryAuthors.has(post.author_id);
       const isAdminPost = post.type === 'admin';
@@ -1733,10 +1960,16 @@ async function loadPosts() {
         ${contentHTML}
         <div class="post-actions">
           <button class="like-button ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
-            <svg class="like-heart" viewBox="0 0 2300 2300" xmlns="http://www.w3.org/2000/svg">
-              <path fill="currentColor" d="M 2169.75708 1273.707397 C 2082.986328 1435.051758 1959.814697 1592.116455 1800.239746 1744.902832 C 1640.756348 1897.699951 1451.88208 2043.705688 1233.619141 2182.920898 C 1220.223145 2191.470215 1206.115234 2198.850586 1191.452637 2204.979248 C 1165.430908 2218.340332 1134.569092 2218.340332 1108.547363 2204.979248 C 1093.884766 2198.850586 1079.776855 2191.470215 1066.380859 2182.920898 C 848.148438 2043.693726 659.267578 1897.687988 499.74292 1744.902832 C 340.21582 1592.116455 217.04187 1435.051758 130.216797 1273.707397 C 43.415771 1112.370728 0 944.232666 0 779.5177 C 0 642.959229 28.581055 527.005981 85.715088 421.457642 C 139.349243 319.653564 219.24231 234.056396 317.106201 173.547607 C 414.637207 113.417725 527.301025 82.374756 641.860352 84.066162 C 755.30127 84.066162 858.310303 112.998535 943.981934 171.086914 C 1030.09082 228.040771 1100.847168 305.330322 1150 396.127686 C 1199.152832 305.330322 1269.90918 228.040771 1356.018066 171.086914 C 1441.689697 112.998535 1544.744385 84.066162 1658.139648 84.066162 C 1772.703369 82.367188 1885.371582 113.411133 1982.904785 173.547607 C 2080.76001 234.048828 2160.637695 319.64917 2214.239258 421.457642 C 2271.384033 527.005981 2300 642.959229 2300 779.5177 C 2300 944.232666 2256.584229 1112.370728 2169.75708 1273.707397 Z"/>
+            <svg class="like-heart" viewBox="0 0 24 24" fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="${liked ? '1.8' : '1.8'}" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
             <span class="like-count">${likeCount}</span>
+          </button>
+          <button class="comment-button" onclick="event.stopPropagation(); window.location.href='view.html?id=${post.id}'" aria-label="댓글 보기">
+            <svg class="comment-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/>
+            </svg>
+            <span class="comment-count">${commentCount}</span>
           </button>
         </div>
         <div class="post-time">${timeStr}</div>
