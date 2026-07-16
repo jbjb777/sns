@@ -1698,15 +1698,8 @@ window.backToLogin = () => { closeSignupModal(); document.getElementById('loginM
 
 function openMakeIframeModal() {
   if (!currentUser) { document.getElementById('loginModal').classList.add('active'); return; }
-  const modal = document.getElementById('makeIframeModal');
-  const iframe = document.getElementById('makeIframe');
-  if (!modal || !iframe) return;
-  iframe.src = 'make.html?embed=1';
-  modal.classList.add('active');
-  modal.setAttribute('aria-hidden','false');
-  document.body.style.overflow = 'hidden';
-  // 포커스 트랩용
-  setTimeout(() => { try { iframe.contentWindow.focus(); } catch(e){} }, 100);
+    window.location.href = "login.html";
+    return;
 }
 function closeMakeIframeModal() {
   const modal = document.getElementById('makeIframeModal');
