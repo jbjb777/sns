@@ -1243,8 +1243,6 @@
   };
 
   initPage();
-</script>
-
   // embed 전용: ESC로 닫기, 부모 테마 동기화
   (function(){
     const isEmbedded = document.documentElement.classList.contains('is-embedded') || window.__SHARER_EMBEDDED__;
@@ -1268,6 +1266,9 @@
     // 초기 테마 동기화 요청
     try { window.parent.postMessage({ type: 'sharer-embed-ready' }, '*'); } catch(e){}
   })();
+</script>
+
+
 
 </body>
 </html>

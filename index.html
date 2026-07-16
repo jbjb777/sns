@@ -1661,7 +1661,7 @@ window.addEventListener('message', (event) => {
       if (feed) {
         // 맨 위에 잠깐 성공 배너
         const banner = document.createElement('div');
-        banner.textContent = '게시글이 업로드되었어요 ✨';
+        banner.textContent = '게시글이 업로드되었어요';
         banner.style.cssText = 'text-align:center;padding:12px 0;font-size:13px;color:var(--t2);animation:fadeUp 0.4s ease;';
         feed.prepend(banner);
         setTimeout(()=> banner.remove(), 2500);
@@ -1886,7 +1886,7 @@ async function loadPosts() {
   try {
     const posts = await api("/posts?select=*&access=not.in.(private,link)&order=created_at.desc");
     if (!posts?.length) {
-      feedDiv.innerHTML = '<div class="no-posts"><div class="no-posts-icon">🍃</div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요! ✨</div></div>';
+      feedDiv.innerHTML = '<div class="no-posts"><div class="no-posts-icon"> </div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요</div></div>';
       return;
     }
     posts.forEach(p => { postAuthorIdMap[p.id] = p.author_id; });
