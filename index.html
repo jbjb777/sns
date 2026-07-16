@@ -1152,6 +1152,88 @@ opacity: 1;
       }
     }
 
+
+    /* ===== Make Iframe Modal (생각 입력 팝업) ===== */
+    .make-iframe-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .make-iframe-modal.active { display: flex; }
+    .make-iframe-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .make-iframe-modal.active .make-iframe-backdrop { opacity: 1; }
+    .make-iframe-box {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      height: min(86vh, 820px);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r4);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      transform: scale(0.96) translateY(10px);
+      opacity: 0;
+      transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .make-iframe-modal.active .make-iframe-box {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+    .make-iframe-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: var(--bg2);
+      flex: 1;
+    }
+    .make-iframe-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--t2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.15s, color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .make-iframe-close:hover { background: var(--bg4); color: var(--t1); transform: scale(1.08); }
+    .make-iframe-close:active { transform: scale(0.92); }
+    @media (max-width: 768px) {
+      .make-iframe-modal { padding: 0; align-items: flex-end; }
+      .make-iframe-box {
+        max-width: 100%;
+        width: 100%;
+        height: 92vh;
+        border-radius: 20px 20px 0 0;
+        transform: translateY(100%);
+      }
+      .make-iframe-modal.active .make-iframe-box { transform: translateY(0); }
+      .make-iframe-close { top: 12px; right: 12px; }
+    }
+
 </style>
 </head>
 <body>
@@ -1258,6 +1340,15 @@ opacity: 1;
         <button class="upload-btn" id="uploadBtn">📷 사진 추가</button>
         <div id="postMessage" style="margin-top: 10px; font-size: 13px; font-weight: 500;"></div>
       </div>
+    </div>
+  </div>
+
+  
+  <div class="make-iframe-modal" id="makeIframeModal" aria-hidden="true">
+    <div class="make-iframe-backdrop" id="makeIframeBackdrop"></div>
+    <div class="make-iframe-box">
+      <button class="make-iframe-close" id="makeIframeCloseBtn" type="button" aria-label="닫기">✕</button>
+      <iframe id="makeIframe" src="" title="새 게시물 만들기" allow="camera; microphone"></iframe>
     </div>
   </div>
 
@@ -1543,6 +1634,42 @@ window.addEventListener('DOMContentLoaded', () => {
     };
   }
 });
+
+// === make.html iframe 통신 ===
+window.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if (!data || typeof data !== 'object') return;
+  if (data.type === 'sharer-close-embed') {
+    closeMakeIframeModal();
+  }
+  if (data.type === 'sharer-need-login') {
+    closeMakeIframeModal();
+    document.getElementById('loginModal')?.classList.add('active');
+  }
+  if (data.type === 'sharer-post-created') {
+    closeMakeIframeModal();
+    // 피드 새로고침
+    try { loadPosts(); } catch(e){}
+    try { fetchRecentStories(); } catch(e){}
+    // 링크/비공개면 상세 페이지로 이동, 아니면 토스트 느낌으로 유지
+    const { id, access } = data;
+    if ((access === 'link' || access === 'private') && id) {
+      setTimeout(() => { window.location.href = `view.html?id=${id}`; }, 350);
+    } else {
+      // 성공 피드백 - 기존 UI에 살짝 표시
+      const feed = document.getElementById('postsFeed');
+      if (feed) {
+        // 맨 위에 잠깐 성공 배너
+        const banner = document.createElement('div');
+        banner.textContent = '게시글이 업로드되었어요 ✨';
+        banner.style.cssText = 'text-align:center;padding:12px 0;font-size:13px;color:var(--t2);animation:fadeUp 0.4s ease;';
+        feed.prepend(banner);
+        setTimeout(()=> banner.remove(), 2500);
+      }
+    }
+  }
+});
+
 initCurrentUser();
 updateSidebarMode();
 window.addEventListener('resize', updateSidebarMode);
@@ -1550,9 +1677,17 @@ window.addEventListener('resize', updateSidebarMode);
 document.getElementById('mobileCreateBtn')?.addEventListener('click', (e) => {
   e.stopPropagation();
   if (currentUser) {
-    window.location.href = 'make.html';
+    openMakeIframeModal();
   } else {
-    window.location.href = 'login.html';
+    document.getElementById('loginModal').classList.add('active');
+  }
+});
+document.getElementById('makeIframeBackdrop')?.addEventListener('click', closeMakeIframeModal);
+document.getElementById('makeIframeCloseBtn')?.addEventListener('click', closeMakeIframeModal);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const m = document.getElementById('makeIframeModal');
+    if (m && m.classList.contains('active')) closeMakeIframeModal();
   }
 });
 
@@ -1561,12 +1696,34 @@ window.closeSignupModal = () => document.getElementById('signupModal').classList
 window.showSignup = () => { closeLoginModal(); document.getElementById('signupModal').classList.add('active'); };
 window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
 
-function handleCreatePost() {
+function openMakeIframeModal() {
   if (!currentUser) { document.getElementById('loginModal').classList.add('active'); return; }
-  document.getElementById('createModal').classList.add('active');
-  document.getElementById('postContent').value = '';
-  document.getElementById('imagePreview').classList.remove('show');
-  selectedImage = null;
+  const modal = document.getElementById('makeIframeModal');
+  const iframe = document.getElementById('makeIframe');
+  if (!modal || !iframe) return;
+  iframe.src = 'make.html?embed=1';
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+  // 포커스 트랩용
+  setTimeout(() => { try { iframe.contentWindow.focus(); } catch(e){} }, 100);
+}
+function closeMakeIframeModal() {
+  const modal = document.getElementById('makeIframeModal');
+  const iframe = document.getElementById('makeIframe');
+  if (!modal) return;
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+  // 애니메이션 후 src 비우기
+  setTimeout(() => {
+    if (iframe && !modal.classList.contains('active')) {
+      iframe.src = '';
+    }
+  }, 320);
+}
+function handleCreatePost() {
+  openMakeIframeModal();
 }
 
 document.getElementById('closeModal').onclick = () => document.getElementById('createModal').classList.remove('active');

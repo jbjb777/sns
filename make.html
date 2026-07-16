@@ -13,6 +13,22 @@
       document.documentElement.setAttribute('data-theme', 'light');
     }
   </script>
+  <script>
+    (function() {
+      try {
+        const params = new URLSearchParams(location.search);
+        const isEmbedParam = params.get('embed') === '1';
+        const isInIframe = window.self !== window.top;
+        const isEmbedded = isEmbedParam || isInIframe;
+        if (isEmbedded) {
+          document.documentElement.classList.add('is-embedded');
+          // 부모에 높이 알림 (선택)
+          window.__SHARER_EMBEDDED__ = true;
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -739,6 +755,32 @@
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       }
     }
+  
+    /* ===== iframe(embed) 모드 전용 ===== */
+    html.is-embedded {
+      background: transparent;
+    }
+    html.is-embedded body {
+      background: var(--bg2);
+      min-height: 100vh;
+      min-height: 100dvh;
+      opacity: 1;
+      animation: none;
+    }
+    html.is-embedded .header {
+      border-radius: 0;
+      background: var(--bg2);
+    }
+    html.is-embedded .main {
+      padding-bottom: 24px;
+    }
+    /* 팝업 안에서는 스크롤바 얇게 */
+    html.is-embedded::-webkit-scrollbar,
+    html.is-embedded body::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
   </style>
 </head>
 <body>
@@ -1010,8 +1052,12 @@
 
   async function initPage() {
     const savedUser = localStorage.getItem('snsUser');
+    const isEmbedded = document.documentElement.classList.contains('is-embedded') || window.__SHARER_EMBEDDED__;
     if (!savedUser) {
-
+      if (isEmbedded) {
+        try { window.parent.postMessage({ type: 'sharer-need-login' }, '*'); } catch(e){}
+        return;
+      }
       window.location.href = 'login.html';
       return;
     }
@@ -1044,7 +1090,14 @@
     }
   }
 
-  window.goBack = function() { window.history.back(); };
+  window.goBack = function() {
+    const isEmbedded = document.documentElement.classList.contains('is-embedded') || window.__SHARER_EMBEDDED__;
+    if (isEmbedded) {
+      try { window.parent.postMessage({ type: 'sharer-close-embed' }, '*'); } catch(e){}
+      return;
+    }
+    window.history.back();
+  };
 
   window.execFormat = function(command, value = null) {
     const postContentDiv = document.getElementById('postContent');
@@ -1161,11 +1214,22 @@
         }
       });
 
+      const createdId = responseData && responseData[0] && responseData[0].id ? responseData[0].id : null;
+      const isEmbedded = document.documentElement.classList.contains('is-embedded') || window.__SHARER_EMBEDDED__;
       setTimeout(() => {
-        if ((currentAccessValue === 'link' || currentAccessValue === 'private') && responseData && responseData[0] && responseData[0].id) {
-          window.location.href = `view.html?id=${responseData[0].id}`;
+        if (isEmbedded) {
+          try {
+            window.parent.postMessage({ type: 'sharer-post-created', id: createdId, access: currentAccessValue }, '*');
+          } catch(e) {
+            // fallback
+            window.location.href = 'index.html';
+          }
         } else {
-          window.location.href = 'index.html';
+          if ((currentAccessValue === 'link' || currentAccessValue === 'private') && createdId) {
+            window.location.href = `view.html?id=${createdId}`;
+          } else {
+            window.location.href = 'index.html';
+          }
         }
       }, 800);
 
@@ -1180,5 +1244,30 @@
 
   initPage();
 </script>
+
+  // embed 전용: ESC로 닫기, 부모 테마 동기화
+  (function(){
+    const isEmbedded = document.documentElement.classList.contains('is-embedded') || window.__SHARER_EMBEDDED__;
+    if (!isEmbedded) return;
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape') {
+        try { window.parent.postMessage({ type: 'sharer-close-embed' }, '*'); } catch(e2){}
+      }
+    });
+    window.addEventListener('message', (ev)=>{
+      try {
+        const d = ev.data || {};
+        if (d.type === 'sharer-sync-theme') {
+          const th = d.theme;
+          if (th === 'light') document.documentElement.setAttribute('data-theme','light');
+          else document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem('theme', th || 'dark');
+        }
+      } catch(e){}
+    });
+    // 초기 테마 동기화 요청
+    try { window.parent.postMessage({ type: 'sharer-embed-ready' }, '*'); } catch(e){}
+  })();
+
 </body>
 </html>
