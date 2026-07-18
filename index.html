@@ -1698,8 +1698,8 @@ window.backToLogin = () => { closeSignupModal(); document.getElementById('loginM
 
 function openMakeIframeModal() {
   if (!currentUser) { document.getElementById('loginModal').classList.add('active'); return; }
-    window.location.href = "login.html";
-    return;
+  window.location.href = "make.html";
+  return;
 }
 function closeMakeIframeModal() {
   const modal = document.getElementById('makeIframeModal');
