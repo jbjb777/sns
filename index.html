@@ -1644,7 +1644,7 @@ window.addEventListener('message', (event) => {
   }
   if (data.type === 'sharer-need-login') {
     closeMakeIframeModal();
-    document.getElementById('loginModal')?.classList.add('active');
+  window.location.href = "login.html";
   }
   if (data.type === 'sharer-post-created') {
     closeMakeIframeModal();
@@ -1679,7 +1679,7 @@ document.getElementById('mobileCreateBtn')?.addEventListener('click', (e) => {
   if (currentUser) {
     openMakeIframeModal();
   } else {
-    document.getElementById('loginModal').classList.add('active');
+    window.location.href = "login.html";
   }
 });
 document.getElementById('makeIframeBackdrop')?.addEventListener('click', closeMakeIframeModal);
@@ -1697,7 +1697,7 @@ window.showSignup = () => { closeLoginModal(); document.getElementById('signupMo
 window.backToLogin = () => { closeSignupModal(); document.getElementById('loginModal').classList.add('active'); };
 
 function openMakeIframeModal() {
-  if (!currentUser) { document.getElementById('loginModal').classList.add('active'); return; }
+if (!currentUser) { window.location.href = "login.html"; return; }
   window.location.href = "make.html";
   return;
 }
@@ -1786,7 +1786,7 @@ function formatPostTime(dateString) {
 
 async function toggleLike(postId, button) {
   if (!currentUser) {
-    document.getElementById('loginModal').classList.add('active');
+    window.location.href = "login.html";
     return;
   }
   const countEl = button.querySelector('.like-count');
