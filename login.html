@@ -121,130 +121,90 @@
     }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-    /* ─── INSTAGRAM PC LAYOUT ─── */
-    .instagram-container {
+    /* ─── INSTAGRAM-STYLE TWO-COLUMN LAYOUT (PC) ─── */
+    .login-wrapper {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 32px;
-      max-width: 935px;
+      gap: 40px;
+      max-width: 900px;
       width: 100%;
-      margin: 0 auto;
     }
 
-    .promo-area {
+    /* ─── LEFT: PROMO SECTION (PC ONLY) ─── */
+    .promo-section {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      width: 380px;
-      flex-shrink: 0;
+      text-align: center;
+      opacity: 0;
+      animation: fadeInBox 0.5s ease 0.4s forwards;
     }
 
     .promo-text {
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 26px;
+      font-weight: 700;
       color: var(--t1);
-      text-align: center;
-      margin-bottom: 20px;
-      line-height: 1.4;
-      word-break: keep-all;
-      letter-spacing: -0.3px;
+      line-height: 1.5;
+      letter-spacing: -0.5px;
+      margin-bottom: 32px;
     }
 
-    .promo-image-wrapper {
+    .promo-image-container {
       width: 100%;
-      height: 420px;
-      border-radius: 20px;
+      max-width: 380px;
+      border-radius: var(--r3);
       overflow: hidden;
-      border: 1px solid var(--border2);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      position: relative;
     }
 
-    .promo-image {
+    .promo-image-container img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
       display: block;
+      border-radius: var(--r3);
+      object-fit: cover;
     }
 
-    .auth-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 350px;
-      gap: 12px;
-    }
-
-    /* ─── AUTH CONTAINER ─── */
+    /* ─── RIGHT: AUTH CONTAINER ─── */
     .auth-container {
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: 8px;
-      padding: 40px 30px 24px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 20px;
       width: 100%;
-      text-align: center;
+      max-width: 420px;
+      flex-shrink: 0;
       opacity: 0;
       animation: fadeInBox 0.4s ease 0.3s forwards;
     }
     @keyframes fadeInBox { to { opacity: 1; } }
 
-    .signup-link-container {
-      padding: 20px;
-    }
-
-    .signup-prompt-text {
-      margin: 0;
-      font-size: 14px;
-      color: var(--t2);
-    }
-
-    .signup-prompt-text button {
-      background: none;
-      border: none;
-      color: #0095f6;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 0;
-      font-size: 14px;
-      font-family: inherit;
-      transition: color 0.15s;
-    }
-
-    .signup-prompt-text button:hover {
-      color: #1877f2;
-      text-decoration: underline;
-    }
-
     .auth-logo {
       display: block;
-      margin: 0 auto 24px;
+      margin: 0 auto 20px;
       width: 48px;
       height: 48px;
     }
 
     .auth-container h2 {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
       color: var(--t1);
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 600;
       letter-spacing: -0.3px;
     }
-
-    .form-section { display: none; }
-    .form-section.active { display: block; }
 
     /* ─── INPUTS ─── */
     .auth-container input[type="text"],
     .auth-container input[type="password"] {
       width: 100%;
-      padding: 10px 14px;
-      border-radius: 6px;
+      padding: 12px 16px;
+      border-radius: var(--r2);
       border: 1px solid var(--border2);
-      font-size: 13px;
-      margin-bottom: 8px;
+      font-size: 14px;
+      margin-bottom: 10px;
       outline: none;
       background: var(--bg3);
       color: var(--t1);
@@ -255,62 +215,62 @@
     .auth-container input::placeholder { color: var(--t3); }
 
     /* ─── BUTTONS ─── */
-    .auth-container button#loginBtn {
+    .auth-container button {
       width: 100%;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: 12px 20px;
+      border-radius: var(--r2);
       border: none;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      background: #0095f6;
-      color: #fff;
+      background: #fff;
+      color: #000;
       margin-bottom: 8px;
-      margin-top: 6px;
       font-family: inherit;
-      transition: background 0.15s;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .auth-container button#loginBtn:hover:not(:disabled) { background: #1877f2; }
-    .auth-container button#loginBtn:disabled { cursor: not-allowed; background: rgba(0, 149, 246, 0.3); color: rgba(255,255,255,0.6); }
+    .auth-container button:hover:not(:disabled) { background: #e8e8e8; transform: scale(1.02); }
+    .auth-container button:active:not(:disabled) { transform: scale(0.97); }
+    .auth-container button:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
 
     /* ─── SOCIAL BTNS ─── */
     .social-btn {
       width: 100%;
-      height: 38px;
-      border-radius: 8px !important;
+      height: 46px;
+      border-radius: var(--r2) !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       gap: 10px !important;
-      font-size: 13px !important;
-      font-weight: 600 !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
       cursor: pointer !important;
       margin-bottom: 8px !important;
       transition: background 0.15s, border-color 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
     }
     .social-btn:active:not(:disabled) { transform: scale(0.97); }
     .social-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .social-btn svg, .social-btn img { width: 16px; height: 16px; }
+    .social-btn svg, .social-btn img { width: 18px; height: 18px; }
 
     .google-btn {
       background: var(--bg3) !important;
       color: var(--t1) !important;
       border: 1px solid var(--border2) !important;
     }
-    .google-btn:hover:not(:disabled) { background: var(--bg4) !important; border-color: var(--border3) !important; }
+    .google-btn:hover:not(:disabled) { background: var(--bg4) !important; border-color: var(--border3) !important; transform: scale(1.02); }
 
     .kakao-btn {
       background: #FEE500 !important;
-      color: #3C1E1E !important;
+      color: #000 !important;
       border: none !important;
     }
-    .kakao-btn:hover:not(:disabled) { background: #e6cf00 !important; }
-    .kakao-btn svg { fill: #3C1E1E; }
+    .kakao-btn:hover:not(:disabled) { background: #e6cf00 !important; transform: scale(1.02); }
+    .kakao-btn svg { fill: #000; }
 
     /* ─── DIVIDER ─── */
     .or-divider {
       text-align: center;
-      margin: 16px 0;
+      margin: 20px 0 16px;
       color: var(--t3);
       font-size: 12px;
       position: relative;
@@ -323,35 +283,116 @@
       height: 1px;
       background: var(--border);
     }
-    .or-divider span { background: var(--bg2); padding: 0 16px; position: relative; }
+    .or-divider span { background: var(--bg); padding: 0 16px; position: relative; }
 
     /* ─── MESSAGES ─── */
-    .error-message { color: var(--pink); font-size: 12px; margin-top: -4px; margin-bottom: 8px; text-align: center; font-weight: 500; }
-    .success-message { color: var(--green); font-size: 12px; margin-top: -4px; margin-bottom: 8px; text-align: center; font-weight: 500; }
+    .error-message { color: var(--pink); font-size: 12px; margin-top: -6px; margin-bottom: 8px; text-align: center; font-weight: 500; }
+    .success-message { color: var(--green); font-size: 12px; margin-top: -6px; margin-bottom: 8px; text-align: center; font-weight: 500; }
 
-    .forgot-password {
-      color: #0095f6;
-      font-size: 12px;
-      text-decoration: none;
+    /* ─── SIGNUP LINK (인스타 스타일) ─── */
+    .signup-section {
       margin-top: 16px;
-      display: inline-block;
-      transition: color 0.15s;
-    }
-    .forgot-password:hover {
-      color: #1877f2;
-      text-decoration: underline;
+      padding: 20px;
+      border: 1px solid var(--border2);
+      border-radius: var(--r2);
+      text-align: center;
     }
 
-    /* ─── TERMS BOX ─── */
-    .terms-label {
-      text-align: left;
-      font-size: 12px;
-      margin-bottom: 6px;
-      color: var(--t3);
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+    .signup-section p {
+      font-size: 14px;
+      color: var(--t2);
     }
+
+    .signup-link {
+      color: var(--t1);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .signup-link:hover { opacity: 0.7; }
+
+    /* ─── TERMS POPUP MODAL ─── */
+    .terms-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 999;
+    }
+
+    .terms-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r4);
+      padding: 32px 28px;
+      z-index: 1000;
+      width: 90%;
+      max-width: 400px;
+      transition: transform 0.28s cubic-bezier(0.34,1.4,0.64,1), opacity 0.22s ease;
+      opacity: 0;
+    }
+    .terms-modal.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .terms-modal h3 {
+      color: var(--t1);
+      margin-bottom: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .terms-modal-subtitle {
+      color: var(--t2);
+      font-size: 13px;
+      text-align: center;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .terms-modal-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .terms-modal-buttons button {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: var(--r2);
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .terms-modal-buttons button:hover:not(:disabled) { transform: scale(1.02); }
+    .terms-modal-buttons button:active:not(:disabled) { transform: scale(0.97); }
+    .terms-modal-buttons button:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
+
+    .terms-next-btn {
+      background: #fff;
+      color: #000;
+    }
+    .terms-next-btn:hover:not(:disabled) { background: #e8e8e8; }
+
+    .terms-cancel-btn {
+      background: transparent;
+      color: var(--t2);
+      border: 1px solid var(--border2) !important;
+    }
+    .terms-cancel-btn:hover { background: var(--bg3); color: var(--t1); }
 
     /* ─── CUSTOM CHECKBOX ─── */
     .checkbox-group {
@@ -371,7 +412,6 @@
       font-size: 13px;
       color: var(--t2);
       transition: color 0.2s;
-      text-align: left;
     }
     .checkbox-item:hover { color: var(--t1); }
 
@@ -436,7 +476,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── MODAL ─── */
+    /* ─── GOOGLE MODAL ─── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -478,84 +518,6 @@
 
     .google-btn-container { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; }
 
-    /* ─── AGREEMENT MODAL ─── */
-    .agreement-modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: var(--r3);
-      padding: 28px;
-      z-index: 1000;
-      width: 90%;
-      max-width: 400px;
-      transition: transform 0.25s cubic-bezier(0.34,1.4,0.64,1), opacity 0.2s ease;
-      opacity: 0;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    }
-    .agreement-modal.show {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
-    }
-    .agreement-modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
-    }
-    .agreement-modal-header h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--t1);
-    }
-    .close-modal-btn {
-      background: none;
-      border: none;
-      color: var(--t2);
-      font-size: 24px;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .close-modal-btn:hover {
-      color: var(--t1);
-    }
-    .agreement-desc {
-      font-size: 13px;
-      color: var(--t2);
-      margin-bottom: 20px;
-      line-height: 1.5;
-      text-align: left;
-    }
-    .agreement-modal-footer {
-      margin-top: 24px;
-    }
-    .agreement-modal-footer button#nextBtn {
-      width: 100%;
-      background-color: #0095f6;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background-color 0.15s;
-    }
-    .agreement-modal-footer button#nextBtn:hover:not(:disabled) {
-      background-color: #1877f2;
-    }
-    .agreement-modal-footer button#nextBtn:disabled {
-      background-color: rgba(0, 149, 246, 0.3);
-      color: rgba(255,255,255,0.6);
-      cursor: not-allowed;
-    }
-
     /* ─── FOOTER ─── */
     .footer {
       border-top: 1px solid var(--border);
@@ -565,24 +527,33 @@
       font-size: 11px;
     }
 
+    /* ─── RESPONSIVE ─── */
+
+    /* PC: Show promo section */
+    @media (min-width: 769px) {
+      .promo-section {
+        display: flex;
+      }
+    }
+
+    /* Mobile: Hide promo section, center auth */
     @media (max-width: 768px) {
-      .instagram-container {
+      .login-wrapper {
         flex-direction: column;
         gap: 0;
       }
-      .promo-area {
-        display: none;
+
+      .promo-section {
+        display: none !important;
       }
-      .auth-wrapper {
+
+      .auth-container {
+        padding: 20px;
         max-width: 100%;
       }
-      .auth-container {
-        background: transparent;
-        border: none;
-        padding: 20px 10px;
-      }
-      .or-divider span {
-        background: var(--bg);
+
+      .auth-container h2 {
+        font-size: 18px;
       }
     }
   </style>
@@ -596,78 +567,80 @@
   </div>
 
   <div class="main-content">
-    <div class="instagram-container">
-      
-      <!-- 왼쪽 프로모션 배너 (PC 전용) -->
-      <div class="promo-area">
-        <div class="promo-text">친한친구의 일상속 순간들을 확인해보세요</div>
-        <div class="promo-image-wrapper">
-          <img src="background.png" alt="background" class="promo-image">
+    <div class="login-wrapper">
+
+      <!-- LEFT: PROMO SECTION (PC ONLY) -->
+      <div class="promo-section">
+        <p class="promo-text">친한 친구의<br>일상 속 순간들을<br>확인해보세요.</p>
+        <div class="promo-image-container">
+          <img src="background.png" alt="Sharer 프로모션">
         </div>
       </div>
 
-      <!-- 오른쪽 로그인 & 가입 영역 -->
-      <div class="auth-wrapper">
-        <div class="auth-container">
-          <img src="logo.svg" alt="Sharer Logo" class="auth-logo">
-          <h2>환영합니다!</h2>
+      <!-- RIGHT: LOGIN FORM -->
+      <div class="auth-container">
+        <img src="logo.svg" alt="Sharer Logo" class="auth-logo">
+        <h2>환영합니다!</h2>
 
-          <div class="form-section active" id="loginForm">
-            <input type="text" id="loginId" placeholder="아이디">
-            <input type="password" id="loginPassword" placeholder="비밀번호">
-            <div class="error-message" id="loginError"></div>
-            <div class="success-message" id="loginSuccess"></div>
-            <button id="loginBtn" onclick="handleLogin()">로그인</button>
-            
-            <div class="or-divider"><span>또는</span></div>
-            <button class="social-btn google-btn" id="googleLoginBtn" onclick="showGoogleModal('login')">
-              <img src="https://sharer.r-e.kr/google.svg" alt="Google">
-              구글로 계속하기
-            </button>
-            <button class="social-btn kakao-btn" id="kakaoLoginBtn" onclick="handleKakaoLogin()">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.504-10 7.828 0 2.766 1.82 5.176 4.625 6.575-.15.532-.478 1.748-.545 2.025-.085.318.113.318.25.213.11-.086 1.48-1.02 2.092-1.436 1.127.33 2.327.508 3.578.508 5.523 0 10-3.504 10-7.828C22 6.504 17.523 3 12 3z"/></svg>
-              카카오로 계속하기
-            </button>
+        <!-- LOGIN FORM -->
+        <div id="loginForm">
+          <input type="text" id="loginId" placeholder="아이디">
+          <input type="password" id="loginPassword" placeholder="비밀번호">
+          <div class="error-message" id="loginError"></div>
+          <div class="success-message" id="loginSuccess"></div>
+          <button id="loginBtn" onclick="handleLogin()">로그인</button>
 
-            <a href="account.html" class="forgot-password">계정을 잊으셨나요?</a>
-          </div>
+          <div class="or-divider"><span>계정을 잊으셨나요?</span></div>
+          <button class="social-btn google-btn" id="accountBtn" onclick="{ window.location.href = 'account.html'; }">
+            <img src="https://sharer.r-e.kr/id.svg" alt="account">
+            계정 복구
+          </button>
+
+          <div class="or-divider"><span>또는</span></div>
+          <button class="social-btn google-btn" id="googleLoginBtn" onclick="showGoogleModal('login')">
+            <img src="https://sharer.r-e.kr/google.svg" alt="Google">
+            구글로 계속하기
+          </button>
+          <button class="social-btn kakao-btn" id="kakaoLoginBtn" onclick="handleKakaoLogin()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3c-5.523 0-10 3.504-10 7.828 0 2.766 1.82 5.176 4.625 6.575-.15.532-.478 1.748-.545 2.025-.085.318.113.318.25.213.11-.086 1.48-1.02 2.092-1.436 1.127.33 2.327.508 3.578.508 5.523 0 10-3.504 10-7.828C22 6.504 17.523 3 12 3z"/></svg>
+            카카오로 계속하기
+          </button>
         </div>
 
-        <div class="auth-container signup-link-container">
-          <p class="signup-prompt-text">
-            계정이 없으신가요? <button id="signUpPromptBtn" onclick="openSignupModal()">새 계정 만들기</button>
-          </p>
+        <!-- SIGNUP LINK (인스타 스타일) -->
+        <div class="signup-section">
+          <p>계정이 없으신가요? <a class="signup-link" onclick="showTermsModal()">새 계정 만들기</a></p>
         </div>
       </div>
 
     </div>
 
-    <!-- 약관 동의 팝업 모달 -->
-    <div class="agreement-modal" id="agreementModal">
-      <div class="agreement-modal-header">
-        <h3>약관 동의</h3>
-        <button class="close-modal-btn" onclick="closeSignupModal()">&times;</button>
+    <!-- TERMS AGREEMENT POPUP MODAL -->
+    <div class="terms-modal-overlay" id="termsOverlay"></div>
+    <div class="terms-modal" id="termsModal">
+      <h3>새 계정 만들기</h3>
+      <p class="terms-modal-subtitle">Sharer에 가입하려면 아래 약관에 동의해주세요.</p>
+
+      <div class="checkbox-group">
+        <label class="checkbox-item">
+          <input type="checkbox" class="checkbox-input" id="agreePrivacy" onchange="validateTermsModal()">
+          <span class="checkbox-custom"></span>
+          <span>Sharer의 <a href="privacy.html" target="_blank" onclick="event.stopPropagation()">개인정보 처리방침</a>에 동의합니다</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" class="checkbox-input" id="agreeTerms" onchange="validateTermsModal()">
+          <span class="checkbox-custom"></span>
+          <span>Sharer의 <a href="policy.html" target="_blank" onclick="event.stopPropagation()">이용약관</a>에 동의합니다</span>
+        </label>
       </div>
-      <div class="agreement-modal-body">
-        <p class="agreement-desc">Sharer의 서비스를 이용하시려면 아래 이용 약관 및 개인정보 처리방침에 동의해 주세요.</p>
-        <div class="checkbox-group">
-          <label class="checkbox-item">
-            <input type="checkbox" class="checkbox-input" id="agreePrivacy" onchange="validateSignup()">
-            <span class="checkbox-custom"></span>
-            <span>Sharer의 <a href="privacy.html" target="_blank" onclick="event.stopPropagation()">개인정보 처리방침</a>에 동의합니다 (필수)</span>
-          </label>
-          <label class="checkbox-item">
-            <input type="checkbox" class="checkbox-input" id="agreeTerms" onchange="validateSignup()">
-            <span class="checkbox-custom"></span>
-            <span>Sharer의 <a href="policy.html" target="_blank" onclick="event.stopPropagation()">이용약관</a>에 동의합니다 (필수)</span>
-          </label>
-        </div>
-      </div>
-      <div class="agreement-modal-footer">
-        <button id="nextBtn" onclick="handleNextStep()" disabled>다음</button>
+
+      <div class="terms-modal-buttons">
+        <button class="terms-next-btn" id="termsNextBtn" onclick="handleTermsNext()" disabled>다음</button>
+        <button class="terms-cancel-btn" onclick="hideTermsModal()">취소</button>
       </div>
     </div>
 
+    <!-- GOOGLE MODAL -->
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="google-modal" id="googleModal">
       <h3 id="modalTitle">구글 인증</h3>
@@ -744,23 +717,24 @@
 
   window.goHome = function() { window.location.href = 'index.html'; }
 
-  window.openSignupModal = function() {
-    const modal = document.getElementById('agreementModal');
-    const overlay = document.getElementById('modalOverlay');
+  // ─── TERMS MODAL ───
+  window.showTermsModal = function() {
+    const modal = document.getElementById('termsModal');
+    const overlay = document.getElementById('termsOverlay');
+    // Reset checkboxes
     const p = document.getElementById('agreePrivacy');
     const t = document.getElementById('agreeTerms');
     if (p) p.checked = false;
     if (t) t.checked = false;
-    validateSignup();
-    
+    validateTermsModal();
     overlay.style.display = 'block';
     modal.style.display = 'block';
     requestAnimationFrame(() => modal.classList.add('show'));
   }
 
-  window.closeSignupModal = function() {
-    const modal = document.getElementById('agreementModal');
-    const overlay = document.getElementById('modalOverlay');
+  window.hideTermsModal = function() {
+    const modal = document.getElementById('termsModal');
+    const overlay = document.getElementById('termsOverlay');
     modal.classList.remove('show');
     setTimeout(() => {
       modal.style.display = 'none';
@@ -768,29 +742,27 @@
     }, 250);
   }
 
-  window.showTab = function(tab) {
-    // 탭 UI 삭제에 따른 예외 방지용 빈 함수
-  }
-
-  window.validateSignup = function() {
+  window.validateTermsModal = function() {
     const p = document.getElementById('agreePrivacy');
     const t = document.getElementById('agreeTerms');
-    const btn = document.getElementById('nextBtn');
+    const btn = document.getElementById('termsNextBtn');
     if (!p || !t || !btn) return;
     btn.disabled = !(p.checked && t.checked);
   }
 
-  window.handleNextStep = function() {
-    setTimeout(() => { window.location.href = 'https://sharer.r-e.kr/join.html'; }, 300);
+  window.handleTermsNext = function() {
+    setTimeout(() => { window.location.href = 'join.html'; }, 300);
   }
 
   window.showGoogleModal = function(mode) {
     const modal = document.getElementById('googleModal');
     const overlay = document.getElementById('modalOverlay');
     const modalTitle = document.getElementById('modalTitle');
+    const authContainer = document.querySelector('.auth-container');
     const buttonId = 'googleLoginBtn';
     setGoogleLoading(buttonId, true);
     modalTitle.textContent = '구글로 계속하기';
+    authContainer.style.display = 'none';
     overlay.style.display = 'block';
     modal.style.display = 'block';
     requestAnimationFrame(() => modal.classList.add('show'));
@@ -801,11 +773,13 @@
   window.hideGoogleModal = function() {
     const modal = document.getElementById('googleModal');
     const overlay = document.getElementById('modalOverlay');
+    const authContainer = document.querySelector('.auth-container');
     modal.classList.remove('show');
     setTimeout(() => {
       modal.style.display = 'none';
       overlay.style.display = 'none';
     }, 250);
+    authContainer.style.display = 'block';
     document.getElementById('googleModalBtn').innerHTML = '';
   }
 
@@ -1015,10 +989,8 @@
         btn.innerHTML = '⚠️ 구글 로그인 사용 불가';
       });
     }
-    document.getElementById('modalOverlay').addEventListener('click', () => {
-      hideGoogleModal();
-      closeSignupModal();
-    });
+    document.getElementById('modalOverlay').addEventListener('click', hideGoogleModal);
+    document.getElementById('termsOverlay').addEventListener('click', hideTermsModal);
   });
 
   document.getElementById('loginPassword').addEventListener('keypress', (e) => {
