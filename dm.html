@@ -13,45 +13,8 @@
       document.documentElement.setAttribute('data-theme', 'light');
     }
   </script>
+  <link rel="stylesheet" href="assets/css/sharer.css">
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --bg: #000;
-      --bg2: #111;
-      --bg3: #1a1a1a;
-      --bg4: #222;
-      --border: #1e1e1e;
-      --border2: #2a2a2a;
-      --border3: #333;
-      --t1: #fff;
-      --t2: #888;
-      --t3: #444;
-      --pink: #ff6b6b;
-      --green: #4ade80;
-      --blue: #3e3bf6;
-      --r1: 10px;
-      --r2: 14px;
-      --r3: 20px;
-      --r4: 28px;
-    }
-
-    html[data-theme="light"] {
-      --bg: #fafafa;
-      --bg2: #ffffff;
-      --bg3: #f0f0f0;
-      --bg4: #e4e4e4;
-      --border: #dbdbdb;
-      --border2: #cccccc;
-      --border3: #a3a3a3;
-      --t1: #000000;
-      --t2: #737373;
-      --t3: #a8a8a8;
-    }
-
-    #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
-    #nprogress .peg { display: none !important; }
-    #nprogress .spinner { display: none !important; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -1575,6 +1538,8 @@
         if (page === 'home') location.href = 'index.html';
         else if (page === 'explore') location.href = 'explore.html';
         else if (page === 'set') location.href = 'set.html';
+        else if (page === 'notifications') location.href = 'notification.html';
+        else if (page === 'profile') location.href = 'user.html';
         else if (page === 'dm' || page === 'message' || page === 'messages') location.href = 'dm.html';
         else if (page) location.href = page + '.html';
       }
@@ -3134,7 +3099,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
         `;
 
-        // 마이페이지 이동 링크 처리 (profile.html로 가정)
+        // 마이페이지 이동 링크 처리
         item.onclick = () => {
           window.location.href = `user.html?id=${u.id}`;
         };

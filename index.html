@@ -47,6 +47,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css">
   <style>
     .splash-text {
       text-align: center;
@@ -70,42 +71,6 @@
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --bg: #000;
-      --bg2: #111;
-      --bg3: #1a1a1a;
-      --bg4: #222;
-      --border: #1e1e1e;
-      --border2: #2a2a2a;
-      --border3: #333;
-      --t1: #fff;
-      --t2: #888;
-      --t3: #444;
-      --pink: #ff6b6b;
-      --green: #4ade80;
-      --r1: 10px;
-      --r2: 14px;
-      --r3: 20px;
-      --r4: 28px;
-    }
-
-    html[data-theme="light"] {
-      --bg: #fafafa;
-      --bg2: #ffffff;
-      --bg3: #f0f0f0;
-      --bg4: #e4e4e4;
-      --border: #dbdbdb;
-      --border2: #cccccc;
-      --border3: #a3a3a3;
-      --t1: #000000;
-      --t2: #737373;
-      --t3: #a8a8a8;
-    }
-
-    html { scroll-behavior: smooth; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -149,10 +114,6 @@
       from { opacity: 0; transform: scale(0.7); }
       to   { opacity: 1; transform: scale(1); }
     }
-
-    #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
-    #nprogress .peg { display: none !important; }
-    #nprogress .spinner { display: none !important; }
 
     .sidebar-container {
       width: 72px;

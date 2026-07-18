@@ -1,0 +1,105 @@
+/*
+ * Sharer 공통 디자인 기반
+ *
+ * 페이지별 레이아웃과 애니메이션은 각 HTML에 남겨 둔다.
+ * 이 파일은 모든 화면에서 같은 값이어야 하는 토큰과 안전한 기본 규칙만 관리한다.
+ */
+
+:root {
+  --bg: #000;
+  --bg2: #111;
+  --bg3: #1a1a1a;
+  --bg4: #222;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+  --border3: #333;
+  --t1: #fff;
+  --t2: #888;
+  --t3: #444;
+  --pink: #ff6b6b;
+  --green: #4ade80;
+  --blue: #3e3bf6;
+  --r1: 10px;
+  --r2: 14px;
+  --r3: 20px;
+  --r4: 28px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+  --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.34);
+}
+
+html[data-theme="light"] {
+  --bg: #fafafa;
+  --bg2: #fff;
+  --bg3: #f0f0f0;
+  --bg4: #e4e4e4;
+  --border: #dbdbdb;
+  --border2: #ccc;
+  --border3: #a3a3a3;
+  --t1: #000;
+  --t2: #737373;
+  --t3: #a8a8a8;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button, a, input, textarea, select):focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+#nprogress .bar {
+  height: 2px !important;
+  background: var(--t1) !important;
+}
+
+#nprogress .peg,
+#nprogress .spinner {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

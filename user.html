@@ -17,28 +17,8 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css">
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --bg: #000;
-      --bg2: #111;
-      --bg3: #1a1a1a;
-      --bg4: #222;
-      --border: #1e1e1e;
-      --border2: #2a2a2a;
-      --border3: #333;
-      --t1: #fff;
-      --t2: #888;
-      --t3: #444;
-      --pink: #ff6b6b;
-      --green: #4ade80;
-      --r1: 10px;
-      --r2: 14px;
-      --r3: 20px;
-      --r4: 28px;
-    }
-
     /* 검색 패널 슬라이드 */
     .search-panel {
       position: fixed;
@@ -109,18 +89,7 @@ opacity: 1;
       border: none;
     }
     /* 라이트 모드 변수 정의 */
-    html[data-theme="light"] {
-      --bg: #fafafa;
-      --bg2: #ffffff;
-      --bg3: #f0f0f0;
-      --bg4: #e4e4e4;
-      --border: #dbdbdb;
-      --border2: #cccccc;
-      --border3: #a3a3a3;
-      --t1: #000000;
-      --t2: #737373;
-      --t3: #a8a8a8;
-    }
+
     /* ===== Mobile Top Bar - injected ===== */
         /* ===== Mobile Top Bar - iframe wrapper (모바일 전용) ===== */
     .mobile-topbar-iframe-wrap {
@@ -159,9 +128,6 @@ opacity: 1;
       }
     }
     /* NProgress 커스텀 */
-    #nprogress .bar { background: var(--t1) !important; height: 2px !important; }
-    #nprogress .peg { display: none !important; }
-    #nprogress .spinner { display: none !important; }
 
     /* ─── SPLASH ─── */
     #splash {
@@ -1222,8 +1188,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
       if (page === 'set') location.href = 'set.html';
       if (page === 'search') location.href = 'search.html';
-      if (page === 'notifications') location.href = 'notifications.html';
-      if (page === 'profile') location.href = 'profile.html';
+      if (page === 'notifications') location.href = 'notification.html';
+      if (page === 'profile') location.href = 'user.html';
 
     }
     if (type === 'logout') { localStorage.removeItem('snsUser'); currentUser = null; NProgress.start(); location.href = 'index.html'; }
