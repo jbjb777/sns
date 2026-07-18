@@ -509,17 +509,19 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
 
     /* =================================================================== */
     /* 통계/지표 섹션 (토스 스타일) */
-    .stats-section {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 30px;
-      padding: 60px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 80px;
-      text-align: center;
-    }
+.stats-section {
+  width: 100%;
+  margin-bottom: 80px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.stats-background {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+}
 
     .stat-card {
       opacity: 0;
@@ -814,21 +816,7 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
   </section>
 
     <section class="stats-section">
-      <div class="stat-card reveal-item" data-animate-count="100">
-        <div class="stat-title">누적 생성된 스토리</div>
-        <div class="stat-value"><span class="count-target">0</span>+</div>
-        <div class="stat-desc">매일 새로운 일상이 공유되고 있어요.</div>
-      </div>
-      <div class="stat-card reveal-item" style="transition-delay: 0.1s;">
-        <div class="stat-title">활성 사용자</div>
-        <div class="stat-value">안전한</div>
-        <div class="stat-desc">보안 환경에서 소통이 이루어집니다.</div>
-      </div>
-      <div class="stat-card reveal-item" style="transition-delay: 0.2s;" data-animate-count="50">
-        <div class="stat-title">누적 사용자 수</div>
-        <div class="stat-value"><span class="count-target">0</span>+</div>
-        <div class="stat-desc">쾌적한 UI/UX를 제공하기 위해 노력합니다.</div>
-      </div>
+  <img src="./background.png" alt="Sharer 소개" class="stats-background">
     </section>
 
     <section class="features">
