@@ -50,7 +50,8 @@
     }
   </script>
 
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
     :root {
       --overlay-bg: rgba(30, 30, 30, 0.85);
@@ -66,89 +67,6 @@
       --text-shadow: none;
     }
     body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--t1); min-height: 100vh; display: flex; overflow: hidden; transition: background 0.3s, color 0.3s; }
-    /* 검색 패널 슬라이드 */
-    .search-panel {
-      position: fixed;
-      top: 0;
-      left: 72px;
-      width: 380px;
-      max-width: calc(100vw - 72px);
-      height: 100vh;
-      background: var(--bg);
-      border-right: 1px solid var(--border);
-      z-index: 90;
-      transform: translateX(-100%);
-      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex;
-      flex-direction: column;
-      box-shadow: 4px 0 24px rgba(0,0,0,0.3);
-
-opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-
-    }
-    html[data-theme="light"] .search-panel {
-      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
-    }
-    .search-panel.open {
-      transform: translateX(0);
-
-opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-
-
-    }
-    .search-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-    .search-panel-header h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--t1);
-    }
-    .search-close-btn {
-      background: transparent;
-      border: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .search-close-btn:hover {
-      color: var(--t1);
-      transform: scale(1.1);
-    }
-    .search-panel iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
-    }
-    .sidebar-container {
-      width: 72px;
-      min-width: 72px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      z-index: 100;
-    }
-    .sidebar-container iframe {
-      width: 72px !important;
-      height: 100%;
-      border: none;
-    }
     .main-wrapper {
       margin-left: 72px;
       width: calc(100% - 72px);
@@ -754,25 +672,10 @@ opacity: 1;
     }
     .end-btn:hover { transform: scale(1.05); background: #3663FF; }
     .end-btn:active { transform: scale(0.95); }
-
-    /* ─── 모바일 프로필 시트(부모) ─── */
-    .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
       position: fixed;
       inset: 0;
       z-index: 1100;
-    }
-    .sharer-profile-sheet-host .sps-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.34s ease;
-    }
-    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
-      opacity: 1;
-      pointer-events: auto;
     }
     .sharer-profile-sheet-host .sps-panel {
       position: absolute;
@@ -793,31 +696,6 @@ opacity: 1;
       transform: translateY(100%);
       transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .sharer-profile-sheet-host.sps-host-open .sps-panel {
-      transform: translateY(0);
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
-      max-height: 88vh;
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
-      transition: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area {
-      touch-action: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 52px;
-      padding: 6px 16px 14px;
-      margin: -2px -16px 0 -16px;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area:active {
-      cursor: grabbing;
-    }
     .sharer-profile-sheet-host .sps-grab {
       width: 40px;
       height: 5px;
@@ -835,24 +713,6 @@ opacity: 1;
       cursor: pointer;
       margin-bottom: 12px;
     }
-    .sharer-profile-sheet-host .sps-av {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #fff;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .sharer-profile-sheet-host .sps-av img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
@@ -861,54 +721,8 @@ opacity: 1;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .sharer-profile-sheet-host .sps-logout {
-      width: 100%;
-      padding: 14px 16px;
-      border: none;
-      border-radius: 14px;
-      background: rgba(255, 80, 80, 0.15);
-      color: #ff8a8a;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-    }
 
     @media (max-width: 768px) {
-
-
-
-      .search-panel {
-        left: 0;
-        width: 100%;
-        max-width: 100%;
-        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
-        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-        top: 0;
-        z-index: 90;
-      }
-
-
-
-
-      .sidebar-container {
-        left: 0;
-        right: 0;
-        top: auto;
-        bottom: 0;
-        width: 100%;
-        min-width: 0;
-        height: calc(64px + env(safe-area-inset-bottom, 0px));
-      }
-      .sidebar-container iframe {
-        width: 100% !important;
-        height: 100% !important;
-      }
-      .main-wrapper {
-        margin-left: 0;
-        width: 100%;
-        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-      }
       .shorts-container {
         height: auto;
         overflow-y: auto;
@@ -1058,14 +872,14 @@ opacity: 1;
     <div class="nav-btn" id="navUpBtn" onclick="scrollToPrevious()">▲</div>
     <div class="nav-btn" id="navDownBtn" onclick="scrollToNext()">▼</div>
   </div>
-  <div class="comment-modal-overlay" id="commentOverlay" onclick="closeComments()"></div>
-  <div class="comment-modal" id="commentModal">
+  <div class="comment-modal-overlay ui-modal-overlay" id="commentOverlay" onclick="closeComments()"></div>
+  <div class="comment-modal ui-modal-surface" id="commentModal" role="dialog" aria-modal="true" aria-labelledby="commentModalTitle">
     <div class="comment-drag-area" id="commentDragArea">
       <div class="comment-grab"></div>
     </div>
     <div class="comment-modal-header">
-      <div class="comment-modal-title">댓글 <span id="commentCountTitle">0</span>개</div>
-      <button class="comment-close-btn" onclick="closeComments()">✕</button>
+      <div class="comment-modal-title ui-modal-title" id="commentModalTitle">댓글 <span id="commentCountTitle">0</span>개</div>
+      <button class="comment-close-btn ui-modal-close" onclick="closeComments()" aria-label="닫기">✕</button>
     </div>
     <div class="comment-modal-list" id="commentList">
       <div style="text-align: center; color: var(--t3); padding: 40px 20px;">
@@ -1438,7 +1252,7 @@ window.addEventListener('DOMContentLoaded', () => {
           endDiv.className = 'short-item';
           endDiv.innerHTML = `
             <div class="end-of-content">
-              <div>모든 콘텐츠를 다 보셨네요!<br>더 이상 콘텐츠가 없습니다. 🎉</div>
+              <div>모든 콘텐츠를 확인했습니다.<br>새 게시물이 올라오면 여기에 표시됩니다.</div>
               <button class="end-btn" onclick="scrollToTop()">처음으로 돌아가기</button>
             </div>
           `;
@@ -1585,9 +1399,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.toggleLike = async function(postId) {
     if (!currentUser) {
-      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
-        window.location.href = 'index.html';
-      }
+      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
       return;
     }
     
@@ -1812,7 +1624,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.openReplyComposer = function(commentId) {
     if (!currentUser) {
-      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) window.location.href = 'index.html';
+      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
       return;
     }
     const compose = document.getElementById(`replyCompose-${commentId}`);
@@ -1833,7 +1645,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById(`replyInput-${parentId}`);
     const text = input?.value?.trim() || '';
     if (!currentUser) {
-      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) window.location.href = 'index.html';
+      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
       return;
     }
     if (!text) return;
@@ -1862,7 +1674,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (countEl) countEl.textContent = parseInt(countEl.textContent || '0') + 1;
     } catch (e) {
       console.error('답글 작성 실패:', e);
-      alert('답글 작성에 실패했습니다.');
+      SharerUI.toast({ type: 'error', message: '답글을 등록하지 못했습니다. 다시 시도해 주세요.' });
     }
   };
 
@@ -1885,9 +1697,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.submitComment = async function() {
     if (!currentUser) {
-      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
-        window.location.href = 'index.html';
-      }
+      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
       return;
     }
     const input = document.getElementById('commentInput');
@@ -1920,14 +1730,20 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) {
       console.error('댓글 업로드 오류:', e);
-      alert('댓글 업로드에 실패했습니다.');
+      SharerUI.toast({ type: 'error', message: '댓글을 등록하지 못했습니다. 다시 시도해 주세요.' });
     } finally {
       submitBtn.disabled = false;
     }
   };
 
   window.deleteComment = async function(commentId, postId) {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    const confirmed = await SharerUI.confirm({
+      title: '댓글을 삭제할까요?',
+      description: '삭제한 댓글은 복구할 수 없습니다.',
+      confirmLabel: '삭제',
+      danger: true
+    });
+    if (!confirmed) return;
     try {
       await api(`/comments?id=eq.${commentId}`, { method: "DELETE" });
       await loadComments(postId);
@@ -1937,7 +1753,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) {
       console.error('댓글 삭제 오류:', e);
-      alert('삭제에 실패했습니다.');
+      SharerUI.toast({ type: 'error', message: '댓글을 삭제하지 못했습니다. 다시 시도해 주세요.' });
     }
   };
 
@@ -1960,10 +1776,9 @@ window.addEventListener('DOMContentLoaded', () => {
   function showError() {
     document.getElementById('shortsContainer').innerHTML = `
       <div class="no-posts">
-        <div class="no-posts-icon">⚠️</div>
         <div class="no-posts-text">
           게시물을 불러오는데 실패했습니다.<br>
-          잠시 후 다시 시도해주세요.
+          잠시 후 다시 시도해 주세요.
         </div>
       </div>
     `;

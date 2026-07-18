@@ -13,7 +13,8 @@
       document.documentElement.setAttribute('data-theme', 'light');
     }
   </script>
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
 
     body {
@@ -28,14 +29,6 @@
       overflow: hidden;
     }
     @keyframes fadeIn { to { opacity: 1; } }
-
-    /* 스켈레톤 로딩 애니메이션 */
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
-      background-size: 300% 100%;
-      animation: shimmer 1.6s ease-in-out infinite;
-      border-radius: var(--r1);
-    }
     @keyframes shimmer {
       0% { background-position: 100% 0; }
       100% { background-position: -100% 0; }
@@ -62,7 +55,6 @@
 
     /* SIDEBAR */
     .sidebar-container { width: 72px; min-width: 72px; height: 100dvh; position: fixed; left: 0; top: 0; z-index: 100; }
-    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
 
     /* MAIN WRAPPER */
     .main-wrapper { 
@@ -113,9 +105,6 @@
       justify-content: center;
       transition: all 0.15s;
     }
-    .back-btn:hover { color: var(--t1); background: var(--bg3); }
-    .back-btn:active { transform: scale(0.82); }
-    .header-title { font-size: 16px; font-weight: 600; }
 
     .header-right .action-btn {
       background: var(--t1);
@@ -318,19 +307,8 @@
     .modal-btn.danger { background: rgba(255,107,107,0.15); color: var(--pink); border: 1px solid rgba(255,107,107,0.3); transition: background 0.2s; }
     .modal-btn.danger:hover { background: rgba(255,107,107,0.25); }
 
-    /* 아이콘 없는 커스텀 알림 */
-    .custom-alert {
-      position: fixed; top: -70px; left: 50%; transform: translateX(-50%); background: var(--bg3); color: var(--t1);
-      border: 1px solid var(--border2); padding: 14px 24px; border-radius: var(--r3); font-size: 14px; font-weight: 600;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
-      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .custom-alert.show { top: 24px; }
-
     @media (max-width: 768px) {
-      .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
-      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
-      .main-wrapper { margin-left: 0; width: 100%; height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px)); }
+      body .main-wrapper { margin-left: 0; width: 100%; height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px)); padding-bottom: 0; min-height: 0; }
   .dm-container {
     padding-bottom: 72px; /* 사이드바 높이만큼 */
     box-sizing: border-box;
@@ -381,68 +359,10 @@
       visibility: hidden;
       pointer-events: none;
     }
-    html[data-theme="light"] .search-panel {
-      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
-    }
-    .search-panel.open {
-      transform: translateX(0);
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-    .search-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-    .search-panel-header h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--t1);
-    }
-    .search-close-btn {
-      background: transparent;
-      border: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .search-close-btn:hover {
-      color: var(--t1);
-      transform: scale(1.1);
-    }
-    .search-panel iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
-    }
-
-    /* === 프로필 시트 (index.html 동일) === */
-    .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
       position: fixed;
       inset: 0;
       z-index: 960;
-    }
-    .sharer-profile-sheet-host .sps-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.34s ease;
-    }
-    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
-      opacity: 1;
-      pointer-events: auto;
     }
     .sharer-profile-sheet-host .sps-panel {
       position: absolute;
@@ -463,31 +383,6 @@
       transform: translateY(100%);
       transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .sharer-profile-sheet-host.sps-host-open .sps-panel {
-      transform: translateY(0);
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
-      max-height: 88vh;
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
-      transition: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area {
-      touch-action: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 52px;
-      padding: 6px 16px 14px;
-      margin: -2px -16px 0 -16px;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area:active {
-      cursor: grabbing;
-    }
     .sharer-profile-sheet-host .sps-grab {
       width: 40px;
       height: 5px;
@@ -505,24 +400,6 @@
       cursor: pointer;
       margin-bottom: 12px;
     }
-    .sharer-profile-sheet-host .sps-av {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #fff;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .sharer-profile-sheet-host .sps-av img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
@@ -531,29 +408,8 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .sharer-profile-sheet-host .sps-logout {
-      width: 100%;
-      padding: 14px 16px;
-      border: none;
-      border-radius: 14px;
-      background: rgba(255, 80, 80, 0.15);
-      color: #ff8a8a;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-    }
 
     @media (max-width: 768px) {
-      .search-panel {
-        left: 0;
-        width: 100%;
-        max-width: 100%;
-        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
-        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-        top: 0;
-        z-index: 90;
-      }
     }
   
     /* === 읽음 처리 UI (추가) === */
@@ -1289,10 +1145,6 @@
 
   <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
 
-  <div class="custom-alert" id="customAlert">
-    <span id="customAlertMsg">알림 메시지</span>
-  </div>
-
   <div class="main-wrapper">
     <div class="header">
       <div class="header-left">
@@ -1363,13 +1215,13 @@
   </div>
 
     <!-- 방 만들기 모달 - 개선된 사용자 선택 UI -->
-  <div class="modal" id="createRoomModal">
-    <div class="modal-content">
+  <div class="modal ui-modal-overlay" id="createRoomModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close" onclick="closeModals()">
+      <button class="modal-close ui-modal-close" onclick="closeModals()" aria-label="닫기">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title">새 채팅방</div>
+      <div class="modal-title ui-modal-title">새 채팅방</div>
       <div class="form-group">
         <label>채팅방 이름</label>
         <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요">
@@ -1389,13 +1241,13 @@
   </div>
 
   <!-- 사용자 초대 모달 - 개선된 사용자 선택 UI -->
-  <div class="modal" id="inviteModal">
-    <div class="modal-content">
+  <div class="modal ui-modal-overlay" id="inviteModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close" onclick="closeModals()">
+      <button class="modal-close ui-modal-close" onclick="closeModals()" aria-label="닫기">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title">사용자 초대</div>
+      <div class="modal-title ui-modal-title">사용자 초대</div>
       <div class="form-group" style="flex:1; min-height:0; display:flex; flex-direction:column;">
         <label>선택한 사용자 <span id="inviteSelectedCount" style="color:var(--t2); font-weight:400; font-size:12px; margin-left:4px;">0명</span></label>
         <div class="selected-users-box" id="inviteSelectedBox">
@@ -1411,13 +1263,13 @@
   </div>
 
   <!-- 2차 팝업: 사용자 검색 (search.html 로직 차용) -->
-  <div class="modal user-search-modal" id="userSearchModal">
-    <div class="modal-content">
+  <div class="modal ui-modal-overlay user-search-modal" id="userSearchModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close" onclick="closeUserSearchModal()">
+      <button class="modal-close ui-modal-close" onclick="closeUserSearchModal()" aria-label="닫기">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title">사용자 검색</div>
+      <div class="modal-title ui-modal-title">사용자 검색</div>
 
       <div class="us-search-box">
         <span class="search-icon">
@@ -1444,13 +1296,13 @@
 
 
   <!-- 채팅방 정보 모달 (새로 추가) -->
-  <div class="modal" id="roomInfoModal">
-    <div class="modal-content">
+  <div class="modal ui-modal-overlay" id="roomInfoModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close" onclick="closeModals()">
+      <button class="modal-close ui-modal-close" onclick="closeModals()" aria-label="닫기">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title">채팅방 정보</div>
+      <div class="modal-title ui-modal-title">채팅방 정보</div>
       <div class="form-group">
         <label>채팅방 이름</label>
         <input type="text" id="infoRoomName" readonly>
@@ -1464,13 +1316,13 @@
   </div>
 
   <!-- 반응 상세 모달 / 바텀시트 -->
-  <div class="modal" id="reactionDetailModal">
-    <div class="modal-content reaction-modal-content">
+  <div class="modal ui-modal-overlay" id="reactionDetailModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface reaction-modal-content">
       <div class="sheet-handle"></div>
-      <button class="modal-close" onclick="closeReactionDetail()">
+      <button class="modal-close ui-modal-close" onclick="closeReactionDetail()" aria-label="닫기">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title" id="reactionDetailTitle">반응</div>
+      <div class="modal-title ui-modal-title" id="reactionDetailTitle">반응</div>
       <div class="reaction-summary-row" id="reactionSummaryRow"></div>
       <div class="reaction-detail-list" id="reactionDetailList"></div>
     </div>
@@ -1567,11 +1419,12 @@
 
 
     function showAlert(message) {
-      const alertEl = document.getElementById('customAlert');
-      const msgEl = document.getElementById('customAlertMsg');
-      msgEl.textContent = message;
-      alertEl.classList.add('show');
-      setTimeout(() => alertEl.classList.remove('show'), 2500);
+      const isError = /실패|찾을 수 없|필요합니다/.test(message);
+      const isSuccess = /초대되었습니다|나갔습니다|개설되었습니다|초대했습니다/.test(message);
+      SharerUI.toast({
+        type: isError ? 'error' : (isSuccess ? 'success' : 'info'),
+        message: message.replace(/:\s*.+$/, '').replace('성공적으로 사용자를 초대했습니다.', '사용자를 초대했습니다.')
+      });
     }
 
     async function api(endpoint, options = {}) {
@@ -1595,8 +1448,7 @@
       NProgress.start();
       const savedUser = localStorage.getItem('snsUser');
       if (!savedUser) {
-        showAlert('로그인이 필요합니다.');
-        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+        SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', duration: 0, action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
         return;
       }
       currentUser = JSON.parse(savedUser);
@@ -1942,7 +1794,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       return { readMap, allReads };
     }
 
-    // ✅ 각 메시지 독립 계산: 이 메시지 기준으로만 안읽은 사람 수 세기
+    // 각 메시지를 기준으로 읽지 않은 사람 수를 독립적으로 계산한다.
     function calcUnreadIndependent(msgId, senderId, roomId, readMap) {
       const members = roomMembersMap[roomId] || [];
       if (members.length === 0) return 0;
@@ -3110,7 +2962,13 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
     async function leaveRoom() {
       if(!activeRoomId) return;
-      if(!confirm("정말로 이 채팅방에서 나가시겠습니까?")) return;
+      const confirmed = await SharerUI.confirm({
+        title: '채팅방에서 나갈까요?',
+        description: '나간 뒤에는 이 채팅방의 새 메시지를 받을 수 없습니다.',
+        confirmLabel: '나가기',
+        danger: true
+      });
+      if(!confirmed) return;
       
       NProgress.start();
       try {

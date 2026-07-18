@@ -47,7 +47,8 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
     .splash-text {
       text-align: center;
@@ -113,86 +114,6 @@
     @keyframes splashLogoPop {
       from { opacity: 0; transform: scale(0.7); }
       to   { opacity: 1; transform: scale(1); }
-    }
-
-    .sidebar-container {
-      width: 72px;
-      min-width: 72px;
-      height: 100vh;
-      position: fixed;
-      left: 0; top: 0;
-      z-index: 100;
-    }
-    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
-
-    /* 검색 패널 슬라이드 */
-    .search-panel {
-      position: fixed;
-      top: 0;
-      left: 72px;
-      width: 380px;
-      max-width: calc(100vw - 72px);
-      height: 100vh;
-      background: var(--bg);
-      border-right: 1px solid var(--border);
-      z-index: 90;
-      transform: translateX(-100%);
-      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex;
-      flex-direction: column;
-      box-shadow: 4px 0 24px rgba(0,0,0,0.3);
-
-opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-
-    }
-    html[data-theme="light"] .search-panel {
-      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
-    }
-    .search-panel.open {
-      transform: translateX(0);
-
-opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-
-
-    }
-    .search-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-    .search-panel-header h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--t1);
-    }
-    .search-close-btn {
-      background: transparent;
-      border: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .search-close-btn:hover {
-      color: var(--t1);
-      transform: scale(1.1);
-    }
-    .search-panel iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
     }
 
     .main-wrapper {
@@ -305,13 +226,6 @@ opacity: 1;
       transition: color 0.15s;
     }
     .profile-item:hover .profile-nickname { color: var(--t1); }
-
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
-      background-size: 300% 100%;
-      animation: shimmer 1.6s ease-in-out infinite;
-      border-radius: var(--r1);
-    }
     @keyframes shimmer {
       0% { background-position: 100% 0; }
       100% { background-position: -100% 0; }
@@ -753,16 +667,6 @@ opacity: 1;
     }
     .auth-box button.secondary:hover { background: var(--bg4); color: var(--t1); opacity: 1; }
 
-    .error-message, .success-message {
-      font-size: 12px;
-      margin-top: -6px;
-      margin-bottom: 8px;
-      text-align: center;
-      font-weight: 500;
-    }
-    .error-message { color: var(--pink); }
-    .success-message { color: var(--green); }
-
     .create-modal-header {
       padding: 18px 22px;
       border-bottom: 1px solid var(--border);
@@ -840,24 +744,10 @@ opacity: 1;
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--border3); }
-
-    .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
       position: fixed;
       inset: 0;
       z-index: 960;
-    }
-    .sharer-profile-sheet-host .sps-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.34s ease;
-    }
-    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
-      opacity: 1;
-      pointer-events: auto;
     }
     .sharer-profile-sheet-host .sps-panel {
       position: absolute;
@@ -878,31 +768,6 @@ opacity: 1;
       transform: translateY(100%);
       transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .sharer-profile-sheet-host.sps-host-open .sps-panel {
-      transform: translateY(0);
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
-      max-height: 88vh;
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
-      transition: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area {
-      touch-action: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 52px;
-      padding: 6px 16px 14px;
-      margin: -2px -16px 0 -16px;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area:active {
-      cursor: grabbing;
-    }
     .sharer-profile-sheet-host .sps-grab {
       width: 40px;
       height: 5px;
@@ -920,24 +785,6 @@ opacity: 1;
       cursor: pointer;
       margin-bottom: 12px;
     }
-    .sharer-profile-sheet-host .sps-av {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #fff;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .sharer-profile-sheet-host .sps-av img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
@@ -946,39 +793,9 @@ opacity: 1;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .sharer-profile-sheet-host .sps-logout {
-      width: 100%;
-      padding: 14px 16px;
-      border: none;
-      border-radius: 14px;
-      background: rgba(255, 80, 80, 0.15);
-      color: #ff8a8a;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-    }
 
     @media (max-width: 768px) {
       .recommend-container { display: none; }
-      .sidebar-container {
-        left: 0; right: 0; top: auto; bottom: 0;
-        width: 100%; min-width: 0;
-        height: calc(64px + env(safe-area-inset-bottom, 0px));
-      }
-      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
-      
-      .search-panel {
-        left: 0;
-        width: 100%;
-        max-width: 100%;
-        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
-        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-        top: 0;
-        z-index: 90;
-      }
-
-      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .main-content { padding: 20px 16px; }
       .post-image-nav {
         width: 36px;
@@ -1074,32 +891,7 @@ opacity: 1;
       87.5% { stroke-dashoffset: 80.11; transform: rotate(810deg); }
       100% { stroke-dashoffset: 304.42; transform: rotate(1080deg); }
     }
-  
-
-        /* ===== Mobile Top Bar - iframe wrapper (모바일 전용) ===== */
-    .mobile-topbar-iframe-wrap {
-      display: none; /* 데스크탑에서는 숨김 - 버그 수정 */
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 56px;
-      z-index: 300;
-      background: transparent;
-      pointer-events: none;
-    }
-    .mobile-topbar-iframe-wrap iframe {
-      width: 100%;
-      height: 56px;
-      border: none;
-      display: block;
-      pointer-events: auto;
-      overflow: hidden;
-    }
     @media (max-width: 768px) {
-      .mobile-topbar-iframe-wrap {
-        display: block;
-      }
       body {
         padding-top: 56px !important;
       }
@@ -1107,9 +899,6 @@ opacity: 1;
     @media (min-width: 769px) {
       body {
         padding-top: 0 !important;
-      }
-      .mobile-topbar-iframe-wrap {
-        display: none !important;
       }
     }
 
@@ -1254,37 +1043,37 @@ opacity: 1;
 
 <div class="main-wrapper">
 
-  <div class="auth-modal" id="loginModal">
-    <div class="auth-box">
-      <button class="auth-close" onclick="closeLoginModal()">✕</button>
+  <div class="auth-modal ui-modal-overlay" id="loginModal" role="dialog" aria-modal="true">
+    <div class="auth-box ui-modal-surface">
+      <button class="auth-close ui-modal-close" onclick="closeLoginModal()" aria-label="닫기">✕</button>
       <h2>로그인</h2>
       <input type="text" id="loginId" placeholder="아이디">
       <input type="password" id="loginPassword" placeholder="비밀번호">
-      <div class="error-message" id="loginError"></div>
-      <div class="success-message" id="loginSuccess"></div>
+      <div class="error-message" role="alert" aria-live="polite" id="loginError"></div>
+      <div class="success-message" role="status" aria-live="polite" id="loginSuccess"></div>
       <button onclick="handleLogin()">로그인</button>
       <button class="secondary" onclick="showSignup()">회원가입</button>
     </div>
   </div>
 
-  <div class="auth-modal" id="signupModal">
-    <div class="auth-box">
-      <button class="auth-close" onclick="closeSignupModal()">✕</button>
+  <div class="auth-modal ui-modal-overlay" id="signupModal" role="dialog" aria-modal="true">
+    <div class="auth-box ui-modal-surface">
+      <button class="auth-close ui-modal-close" onclick="closeSignupModal()" aria-label="닫기">✕</button>
       <h2>회원가입</h2>
       <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
-      <div class="error-message" id="nicknameError"></div>
+      <div class="error-message" role="alert" aria-live="polite" id="nicknameError"></div>
       <input type="text" id="signupId" placeholder="아이디">
-      <div class="error-message" id="idError"></div>
+      <div class="error-message" role="alert" aria-live="polite" id="idError"></div>
       <input type="password" id="signupPassword" placeholder="비밀번호">
-      <div class="error-message" id="signupError"></div>
-      <div class="success-message" id="signupSuccess"></div>
+      <div class="error-message" role="alert" aria-live="polite" id="signupError"></div>
+      <div class="success-message" role="status" aria-live="polite" id="signupSuccess"></div>
       <button onclick="handleSignup()">가입</button>
       <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
     </div>
   </div>
 
-  <div class="create-modal" id="createModal">
-    <div class="create-modal-content">
+  <div class="create-modal ui-modal-overlay" id="createModal" role="dialog" aria-modal="true">
+    <div class="create-modal-content ui-modal-surface">
       <div class="create-modal-header">
         <h3>새 게시물 만들기</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
@@ -1995,13 +1784,19 @@ window.goToProfile = (userId, nickname) => {
 };
 
 window.deletePost = async (postId) => {
-  if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
+  const confirmed = await SharerUI.confirm({
+    title: '게시물을 삭제할까요?',
+    description: '삭제한 게시물은 복구할 수 없습니다.',
+    confirmLabel: '삭제',
+    danger: true
+  });
+  if (!confirmed) return;
   try {
     await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
     loadPosts();
   } catch (err) {
     console.error('삭제 오류:', err);
-    alert('삭제에 실패했습니다.');
+    SharerUI.toast({ type: 'error', message: '게시물을 삭제하지 못했습니다. 다시 시도해 주세요.' });
   }
 };
 
@@ -2280,6 +2075,5 @@ fetchRecentStories().then(() => {
       }
     }, 800);
   </script>
-
 </body>
 </html>

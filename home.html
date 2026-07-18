@@ -26,7 +26,8 @@
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
     /* Sharer 피드 페이지 원본 리셋 및 애니메이션 */
 
@@ -472,14 +473,6 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
   height: 40px;
 }
     
-    .toast {
-      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: var(--t1); color: var(--bg); padding: 10px 20px; border-radius: var(--r3);
-      font-size: 14px; font-weight: 500; z-index: 2500; opacity: 0; pointer-events: none;
-      transition: opacity 0.3s, transform 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
     /* =================================================================== */
     /* 통계/지표 섹션 (토스 스타일) */
 .stats-section {
@@ -865,8 +858,6 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
     <button class="theme-switch" onclick="toggleTheme()">테마 변경</button>
   </div>
 
-  <div class="toast" id="toast"></div>
-
   <script>
     function toggleTheme() {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
@@ -968,11 +959,7 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
     // 새로 이식된 AI 챗봇 모달 스크립트 기능
     // ====================================================
     function showToast(msg) {
-      const toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 2500);
+      SharerUI.toast({ type: 'success', message: msg });
     }
 
     const WORKER_API_URL = "https://sharer-api.alexeom97.workers.dev/api/ai"; 
@@ -1035,8 +1022,9 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       copyBtn.classList.add("action-btn");
       copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
       copyBtn.onclick = () => {
-        navigator.clipboard.writeText(textContent);
-        showToast("답변이 복사되었습니다.");
+        navigator.clipboard.writeText(textContent)
+          .then(() => showToast("답변을 복사했습니다."))
+          .catch(() => SharerUI.toast({ type: 'error', message: '답변을 복사하지 못했습니다.' }));
       };
 
       const regenBtn = document.createElement("button");
@@ -1145,7 +1133,7 @@ async function fetchAIResponse(userText, isRegen = false) {
           aiMessageElement.appendChild(contentDiv);
           chatMessages.appendChild(aiMessageElement);
         }
-        contentDiv.innerHTML = `<p style="color:#ef4444;">⚠️ 오류가 발생했습니다. 다시 시도해주세요.</p>`;
+        contentDiv.innerHTML = `<p class="sharer-ui-field-message sharer-ui-field-message--error">답변을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.</p>`;
       } finally {
         chatInput.disabled = false;
         sendBtn.disabled = true;
@@ -1162,11 +1150,7 @@ async function fetchAIResponse(userText, isRegen = false) {
     }
 
     function showToast(msg) {
-      const toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      SharerUI.toast({ type: 'success', message: msg });
     }
 
 

@@ -17,7 +17,8 @@
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
     :root {
       --blue: #3b82f6;
@@ -53,11 +54,6 @@
       animation: fadeIn 0.4s ease forwards;
     }
     @keyframes fadeIn { to { opacity: 1; } }
-    /* ─── SIDEBAR ─── */
-    .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
-    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
-    /* ─── MAIN WRAPPER ─── */
-    .main-wrapper { margin-left: 72px; width: calc(100% - 72px); display: flex; flex-direction: column; min-height: 100vh; }
     /* ─── HEADER ─── */
     .header {
       background: var(--bg);
@@ -74,94 +70,7 @@
       animation: slideDown 0.4s ease 0.1s forwards;
     }
     @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
-    .back-btn {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      border: none;
-      background: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .back-btn:hover { color: var(--t1); background: var(--bg3); }
-    .back-btn:active { transform: scale(0.82); }
     .header-title { font-size: 16px; font-weight: 600; color: var(--t1); }
-    /* ─── CONTAINER ─── */
-
-
-    /* 검색 패널 슬라이드 */
-    .search-panel {
-      position: fixed;
-      top: 0;
-      left: 72px;
-      width: 380px;
-      max-width: calc(100vw - 72px);
-      height: 100vh;
-      background: var(--bg);
-      border-right: 1px solid var(--border);
-      z-index: 90;
-      transform: translateX(-100%);
-      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex;
-      flex-direction: column;
-      box-shadow: 4px 0 24px rgba(0,0,0,0.3);
-
-opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-
-    }
-    html[data-theme="light"] .search-panel {
-      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
-    }
-    .search-panel.open {
-      transform: translateX(0);
-
-opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-
-
-    }
-    .search-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-    .search-panel-header h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--t1);
-    }
-    .search-close-btn {
-      background: transparent;
-      border: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .search-close-btn:hover {
-      color: var(--t1);
-      transform: scale(1.1);
-    }
-    .search-panel iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
-    }
 
 
     .container {
@@ -274,30 +183,7 @@ opacity: 1;
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-        /* ===== Mobile Top Bar - iframe wrapper (모바일 전용) ===== */
-    .mobile-topbar-iframe-wrap {
-      display: none; /* 데스크탑에서는 숨김 - 버그 수정 */
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 56px;
-      z-index: 300;
-      background: transparent;
-      pointer-events: none;
-    }
-    .mobile-topbar-iframe-wrap iframe {
-      width: 100%;
-      height: 56px;
-      border: none;
-      display: block;
-      pointer-events: auto;
-      overflow: hidden;
-    }
     @media (max-width: 768px) {
-      .mobile-topbar-iframe-wrap {
-        display: block;
-      }
       body {
         padding-top: 56px !important;
       }
@@ -305,9 +191,6 @@ opacity: 1;
     @media (min-width: 769px) {
       body {
         padding-top: 0 !important;
-      }
-      .mobile-topbar-iframe-wrap {
-        display: none !important;
       }
     }
 
@@ -701,75 +584,6 @@ opacity: 1;
     .reply-item .comment-author { font-size: 13px; }
     .reply-item .comment-content { font-size: 13px; color: var(--t1); }
     .reply-item .comment-date { font-size: 10px; }
-    /* ─── LOGIN ALERT ─── */
-    .login-alert {
-      position: fixed;
-      top: -80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      color: var(--t1);
-      padding: 12px 24px;
-      border-radius: 22px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      z-index: 9999;
-      transition: top 0.5s cubic-bezier(0.34,1.4,0.64,1);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      white-space: nowrap;
-    }
-    .login-alert.show { top: 20px; }
-    /* ─── DELETE MODAL ─── */
-    .delete-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.25s ease, visibility 0.25s ease;
-    }
-    .delete-modal-overlay.show { opacity: 1; visibility: visible; }
-    .delete-modal {
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: var(--r4);
-      padding: 36px 28px;
-      text-align: center;
-      max-width: 360px;
-      width: 90%;
-      transform: scale(0.88) translateY(12px);
-      transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1);
-    }
-    .delete-modal-overlay.show .delete-modal { transform: scale(1) translateY(0); }
-    .delete-modal img { width: 80px; height: 80px; margin-bottom: 20px; opacity: 0.85; }
-    .delete-modal-title { font-size: 16px; font-weight: 600; margin-bottom: 28px; color: var(--t1); line-height: 1.5; }
-    .delete-modal-buttons { display: flex; gap: 10px; justify-content: center; }
-    .delete-modal-btn {
-      padding: 10px 28px;
-      border-radius: var(--r2);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      border: none;
-    }
-    .delete-modal-btn.cancel { background: var(--bg3); color: var(--t2); border: 1px solid var(--border2); }
-    .delete-modal-btn.cancel:hover { background: var(--bg4); color: var(--t1); }
-    .delete-modal-btn.delete { background: rgba(255,107,107,0.15); color: var(--pink); border: 1px solid rgba(255,107,107,0.3); }
-    .delete-modal-btn.delete:hover { background: rgba(255,107,107,0.25); border-color: var(--pink); }
     /* 라이트박스 (이미지 확대 보기) */
     #imageLightbox {
       position: fixed;
@@ -841,23 +655,10 @@ opacity: 1;
       border-radius: 20px;
     }
     @media (max-width: 768px) {
-      .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
-      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
-      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .container { padding: 20px 16px; }
       .post-detail-header { flex-direction: column; align-items: flex-start; gap: 16px; }
       .header-actions { align-self: flex-end; }
       .carousel-nav { width: 36px; height: 36px; font-size: 18px; }
-
-      .search-panel {
-        left: 0;
-        width: 100%;
-        max-width: 100%;
-        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
-        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-        top: 0;
-        z-index: 90;
-      }
 
     }
     /* 푸터 */
@@ -872,25 +673,10 @@ opacity: 1;
     .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
-
-    /* ─── Profile Sheet (Mobile) ─── */
-    .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
       position: fixed;
       inset: 0;
       z-index: 960;
-    }
-    .sharer-profile-sheet-host .sps-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.34s ease;
-    }
-    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
-      opacity: 1;
-      pointer-events: auto;
     }
     .sharer-profile-sheet-host .sps-panel {
       position: absolute;
@@ -911,31 +697,6 @@ opacity: 1;
       transform: translateY(100%);
       transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .sharer-profile-sheet-host.sps-host-open .sps-panel {
-      transform: translateY(0);
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
-      max-height: 88vh;
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
-      transition: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area {
-      touch-action: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 52px;
-      padding: 6px 16px 14px;
-      margin: -2px -16px 0 -16px;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area:active {
-      cursor: grabbing;
-    }
     .sharer-profile-sheet-host .sps-grab {
       width: 40px;
       height: 5px;
@@ -953,24 +714,6 @@ opacity: 1;
       cursor: pointer;
       margin-bottom: 12px;
     }
-    .sharer-profile-sheet-host .sps-av {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #fff;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .sharer-profile-sheet-host .sps-av img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
@@ -978,18 +721,6 @@ opacity: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-    .sharer-profile-sheet-host .sps-logout {
-      width: 100%;
-      padding: 14px 16px;
-      border: none;
-      border-radius: 14px;
-      background: rgba(255, 80, 80, 0.15);
-      color: #ff8a8a;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
     }
 
     /* ─── MODAL (POPUP) STYLE ─── */
@@ -1113,14 +844,6 @@ opacity: 1;
     html[data-theme="light"] .info-icon-box img {
       filter: brightness(0);
     }
-
-    /* ─── 추가된 스켈레톤 로딩 (Skeleton Loading) CSS ─── */
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
-      background-size: 300% 100%;
-      animation: shimmer 1.6s ease-in-out infinite;
-      border-radius: var(--r1);
-    }
     @keyframes shimmer {
       0% { background-position: 100% 0; }
       100% { background-position: -100% 0; }
@@ -1203,31 +926,16 @@ opacity: 1;
     <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
 
-  <div class="login-alert" id="loginAlert">
-    <span>로그인 후 사용 가능합니다</span>
-  </div>
-
-  <div class="delete-modal-overlay" id="deleteModal">
-    <div class="delete-modal">
-      <img src="careful.png" alt="주의">
-      <div class="delete-modal-title">정말로 삭제하시겠습니까?</div>
-      <div class="delete-modal-buttons">
-        <button class="delete-modal-btn cancel" onclick="closeDeleteModal()">취소</button>
-        <button class="delete-modal-btn delete" id="confirmDeleteBtn">삭제</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="accessInfoModal">
-    <div class="modal-content">
-      <button class="modal-close-btn" onclick="closeInfoModal()">
+  <div class="modal ui-modal-overlay" id="accessInfoModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface">
+      <button class="modal-close-btn ui-modal-close" onclick="closeInfoModal()" aria-label="닫기">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
       <div class="modal-header">
         <img src="set.svg" alt="set">
-        <div class="modal-title">공개 범위 설정</div>
+        <div class="modal-title ui-modal-title">공개 범위 설정</div>
       </div>
       <div class="info-section">
         <div class="info-row">
@@ -1391,7 +1099,6 @@ opacity: 1;
 
   let currentUser = JSON.parse(localStorage.getItem('snsUser')) || null;
   let currentPost = null;
-  let pendingDeletePostId = null;
   const openReplyThreads = new Set();
   let currentLightboxImages = [];
   let currentLightboxIndex = 0;
@@ -1442,10 +1149,7 @@ opacity: 1;
   }
 
   function showLoginAlert() {
-    const alert = document.getElementById('loginAlert');
-    alert.classList.add('show');
-    setTimeout(() => alert.classList.remove('show'), 3000);
-    alert.onclick = () => window.location.href = 'login.html';
+    SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
   }
 
   function initCurrentUser() {
@@ -2064,16 +1768,22 @@ window.toggleSearchPanel = function() {
     }
   });
 
-  window.openDeleteModal = function(id) {
-    pendingDeletePostId = id;
-    document.getElementById('deleteModal').classList.add('show');
-    document.body.style.overflow = 'hidden';
-  };
-  
-  window.closeDeleteModal = function() {
-    document.getElementById('deleteModal').classList.remove('show');
-    document.body.style.overflow = '';
-    pendingDeletePostId = null;
+  window.openDeleteModal = async function(id) {
+    const confirmed = await SharerUI.confirm({
+      title: '게시물을 삭제할까요?',
+      description: '삭제한 게시물과 댓글은 복구할 수 없습니다.',
+      confirmLabel: '삭제',
+      danger: true
+    });
+    if (!confirmed) return;
+    try {
+      await api(`/comments?post_id=eq.${id}`, { method: "DELETE" });
+      await api(`/likes?post_id=eq.${id}`, { method: "DELETE" });
+      await api(`/posts?id=eq.${id}`, { method: "DELETE" });
+      window.location.href = 'index.html';
+    } catch (e) {
+      SharerUI.toast({ type: 'error', message: '게시물을 삭제하지 못했습니다. 다시 시도해 주세요.' });
+    }
   };
   
   window.goToProfile = function(userId, nickname) {
@@ -2101,7 +1811,7 @@ window.toggleSearchPanel = function() {
       createNotification(currentPost.author_id, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${postId}`);
       input.value = '';
       listenComments(postId);
-    } catch (e) { alert('댓글 작성 실패'); }
+    } catch (e) { SharerUI.toast({ type: 'error', message: '댓글을 등록하지 못했습니다. 다시 시도해 주세요.' }); }
   };
   
   window.openReplyComposer = function(commentId) {
@@ -2147,7 +1857,7 @@ window.toggleSearchPanel = function() {
       if (compose) compose.style.display = 'none';
       openReplyThreads.add(parentId);
       listenComments(postId);
-    } catch (e) { alert('답글 작성 실패'); }
+    } catch (e) { SharerUI.toast({ type: 'error', message: '답글을 등록하지 못했습니다. 다시 시도해 주세요.' }); }
   };
   
   window.toggleReplies = function(commentId) {
@@ -2170,11 +1880,17 @@ window.toggleSearchPanel = function() {
   };
   
   window.deleteComment = async function(commentId) {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    const confirmed = await SharerUI.confirm({
+      title: '댓글을 삭제할까요?',
+      description: '삭제한 댓글은 복구할 수 없습니다.',
+      confirmLabel: '삭제',
+      danger: true
+    });
+    if (!confirmed) return;
     try {
       await api(`/comments?id=eq.${commentId}`, { method: "DELETE" });
       listenComments(postId);
-    } catch (e) { alert('댓글 삭제 실패'); }
+    } catch (e) { SharerUI.toast({ type: 'error', message: '댓글을 삭제하지 못했습니다. 다시 시도해 주세요.' }); }
   };
   
   window.copyShareLink = function() {
@@ -2182,6 +1898,9 @@ window.toggleSearchPanel = function() {
       const btn = document.getElementById('copyBtn');
       btn.classList.add('success');
       setTimeout(() => btn.classList.remove('success'), 1500);
+      SharerUI.toast({ type: 'success', message: '게시물 링크를 복사했습니다.' });
+    }).catch(() => {
+      SharerUI.toast({ type: 'error', message: '게시물 링크를 복사하지 못했습니다.' });
     });
   };
 
@@ -2189,16 +1908,6 @@ window.toggleSearchPanel = function() {
   window.showPrivacyPolicy = () => window.location.href = "privacy.html";
   window.showTerms = () => window.location.href = "policy.html";
 
-  document.getElementById('confirmDeleteBtn').onclick = async () => {
-    if (!pendingDeletePostId) return;
-    try {
-      await api(`/comments?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
-      await api(`/likes?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
-      await api(`/posts?id=eq.${pendingDeletePostId}`, { method: "DELETE" });
-      window.location.href = 'index.html';
-    } catch (e) { alert('게시물 삭제 실패'); }
-  };
-  
   function escapeHtml(unsafe) {
     return unsafe
       .replace(/&/g, "&amp;")

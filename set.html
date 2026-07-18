@@ -14,7 +14,8 @@
       document.documentElement.setAttribute('data-theme', 'light');
     }
   </script>
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
 
     :root {
@@ -56,13 +57,6 @@
     }
     @keyframes fadeIn { to { opacity: 1; } }
 
-    /* ─── SIDEBAR (메인 앱 사이드바) ─── */
-    .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
-    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
-
-    /* ─── MAIN WRAPPER ─── */
-    .main-wrapper { margin-left: 72px; width: calc(100% - 72px); display: flex; flex-direction: column; min-height: 100vh; }
-
     /* ─── HEADER ─── */
     .header {
       background: var(--bg);
@@ -75,22 +69,6 @@
       top: 0;
       z-index: 50;
     }
-    .back-btn {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      border: none;
-      background: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .back-btn:hover { color: var(--t1); background: var(--bg3); }
-    .back-btn:active { transform: scale(0.82); }
-    .header-title { font-size: 16px; font-weight: 600; }
 
     /* ─── SETTINGS LAYOUT (Master-Detail) ─── */
     .settings-container {
@@ -345,25 +323,10 @@
     .theme-option input[type="radio"]:checked::before { transform: scale(1); }
     .theme-label-content { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; color: var(--t1); }
     .theme-label-content svg { width: 22px; height: 22px; stroke: var(--t2); fill: none; stroke-width: 2; }
-
-    /* ─── Profile Sheet (Mobile) ─── */
-    .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
       position: fixed;
       inset: 0;
       z-index: 960;
-    }
-    .sharer-profile-sheet-host .sps-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.34s ease;
-    }
-    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
-      opacity: 1;
-      pointer-events: auto;
     }
     .sharer-profile-sheet-host .sps-panel {
       position: absolute;
@@ -384,31 +347,6 @@
       transform: translateY(100%);
       transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .sharer-profile-sheet-host.sps-host-open .sps-panel {
-      transform: translateY(0);
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
-      max-height: 88vh;
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
-      transition: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area {
-      touch-action: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 52px;
-      padding: 6px 16px 14px;
-      margin: -2px -16px 0 -16px;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area:active {
-      cursor: grabbing;
-    }
     .sharer-profile-sheet-host .sps-grab {
       width: 40px;
       height: 5px;
@@ -426,24 +364,6 @@
       cursor: pointer;
       margin-bottom: 12px;
     }
-    .sharer-profile-sheet-host .sps-av {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #fff;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .sharer-profile-sheet-host .sps-av img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
@@ -452,24 +372,9 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .sharer-profile-sheet-host .sps-logout {
-      width: 100%;
-      padding: 14px 16px;
-      border: none;
-      border-radius: 14px;
-      background: rgba(255, 80, 80, 0.15);
-      color: #ff8a8a;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-    }
 
     /* ─── RESPONSIVE (MOBILE VIEW) ─── */
     @media (max-width: 768px) {
-      .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
-      .sidebar-container iframe { width: 100% !important; height: 100% !important; }
-      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
       
       .settings-container { padding: 0; flex-direction: column; gap: 0; animation: none; transform: none; opacity: 1; }
       
@@ -840,7 +745,7 @@
 
     } catch (err) {
       console.error(err);
-      alert('프로필 사진 변경 중 오류가 발생했습니다.');
+      SharerUI.toast({ type: 'error', message: '프로필 사진을 변경하지 못했습니다. 다시 시도해 주세요.' });
     } finally {
       btn.disabled = false;
       btn.textContent = "사진 변경";
@@ -856,7 +761,7 @@
     const cfmPwd = document.getElementById('confirmPasswordInput').value;
 
     if (!curPwd || !newPwd || !cfmPwd) {
-      alert('모든 비밀번호 입력 필드를 채워주세요.');
+      SharerUI.toast({ type: 'warning', message: '비밀번호 입력란을 모두 작성해 주세요.' });
       return;
     }
 
@@ -871,7 +776,7 @@
       const actualPassword = userRes[0].password;
 
       if (actualPassword && actualPassword !== curPwd) {
-        alert('현재 비밀번호가 일치하지 않습니다.');
+        SharerUI.setFieldMessage('#currentPasswordInput', { type: 'error', message: '현재 비밀번호가 일치하지 않습니다.' });
         btn.disabled = false;
         btn.textContent = "비밀번호 변경";
         NProgress.done();
@@ -879,7 +784,7 @@
       }
 
       if (newPwd !== cfmPwd) {
-        alert('새로 입력하신 비밀번호가 서로 일치하지 않습니다.');
+        SharerUI.setFieldMessage('#confirmPasswordInput', { type: 'error', message: '새 비밀번호가 서로 일치하지 않습니다.' });
         btn.disabled = false;
         btn.textContent = "비밀번호 변경";
         NProgress.done();
@@ -887,7 +792,7 @@
       }
 
       if (newPwd.length < 4) {
-        alert('비밀번호는 최소 4자 이상이어야 합니다.');
+        SharerUI.setFieldMessage('#newPasswordInput', { type: 'error', message: '비밀번호는 4자 이상 입력해 주세요.' });
         btn.disabled = false;
         btn.textContent = "비밀번호 변경";
         NProgress.done();
@@ -910,7 +815,7 @@
 
     } catch (e) {
       console.error(e);
-      alert('비밀번호 변경 중 오류가 발생했습니다.');
+      SharerUI.toast({ type: 'error', message: '비밀번호를 변경하지 못했습니다. 다시 시도해 주세요.' });
     } finally {
       btn.disabled = false;
       btn.textContent = "비밀번호 변경";
@@ -941,7 +846,7 @@
     const btn = document.getElementById('sendEmailCodeBtn');
     
     if(!inputEmail) { 
-      alert("변경할 이메일 주소를 입력해주세요."); 
+      SharerUI.setFieldMessage('#newEmailInput', { type: 'error', message: '변경할 이메일 주소를 입력해 주세요.' });
       return; 
     }
 
@@ -967,7 +872,7 @@
 
     } catch(e) {
       console.error(e);
-      alert("인증 메일 발송에 실패했습니다. 이메일 주소를 다시 확인해주세요.");
+      SharerUI.toast({ type: 'error', message: '인증 메일을 보내지 못했습니다. 이메일 주소를 확인해 주세요.' });
     } finally {
       btn.disabled = false;
       btn.textContent = "인증 메일 보내기";
@@ -981,7 +886,7 @@
     const btn = document.getElementById('verifyEmailCodeBtn');
     
     if(!code) { 
-      alert("인증번호를 입력해주세요."); 
+      SharerUI.setFieldMessage('#emailCodeInput', { type: 'error', message: '인증번호를 입력해 주세요.' });
       return; 
     }
 
@@ -1021,11 +926,11 @@
         
 
       } else {
-        alert("인증번호가 일치하지 않거나 만료되었습니다.");
+        SharerUI.setFieldMessage('#emailCodeInput', { type: 'error', message: '인증번호가 일치하지 않거나 만료되었습니다.' });
       }
     } catch(e) {
       console.error(e);
-      alert("인증 확인 중 오류가 발생했습니다.");
+      SharerUI.toast({ type: 'error', message: '인증번호를 확인하지 못했습니다. 다시 시도해 주세요.' });
     } finally {
       btn.disabled = false;
       btn.textContent = "인증 완료 및 저장";
@@ -1098,8 +1003,5 @@
     }
   });
 </script>
-
-
-
 </body>
 </html>

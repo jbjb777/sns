@@ -17,104 +17,10 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
-    /* 검색 패널 슬라이드 */
-    .search-panel {
-      position: fixed;
-      top: 0;
-      left: 72px;
-      width: 380px;
-      max-width: calc(100vw - 72px);
-      height: 100vh;
-      background: var(--bg);
-      border-right: 1px solid var(--border);
-      z-index: 90;
-      transform: translateX(-100%);
-      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex;
-      flex-direction: column;
-      box-shadow: 4px 0 24px rgba(0,0,0,0.3);
-
-opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-
-    }
-    html[data-theme="light"] .search-panel {
-      box-shadow: 4px 0 24px rgba(0,0,0,0.1);
-    }
-    .search-panel.open {
-      transform: translateX(0);
-
-opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-
-
-    }
-    .search-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-    .search-panel-header h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--t1);
-    }
-    .search-close-btn {
-      background: transparent;
-      border: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .search-close-btn:hover {
-      color: var(--t1);
-      transform: scale(1.1);
-    }
-    .search-panel iframe {
-      width: 100%;
-      flex: 1;
-      border: none;
-    }
-    /* 라이트 모드 변수 정의 */
-
-    /* ===== Mobile Top Bar - injected ===== */
-        /* ===== Mobile Top Bar - iframe wrapper (모바일 전용) ===== */
-    .mobile-topbar-iframe-wrap {
-      display: none; /* 데스크탑에서는 숨김 - 버그 수정 */
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 56px;
-      z-index: 300;
-      background: transparent;
-      pointer-events: none;
-    }
-    .mobile-topbar-iframe-wrap iframe {
-      width: 100%;
-      height: 56px;
-      border: none;
-      display: block;
-      pointer-events: auto;
-      overflow: hidden;
-    }
     @media (max-width: 768px) {
-      .mobile-topbar-iframe-wrap {
-        display: block;
-      }
       body {
         padding-top: 56px !important;
       }
@@ -122,9 +28,6 @@ opacity: 1;
     @media (min-width: 769px) {
       body {
         padding-top: 0 !important;
-      }
-      .mobile-topbar-iframe-wrap {
-        display: none !important;
       }
     }
     /* NProgress 커스텀 */
@@ -162,13 +65,6 @@ opacity: 1;
     }
     @keyframes fadeIn { to { opacity: 1; } }
 
-    /* ─── SIDEBAR ─── */
-    .sidebar-container { width: 72px; min-width: 72px; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
-    .sidebar-container iframe { width: 72px !important; height: 100%; border: none; }
-
-    /* ─── MAIN WRAPPER ─── */
-    .main-wrapper { margin-left: 72px; width: calc(100% - 72px); display: flex; flex-direction: column; min-height: 100vh; }
-
     /* ─── HEADER ─── */
     .header {
       background: var(--bg);
@@ -185,24 +81,6 @@ opacity: 1;
       animation: slideDown 0.4s ease 0.1s forwards;
     }
     @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
-
-    .back-btn {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      border: none;
-      background: none;
-      color: var(--t2);
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .back-btn:hover { color: var(--t1); background: var(--bg3); }
-    .back-btn:active { transform: scale(0.82); }
-
-    .header-title { font-size: 16px; font-weight: 600; }
 
     /* ─── CONTAINER ─── */
     .container {
@@ -546,14 +424,6 @@ opacity: 1;
       font-size: 12px;
       font-weight: 600;
     }
-
-    /* ─── SKELETON ─── */
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg2) 0%, var(--bg3) 50%, var(--bg2) 100%);
-      background-size: 300% 100%;
-      animation: shimmer 1.6s ease-in-out infinite;
-      border-radius: var(--r1);
-    }
     @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
     .skeleton-avatar { width: 88px; height: 88px; border-radius: 50%; }
     .skeleton-text { height: 22px; border-radius: 8px; margin-bottom: 12px; }
@@ -630,24 +500,6 @@ opacity: 1;
     .modal-btn-confirm { background: var(--t1); color: var(--bg); }
     .modal-btn-confirm:hover { opacity: 0.85; }
 
-    .upload-toast {
-      position: fixed;
-      bottom: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      color: var(--t1);
-      padding: 10px 22px;
-      border-radius: 22px;
-      font-size: 13px;
-      font-weight: 500;
-      z-index: 9999;
-      transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
-      white-space: nowrap;
-    }
-    .upload-toast.show { bottom: 28px; }
-
     /* ─── FOOTER ─── */
     .footer {
       border-top: 1px solid var(--border);
@@ -660,25 +512,10 @@ opacity: 1;
     .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
     .footer-links a:hover { color: var(--t1); }
     .footer-text { color: var(--t3); font-size: 11px; }
-
-    /* 모바일 프로필 시트 */
-    .sharer-profile-sheet-host[hidden] { display: none !important; }
     .sharer-profile-sheet-host {
       position: fixed;
       inset: 0;
       z-index: 960;
-    }
-    .sharer-profile-sheet-host .sps-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.34s ease;
-    }
-    .sharer-profile-sheet-host.sps-host-open .sps-backdrop {
-      opacity: 1;
-      pointer-events: auto;
     }
     .sharer-profile-sheet-host .sps-panel {
       position: absolute;
@@ -699,31 +536,6 @@ opacity: 1;
       transform: translateY(100%);
       transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .sharer-profile-sheet-host.sps-host-open .sps-panel {
-      transform: translateY(0);
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-expanded {
-      max-height: 88vh;
-    }
-    .sharer-profile-sheet-host .sps-panel.sps-panel-dragging {
-      transition: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area {
-      touch-action: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 52px;
-      padding: 6px 16px 14px;
-      margin: -2px -16px 0 -16px;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .sharer-profile-sheet-host .sps-drag-area:active {
-      cursor: grabbing;
-    }
     .sharer-profile-sheet-host .sps-grab {
       width: 40px;
       height: 5px;
@@ -741,24 +553,6 @@ opacity: 1;
       cursor: pointer;
       margin-bottom: 12px;
     }
-    .sharer-profile-sheet-host .sps-av {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #3478f6, #53b6f9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: #fff;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .sharer-profile-sheet-host .sps-av img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
     .sharer-profile-sheet-host .sps-name {
       font-size: 16px;
       font-weight: 600;
@@ -766,18 +560,6 @@ opacity: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-    .sharer-profile-sheet-host .sps-logout {
-      width: 100%;
-      padding: 14px 16px;
-      border: none;
-      border-radius: 14px;
-      background: rgba(255, 80, 80, 0.15);
-      color: #ff8a8a;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
     }
 
     /* ─── STORY OVERLAY ─── */
@@ -844,21 +626,6 @@ opacity: 1;
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
-      .sidebar-container {
-        left: 0;
-        right: 0; top: auto; bottom: 0;
-        width: 100%; min-width: 0;
-        height: calc(64px + env(safe-area-inset-bottom, 0px));
-      }
-      .sidebar-container iframe {
-        width: 100% !important;
-        height: 100% !important;
-      }
-      .main-wrapper {
-        margin-left: 0;
-        width: 100%;
-        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-      }
       .container { padding: 20px 16px;
       }
       .post-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;
@@ -876,17 +643,6 @@ opacity: 1;
       }
 
 
-      .search-panel {
-        left: 0;
-        width: 100%;
-        max-width: 100%;
-        height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px));
-        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-        top: 0;
-        z-index: 90;
-      }
-
-
     }
   </style>
 </head>
@@ -897,8 +653,6 @@ opacity: 1;
   <div id="splash">
     <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
-
-  <div class="upload-toast" id="uploadToast">⏳ 업로드 중...</div>
 
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
@@ -985,21 +739,21 @@ opacity: 1;
     </div>
   </div>
 
-  <div class="modal-overlay" id="statusModal">
-    <div class="modal-content">
-      <div class="modal-title">상태메시지 수정</div>
+  <div class="modal-overlay ui-modal-overlay" id="statusModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface">
+      <div class="modal-title ui-modal-title">상태 메시지 수정</div>
       <textarea class="modal-input" id="statusInput" placeholder="상태메시지를 입력하세요..." maxlength="100"></textarea>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
-        <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
+        <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">저장</button>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="profilePicModal">
-    <div class="modal-content" style="text-align: center;">
-      <div class="modal-title" style="font-size:18px;">가입을 환영합니다! 🎉</div>
-      <p style="color:var(--t2); font-size:14px; margin-bottom:24px; line-height:1.6;">
+  <div class="modal-overlay ui-modal-overlay" id="profilePicModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface" style="text-align: center;">
+      <div class="modal-title ui-modal-title">가입을 환영합니다</div>
+      <p class="ui-modal-description" style="margin-bottom:24px;">
         나만의 개성을 표현할<br>프로필 사진을 설정해 보세요.
       </p>
       <div class="modal-buttons" style="justify-content: center; gap:12px;">
@@ -1009,28 +763,28 @@ opacity: 1;
     </div>
   </div>
 
-  <div class="modal-overlay" id="adminInfoModal">
-    <div class="modal-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 32px 24px;">
+  <div class="modal-overlay ui-modal-overlay" id="adminInfoModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 32px 24px;">
       <img src="badge.svg" alt="set" style="width: 44px; height: 44px; margin-bottom: 4px;">
-      <div class="modal-title" style="font-size: 18px; font-weight: 700; margin-bottom: 0; color: var(--t1);">관리자</div>
-      <p style="color: var(--t2); font-size: 14px; line-height: 1.6; margin-bottom: 10px; word-break: keep-all;">
+      <div class="modal-title ui-modal-title" style="margin-bottom: 0;">관리자</div>
+      <p class="ui-modal-description" style="margin-bottom: 10px; word-break: keep-all;">
         Sharer를 1인 개발한 중2 관리자입니다
       </p>
       <div class="modal-buttons" style="justify-content: center; width: 100%;">
-        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAdminModal()">확인</button>
+        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAdminModal()">닫기</button>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="aiAnalysisModal">
-    <div class="modal-content" style="text-align: left; padding: 32px 24px;">
-      <div class="modal-title" style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--t1); display: flex; align-items: center; justify-content: center; gap: 8px;">
+  <div class="modal-overlay ui-modal-overlay" id="aiAnalysisModal" role="dialog" aria-modal="true">
+    <div class="modal-content ui-modal-surface" style="text-align: left; padding: 32px 24px;">
+      <div class="modal-title ui-modal-title" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px;">
         <img src="logo_ai/color.png" alt="AI" style="width: 24px; height: 24px; object-fit: contain;"> AI 사용자 분석
       </div>
       <div id="aiAnalysisContent" style="color: var(--t1); font-size: 14px; line-height: 1.6; word-break: keep-all; max-height: 60vh; overflow-y: auto;">
       </div>
       <div class="modal-buttons" style="justify-content: center; width: 100%; margin-top: 24px;">
-        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAiAnalysisModal()">확인</button>
+        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAiAnalysisModal()">닫기</button>
       </div>
     </div>
   </div>
@@ -1114,12 +868,16 @@ opacity: 1;
   }
 
   function showToast(msg) {
-    const t = document.getElementById('uploadToast');
-    t.textContent = msg;
-    t.classList.add('show');
+    const type = msg.includes('실패') ? 'error' : (msg.includes('변경') ? 'success' : 'info');
+    const message = msg
+      .replace(/업로드 중\.\.\./, '프로필 사진을 올리고 있습니다.')
+      .replace(/프로필 사진이 변경되었습니다!/, '프로필 사진을 변경했습니다.')
+      .replace(/업로드 실패:.*/, '프로필 사진을 올리지 못했습니다. 다시 시도해 주세요.')
+      .trim();
+    SharerUI.toast({ type, message, duration: type === 'info' ? 0 : 2800 });
   }
   function hideToast() {
-    document.getElementById('uploadToast').classList.remove('show');
+    SharerUI.dismissToast();
   }
 // 1. 로그인 성공 후
 function handleLogin() {
@@ -1210,7 +968,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const file = e.target.files?.[0];
     if (!file || !currentUser?.id) return;
 
-    showToast('⏳ 업로드 중...');
+    showToast('프로필 사진을 올리고 있습니다.');
     try {
       const imageUrl = await uploadImageToCloudinary(file);
       await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
@@ -1224,12 +982,12 @@ window.addEventListener('DOMContentLoaded', () => {
       viewingUser.profile_image = imageUrl;
       await displayProfile(viewingUser);
       hideToast();
-      showToast('✅ 프로필 사진이 변경되었습니다!');
+      showToast('프로필 사진을 변경했습니다.');
       setTimeout(hideToast, 2200);
     } catch (err) {
       console.error('프로필 사진 업로드 실패:', err);
       hideToast();
-      showToast('❌ 업로드 실패: ' + (err.message || '알 수 없는 오류'));
+      showToast('프로필 사진 업로드 실패');
       setTimeout(hideToast, 3000);
     } finally {
       e.target.value = '';
@@ -1664,7 +1422,10 @@ while (true) {
   window.saveStatusMessage = async function() {
     const input = document.getElementById('statusInput');
     const newMessage = input.value.trim();
-    if (!currentUser?.id) { alert('로그인이 필요합니다.'); return; }
+    if (!currentUser?.id) {
+      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
+      return;
+    }
     try {
       await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
         method: "PATCH",
@@ -1676,7 +1437,7 @@ while (true) {
       closeStatusModal();
     } catch (e) {
       console.error('상태메시지 저장 실패:', e);
-      alert('상태메시지 저장에 실패했습니다.');
+      SharerUI.toast({ type: 'error', message: '상태 메시지를 저장하지 못했습니다. 다시 시도해 주세요.' });
     }
   };
 
@@ -1699,8 +1460,10 @@ while (true) {
       if (!btn) return;
       btn.classList.add('success');
       setTimeout(() => btn.classList.remove('success'), 1500);
+      SharerUI.toast({ type: 'success', message: '프로필 링크를 복사했습니다.' });
     }).catch(err => {
       console.error('링크 복사 실패:', err);
+      SharerUI.toast({ type: 'error', message: '프로필 링크를 복사하지 못했습니다.' });
     });
   };
 

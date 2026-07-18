@@ -15,7 +15,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
     /* ----------------------------------------------------
        기본 리셋 및ew 변수 
@@ -284,15 +285,6 @@
   align-items: center;
 }
 
-    /* 토스트 알림 */
-    .toast {
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
-      background: var(--t1); color: var(--bg); padding: 10px 20px; border-radius: 20px;
-      font-size: 14px; font-weight: 600; z-index: 2500; opacity: 0; pointer-events: none;
-      transition: opacity 0.3s, transform 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
     /* 편의용 우측 상단 테마 변경 버튼 */
     .theme-toggle {
       position: fixed; top: 20px; right: 20px; z-index: 1000;
@@ -333,8 +325,6 @@
     </div>
 
   </div>
-
-  <div class="toast" id="toast"></div>
 
   <script>
     // 테마 토글 로직
@@ -410,8 +400,9 @@
       copyBtn.classList.add("action-btn");
       copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
       copyBtn.onclick = () => {
-        navigator.clipboard.writeText(textContent);
-        showToast("답변이 복사되었습니다.");
+        navigator.clipboard.writeText(textContent)
+          .then(() => showToast("답변을 복사했습니다."))
+          .catch(() => SharerUI.toast({ type: 'error', message: '답변을 복사하지 못했습니다.' }));
       };
 
       const regenBtn = document.createElement("button");
@@ -545,11 +536,7 @@
 
     // 토스트 팝업 함수
     function showToast(msg) {
-      const toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      SharerUI.toast({ type: 'success', message: msg });
     }
   </script>
 </body>

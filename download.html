@@ -8,7 +8,8 @@
 
   <title>앱 다운로드 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
-  <link rel="stylesheet" href="assets/css/sharer.css">
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
+  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
   <style>
     body {
       margin: 0;
@@ -166,7 +167,7 @@
       } else if (ua.includes("win")) {
         window.location.href = "https://github.com/jbjb777/sharer-app/releases/download/untagged-01f47c82aa8292679cae/Sharer-Setup-1.0.0.exe";
       } else {
-        alert("지원하지 않는 운영체제입니다.\n직접 선택하여 다운로드해주세요.");
+        SharerUI.toast({ type: 'warning', message: '자동 다운로드를 지원하지 않는 운영체제입니다. 파일을 직접 선택해 주세요.' });
       }
     }
   </script>
