@@ -50,8 +50,7 @@
     }
   </script>
 
-  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
-  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
   <style>
     :root {
       --overlay-bg: rgba(30, 30, 30, 0.85);
@@ -872,14 +871,14 @@
     <div class="nav-btn" id="navUpBtn" onclick="scrollToPrevious()">▲</div>
     <div class="nav-btn" id="navDownBtn" onclick="scrollToNext()">▼</div>
   </div>
-  <div class="comment-modal-overlay ui-modal-overlay" id="commentOverlay" onclick="closeComments()"></div>
-  <div class="comment-modal ui-modal-surface" id="commentModal" role="dialog" aria-modal="true" aria-labelledby="commentModalTitle">
+  <div class="comment-modal-overlay" id="commentOverlay" onclick="closeComments()"></div>
+  <div class="comment-modal" id="commentModal">
     <div class="comment-drag-area" id="commentDragArea">
       <div class="comment-grab"></div>
     </div>
     <div class="comment-modal-header">
-      <div class="comment-modal-title ui-modal-title" id="commentModalTitle">댓글 <span id="commentCountTitle">0</span>개</div>
-      <button class="comment-close-btn ui-modal-close" onclick="closeComments()" aria-label="닫기">✕</button>
+      <div class="comment-modal-title">댓글 <span id="commentCountTitle">0</span>개</div>
+      <button class="comment-close-btn" onclick="closeComments()">✕</button>
     </div>
     <div class="comment-modal-list" id="commentList">
       <div style="text-align: center; color: var(--t3); padding: 40px 20px;">
@@ -1252,7 +1251,7 @@ window.addEventListener('DOMContentLoaded', () => {
           endDiv.className = 'short-item';
           endDiv.innerHTML = `
             <div class="end-of-content">
-              <div>모든 콘텐츠를 확인했습니다.<br>새 게시물이 올라오면 여기에 표시됩니다.</div>
+              <div>모든 콘텐츠를 다 보셨네요!<br>더 이상 콘텐츠가 없습니다. 🎉</div>
               <button class="end-btn" onclick="scrollToTop()">처음으로 돌아가기</button>
             </div>
           `;
@@ -1399,7 +1398,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.toggleLike = async function(postId) {
     if (!currentUser) {
-      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
+      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
+        window.location.href = 'index.html';
+      }
       return;
     }
     
@@ -1624,7 +1625,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.openReplyComposer = function(commentId) {
     if (!currentUser) {
-      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
+      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) window.location.href = 'index.html';
       return;
     }
     const compose = document.getElementById(`replyCompose-${commentId}`);
@@ -1645,7 +1646,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById(`replyInput-${parentId}`);
     const text = input?.value?.trim() || '';
     if (!currentUser) {
-      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
+      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) window.location.href = 'index.html';
       return;
     }
     if (!text) return;
@@ -1674,7 +1675,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (countEl) countEl.textContent = parseInt(countEl.textContent || '0') + 1;
     } catch (e) {
       console.error('답글 작성 실패:', e);
-      SharerUI.toast({ type: 'error', message: '답글을 등록하지 못했습니다. 다시 시도해 주세요.' });
+      alert('답글 작성에 실패했습니다.');
     }
   };
 
@@ -1697,7 +1698,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.submitComment = async function() {
     if (!currentUser) {
-      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
+      if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) {
+        window.location.href = 'index.html';
+      }
       return;
     }
     const input = document.getElementById('commentInput');
@@ -1730,20 +1733,14 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) {
       console.error('댓글 업로드 오류:', e);
-      SharerUI.toast({ type: 'error', message: '댓글을 등록하지 못했습니다. 다시 시도해 주세요.' });
+      alert('댓글 업로드에 실패했습니다.');
     } finally {
       submitBtn.disabled = false;
     }
   };
 
   window.deleteComment = async function(commentId, postId) {
-    const confirmed = await SharerUI.confirm({
-      title: '댓글을 삭제할까요?',
-      description: '삭제한 댓글은 복구할 수 없습니다.',
-      confirmLabel: '삭제',
-      danger: true
-    });
-    if (!confirmed) return;
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
     try {
       await api(`/comments?id=eq.${commentId}`, { method: "DELETE" });
       await loadComments(postId);
@@ -1753,7 +1750,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) {
       console.error('댓글 삭제 오류:', e);
-      SharerUI.toast({ type: 'error', message: '댓글을 삭제하지 못했습니다. 다시 시도해 주세요.' });
+      alert('삭제에 실패했습니다.');
     }
   };
 
@@ -1776,9 +1773,10 @@ window.addEventListener('DOMContentLoaded', () => {
   function showError() {
     document.getElementById('shortsContainer').innerHTML = `
       <div class="no-posts">
+        <div class="no-posts-icon">⚠️</div>
         <div class="no-posts-text">
           게시물을 불러오는데 실패했습니다.<br>
-          잠시 후 다시 시도해 주세요.
+          잠시 후 다시 시도해주세요.
         </div>
       </div>
     `;

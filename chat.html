@@ -27,8 +27,7 @@
   <path fill="%23fff" filter="url(%23filter1)" d="M 1137 506 C 1252 449 1369 497 1427 625 L 1459 696 C 1484 752 1488 821 1471 878 L 1472 877 C 1535 891 1581 939 1608 997 L 1632 1052 C 1698 1199 1657 1324 1544 1381 L 1175 1565 L 972 1114 C 1002 1241 946 1377 834 1433 L 776 1462 C 654 1523 518 1467 449 1343 L 596 1269 C 625 1309 663 1331 708 1308 L 758 1283 C 813 1256 830 1185 802 1124 L 525 509 L 672 435 L 784 683 L 1137 506 Z M 1444 1232 C 1488 1210 1504 1149 1480 1095 L 1476 1085 C 1452 1033 1397 1007 1353 1029 L 1151 1130 L 1242 1333 L 1444 1232 Z M 1184 679 L 991 775 L 1084 981 L 1276 885 C 1319 864 1336 802 1312 749 L 1306 736 C 1283 684 1226 658 1184 679 Z"/>
 </svg>' />
 
-  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
-  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
   <style>
     body {
       margin:0; padding:0; font-family:'Segoe UI', sans-serif;
@@ -94,6 +93,7 @@
     }
     #nicknameModal button:hover { transform:translateY(-8px) scale(1.05); }
     #nicknameModal button:active { background:#2952CC; }
+    .error-message { color:#ff6b6b; font-size:14px; margin-top:8px; }
     .verification-badge {
       display:inline-block;
       width:18px;
@@ -209,9 +209,9 @@
 
 <div class="main-wrapper">
   <div id="nicknameModal">
-    <h2>채팅에서 사용할 닉네임</h2>
+    <h2>✏️ 여기에서 사용할 닉네임을 입력해주세요</h2>
     <input id="nicknameInput" placeholder="닉네임" maxlength="10">
-    <div class="error-message" role="alert" aria-live="polite" id="errorMessage"></div>
+    <div class="error-message" id="errorMessage"></div>
     <button id="nicknameBtn">확인</button>
   </div>
 
@@ -230,12 +230,12 @@
           <button id="cancelReply">×</button>
         </div>
         <div id="inputRow">
-          <button id="imgUploadBtn">이미지 추가</button>
+          <button id="imgUploadBtn">🖼️ 이미지 업로드</button>
           <input id="msg" placeholder="메시지를 입력하세요" autocomplete="off" maxlength="500">
         </div>
         <div class="charCount"><span id="charCount">0</span> / 500</div>
         <input type="file" id="imgInput" accept="image/*">
-        <button id="send">전송</button>
+        <button id="send">💬 전송</button>
       </div>
     </div>
   </div>
@@ -367,14 +367,15 @@ async function sendVerificationEmail(code) {
     console.log("Email send result:", result);
    
     if (result.success) {
-      console.log("인증 코드 이메일 발송 완료");
+      console.log("✅ 인증 코드 이메일 발송 성공!");
       return true;
     } else {
       throw new Error(result.message || "발송 실패");
     }
   } catch (err) {
     console.error("Email send error:", err);
-    SharerUI.toast({ type: 'error', message: '인증 메일을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.' });
+    console.log("⚠️ Verification Code (email failed):", code);
+    alert(`이메일 발송 실패. 콘솔(F12)에서 인증번호를 확인하세요: ${code}`);
     return true;
   }
 }
@@ -481,26 +482,20 @@ async function uploadToCloudinary(file){
 sendBtn.onclick=async()=>{
   const text=msgInput.value.trim();
   const file=imgInput.files[0];
-  if(!nickname) {
-    SharerUI.toast({ type: 'warning', message: '메시지를 보내기 전에 닉네임을 설정해 주세요.' });
-    return;
-  }
+  if(!nickname) return alert("닉네임을 먼저 설정하세요!");
  
   if (nickname === "정빈777" && !localStorage.getItem("jungbin777_verified")) {
-    SharerUI.toast({ type: 'error', message: '계정을 인증하지 못했습니다. 다시 로그인해 주세요.' });
+    alert("제작자 인증이 불가합니다. 로그아웃 후 다시 시도해주세요.");
     return;
   }
  
   if (nickname.includes("정빈777") && nickname !== "정빈777") {
-    SharerUI.toast({ type: 'error', message: '사용할 수 없는 닉네임입니다. 닉네임을 변경해 주세요.' });
+    alert("이 닉네임은 사용할 수 없습니다. 로그아웃 후 다시 닉네임을 바꿔주세요.");
     return;
   }
  
   if(!text && !file) return;
-  if(text.length>500) {
-    SharerUI.toast({ type: 'warning', message: '메시지는 500자 이하로 입력해 주세요.' });
-    return;
-  }
+  if(text.length>500) return alert("메시지는 500자 이하로 입력하세요!");
   sendBtn.disabled = true;
   document.body.style.cursor = "wait";
   let messageText=text;
@@ -509,7 +504,7 @@ sendBtn.onclick=async()=>{
       const imageUrl=await uploadToCloudinary(file);
       messageText+=(messageText?"\n":"")+imageUrl;
     }catch(err){
-      SharerUI.toast({ type: 'error', message: '이미지를 올리지 못했습니다. 다시 시도해 주세요.' });
+      alert("이미지 업로드 실패: " + (err.message || ""));
       console.error(err);
       sendBtn.disabled = false;
       document.body.style.cursor = "default";
@@ -524,7 +519,7 @@ sendBtn.onclick=async()=>{
     await db.ref("messages").push(data);
     msgInput.value=""; charCount.textContent="0"; replyTo=null; replyBox.classList.remove("active");
   } catch(err) {
-    SharerUI.toast({ type: 'error', message: '메시지를 보내지 못했습니다. 다시 시도해 주세요.' });
+    alert("메시지 전송 실패: " + (err.message || ""));
     console.error(err);
   } finally {
     sendBtn.disabled = false;
@@ -568,7 +563,7 @@ db.ref("messages").on("value",snap=>{
       div.appendChild(replyInfo);
       const arrow=document.createElement("div");
       arrow.className="replyArrow";
-      arrow.textContent="↩";
+      arrow.textContent="↩️";
       div.appendChild(arrow);
     }
     const nick=document.createElement("div");
@@ -601,20 +596,14 @@ db.ref("messages").on("value",snap=>{
     if(isVerifiedJungbin()) {
       const deleteBtn=document.createElement("button");
       deleteBtn.className="deleteBtn";
-      deleteBtn.textContent="삭제";
+      deleteBtn.textContent="🗑️ 삭제";
       deleteBtn.onclick=async(e)=>{
         e.stopPropagation();
-        const confirmed = await SharerUI.confirm({
-          title: '메시지를 삭제할까요?',
-          description: '삭제한 메시지는 복구할 수 없습니다.',
-          confirmLabel: '삭제',
-          danger: true
-        });
-        if(confirmed) {
+        if(confirm("이 메시지를 삭제하시겠습니까?")) {
           try {
             await db.ref("messages/" + key).remove();
           } catch(err) {
-            SharerUI.toast({ type: 'error', message: '메시지를 삭제하지 못했습니다. 다시 시도해 주세요.' });
+            alert("삭제 실패: " + (err.message || ""));
             console.error(err);
           }
         }
@@ -623,7 +612,7 @@ db.ref("messages").on("value",snap=>{
     }
     const replyBtn=document.createElement("button");
     replyBtn.className="replyBtn";
-    replyBtn.textContent="답장";
+    replyBtn.textContent="↩️ 답장";
     replyBtn.onclick=(e)=>{
       e.stopPropagation();
       replyTo={nickname:m.nickname,text:m.text};

@@ -25,11 +25,12 @@
 ## 프런트엔드 스타일
 
 - 공통 색상 토큰, reset, 폼 기본값, focus와 NProgress: [`assets/css/sharer.css`](assets/css/sharer.css)
-- 페이지별 레이아웃과 애니메이션: 각 HTML의 인라인 `<style>`
+- 공통 앱 UI(사이드바, 메인 래퍼, 검색 패널, 뒤로가기 버튼, 스켈레톤, 모바일 상단 바, 프로필 시트 동작): 같은 공통 CSS
+- 페이지별 고유 레이아웃과 애니메이션: 각 HTML의 인라인 `<style>`
 - 새 페이지는 공통 CSS를 먼저 불러온 뒤 페이지 전용 CSS를 작성한다.
 
 ```html
-<link rel="stylesheet" href="assets/css/sharer.css">
+<link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
 ```
 
 ```bash

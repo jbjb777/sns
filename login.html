@@ -40,8 +40,7 @@
 
   <script src="https://accounts.google.com/gsi/client" defer></script>
   <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
-  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
-  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -265,6 +264,10 @@
       background: var(--border);
     }
     .or-divider span { background: var(--bg); padding: 0 16px; position: relative; }
+
+    /* ─── MESSAGES ─── */
+    .error-message { color: var(--pink); font-size: 12px; margin-top: -6px; margin-bottom: 8px; text-align: center; font-weight: 500; }
+    .success-message { color: var(--green); font-size: 12px; margin-top: -6px; margin-bottom: 8px; text-align: center; font-weight: 500; }
 
     /* ─── SIGNUP LINK (인스타 스타일) ─── */
     .signup-section {
@@ -563,8 +566,8 @@
         <div id="loginForm">
           <input type="text" id="loginId" placeholder="아이디">
           <input type="password" id="loginPassword" placeholder="비밀번호">
-          <div class="error-message" role="alert" aria-live="polite" id="loginError"></div>
-          <div class="success-message" role="status" aria-live="polite" id="loginSuccess"></div>
+          <div class="error-message" id="loginError"></div>
+          <div class="success-message" id="loginSuccess"></div>
           <button id="loginBtn" onclick="handleLogin()">로그인</button>
 
           <div class="or-divider"><span>계정을 잊으셨나요?</span></div>
@@ -593,9 +596,9 @@
     </div>
 
     <!-- TERMS AGREEMENT POPUP MODAL -->
-    <div class="terms-modal-overlay ui-modal-overlay" id="termsOverlay"></div>
-    <div class="terms-modal ui-modal-surface" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle">
-      <h3 class="ui-modal-title" id="termsModalTitle">새 계정 만들기</h3>
+    <div class="terms-modal-overlay" id="termsOverlay"></div>
+    <div class="terms-modal" id="termsModal">
+      <h3>새 계정 만들기</h3>
       <p class="terms-modal-subtitle">Sharer에 가입하려면 아래 약관에 동의해주세요.</p>
 
       <div class="checkbox-group">
@@ -618,9 +621,9 @@
     </div>
 
     <!-- GOOGLE MODAL -->
-    <div class="modal-overlay ui-modal-overlay" id="modalOverlay"></div>
-    <div class="google-modal ui-modal-surface" id="googleModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <h3 class="ui-modal-title" id="modalTitle">Google 인증</h3>
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="google-modal" id="googleModal">
+      <h3 id="modalTitle">구글 인증</h3>
       <div class="google-btn-container" id="googleModalBtn"></div>
     </div>
   </div>
@@ -788,7 +791,7 @@
       if (!result.success) throw new Error(result.message || "발송 실패");
     } catch (err) {
       console.error("Email send error:", err);
-      SharerUI.toast({ type: 'error', message: '인증 메일을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.' });
+      alert(`이메일 발송 실패. 콘솔에서 인증번호 확인: ${code}`);
     }
   }
 
@@ -822,7 +825,7 @@
         } else {
           if (id === verificationCode) {
             localStorage.setItem('snsUser', JSON.stringify({id: "정빈777", nickname: "JB777", isVerified: true}));
-            successDiv.textContent = '로그인했습니다.';
+            successDiv.textContent = '로그인 성공!';
             setTimeout(() => window.location.href = 'index.html', 1000);
           } else {
             errorDiv.textContent = "인증번호가 맞지 않습니다.";
@@ -843,12 +846,12 @@
 
       const user = users[0];
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname: user.nickname, isVerified: false }));
-      successDiv.textContent = '로그인했습니다.';
+      successDiv.textContent = '로그인 성공!';
       setTimeout(() => window.location.href = 'index.html', 1000);
 
     } catch (e) {
       console.error('로그인 오류:', e);
-      errorDiv.textContent = '로그인하지 못했습니다. 아이디와 비밀번호를 확인해 주세요.';
+      errorDiv.textContent = '로그인 실패. 다시 시도해주세요.';
     } finally {
       loginBtn.disabled = false;
       loginBtn.innerHTML = '로그인';
@@ -873,7 +876,7 @@
       if (users?.length > 0) {
         // 이미 계정이 존재하는 경우 -> 바로 로그인
         localStorage.setItem('snsUser', JSON.stringify({ id: googleEmail, nickname: users[0].nickname, isVerified: false }));
-        successDiv.textContent = 'Google 계정으로 로그인했습니다.';
+        successDiv.textContent = '구글 로그인 성공!';
       } else {
         // 계정이 없는 경우 -> 자동 가입 및 프로필 사진 세팅 후 로그인
         await api("/users", {
@@ -881,13 +884,13 @@
           body: JSON.stringify({ id: googleEmail, password: 'googlelogin', nickname: googleName, profile_image: profileImage })
         });
         localStorage.setItem('snsUser', JSON.stringify({ id: googleEmail, nickname: googleName, isVerified: false }));
-        successDiv.textContent = 'Google 계정으로 가입하고 로그인했습니다.';
+        successDiv.textContent = '구글로 회원가입 및 로그인 완료!';
       }
       hideGoogleModal();
       setTimeout(() => window.location.href = 'index.html', 1000);
     } catch (err) {
       console.error(err);
-      errorDiv.textContent = 'Google 로그인을 완료하지 못했습니다. 다시 시도해 주세요.';
+      errorDiv.textContent = '구글 처리 중 오류가 발생했습니다.';
       hideGoogleModal();
     }
   }
@@ -916,7 +919,7 @@
               if (users?.length > 0) {
                 // 이미 계정이 존재하는 경우 -> 바로 로그인
                 localStorage.setItem('snsUser', JSON.stringify({ id: kakaoId, nickname: users[0].nickname, isVerified: false }));
-                successDiv.textContent = 'Kakao 계정으로 로그인했습니다.';
+                successDiv.textContent = '카카오 로그인 성공!';
               } else {
                 // 계정이 없는 경우 -> 자동 가입 및 프로필 사진 세팅 후 로그인
                 await api("/users", {
@@ -924,12 +927,12 @@
                   body: JSON.stringify({ id: kakaoId, password: 'kakaologin', nickname: nickname, profile_image: profileImage })
                 });
                 localStorage.setItem('snsUser', JSON.stringify({ id: kakaoId, nickname: nickname, isVerified: false }));
-                successDiv.textContent = 'Kakao 계정으로 가입하고 로그인했습니다.';
+                successDiv.textContent = '카카오로 회원가입 및 로그인 완료!';
               }
               setTimeout(() => window.location.href = 'index.html', 1000);
             } catch (e) {
               console.error(e);
-              errorDiv.textContent = 'Kakao 로그인을 완료하지 못했습니다. 다시 시도해 주세요.';
+              errorDiv.textContent = '카카오 로그인 처리 중 오류가 발생했습니다.';
             }
           },
           fail: function(error) {
@@ -940,7 +943,7 @@
       },
       fail: function(error) {
         console.error(error);
-        errorDiv.textContent = 'Kakao 로그인이 취소되었거나 완료되지 않았습니다.';
+        errorDiv.textContent = '카카오 로그인을 취소했거나 실패했습니다.';
       }
     });
   }
@@ -963,7 +966,7 @@
       console.error('Google GSI 초기화 실패:', err);
       document.querySelectorAll('.google-btn').forEach(btn => {
         btn.disabled = true;
-        btn.textContent = 'Google 로그인 사용 불가';
+        btn.innerHTML = '⚠️ 구글 로그인 사용 불가';
       });
     }
     document.getElementById('modalOverlay').addEventListener('click', hideGoogleModal);

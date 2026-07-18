@@ -13,8 +13,7 @@
       document.documentElement.setAttribute('data-theme', 'light');
     }
   </script>
-  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
-  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
   <style>
 
     body {
@@ -306,6 +305,15 @@
     .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .modal-btn.danger { background: rgba(255,107,107,0.15); color: var(--pink); border: 1px solid rgba(255,107,107,0.3); transition: background 0.2s; }
     .modal-btn.danger:hover { background: rgba(255,107,107,0.25); }
+
+    /* 아이콘 없는 커스텀 알림 */
+    .custom-alert {
+      position: fixed; top: -70px; left: 50%; transform: translateX(-50%); background: var(--bg3); color: var(--t1);
+      border: 1px solid var(--border2); padding: 14px 24px; border-radius: var(--r3); font-size: 14px; font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;
+      transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .custom-alert.show { top: 24px; }
 
     @media (max-width: 768px) {
       body .main-wrapper { margin-left: 0; width: 100%; height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px)); padding-bottom: 0; min-height: 0; }
@@ -1145,6 +1153,10 @@
 
   <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
 
+  <div class="custom-alert" id="customAlert">
+    <span id="customAlertMsg">알림 메시지</span>
+  </div>
+
   <div class="main-wrapper">
     <div class="header">
       <div class="header-left">
@@ -1215,13 +1227,13 @@
   </div>
 
     <!-- 방 만들기 모달 - 개선된 사용자 선택 UI -->
-  <div class="modal ui-modal-overlay" id="createRoomModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface">
+  <div class="modal" id="createRoomModal">
+    <div class="modal-content">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close ui-modal-close" onclick="closeModals()" aria-label="닫기">
+      <button class="modal-close" onclick="closeModals()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title ui-modal-title">새 채팅방</div>
+      <div class="modal-title">새 채팅방</div>
       <div class="form-group">
         <label>채팅방 이름</label>
         <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요">
@@ -1241,13 +1253,13 @@
   </div>
 
   <!-- 사용자 초대 모달 - 개선된 사용자 선택 UI -->
-  <div class="modal ui-modal-overlay" id="inviteModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface">
+  <div class="modal" id="inviteModal">
+    <div class="modal-content">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close ui-modal-close" onclick="closeModals()" aria-label="닫기">
+      <button class="modal-close" onclick="closeModals()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title ui-modal-title">사용자 초대</div>
+      <div class="modal-title">사용자 초대</div>
       <div class="form-group" style="flex:1; min-height:0; display:flex; flex-direction:column;">
         <label>선택한 사용자 <span id="inviteSelectedCount" style="color:var(--t2); font-weight:400; font-size:12px; margin-left:4px;">0명</span></label>
         <div class="selected-users-box" id="inviteSelectedBox">
@@ -1263,13 +1275,13 @@
   </div>
 
   <!-- 2차 팝업: 사용자 검색 (search.html 로직 차용) -->
-  <div class="modal ui-modal-overlay user-search-modal" id="userSearchModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface">
+  <div class="modal user-search-modal" id="userSearchModal">
+    <div class="modal-content">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close ui-modal-close" onclick="closeUserSearchModal()" aria-label="닫기">
+      <button class="modal-close" onclick="closeUserSearchModal()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title ui-modal-title">사용자 검색</div>
+      <div class="modal-title">사용자 검색</div>
 
       <div class="us-search-box">
         <span class="search-icon">
@@ -1296,13 +1308,13 @@
 
 
   <!-- 채팅방 정보 모달 (새로 추가) -->
-  <div class="modal ui-modal-overlay" id="roomInfoModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface">
+  <div class="modal" id="roomInfoModal">
+    <div class="modal-content">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close ui-modal-close" onclick="closeModals()" aria-label="닫기">
+      <button class="modal-close" onclick="closeModals()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title ui-modal-title">채팅방 정보</div>
+      <div class="modal-title">채팅방 정보</div>
       <div class="form-group">
         <label>채팅방 이름</label>
         <input type="text" id="infoRoomName" readonly>
@@ -1316,13 +1328,13 @@
   </div>
 
   <!-- 반응 상세 모달 / 바텀시트 -->
-  <div class="modal ui-modal-overlay" id="reactionDetailModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface reaction-modal-content">
+  <div class="modal" id="reactionDetailModal">
+    <div class="modal-content reaction-modal-content">
       <div class="sheet-handle"></div>
-      <button class="modal-close ui-modal-close" onclick="closeReactionDetail()" aria-label="닫기">
+      <button class="modal-close" onclick="closeReactionDetail()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="modal-title ui-modal-title" id="reactionDetailTitle">반응</div>
+      <div class="modal-title" id="reactionDetailTitle">반응</div>
       <div class="reaction-summary-row" id="reactionSummaryRow"></div>
       <div class="reaction-detail-list" id="reactionDetailList"></div>
     </div>
@@ -1419,12 +1431,11 @@
 
 
     function showAlert(message) {
-      const isError = /실패|찾을 수 없|필요합니다/.test(message);
-      const isSuccess = /초대되었습니다|나갔습니다|개설되었습니다|초대했습니다/.test(message);
-      SharerUI.toast({
-        type: isError ? 'error' : (isSuccess ? 'success' : 'info'),
-        message: message.replace(/:\s*.+$/, '').replace('성공적으로 사용자를 초대했습니다.', '사용자를 초대했습니다.')
-      });
+      const alertEl = document.getElementById('customAlert');
+      const msgEl = document.getElementById('customAlertMsg');
+      msgEl.textContent = message;
+      alertEl.classList.add('show');
+      setTimeout(() => alertEl.classList.remove('show'), 2500);
     }
 
     async function api(endpoint, options = {}) {
@@ -1448,7 +1459,8 @@
       NProgress.start();
       const savedUser = localStorage.getItem('snsUser');
       if (!savedUser) {
-        SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', duration: 0, action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
+        showAlert('로그인이 필요합니다.');
+        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
         return;
       }
       currentUser = JSON.parse(savedUser);
@@ -1794,7 +1806,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       return { readMap, allReads };
     }
 
-    // 각 메시지를 기준으로 읽지 않은 사람 수를 독립적으로 계산한다.
+    // ✅ 각 메시지 독립 계산: 이 메시지 기준으로만 안읽은 사람 수 세기
     function calcUnreadIndependent(msgId, senderId, roomId, readMap) {
       const members = roomMembersMap[roomId] || [];
       if (members.length === 0) return 0;
@@ -2962,13 +2974,7 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
     async function leaveRoom() {
       if(!activeRoomId) return;
-      const confirmed = await SharerUI.confirm({
-        title: '채팅방에서 나갈까요?',
-        description: '나간 뒤에는 이 채팅방의 새 메시지를 받을 수 없습니다.',
-        confirmLabel: '나가기',
-        danger: true
-      });
-      if(!confirmed) return;
+      if(!confirm("정말로 이 채팅방에서 나가시겠습니까?")) return;
       
       NProgress.start();
       try {

@@ -29,8 +29,7 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
-  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
   <style>
     /* 라이트 모드 변수 정의 */
 
@@ -307,6 +306,46 @@
       0% { stroke-dashoffset: 244; }
       50% { stroke-dashoffset: 122; }
       100% { stroke-dashoffset: -244; }
+    }
+
+    /* ─── TOAST NOTIFICATION SYSTEM ─── */
+    .toast-container {
+      position: fixed;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg2);
+      border: 1px solid rgba(255,107,107,0.3);
+      padding: 14px 24px;
+      border-radius: var(--r2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.7);
+      z-index: 9999;
+      transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+      max-width: 90%;
+      width: max-content;
+    }
+    .toast-container.show {
+      bottom: 30px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .toast-icon {
+      color: var(--pink);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .toast-text {
+      color: var(--t1);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.4;
     }
 
     /* ─── MAIN CONTENT ─── */
@@ -806,16 +845,21 @@
     </div>
   </div>
 
-  <div class="modal ui-modal-overlay" id="accessInfoModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface">
-      <button class="modal-close-btn ui-modal-close" onclick="closeInfoModal()" aria-label="닫기">
+  <div class="toast-container" id="errorToast">
+    <div class="toast-icon">✕</div>
+    <div class="toast-text" id="toastMessage">알림 내용</div>
+  </div>
+
+  <div class="modal" id="accessInfoModal">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closeInfoModal()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
       <div class="modal-header">
         <img src="set.svg" alt="set">
-        <div class="modal-title ui-modal-title">공개 범위 설정</div>
+        <div class="modal-title">공개 범위 설정</div>
       </div>
       <div class="info-section">
         <div class="info-row">
@@ -887,8 +931,16 @@
   }
 
   // 아래에서 위로 올라오는 토스트 팝업 제어 함수
-  function showToast(msg, type = 'error') {
-    SharerUI.toast({ type, message: msg, duration: 3500 });
+  function showToast(msg) {
+    const toast = document.getElementById('errorToast');
+    const toastMsg = document.getElementById('toastMessage');
+    toastMsg.textContent = msg;
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3500);
   }
 
   const selectContainer = document.getElementById('customSelectContainer');
@@ -1028,7 +1080,7 @@
     const files = Array.from(e.target.files);
     
     if (selectedImages.length + files.length > 5) {
-      showToast('이미지는 최대 5장까지 올릴 수 있습니다.', 'warning');
+      showToast('최대 5장까지 업로드할 수 있습니다.');
       return;
     }
 
@@ -1100,7 +1152,7 @@
     const postButton = document.getElementById('postBtn');
 
     if (!content && selectedImages.length === 0) {
-      showToast('내용 또는 이미지를 추가해 주세요.', 'warning');
+      showToast('내용 또는 이미지를 추가해주세요.');
       return;
     }
 
@@ -1151,7 +1203,7 @@
     } catch (error) {
       console.error('게시 오류:', error);
       // 공유 실패 시 팝업 토스트 호출 및 상태 복구
-      showToast('게시물을 등록하지 못했습니다. 다시 시도해 주세요.', 'error');
+      showToast(error.message || '게시에 실패했습니다. 다시 시도해주세요.');
       postButton.disabled = false;
       postButton.classList.remove('loading');
     }
@@ -1182,5 +1234,8 @@
     try { window.parent.postMessage({ type: 'sharer-embed-ready' }, '*'); } catch(e){}
   })();
 </script>
+
+
+
 </body>
 </html>

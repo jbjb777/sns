@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>계정 복구 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
-  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
-  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
   <style>
 
     body {
@@ -38,6 +37,7 @@
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-secondary { background: var(--bg3); color: var(--t1); border: 1px solid var(--border2); }
     
+    .error-message { color: var(--pink); font-size: 12px; margin-bottom: 8px; text-align: center; font-weight: 500; min-height: 14px; }
     .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.2); border-radius: 50%; border-top-color: #000; animation: spin 0.7s linear infinite; margin-right: 6px; vertical-align: middle; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .footer { text-align: center; padding: 30px 20px; color: var(--t3); font-size: 11px; }
@@ -75,7 +75,7 @@
             <h2 id="step1Title">정보 입력</h2>
             <p class="intro-desc" id="inputDesc">정보를 입력하면 이메일로 인증코드가 발송됩니다.</p>
             <input type="text" id="userInput" placeholder="">
-            <div class="error-message" role="alert" aria-live="polite" id="inputError"></div>
+            <div class="error-message" id="inputError"></div>
             <button onclick="handleRequest()">인증 메일 받기</button>
             <button class="btn-secondary" onclick="moveStep(0)">이전</button>
           </div>
@@ -85,7 +85,7 @@
             <h2>이메일 인증</h2>
             <p class="intro-desc">전송된 인증번호 6자리를 입력해주세요.</p>
             <input type="text" id="verifyCode" placeholder="인증번호">
-            <div class="error-message" role="alert" aria-live="polite" id="verifyError"></div>
+            <div class="error-message" id="verifyError"></div>
             <button onclick="handleVerify()">인증 확인</button>
           </div>
 

@@ -17,8 +17,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
-  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
-  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
   <style>
     @media (max-width: 768px) {
       body {
@@ -500,6 +499,24 @@
     .modal-btn-confirm { background: var(--t1); color: var(--bg); }
     .modal-btn-confirm:hover { opacity: 0.85; }
 
+    .upload-toast {
+      position: fixed;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--t1);
+      padding: 10px 22px;
+      border-radius: 22px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 9999;
+      transition: bottom 0.4s cubic-bezier(0.34,1.4,0.64,1);
+      white-space: nowrap;
+    }
+    .upload-toast.show { bottom: 28px; }
+
     /* ─── FOOTER ─── */
     .footer {
       border-top: 1px solid var(--border);
@@ -654,6 +671,8 @@
     <img src="logo.svg" class="splash-logo" alt="Sharer">
   </div>
 
+  <div class="upload-toast" id="uploadToast">⏳ 업로드 중...</div>
+
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" width="72" height="100%" frameborder="0"></iframe>
   </div>
@@ -739,21 +758,21 @@
     </div>
   </div>
 
-  <div class="modal-overlay ui-modal-overlay" id="statusModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface">
-      <div class="modal-title ui-modal-title">상태 메시지 수정</div>
+  <div class="modal-overlay" id="statusModal">
+    <div class="modal-content">
+      <div class="modal-title">상태메시지 수정</div>
       <textarea class="modal-input" id="statusInput" placeholder="상태메시지를 입력하세요..." maxlength="100"></textarea>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-cancel" onclick="closeStatusModal()">취소</button>
-        <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">저장</button>
+        <button class="modal-btn modal-btn-confirm" onclick="saveStatusMessage()">확인</button>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay ui-modal-overlay" id="profilePicModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface" style="text-align: center;">
-      <div class="modal-title ui-modal-title">가입을 환영합니다</div>
-      <p class="ui-modal-description" style="margin-bottom:24px;">
+  <div class="modal-overlay" id="profilePicModal">
+    <div class="modal-content" style="text-align: center;">
+      <div class="modal-title" style="font-size:18px;">가입을 환영합니다! 🎉</div>
+      <p style="color:var(--t2); font-size:14px; margin-bottom:24px; line-height:1.6;">
         나만의 개성을 표현할<br>프로필 사진을 설정해 보세요.
       </p>
       <div class="modal-buttons" style="justify-content: center; gap:12px;">
@@ -763,28 +782,28 @@
     </div>
   </div>
 
-  <div class="modal-overlay ui-modal-overlay" id="adminInfoModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 32px 24px;">
+  <div class="modal-overlay" id="adminInfoModal">
+    <div class="modal-content" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 32px 24px;">
       <img src="badge.svg" alt="set" style="width: 44px; height: 44px; margin-bottom: 4px;">
-      <div class="modal-title ui-modal-title" style="margin-bottom: 0;">관리자</div>
-      <p class="ui-modal-description" style="margin-bottom: 10px; word-break: keep-all;">
+      <div class="modal-title" style="font-size: 18px; font-weight: 700; margin-bottom: 0; color: var(--t1);">관리자</div>
+      <p style="color: var(--t2); font-size: 14px; line-height: 1.6; margin-bottom: 10px; word-break: keep-all;">
         Sharer를 1인 개발한 중2 관리자입니다
       </p>
       <div class="modal-buttons" style="justify-content: center; width: 100%;">
-        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAdminModal()">닫기</button>
+        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAdminModal()">확인</button>
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay ui-modal-overlay" id="aiAnalysisModal" role="dialog" aria-modal="true">
-    <div class="modal-content ui-modal-surface" style="text-align: left; padding: 32px 24px;">
-      <div class="modal-title ui-modal-title" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+  <div class="modal-overlay" id="aiAnalysisModal">
+    <div class="modal-content" style="text-align: left; padding: 32px 24px;">
+      <div class="modal-title" style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--t1); display: flex; align-items: center; justify-content: center; gap: 8px;">
         <img src="logo_ai/color.png" alt="AI" style="width: 24px; height: 24px; object-fit: contain;"> AI 사용자 분석
       </div>
       <div id="aiAnalysisContent" style="color: var(--t1); font-size: 14px; line-height: 1.6; word-break: keep-all; max-height: 60vh; overflow-y: auto;">
       </div>
       <div class="modal-buttons" style="justify-content: center; width: 100%; margin-top: 24px;">
-        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAiAnalysisModal()">닫기</button>
+        <button class="modal-btn modal-btn-confirm" style="padding: 10px 36px; font-size: 13px;" onclick="closeAiAnalysisModal()">확인</button>
       </div>
     </div>
   </div>
@@ -868,16 +887,12 @@
   }
 
   function showToast(msg) {
-    const type = msg.includes('실패') ? 'error' : (msg.includes('변경') ? 'success' : 'info');
-    const message = msg
-      .replace(/업로드 중\.\.\./, '프로필 사진을 올리고 있습니다.')
-      .replace(/프로필 사진이 변경되었습니다!/, '프로필 사진을 변경했습니다.')
-      .replace(/업로드 실패:.*/, '프로필 사진을 올리지 못했습니다. 다시 시도해 주세요.')
-      .trim();
-    SharerUI.toast({ type, message, duration: type === 'info' ? 0 : 2800 });
+    const t = document.getElementById('uploadToast');
+    t.textContent = msg;
+    t.classList.add('show');
   }
   function hideToast() {
-    SharerUI.dismissToast();
+    document.getElementById('uploadToast').classList.remove('show');
   }
 // 1. 로그인 성공 후
 function handleLogin() {
@@ -968,7 +983,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const file = e.target.files?.[0];
     if (!file || !currentUser?.id) return;
 
-    showToast('프로필 사진을 올리고 있습니다.');
+    showToast('⏳ 업로드 중...');
     try {
       const imageUrl = await uploadImageToCloudinary(file);
       await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
@@ -982,12 +997,12 @@ window.addEventListener('DOMContentLoaded', () => {
       viewingUser.profile_image = imageUrl;
       await displayProfile(viewingUser);
       hideToast();
-      showToast('프로필 사진을 변경했습니다.');
+      showToast('✅ 프로필 사진이 변경되었습니다!');
       setTimeout(hideToast, 2200);
     } catch (err) {
       console.error('프로필 사진 업로드 실패:', err);
       hideToast();
-      showToast('프로필 사진 업로드 실패');
+      showToast('❌ 업로드 실패: ' + (err.message || '알 수 없는 오류'));
       setTimeout(hideToast, 3000);
     } finally {
       e.target.value = '';
@@ -1422,10 +1437,7 @@ while (true) {
   window.saveStatusMessage = async function() {
     const input = document.getElementById('statusInput');
     const newMessage = input.value.trim();
-    if (!currentUser?.id) {
-      SharerUI.toast({ type: 'info', message: '로그인이 필요합니다.', action: { label: '로그인', onClick: () => { window.location.href = 'login.html'; } } });
-      return;
-    }
+    if (!currentUser?.id) { alert('로그인이 필요합니다.'); return; }
     try {
       await api(`/users?id=eq.${encodeURIComponent(currentUser.id)}`, {
         method: "PATCH",
@@ -1437,7 +1449,7 @@ while (true) {
       closeStatusModal();
     } catch (e) {
       console.error('상태메시지 저장 실패:', e);
-      SharerUI.toast({ type: 'error', message: '상태 메시지를 저장하지 못했습니다. 다시 시도해 주세요.' });
+      alert('상태메시지 저장에 실패했습니다.');
     }
   };
 
@@ -1460,10 +1472,8 @@ while (true) {
       if (!btn) return;
       btn.classList.add('success');
       setTimeout(() => btn.classList.remove('success'), 1500);
-      SharerUI.toast({ type: 'success', message: '프로필 링크를 복사했습니다.' });
     }).catch(err => {
       console.error('링크 복사 실패:', err);
-      SharerUI.toast({ type: 'error', message: '프로필 링크를 복사하지 못했습니다.' });
     });
   };
 

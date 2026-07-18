@@ -47,8 +47,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
-  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.3">
-  <script src="assets/js/sharer-ui.js?v=20260719.2"></script>
+  <link rel="stylesheet" href="assets/css/sharer.css?v=20260719.2">
   <style>
     .splash-text {
       text-align: center;
@@ -667,6 +666,16 @@
     }
     .auth-box button.secondary:hover { background: var(--bg4); color: var(--t1); opacity: 1; }
 
+    .error-message, .success-message {
+      font-size: 12px;
+      margin-top: -6px;
+      margin-bottom: 8px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .error-message { color: var(--pink); }
+    .success-message { color: var(--green); }
+
     .create-modal-header {
       padding: 18px 22px;
       border-bottom: 1px solid var(--border);
@@ -1043,37 +1052,37 @@
 
 <div class="main-wrapper">
 
-  <div class="auth-modal ui-modal-overlay" id="loginModal" role="dialog" aria-modal="true">
-    <div class="auth-box ui-modal-surface">
-      <button class="auth-close ui-modal-close" onclick="closeLoginModal()" aria-label="닫기">✕</button>
+  <div class="auth-modal" id="loginModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeLoginModal()">✕</button>
       <h2>로그인</h2>
       <input type="text" id="loginId" placeholder="아이디">
       <input type="password" id="loginPassword" placeholder="비밀번호">
-      <div class="error-message" role="alert" aria-live="polite" id="loginError"></div>
-      <div class="success-message" role="status" aria-live="polite" id="loginSuccess"></div>
+      <div class="error-message" id="loginError"></div>
+      <div class="success-message" id="loginSuccess"></div>
       <button onclick="handleLogin()">로그인</button>
       <button class="secondary" onclick="showSignup()">회원가입</button>
     </div>
   </div>
 
-  <div class="auth-modal ui-modal-overlay" id="signupModal" role="dialog" aria-modal="true">
-    <div class="auth-box ui-modal-surface">
-      <button class="auth-close ui-modal-close" onclick="closeSignupModal()" aria-label="닫기">✕</button>
+  <div class="auth-modal" id="signupModal">
+    <div class="auth-box">
+      <button class="auth-close" onclick="closeSignupModal()">✕</button>
       <h2>회원가입</h2>
       <input type="text" id="signupNickname" placeholder="닉네임" maxlength="20">
-      <div class="error-message" role="alert" aria-live="polite" id="nicknameError"></div>
+      <div class="error-message" id="nicknameError"></div>
       <input type="text" id="signupId" placeholder="아이디">
-      <div class="error-message" role="alert" aria-live="polite" id="idError"></div>
+      <div class="error-message" id="idError"></div>
       <input type="password" id="signupPassword" placeholder="비밀번호">
-      <div class="error-message" role="alert" aria-live="polite" id="signupError"></div>
-      <div class="success-message" role="status" aria-live="polite" id="signupSuccess"></div>
+      <div class="error-message" id="signupError"></div>
+      <div class="success-message" id="signupSuccess"></div>
       <button onclick="handleSignup()">가입</button>
       <button class="secondary" onclick="backToLogin()">로그인으로 돌아가기</button>
     </div>
   </div>
 
-  <div class="create-modal ui-modal-overlay" id="createModal" role="dialog" aria-modal="true">
-    <div class="create-modal-content ui-modal-surface">
+  <div class="create-modal" id="createModal">
+    <div class="create-modal-content">
       <div class="create-modal-header">
         <h3>새 게시물 만들기</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
@@ -1784,19 +1793,13 @@ window.goToProfile = (userId, nickname) => {
 };
 
 window.deletePost = async (postId) => {
-  const confirmed = await SharerUI.confirm({
-    title: '게시물을 삭제할까요?',
-    description: '삭제한 게시물은 복구할 수 없습니다.',
-    confirmLabel: '삭제',
-    danger: true
-  });
-  if (!confirmed) return;
+  if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
   try {
     await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
     loadPosts();
   } catch (err) {
     console.error('삭제 오류:', err);
-    SharerUI.toast({ type: 'error', message: '게시물을 삭제하지 못했습니다. 다시 시도해 주세요.' });
+    alert('삭제에 실패했습니다.');
   }
 };
 
@@ -2075,5 +2078,6 @@ fetchRecentStories().then(() => {
       }
     }, 800);
   </script>
+
 </body>
 </html>
