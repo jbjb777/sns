@@ -2131,7 +2131,7 @@ window.toggleSearchPanel = function() {
       createNotification(currentPost.author_id, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${postId}`);
       input.value = '';
       listenComments(postId);
-    } catch (e) {  }
+    } catch (e) { alert('댓글 작성 실패'); }
   };
   
   window.openReplyComposer = function(commentId) {
