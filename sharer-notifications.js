@@ -28,7 +28,7 @@
       #sharerNotificationHost{position:fixed;top:max(12px,env(safe-area-inset-top));left:50%;z-index:2147483647;width:min(420px,calc(100vw - 24px));pointer-events:none;transform:translateX(-50%);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif}
       .sharer-toast{display:flex;align-items:center;gap:11px;width:100%;margin-bottom:9px;padding:13px 14px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(28,28,30,.92);color:#fff;box-shadow:0 16px 42px rgba(0,0,0,.32);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);pointer-events:auto;opacity:0;transform:translateY(-28px) scale(.97);transition:opacity .28s ease,transform .34s cubic-bezier(.22,1,.36,1)}
       .sharer-toast.show{opacity:1;transform:translateY(0) scale(1)}.sharer-toast.leave{opacity:0;transform:translateY(-18px) scale(.98)}
-      .sharer-toast__icon{width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.13);font-size:16px;font-weight:800}.sharer-toast--success .sharer-toast__icon{background:#24a148}.sharer-toast--error .sharer-toast__icon{background:#d83a52}.sharer-toast--message .sharer-toast__icon{background:#3e3bf6}
+      .sharer-toast__icon{width:30px;height:30px;flex:0 0 30px;display:block;object-fit:contain;border-radius:50%;background:rgba(255,255,255,.13)}
       .sharer-toast__body{min-width:0;flex:1}.sharer-toast__title{font-size:13px;font-weight:750;line-height:1.25}.sharer-toast__text{margin-top:2px;font-size:13px;line-height:1.35;color:rgba(255,255,255,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sharer-toast__close{width:28px;height:28px;flex:0 0 28px;border:0;border-radius:50%;background:transparent;color:rgba(255,255,255,.72);font-size:20px;line-height:1;cursor:pointer}.sharer-toast__close:hover{background:rgba(255,255,255,.12);color:#fff}
       html[data-theme="light"] .sharer-toast{background:rgba(255,255,255,.94);border-color:rgba(0,0,0,.09);color:#101114;box-shadow:0 14px 35px rgba(0,0,0,.15)}html[data-theme="light"] .sharer-toast__text,html[data-theme="light"] .sharer-toast__close{color:rgba(0,0,0,.58)}html[data-theme="light"] .sharer-toast__close:hover{background:rgba(0,0,0,.07);color:#000}
       @media(max-width:768px){#sharerNotificationHost{top:max(8px,env(safe-area-inset-top));width:calc(100vw - 18px)}.sharer-toast{border-radius:16px;padding:12px 13px}}
@@ -47,18 +47,22 @@
 
   function showNext() {
     if (activeToast || !document.body) return;
-    const item = queue()[0];
+    const items = queue();
+    // DM 안에서 현재 보고 있는 방의 메시지는 이미 화면에 있으므로 배너를 띄우지 않는다.
+    const visibleItems = items.filter(item => !item.roomId || !isOpenDmRoom(item.roomId));
+    if (visibleItems.length !== items.length) saveQueue(visibleItems);
+    const item = visibleItems[0];
     if (!item) return;
     const toast = document.createElement('div');
     toast.className = `sharer-toast sharer-toast--${item.type || 'info'}`;
     toast.setAttribute('role', 'status');
-    const icon = item.type === 'success' ? '✓' : item.type === 'error' ? '!' : item.type === 'message' ? '✉' : 'i';
-    toast.innerHTML = `<span class="sharer-toast__icon">${icon}</span><div class="sharer-toast__body"><div class="sharer-toast__title">${escapeText(item.title || 'Sharer')}</div><div class="sharer-toast__text">${escapeText(item.message)}</div></div><button class="sharer-toast__close" aria-label="닫기">×</button>`;
+    const iconName = item.type === 'success' ? 'success' : item.type === 'error' ? 'error' : item.type === 'message' ? 'message' : 'info';
+    toast.innerHTML = `<img class="sharer-toast__icon" src="notification-icons/${iconName}.png" alt=""><div class="sharer-toast__body"><div class="sharer-toast__title">${escapeText(item.title || 'Sharer')}</div><div class="sharer-toast__text">${escapeText(item.message)}</div></div><button class="sharer-toast__close" aria-label="닫기">×</button>`;
     ensureHost().appendChild(toast);
     activeToast = toast;
     requestAnimationFrame(() => toast.classList.add('show'));
     toast.querySelector('.sharer-toast__close').addEventListener('click', event => { event.stopPropagation(); dismiss(toast, item.id); });
-    if (item.roomId) toast.addEventListener('click', () => { location.href = `dm.html?room=${encodeURIComponent(item.roomId)}`; });
+    if (item.roomId) toast.addEventListener('click', () => { dismiss(toast, item.id); location.href = `dm.html?room=${encodeURIComponent(item.roomId)}`; });
     setTimeout(() => dismiss(toast, item.id), item.duration || 4500);
   }
 
@@ -80,6 +84,11 @@
   }
   const loadCursors = userId => { try { return JSON.parse(localStorage.getItem(CURSOR_PREFIX + userId) || '{}'); } catch (_) { return {}; } };
   const saveCursors = (userId, cursors) => { try { localStorage.setItem(CURSOR_PREFIX + userId, JSON.stringify(cursors)); } catch (_) {} };
+
+  function isOpenDmRoom(roomId) {
+    if (!/\/dm\.html$/.test(location.pathname)) return false;
+    return Array.from(document.querySelectorAll('.room-item.active')).some(element => element.dataset.roomId === String(roomId));
+  }
 
   async function pollDirectMessages() {
     const user = getUser();
@@ -105,7 +114,9 @@
         if (message.sender_id === user.id || !message.content || message.content.startsWith('[SYSTEM] ') || message.content.startsWith('[EMOTION]')) continue;
         let sender = '새 메시지';
         try { const people = await request(`/users?id=eq.${encodeURIComponent(message.sender_id)}&select=nickname&limit=1`); sender = people?.[0]?.nickname || sender; } catch (_) {}
-        notify(message.content, { type: 'message', title: sender, roomId: message.room_id, id: `dm-${message.id}`, duration: 6000 });
+        if (!isOpenDmRoom(message.room_id)) {
+          notify(message.content, { type: 'message', title: sender, roomId: message.room_id, id: `dm-${message.id}`, duration: 6000 });
+        }
       }
     } catch (error) { console.warn('[notifications] DM polling failed', error); }
     finally { isPolling = false; }
