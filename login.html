@@ -7,6 +7,7 @@
   <link rel="canonical" href="https://sharer.r-e.kr/login.html">
 
   <title>로그인 : Sharer</title>
+  <script src="sharer-notifications.js"></script>
   <link rel="icon" type="image/png" href="./logo.png">
 
   <meta name="description" content="Sharer에 로그인 또는 가입을 하고 게시물을 업로드해 보세요">
@@ -846,6 +847,7 @@
           if (id === verificationCode) {
             localStorage.setItem('snsUser', JSON.stringify({id: "정빈777", nickname: "JB777", isVerified: true}));
             successDiv.textContent = '로그인 성공!';
+            window.SharerNotify?.('로그인에 성공했습니다.', { type: 'success', title: '환영합니다' });
             setTimeout(() => window.location.href = 'index.html', 1000);
           } else {
             errorDiv.textContent = "인증번호가 맞지 않습니다.";
@@ -867,6 +869,7 @@
       const user = users[0];
       localStorage.setItem('snsUser', JSON.stringify({ id, nickname: user.nickname, isVerified: false }));
       successDiv.textContent = '로그인 성공!';
+      window.SharerNotify?.('로그인에 성공했습니다.', { type: 'success', title: '환영합니다' });
       setTimeout(() => window.location.href = 'index.html', 1000);
 
     } catch (e) {
@@ -897,6 +900,7 @@
         // 이미 계정이 존재하는 경우 -> 바로 로그인
         localStorage.setItem('snsUser', JSON.stringify({ id: googleEmail, nickname: users[0].nickname, isVerified: false }));
         successDiv.textContent = '구글 로그인 성공!';
+        window.SharerNotify?.('구글 로그인에 성공했습니다.', { type: 'success', title: '환영합니다' });
       } else {
         // 계정이 없는 경우 -> 자동 가입 및 프로필 사진 세팅 후 로그인
         await api("/users", {
@@ -905,6 +909,7 @@
         });
         localStorage.setItem('snsUser', JSON.stringify({ id: googleEmail, nickname: googleName, isVerified: false }));
         successDiv.textContent = '구글로 회원가입 및 로그인 완료!';
+        window.SharerNotify?.('회원가입과 로그인에 성공했습니다.', { type: 'success', title: '환영합니다' });
       }
       hideGoogleModal();
       setTimeout(() => window.location.href = 'index.html', 1000);
@@ -940,6 +945,7 @@
                 // 이미 계정이 존재하는 경우 -> 바로 로그인
                 localStorage.setItem('snsUser', JSON.stringify({ id: kakaoId, nickname: users[0].nickname, isVerified: false }));
                 successDiv.textContent = '카카오 로그인 성공!';
+                window.SharerNotify?.('카카오 로그인에 성공했습니다.', { type: 'success', title: '환영합니다' });
               } else {
                 // 계정이 없는 경우 -> 자동 가입 및 프로필 사진 세팅 후 로그인
                 await api("/users", {
@@ -948,6 +954,7 @@
                 });
                 localStorage.setItem('snsUser', JSON.stringify({ id: kakaoId, nickname: nickname, isVerified: false }));
                 successDiv.textContent = '카카오로 회원가입 및 로그인 완료!';
+                window.SharerNotify?.('회원가입과 로그인에 성공했습니다.', { type: 'success', title: '환영합니다' });
               }
               setTimeout(() => window.location.href = 'index.html', 1000);
             } catch (e) {

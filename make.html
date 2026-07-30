@@ -924,6 +924,7 @@
     본 서비스는 대한민국의 중2 개발자 1인이 만든 프로젝트입니다 모든 소스 코드 및 파일의 출처는 전적으로 개발자에게 있음을 알립니다.
   </div>
 
+<script src="sharer-notifications.js"></script>
 <script src="markdown.js"></script>
 <script>
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
@@ -965,6 +966,10 @@
 
   // 아래에서 위로 올라오는 토스트 팝업 제어 함수
   function showToast(msg) {
+    if (window.SharerNotify) {
+      window.SharerNotify(msg, { type: 'error', title: '게시물' });
+      return;
+    }
     const toast = document.getElementById('errorToast');
     const toastMsg = document.getElementById('toastMessage');
     toastMsg.textContent = msg;
@@ -1215,6 +1220,7 @@
       });
 
       const createdId = responseData && responseData[0] && responseData[0].id ? responseData[0].id : null;
+      window.SharerNotify?.('게시물이 업로드되었습니다.', { type: 'success', title: '게시물' });
       const isEmbedded = document.documentElement.classList.contains('is-embedded') || window.__SHARER_EMBEDDED__;
       setTimeout(() => {
         if (isEmbedded) {

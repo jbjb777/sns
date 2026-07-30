@@ -17,6 +17,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <script src="sharer-notifications.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -1148,6 +1149,11 @@ opacity: 1;
   }
 
   function showToast(msg) {
+    if (window.SharerNotify) {
+      const type = String(msg).includes('✅') ? 'success' : String(msg).includes('❌') ? 'error' : 'info';
+      window.SharerNotify(String(msg).replace(/[⏳✅❌]\s*/g, ''), { type, title: '프로필' });
+      return;
+    }
     const t = document.getElementById('uploadToast');
     t.textContent = msg;
     t.classList.add('show');

@@ -47,6 +47,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <script src="sharer-notifications.js"></script>
   <style>
     .splash-text {
       text-align: center;
@@ -1748,7 +1749,7 @@ document.getElementById('modalPostBtn').onclick = async () => {
   const content = document.getElementById('postContent').value.trim();
   const messageDiv = document.getElementById('postMessage');
   const postButton = document.getElementById('modalPostBtn');
-  if (!content && !selectedImage) { messageDiv.innerHTML = '<span style="color:var(--pink);">내용 또는 이미지를 추가해주세요.</span>'; return; }
+  if (!content && !selectedImage) { messageDiv.innerHTML = '<span style="color:var(--pink);">내용 또는 이미지를 추가해주세요.</span>'; window.SharerNotify?.('이미지 또는 내용을 입력해 주세요.', { type: 'error', title: '게시물' }); return; }
   postButton.disabled = true;
   messageDiv.innerHTML = '<span style="color:var(--t2);">게시 중...</span>';
   try {
@@ -1762,10 +1763,12 @@ document.getElementById('modalPostBtn').onclick = async () => {
       body: JSON.stringify({ author: currentUser.nickname, author_id: currentUser.id, content, image_url: imageUrl, created_at: new Date().toISOString() })
     });
     messageDiv.innerHTML = '<span style="color:var(--green);">게시글이 작성되었습니다!</span>';
+    window.SharerNotify?.('게시물이 업로드되었습니다.', { type: 'success', title: '게시물' });
     setTimeout(() => { document.getElementById('createModal').classList.remove('active'); messageDiv.innerHTML = ''; loadPosts(); }, 1200);
   } catch (err) {
     console.error('게시 오류:', err);
     messageDiv.innerHTML = '<span style="color:var(--pink);">게시에 실패했습니다.</span>';
+    window.SharerNotify?.('게시물 업로드에 실패했습니다.', { type: 'error', title: '게시물' });
   } finally { postButton.disabled = false; }
 };
 
