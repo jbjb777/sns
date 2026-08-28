@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Sharer IP 지도</title>  <!-- Leaflet CSS -->  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style></head><body>  <div id="map"></div>  <!-- Leaflet JS -->  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>  <script>
+
+    // 지도 시작 위치
+    const map = L.map("map").setView(
+      [37.2411, 127.1776],
+      10
+    );
+
+    // OpenStreetMap 지도
+    L.tileLayer(
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+      }
+    ).addTo(map);
+
+    // 테스트 마커
+    L.marker([37.2411, 127.1776])
+      .addTo(map)
+      .bindPopup("용인 테스트 위치")
+      .openPopup();
+
+  </script></body>
+</html>
