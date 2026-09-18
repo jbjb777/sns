@@ -3,6 +3,18 @@
 <head>
 
   <title>탐색 : Sharer</title>
+  <style>@view-transition { navigation: auto; }</style>
+  <script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "source": "list",
+        "urls": ["https://sharer.r-e.kr/index.html", "https://sharer.r-e.kr/dm.html", "https://sharer.r-e.kr/set.html"],
+        "eagerness": "eager"
+      }
+    ]
+  }
+  </script>
   <link rel="icon" type="image/png" href="./logo.png">
 
 

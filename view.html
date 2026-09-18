@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>게시물 : Sharer</title>
+  <style>@view-transition { navigation: auto; }</style>
+  <script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "source": "list",
+        "urls": ["https://sharer.r-e.kr/index.html", "https://sharer.r-e.kr/explore.html", "https://sharer.r-e.kr/dm.html", "https://sharer.r-e.kr/set.html"],
+        "eagerness": "eager"
+      }
+    ]
+  }
+  </script>
   
   <script>
     // 화면 깜빡임(FOUC) 방지를 위해 HTML 렌더링 전 테마를 즉시 적용합니다.

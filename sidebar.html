@@ -66,6 +66,11 @@
    .nav-item:hover {
       transform: scale(1.08);
     }
+   .nav-item:active {
+      transform: scale(0.88);
+      transition: transform 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+      filter: brightness(0.85);
+    }
    .nav-item.active {
       /* 배경 그라데이션 및 그림자 제거 (필요시 다시 추가 가능) */
     }
@@ -217,6 +222,10 @@
       box-shadow:
         0 10px 24px rgba(0,0,0,0.5),
         0 0 20px rgba(255,255,255,0.04);
+    }
+   .create-btn:active {
+      transform: scale(0.9);
+      transition: transform 0.08s cubic-bezier(0.4, 0, 0.2, 1);
     }
    .btn-icon-img {
       width: 32px;
@@ -771,6 +780,15 @@
       profileSheetBackdrop.setAttribute('aria-hidden', 'true');
     }
 
+    function prefetchPage(url) {
+      try {
+        window._sharerPrefetched = window._sharerPrefetched || new Set();
+        if (window._sharerPrefetched.has(url)) return;
+        window._sharerPrefetched.add(url);
+        fetch(url, { mode: 'same-origin', credentials: 'omit' }).catch(function(){});
+      } catch (e) {}
+    }
+
     function goCreate() {
       if (isLoggedIn) {
         window.top.location.href = 'https://sharer.r-e.kr/make.html';
@@ -919,6 +937,17 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
       closeProfileSheet();
       window.top.location.href = 'https://sharer.r-e.kr/set.html';
     };
+
+    [
+      [homeNav, 'https://sharer.r-e.kr/index.html'],
+      [exploreNav, 'https://sharer.r-e.kr/explore.html'],
+      [dmNav, 'https://sharer.r-e.kr/dm.html'],
+      [setNav, 'https://sharer.r-e.kr/set.html']
+    ].forEach(([el, url]) => {
+      if (!el) return;
+      el.addEventListener('mouseenter', () => prefetchPage(url));
+      el.addEventListener('pointerdown', () => prefetchPage(url));
+    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeProfileSheet();
