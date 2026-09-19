@@ -36,6 +36,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <script>window.NProgress = window.NProgress || { configure(){}, start(){}, done(){}, set(){}, inc(){} };</script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   
   <style>
@@ -775,8 +776,71 @@ html[data-theme="light"] .ai-chat-section.expanded .chat-input-area {
       .bottom-sticky-btn { font-size: 12px; padding: 0 14px; height: 36px; }
     }
   </style>
+  <style>
+    .splash-text {
+      text-align: center;
+      animation: fadeUp 0.6s ease forwards;
+      animation-delay: 0.2s;
+      opacity: 1;
+    }
+    .splash-title { font-size: 20px; font-weight: 700; letter-spacing: 0.05em; color: var(--t1); }
+    .splash-sub { font-size: 12px; color: var(--t2); margin-top: 4px; letter-spacing: 0.08em; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    #splash {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 99999; transition: opacity 0.45s ease;
+    }
+    #splash.fade-out { opacity: 0; pointer-events: none; }
+    .splash-inner { display: flex; flex-direction: column; align-items: center; gap: 32px; }
+    .splash-logo { width: 72px; height: 72px; animation: splashLogoPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    @keyframes splashLogoPop { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+    .splash-spinner {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0%, var(--t1) 92%);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+      opacity: 0;
+      animation: splashSpin 0.85s linear infinite, splashSpinFadeIn 0.4s ease forwards;
+      animation-delay: 0s, 0.35s;
+    }
+    @keyframes splashSpin { to { transform: rotate(360deg); } }
+    @keyframes splashSpinFadeIn { to { opacity: 0.55; } }
+  </style>
 </head>
 <body>
+  <div id="splash">
+    <div class="splash-inner">
+      <img src="logo.svg" class="splash-logo" alt="Sharer">
+      <div class="splash-text">
+        <div class="splash-title">Sharer</div>
+        <div class="splash-sub">By JBJB</div>
+      </div>
+      <div class="splash-spinner" aria-hidden="true"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const splash = document.getElementById('splash');
+      if (!splash) return;
+      if (sessionStorage.getItem('splashShown')) {
+        splash.style.display = 'none';
+        return;
+      }
+      sessionStorage.setItem('splashShown', 'true');
+      const start = Date.now();
+      const MIN_SPLASH = 900;
+      function finishSplash() {
+        splash.classList.add('fade-out');
+        setTimeout(() => { splash.style.display = 'none'; }, 460);
+      }
+      window.addEventListener('load', () => {
+        const elapsed = Date.now() - start;
+        setTimeout(finishSplash, Math.max(0, MIN_SPLASH - elapsed));
+      });
+      setTimeout(finishSplash, 3000);
+    })();
+  </script>
 
   <div class="bg-gradients"></div>
 

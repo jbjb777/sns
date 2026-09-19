@@ -29,6 +29,7 @@
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
   <link rel="stylesheet" href="https://unpkg.com/nprogress/nprogress.css">
   <script src="https://unpkg.com/nprogress/nprogress.js"></script>
+  <script>window.NProgress = window.NProgress || { configure(){}, start(){}, done(){}, set(){}, inc(){} };</script>
   <script src="sharer-notifications.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -74,6 +75,22 @@
       from { opacity: 0; transform: scale(0.7); }
       to { opacity: 1; transform: scale(1); }
     }
+    .splash-inner { display: flex; flex-direction: column; align-items: center; gap: 32px; }
+    .splash-text { text-align: center; animation: fadeUp 0.6s ease forwards; animation-delay: 0.2s; opacity: 1; }
+    .splash-title { font-size: 20px; font-weight: 700; letter-spacing: 0.05em; color: var(--t1); }
+    .splash-sub { font-size: 12px; color: var(--t2); margin-top: 4px; letter-spacing: 0.08em; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .splash-spinner {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0%, var(--t1) 92%);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+      opacity: 0;
+      animation: splashSpin 0.85s linear infinite, splashSpinFadeIn 0.4s ease forwards;
+      animation-delay: 0s, 0.35s;
+    }
+    @keyframes splashSpin { to { transform: rotate(360deg); } }
+    @keyframes splashSpinFadeIn { to { opacity: 0.55; } }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
@@ -1243,7 +1260,14 @@ opacity: 1;
   </div>
 
   <div id="splash">
-    <img src="logo.svg" class="splash-logo" alt="Sharer">
+    <div class="splash-inner">
+      <img src="logo.svg" class="splash-logo" alt="Sharer">
+      <div class="splash-text">
+        <div class="splash-title">Sharer</div>
+        <div class="splash-sub">By JBJB</div>
+      </div>
+      <div class="splash-spinner" aria-hidden="true"></div>
+    </div>
   </div>
 
   <div class="login-alert" id="loginAlert">
@@ -2368,7 +2392,9 @@ window.toggleSearchPanel = function() {
         throw new Error(t || ("HTTP " + res.status));
       }
       if (res.status === 204) return null;
-      return res.json();
+      const text = await res.text();
+      if (!text) return null;
+      try { return JSON.parse(text); } catch (e) { console.error("JSON 파싱 오류:", e); return null; }
     }
 
     function getCurrentUser() {

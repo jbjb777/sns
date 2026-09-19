@@ -1644,7 +1644,7 @@ dmIcon.src = isLight? 'sendO.svg' : 'send.svg';
       }
       // 부모 패널 주입 시도 (데스크톱)
       try { injectNotiPanelToParent(); } catch(e){}
-    }, 400);
+    }, 0);
 
     // 초기 시도: localStorage에 유저가 있으면 바로 폴링 시작
     setTimeout(() => {
