@@ -1117,6 +1117,7 @@ opacity: 1;
     ></iframe>
   </div>
   <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
+  <div id="categoryFilter"></div>
   <div class="main-wrapper">
     <div class="shorts-container" id="shortsContainer">
       <div class="skeleton-short-item">
@@ -1178,6 +1179,7 @@ opacity: 1;
 
 <script src="sharer-notifications.js"></script>
 <script src="markdown.js"></script>
+<script src="sharer-category.js"></script>
 <script>
   // Cloudflare Worker API 프록시 주소 (키 노출 완전 제거)
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
@@ -1455,9 +1457,14 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  let catFilter = SharerCategory.getSaved();
+  let loadAllSeq = 0;
+
   async function loadAllPosts() {
+    const seq = ++loadAllSeq;
     try {
-      const posts = await api("/posts?select=*&order=created_at.desc");
+      const posts = await api("/posts?select=*" + SharerCategory.queryFor(catFilter) + "&order=created_at.desc");
+      if (seq !== loadAllSeq) return;
       if (!posts || posts.length === 0) {
         showNoPosts();
         return;
@@ -1557,7 +1564,10 @@ window.addEventListener('DOMContentLoaded', () => {
     updateNavButtons();
   };
 
+  let scrollTrackingBound = false;
   function setupScrollTracking() {
+    if (scrollTrackingBound) return;   // 필터를 바꿔 다시 불러와도 리스너가 중복되지 않게
+    scrollTrackingBound = true;
     const container = document.getElementById('shortsContainer');
     container.addEventListener('scroll', () => {
       const scrollPosition = container.scrollTop;
@@ -1595,7 +1605,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="short-avatar">${avatarInnerHtml}</div></div>`;
 
     let contentHTML = '';
-    if (hasImage && hasContent) {
+    const sCat = SharerCategory.normalize(post);
+    if (sCat === 'dday' || sCat === 'game') {
+      const caption = hasContent ? `<div class="short-caption"><div class="short-caption-text">${parseMarkdown(post.content)}</div></div>` : '';
+      contentHTML = `<div class="short-content">${SharerCategory.extra(post, 'explore')}${caption}</div>`;
+    } else if (hasImage && hasContent) {
       const linkedContent = parseMarkdown(post.content);
       contentHTML = `
         <div class="short-content">
@@ -2048,13 +2062,13 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   function showNoPosts() {
+    const msg = catFilter === 'all'
+      ? '아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요!'
+      : '이 카테고리에는 아직 게시물이 없습니다.';
     document.getElementById('shortsContainer').innerHTML = `
       <div class="no-posts">
         <div class="no-posts-icon">📭</div>
-        <div class="no-posts-text">
-          아직 게시물이 없습니다.<br>
-          첫 번째 게시물을 작성해보세요!
-        </div>
+        <div class="no-posts-text">${msg}</div>
       </div>
     `;
   }
@@ -2070,6 +2084,16 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     `;
   }
+
+  // 카테고리 필터 (홈과 같은 모듈/같은 선택값 사용) + 게임 ▶ 플레이 버튼
+  SharerCategory.filterBar(document.getElementById('categoryFilter'), (id) => {
+    catFilter = id;
+    const c = document.getElementById('shortsContainer');
+    c.innerHTML = '';
+    c.scrollTop = 0;
+    loadAllPosts();
+  }, { floating: true });
+  SharerCategory.bindPlay(api);
 
   // 초기 로드 (최근 스토리 정보를 가져온 뒤 게시물을 로드합니다)
   fetchRecentStories().then(() => {

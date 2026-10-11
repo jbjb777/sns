@@ -1386,6 +1386,7 @@ opacity: 1;
         <div class="compose-avatar" id="composeAvatar"></div>
         <div class="compose-placeholder">나의 생각을 입력해봐요</div>
       </div>
+      <div id="categoryFilter"></div>
       <div id="postsFeed">
         <div class="skeleton-post">
           <div class="skeleton-post-header">
@@ -1432,6 +1433,7 @@ opacity: 1;
 </div>
 
 <script src="markdown.js"></script>
+<script src="sharer-category.js"></script>
 <script>
 function closeNoticeBanner() {
   const banner = document.getElementById('topNoticeBanner');
@@ -1789,7 +1791,7 @@ document.getElementById('modalPostBtn').onclick = async () => {
     }
     await api("/posts", {
       method: "POST",
-      body: JSON.stringify({ author: currentUser.nickname, author_id: currentUser.id, content, image_url: imageUrl, created_at: new Date().toISOString() })
+      body: JSON.stringify({ author: currentUser.nickname, author_id: currentUser.id, content, image_url: imageUrl, category: imageUrl ? (/\.gif(\?|$)/i.test(imageUrl) ? 'gif' : 'photo') : 'text', created_at: new Date().toISOString() })
     });
     messageDiv.innerHTML = '<span style="color:var(--green);">게시글이 작성되었습니다!</span>';
     window.SharerNotify?.('게시물이 업로드되었습니다.', { type: 'success', title: '게시물' });
@@ -1906,12 +1908,19 @@ window.nextFeedSlide = function(btn) {
   carousel.scrollBy({ left: carousel.clientWidth, behavior: 'smooth' });
 };
 
+let catFilter = SharerCategory.getSaved();
+let loadPostsSeq = 0;
+
 async function loadPosts() {
   const feedDiv = document.getElementById('postsFeed');
+  const seq = ++loadPostsSeq;
   try {
-    const posts = await api("/posts?select=*&access=not.in.(private,link)&order=created_at.desc");
+    const posts = await api("/posts?select=*&access=not.in.(private,link)" + SharerCategory.queryFor(catFilter) + "&order=created_at.desc");
+    if (seq !== loadPostsSeq) return;
     if (!posts?.length) {
-      feedDiv.innerHTML = '<div class="no-posts"><div class="no-posts-icon"> </div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요</div></div>';
+      feedDiv.innerHTML = catFilter === 'all'
+        ? '<div class="no-posts"><div class="no-posts-icon"> </div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요</div></div>'
+        : '<div class="no-posts"><div class="no-posts-icon"> </div><div>이 카테고리에는 아직 게시물이 없습니다.</div></div>';
       return;
     }
     posts.forEach(p => { postAuthorIdMap[p.id] = p.author_id; });
@@ -1934,6 +1943,7 @@ async function loadPosts() {
       currentUser ? api(`/likes?post_id=in.(${postIdFilter})&user_id=eq.${currentUser.id}&select=post_id`).catch(() => []) : Promise.resolve([]),
       api(`/comments?post_id=in.(${postIdFilter})&select=post_id`).catch(() => [])
     ]);
+    if (seq !== loadPostsSeq) return;
 
     const likeCountMap = {};
     (allLikes || []).forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
@@ -1984,11 +1994,12 @@ async function loadPosts() {
         <div class="post-header">
           <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(authorNickname)}')">
             ${avatarHTML}
-            <div class="post-author-name">${authorDisplay}<span class="post-time-inline">${timeStr}</span></div>
+            <div class="post-author-name">${authorDisplay}<span class="post-time-inline">${timeStr}</span>${SharerCategory.badge(post)}</div>
           </div>
           ${deleteButton}
         </div>
         ${renderPostImages(post.image_url)}
+        ${SharerCategory.extra(post)}
         ${contentHTML}
         <div class="post-actions">
           <button class="like-button ${liked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike('${post.id}', this)">
@@ -2069,6 +2080,7 @@ window.deletePost = async (postId) => {
   if (!confirm('이 게시물을 삭제하시겠습니까?')) return;
   try {
     await api(`/posts?id=eq.${postId}`, { method: "DELETE" });
+    try { await api(`/post_games?post_id=eq.${postId}`, { method: "DELETE" }); } catch (e) {}
     loadPosts();
   } catch (err) {
     console.error('삭제 오류:', err);
@@ -2085,6 +2097,11 @@ function escapeHtml(unsafe) {
 }
 
 const defaultFeedSkeleton = document.getElementById('postsFeed').innerHTML;
+SharerCategory.filterBar(document.getElementById('categoryFilter'), (id) => {
+  catFilter = id;
+  document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
+  loadPosts();
+});
 const defaultRecommendSkeleton = document.getElementById('recommendProfiles').innerHTML;
 
 fetchRecentStories().then(() => {

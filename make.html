@@ -854,6 +854,8 @@
         </div>
       </div>
 
+      <div id="categoryPicker"></div>
+
       <div class="editor-toolbar" id="editorToolbar">
         <button type="button" onclick="execFormat('bold')"><b>B</b></button>
         <button type="button" onclick="execFormat('italic')"><i>I</i></button>
@@ -865,9 +867,9 @@
 
       <div class="create-textarea" id="postContent" contenteditable="true" placeholder="문구를 입력하세요..."></div>
 
-      <div class="section-divider"></div>
+      <div class="section-divider" id="mediaDivider"></div>
 
-      <div class="image-preview-container">
+      <div class="image-preview-container" id="mediaPreviewBox">
         <div class="image-preview-grid" id="imagePreviewGrid"></div>
         <div class="image-count" id="imageCount">0 / 5 장</div>
       </div>
@@ -926,6 +928,7 @@
 
 <script src="sharer-notifications.js"></script>
 <script src="markdown.js"></script>
+<script src="sharer-category.js"></script>
 <script>
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
 
@@ -1052,7 +1055,7 @@
       reader.readAsDataURL(file);
     });
 
-    countEl.textContent = `${selectedImages.length} / 5 장`;
+    countEl.textContent = catPicker.category === 'gif' ? `${selectedImages.length} / 1 개` : `${selectedImages.length} / 5 장`;
   }
 
   async function initPage() {
@@ -1110,13 +1113,61 @@
     document.execCommand(command, false, value);
   };
 
+  // ===== 카테고리 선택기 =====
+  const catPicker = SharerCategory.picker(document.getElementById('categoryPicker'), applyCategoryUI);
+
+  function applyCategoryUI(cat) {
+    const showMedia = (cat === 'photo' || cat === 'gif');
+    const input = document.getElementById('imageInput');
+    const btn = document.getElementById('uploadBtn');
+    document.getElementById('mediaDivider').style.display = showMedia ? '' : 'none';
+    document.getElementById('mediaPreviewBox').style.display = showMedia ? '' : 'none';
+    btn.style.display = showMedia ? '' : 'none';
+    // 카테고리를 바꾸면 이전에 고른 파일은 비움 (사진 ↔ GIF 섞임 방지)
+    selectedImages = [];
+    updateImagePreview();
+    if (cat === 'gif') {
+      input.accept = 'image/gif';
+      input.multiple = false;
+      btn.textContent = '🎞️ GIF 추가 (1개, 최대 8MB)';
+    } else {
+      input.accept = 'image/*';
+      input.multiple = true;
+      btn.textContent = '📷 사진 추가 (최대 5장)';
+    }
+    const ph = {
+      text: '문구를 입력하세요...', photo: '사진에 대한 설명을 입력하세요 (선택)',
+      gif: 'GIF에 대한 설명을 입력하세요 (선택)', dday: '디데이 제목을 입력하세요 (예: 수학여행)',
+      game: '게임 설명을 입력하세요 (선택)'
+    };
+    document.getElementById('postContent').setAttribute('placeholder', ph[cat] || ph.text);
+  }
+  applyCategoryUI('text');
+
   document.getElementById('uploadBtn').onclick = () => {
     document.getElementById('imageInput').click();
   };
 
   document.getElementById('imageInput').onchange = (e) => {
     const files = Array.from(e.target.files);
-    
+    const cat = catPicker.category;
+
+    if (cat === 'gif') {
+      const f = files[0];
+      if (!f) return;
+      if (f.type !== 'image/gif') { showToast('GIF 파일만 올릴 수 있어요.'); e.target.value = ''; return; }
+      if (f.size > SharerCategory.GIF_MAX_BYTES) { showToast('GIF는 8MB 이하만 올릴 수 있어요.'); e.target.value = ''; return; }
+      selectedImages = [f];
+      updateImagePreview();
+      e.target.value = '';
+      return;
+    }
+    if (files.some(f => f.type === 'image/gif')) {
+      showToast('GIF는 "짧은 동영상(GIF)" 카테고리에서 올려주세요.');
+      e.target.value = '';
+      return;
+    }
+
     if (selectedImages.length + files.length > 5) {
       showToast('최대 5장까지 업로드할 수 있습니다.');
       return;
@@ -1189,10 +1240,18 @@
     const content = htmlToMarkdown(rawHtml);
     const postButton = document.getElementById('postBtn');
 
-    if (!content && selectedImages.length === 0) {
-      showToast('내용 또는 이미지를 추가해주세요.');
+    const cat = catPicker.category;
+    let extra;
+    try {
+      extra = catPicker.getData();
+    } catch (err) {
+      showToast(err.message);
       return;
     }
+    if (cat === 'text' && !content) { showToast('내용을 입력해주세요.'); return; }
+    if (cat === 'photo' && selectedImages.length === 0) { showToast('사진을 1장 이상 추가해주세요.'); return; }
+    if (cat === 'gif' && selectedImages.length !== 1) { showToast('GIF 파일을 1개 추가해주세요.'); return; }
+    if (cat === 'dday' && !content) { showToast('디데이 제목을 입력해주세요.'); return; }
 
     // 버튼 잠금 및 테두리 흐름 애니메이션 작동 트리거
     postButton.disabled = true;
@@ -1200,26 +1259,44 @@
 
     try {
       let imageUrls = null;
-      if (selectedImages.length > 0) {
+      if ((cat === 'photo' || cat === 'gif') && selectedImages.length > 0) {
         imageUrls = await uploadImagesToCloudinary();
       }
 
+      const postBody = {
+        author: currentUser.nickname,
+        author_id: currentUser.id,
+        content: content,
+        image_url: imageUrls ? imageUrls.join(',') : null,
+        access: currentAccessValue,
+        category: cat,
+        created_at: new Date().toISOString()
+      };
+      if (cat === 'dday') { postBody.dday_date = extra.dday_date; postBody.dday_color = extra.dday_color; }
+
       const responseData = await api("/posts", {
         method: "POST",
-        body: JSON.stringify({
-          author: currentUser.nickname,
-          author_id: currentUser.id,
-          content: content,
-          image_url: imageUrls ? imageUrls.join(',') : null,
-          access: currentAccessValue, 
-          created_at: new Date().toISOString()
-        }),
+        body: JSON.stringify(postBody),
         headers: {
           "Prefer": "return=representation"
         }
       });
 
       const createdId = responseData && responseData[0] && responseData[0].id ? responseData[0].id : null;
+
+      // HTML5 게임 코드는 별도 테이블(post_games)에 저장. 실패하면 글도 되돌림
+      if (cat === 'game') {
+        try {
+          if (!createdId) throw new Error('no id');
+          await api("/post_games", {
+            method: "POST",
+            body: JSON.stringify({ post_id: String(createdId), html: extra.gameHtml })
+          });
+        } catch (gameErr) {
+          if (createdId) { try { await api(`/posts?id=eq.${createdId}`, { method: "DELETE" }); } catch (e) {} }
+          throw new Error('게임 저장에 실패했어요. 다시 시도해주세요.');
+        }
+      }
       window.SharerNotify?.('게시물이 업로드되었습니다.', { type: 'success', title: '게시물' });
       const isEmbedded = document.documentElement.classList.contains('is-embedded') || window.__SHARER_EMBEDDED__;
       setTimeout(() => {

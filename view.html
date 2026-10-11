@@ -1398,6 +1398,7 @@ opacity: 1;
   </div>
 
 <script src="markdown.js"></script>
+<script src="sharer-category.js"></script>
 <script>
   // ─── 초기 스켈레톤 HTML 저장 (새로고침 시 활용) ───
   const defaultPostSkeleton = document.getElementById('postContent').innerHTML;
@@ -1804,6 +1805,7 @@ window.toggleSearchPanel = function() {
               <div class="author-name">
                 ${escapeHtml(post.author)}
                 ${isVerified ? '<span class="admin-badge">관리자</span>' : ''}
+                ${SharerCategory.badge(post)}
               </div>
               <div class="post-timestamp">${timeStr}</div>
             </div>
@@ -1824,6 +1826,7 @@ window.toggleSearchPanel = function() {
           </div>
         </div>
         ${renderImages(post.image_url)}
+        ${SharerCategory.extra(post)}
         <div class="post-detail-content">
           <div class="post-text">${linkedContent}</div>
         </div>
@@ -1842,6 +1845,12 @@ window.toggleSearchPanel = function() {
       </div>
     `;
     
+    // HTML5 게임: 상세 화면에서는 바로 실행 (격리된 iframe)
+    if (SharerCategory.normalize(post) === 'game') {
+      const gameBox = contentDiv.querySelector('.sc-game');
+      if (gameBox) SharerCategory.mountGame(gameBox, postId, api);
+    }
+
     // 캐러셀 인디케이터 초기화
     if (post.image_url) {
       const urls = post.image_url.split(',').map(u => u.trim()).filter(Boolean);
@@ -2261,6 +2270,7 @@ window.toggleSearchPanel = function() {
     try {
       await api(`/comments?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
       await api(`/likes?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" });
+      try { await api(`/post_games?post_id=eq.${pendingDeletePostId}`, { method: "DELETE" }); } catch (e) {}
       await api(`/posts?id=eq.${pendingDeletePostId}`, { method: "DELETE" });
       window.location.href = 'index.html';
     } catch (e) { alert('게시물 삭제 실패'); }
