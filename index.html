@@ -1387,7 +1387,8 @@ opacity: 1;
         <div class="compose-avatar" id="composeAvatar"></div>
         <div class="compose-placeholder">나의 생각을 입력해봐요</div>
       </div>
-      <div id="categoryFilter"></div>
+      <div id="feedTabs"></div>
+      <div id="recTop"></div>
       <div id="postsFeed">
         <div class="skeleton-post">
           <div class="skeleton-post-header">
@@ -1435,6 +1436,7 @@ opacity: 1;
 
 <script src="markdown.js"></script>
 <script src="sharer-category.js"></script>
+<script src="sharer-feed.js"></script>
 <script>
 function closeNoticeBanner() {
   const banner = document.getElementById('topNoticeBanner');
@@ -1909,15 +1911,122 @@ window.nextFeedSlide = function(btn) {
   carousel.scrollBy({ left: carousel.clientWidth, behavior: 'smooth' });
 };
 
-let catFilter = SharerCategory.getSaved();
-let loadPostsSeq = 0;
+// ===== 피드 맞춤설정 (피드 최대 3개, 탭/나란히, 추천 사용자 위치) =====
+let feedCfg = SharerFeed.getLocal();
+let activeFeed = 0;
+try { activeFeed = parseInt(sessionStorage.getItem('sharerFeedActive'), 10) || 0; } catch (e) {}
+let panes = [];            // 화면에 그려진 피드들 { c: 카테고리, el, seq }
+let recUsersCache = null;
+
+function effectiveRecPos() {
+  // 나란히 보기(2개 이상)에서는 옆 목록이 자리를 차지하지 않도록 위쪽 가로 목록으로 대체
+  if (feedCfg.layout === 'columns' && feedCfg.feeds.length > 1 && feedCfg.recommend.pos === 'side') return 'top';
+  return feedCfg.recommend.pos;
+}
+
+async function getRecUsers(force) {
+  if (!force && recUsersCache) return recUsersCache;
+  let users = [];
+  try { users = (await api("/users?select=id,nickname,profile_image")) || []; } catch (e) {}
+  users = users.filter(u => !currentUser || u.id !== currentUser.id);
+  for (let i = users.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [users[i], users[j]] = [users[j], users[i]];
+  }
+  recUsersCache = users;
+  return users;
+}
+
+function makeRecStrip(users) {
+  return SharerFeed.recStrip(users.slice(0, 10), (id, nick) => goToProfile(id, nick));
+}
+
+async function renderRecTop() {
+  const host = document.getElementById('recTop');
+  host.innerHTML = '';
+  if (effectiveRecPos() !== 'top') return;
+  const users = await getRecUsers();
+  if (users.length && effectiveRecPos() === 'top') host.appendChild(makeRecStrip(users));
+}
+
+function applyFeedUI() {
+  const pos = effectiveRecPos();
+  const side = document.getElementById('recommendProfiles');
+  if (side) side.style.display = pos === 'side' ? '' : 'none';
+  const wide = feedCfg.layout === 'columns' && feedCfg.feeds.length > 1;
+  const fc = document.querySelector('.feed-container');
+  if (fc) fc.style.maxWidth = wide ? (feedCfg.feeds.length === 2 ? '920px' : '1240px') : '';
+  if (activeFeed >= feedCfg.feeds.length) activeFeed = 0;
+  SharerFeed.tabBar(document.getElementById('feedTabs'), feedCfg, activeFeed, {
+    onSelect: (i) => {
+      activeFeed = i;
+      try { sessionStorage.setItem('sharerFeedActive', String(i)); } catch (e) {}
+      SharerCategory.save(feedCfg.feeds[i].c);   // 탐색 화면도 같은 카테고리를 따라감
+      panes = [];
+      document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
+      applyFeedUI();
+      loadPosts();
+    },
+    onSettings: openFeedSettings
+  });
+}
+
+function applyFeedConfig(cfg, persistRemote) {
+  feedCfg = SharerFeed.normalize(cfg);
+  SharerFeed.saveLocal(feedCfg);
+  activeFeed = 0;
+  try { sessionStorage.setItem('sharerFeedActive', '0'); } catch (e) {}
+  SharerCategory.save(feedCfg.feeds[0].c);
+  panes = [];
+  document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
+  applyFeedUI();
+  renderRecTop();
+  loadPosts();
+  if (persistRemote && currentUser) SharerFeed.saveRemote(api, currentUser.id, feedCfg);
+}
+
+function openFeedSettings() {
+  SharerFeed.openEditor(feedCfg, (cfg) => applyFeedConfig(cfg, true));
+}
+
+function buildPanes() {
+  const wrap = document.getElementById('postsFeed');
+  wrap.innerHTML = '';
+  panes = [];
+  const columns = feedCfg.layout === 'columns' && feedCfg.feeds.length > 1;
+  const list = columns ? feedCfg.feeds : [feedCfg.feeds[Math.min(activeFeed, feedCfg.feeds.length - 1)]];
+  wrap.className = columns ? 'sf-columns' : '';
+  wrap.style.gridTemplateColumns = columns ? `repeat(${list.length}, minmax(0, 1fr))` : '';
+  list.forEach(f => {
+    const col = document.createElement('div');
+    col.className = 'sf-col';
+    if (columns) {
+      const h = document.createElement('div');
+      h.className = 'sf-col-head';
+      h.textContent = SharerFeed.labelOf(f.c);
+      col.appendChild(h);
+    }
+    const el = document.createElement('div');
+    el.innerHTML = defaultFeedSkeleton;
+    col.appendChild(el);
+    wrap.appendChild(col);
+    panes.push({ c: f.c, el, seq: 0 });
+  });
+}
 
 async function loadPosts() {
-  const feedDiv = document.getElementById('postsFeed');
-  const seq = ++loadPostsSeq;
+  const wrap = document.getElementById('postsFeed');
+  if (!panes.length || !wrap.contains(panes[0].el)) buildPanes();
+  await Promise.all(panes.map(loadPane));
+}
+
+async function loadPane(pane) {
+  const feedDiv = pane.el;
+  const catFilter = pane.c;
+  const seq = ++pane.seq;
   try {
     const posts = await api("/posts?select=*&access=not.in.(private,link)" + SharerCategory.queryFor(catFilter) + "&order=created_at.desc");
-    if (seq !== loadPostsSeq) return;
+    if (seq !== pane.seq) return;
     if (!posts?.length) {
       feedDiv.innerHTML = catFilter === 'all'
         ? '<div class="no-posts"><div class="no-posts-icon"> </div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요</div></div>'
@@ -1944,7 +2053,10 @@ async function loadPosts() {
       currentUser ? api(`/likes?post_id=in.(${postIdFilter})&user_id=eq.${currentUser.id}&select=post_id`).catch(() => []) : Promise.resolve([]),
       api(`/comments?post_id=in.(${postIdFilter})&select=post_id`).catch(() => [])
     ]);
-    if (seq !== loadPostsSeq) return;
+    if (seq !== pane.seq) return;
+    const inlineRec = effectiveRecPos() === 'inline';
+    const recUsers = inlineRec ? await getRecUsers() : [];
+    if (seq !== pane.seq) return;
 
     const likeCountMap = {};
     (allLikes || []).forEach(l => { likeCountMap[l.post_id] = (likeCountMap[l.post_id] || 0) + 1; });
@@ -2023,6 +2135,9 @@ async function loadPosts() {
         }
       };
       feedDiv.appendChild(postCard);
+      if (inlineRec && recUsers.length && (idx + 1) % feedCfg.recommend.every === 0 && idx + 1 < posts.length) {
+        feedDiv.appendChild(makeRecStrip(recUsers));
+      }
     });
 
   } catch (err) {
@@ -2035,7 +2150,7 @@ async function loadRecommendedProfiles() {
   const container = document.getElementById('recommendProfiles');
   const skeleton = document.getElementById('recommendSkeleton');
   try {
-    let users = await api("/users?select=id,nickname,profile_image");
+    let users = [...(await getRecUsers(true))];
     if (!users?.length) {
       skeleton?.remove();
       container.innerHTML += '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">사용자 없음</div>';
@@ -2099,11 +2214,17 @@ function escapeHtml(unsafe) {
 }
 
 const defaultFeedSkeleton = document.getElementById('postsFeed').innerHTML;
-SharerCategory.filterBar(document.getElementById('categoryFilter'), (id) => {
-  catFilter = id;
-  document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
-  loadPosts();
+applyFeedUI();
+renderRecTop();
+window.addEventListener('message', (e) => {
+  if (e.origin === location.origin && e.data && e.data.type === 'openFeedSettings') openFeedSettings();
 });
+// 로그인 상태면 서버에 저장된 내 피드 설정을 불러와 적용 (다른 기기에서 바꾼 설정 반영)
+if (currentUser) {
+  SharerFeed.loadRemote(api, currentUser.id).then(c => {
+    if (c && JSON.stringify(c) !== JSON.stringify(feedCfg)) applyFeedConfig(c, false);
+  });
+}
 const defaultRecommendSkeleton = document.getElementById('recommendProfiles').innerHTML;
 
 fetchRecentStories().then(() => {
