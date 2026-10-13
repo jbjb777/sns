@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <script src="sharer-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Sharer</title>
   <style>@view-transition { navigation: auto; }</style>
@@ -1992,7 +1993,7 @@ async function loadPosts() {
       postCard.style.animationDelay = `${Math.min(idx, 7) * 0.07}s`;
       postCard.innerHTML = `
         <div class="post-header">
-          <div class="post-author-info" onclick="event.stopPropagation(); goToProfile('${post.author_id}', '${escapeHtml(authorNickname)}')">
+          <div class="post-author-info" data-uid="${escapeHtml(String(post.author_id))}" data-nick="${escapeHtml(authorNickname)}" onclick="event.stopPropagation(); goToProfile(this.dataset.uid, this.dataset.nick)">
             ${avatarHTML}
             <div class="post-author-name">${authorDisplay}<span class="post-time-inline">${timeStr}</span>${SharerCategory.badge(post)}</div>
           </div>
@@ -2089,9 +2090,10 @@ window.deletePost = async (postId) => {
 };
 
 function escapeHtml(unsafe) {
-  return unsafe
+  return String(unsafe == null ? '' : unsafe)
     .replace(/&/g, "&amp;")
-    .replace(/</g, "&gt;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }

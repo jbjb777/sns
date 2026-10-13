@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <script src="sharer-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>계정 복구 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
@@ -68,11 +69,11 @@
             <p class="intro-desc">계정을 찾기 위한 방법을 선택해주세요.</p>
             <button onclick="selectType('ID')">
               <img src="id_.svg" style="width:16px; height:16px; vertical-align:middle; margin-right:8px;">
-              아이디를 통해 복구
+              비밀번호 재설정 (아이디를 알아요)
             </button>
             <button onclick="selectType('PW')">
               <img src="key_.svg" style="width:16px; height:16px; vertical-align:middle; margin-right:8px;">
-              비밀번호를 통해 복구
+              아이디 찾기 (가입 이메일로)
             </button>
           </div>
 
@@ -91,6 +92,7 @@
             <h2>이메일 인증</h2>
             <p class="intro-desc">전송된 인증번호 6자리를 입력해주세요.</p>
             <input type="text" id="verifyCode" placeholder="인증번호">
+            <input type="password" id="newPassword" placeholder="새 비밀번호 (4자 이상)" style="display:none; margin-top:10px;">
             <div class="error-message" id="verifyError"></div>
             <button onclick="handleVerify()">인증 확인</button>
           </div>
@@ -99,8 +101,8 @@
             <img src="shield.svg" class="step-icon" alt="완료">
             <h2 id="resultTitle">복구 완료</h2>
             <div style="background:var(--bg3); padding:20px; border-radius:var(--r2); text-align:center; margin-bottom:20px;">
-              <p style="font-size:12px; color:var(--t2);">확인된 정보입니다.</p>
-              <h3 id="resultValue" style="margin-top:10px; font-size:24px; color:var(--green);">--</h3>
+              <p style="font-size:12px; color:var(--t2);" id="resultDesc">확인된 정보입니다.</p>
+              <h3 id="resultValue" style="margin-top:10px; font-size:24px; color:var(--green); word-break:break-all;">--</h3>
             </div>
             <button onclick="location.href='login.html'">로그인하러 가기</button>
           </div>
@@ -115,10 +117,9 @@
 
 <script>
   const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-  const EMAIL_WORKER_URL = "https://white-salad-5eb7.alexeom97.workers.dev/";
 
-  let recoveryType = ''; // 'ID' or 'PW'
-  let foundUser = null; 
+  let recoveryType = ''; // 'ID' = 아이디를 알고 비밀번호 재설정, 'PW' = 이메일로 아이디 찾기
+  let recoveryValue = '';
 
   function moveStep(step) {
     document.getElementById('sliderTrack').style.transform = `translateX(-${step * 25}%)`;
@@ -129,49 +130,38 @@
     const input = document.getElementById('userInput');
     const title = document.getElementById('step1Title');
     const icon = document.getElementById('inputIcon');
-    
+
     if (type === 'ID') {
+      input.type = 'text';
       input.placeholder = "아이디를 입력하세요";
-      title.textContent = "아이디로 찾기";
+      title.textContent = "비밀번호 재설정";
       icon.src = "id.png";
     } else {
-      input.placeholder = "비밀번호를 입력하세요";
-      title.textContent = "비밀번호로 찾기";
+      input.type = 'email';
+      input.placeholder = "가입한 이메일을 입력하세요";
+      title.textContent = "아이디 찾기";
       icon.src = "key.png";
     }
+    document.getElementById('newPassword').style.display = (type === 'ID') ? 'block' : 'none';
     moveStep(1);
   }
 
+  // 인증번호 보내기 (서버가 가입 이메일로 발송. 계정이 있는지는 알려주지 않음)
   async function handleRequest() {
     const val = document.getElementById('userInput').value.trim();
     const err = document.getElementById('inputError');
+    err.textContent = '';
     if (!val) { err.textContent = "정보를 입력해주세요."; return; }
 
     try {
-      const query = recoveryType === 'ID' ? `id=eq.${encodeURIComponent(val)}` : `password=eq.${encodeURIComponent(val)}`;
-      const res = await fetch(`${API_BASE}/users?${query}&select=*`);
-      const users = await res.json();
-
-      if (!users || users.length === 0) {
-        err.textContent = "해당 정보를 가진 계정을 찾을 수 없습니다.";
-        return;
-      }
-
-      foundUser = users[0];
-      
-      if (!foundUser.email) {
-        err.textContent = "이 계정은 등록된 이메일이 없습니다.";
-        return;
-      }
-
-      const emailRes = await fetch(EMAIL_WORKER_URL, {
+      const res = await fetch(`${API_BASE}/auth/send-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: foundUser.email })
+        body: JSON.stringify(recoveryType === 'ID' ? { id: val } : { email: val })
       });
-
-      if (!emailRes.ok) throw new Error("메일 발송 실패");
-      
+      if (res.status === 429) { err.textContent = "요청이 너무 많아요. 잠시 후 다시 시도해주세요."; return; }
+      if (!res.ok) throw new Error("요청 실패");
+      recoveryValue = val;
       moveStep(2);
     } catch (e) {
       err.textContent = "서버 오류가 발생했습니다.";
@@ -179,36 +169,43 @@
     }
   }
 
+  // 인증번호 확인 (확인과 처리는 서버가 함께 수행)
   async function handleVerify() {
     const code = document.getElementById('verifyCode').value.trim();
     const err = document.getElementById('verifyError');
+    err.textContent = '';
     if (!code) { err.textContent = "인증번호를 입력하세요."; return; }
 
     try {
-      const res = await fetch(EMAIL_WORKER_URL + 'verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: foundUser.email, code: code })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        let secret, title;
-        // 수정된 로직: ID 입력 시 비번 노출, PW 입j력 시 ID 노출
-        if (recoveryType === 'ID') {
-          secret = foundUser.password;
-          title = "비밀번호 복구 완료";
-        } else {
-          secret = foundUser.id;
-          title = "아이디 복구 완료";
-        }
-        
-        document.getElementById('resultTitle').textContent = title;
-        document.getElementById('resultValue').textContent = secret;
-        moveStep(3);
+      let res, data;
+      if (recoveryType === 'ID') {
+        const pw = document.getElementById('newPassword').value;
+        if (pw.length < 4) { err.textContent = "새 비밀번호는 4자 이상이어야 합니다."; return; }
+        res = await fetch(`${API_BASE}/auth/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: recoveryValue, code, new_password: pw })
+        });
       } else {
-        err.textContent = "인증번호가 일치하지 않습니다.";
+        res = await fetch(`${API_BASE}/auth/find-id`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: recoveryValue, code })
+        });
       }
+      data = await res.json().catch(() => ({}));
+      if (!res.ok) { err.textContent = data.error || "인증번호가 일치하지 않습니다."; return; }
+
+      if (recoveryType === 'ID') {
+        document.getElementById('resultTitle').textContent = "비밀번호 변경 완료";
+        document.getElementById('resultDesc').textContent = "새 비밀번호로 로그인해주세요.";
+        document.getElementById('resultValue').textContent = "✓";
+      } else {
+        document.getElementById('resultTitle').textContent = "아이디 복구 완료";
+        document.getElementById('resultDesc').textContent = "가입된 아이디입니다.";
+        document.getElementById('resultValue').textContent = (data.ids && data.ids.length) ? data.ids.join(', ') : '(없음)';
+      }
+      moveStep(3);
     } catch (e) {
       err.textContent = "인증 오류 발생";
     }

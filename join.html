@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <script src="sharer-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원가입 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
@@ -582,12 +583,14 @@
     const errorDiv = document.getElementById('signupError');
 
     try {
-      await api("/users", {
-        method: "POST",
-        body: JSON.stringify({ id, nickname, password, email: null, created_at: new Date().toISOString() })
+      const sres = await fetch(API_BASE + '/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, nickname, password })
       });
-
-      localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: false }));
+      const sdata = await sres.json().catch(() => ({}));
+      if (!sres.ok) throw new Error(sdata.error || '가입에 실패했습니다.');
+      SharerAuth.setSession(sdata);
       document.getElementById('loadingAvatar').textContent = (nickname[0] || '?').toUpperCase();
       document.getElementById('loadingTitle').textContent = "계정 설정 중";
       document.getElementById('verificationCode').style.display = 'none';
@@ -677,13 +680,14 @@
 
     try {
       // 제공해주신 /verify 엔드포인트 호출 검증 진행
-      const response = await fetch(EMAIL_WORKER_URL + 'verify', {
+      // 인증번호 확인과 가입은 서버가 한 번에 처리합니다
+      const signupRes = await fetch(API_BASE + '/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code })
+        body: JSON.stringify({ id, nickname, password, email, code })
       });
-
-      const data = await response.json();
+      const signupData = await signupRes.json().catch(() => ({}));
+      const data = { success: signupRes.ok };
 
       if (data.success) {
         // 인증에 성공하면 UI 연출 고정 및 입력 필드 가리기
@@ -693,18 +697,7 @@
         document.getElementById('loadingStatusText').innerHTML = `<span font-weight:600;">이메일 인증 성공</span><br><span style="font-size:12px;color:var(--t2);">계정 설정 중</span>`;
 
         // 자체 백엔드 DB 서버에 email 컬럼을 추가하여 회원가입 최종 기록
-        await api("/users", {
-          method: "POST",
-          body: JSON.stringify({ 
-            id, 
-            nickname, 
-            password, 
-            email, 
-            created_at: new Date().toISOString() 
-          })
-        });
-
-        localStorage.setItem('snsUser', JSON.stringify({ id, nickname, isVerified: true }));
+        SharerAuth.setSession(signupData);
 
         setTimeout(() => {
           document.getElementById('loadingStatusText').innerHTML = `<span>가입이 완료되었습니다</span>`;
@@ -714,7 +707,7 @@
         }, 1500);
 
       } else {
-        codeError.textContent = '인증번호가 일치하지 않거나 만료되었습니다.';
+        codeError.textContent = signupData.error || '인증번호가 일치하지 않거나 만료되었습니다.';
         codeInput.classList.add('input-error');
         verifyBtn.innerHTML = originalText;
         verifyBtn.disabled = false;

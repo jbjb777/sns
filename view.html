@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <script src="sharer-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>게시물 : Sharer</title>
@@ -1623,7 +1624,7 @@ window.addEventListener('DOMContentLoaded', () => {
     urls.forEach((url, index) => {
       html += `
         <div class="carousel-slide">
-          <img src="${url}" alt="게시물 이미지 ${index + 1}" loading="lazy" onclick="openLightbox(${index})">
+          <img src="${escapeHtml(url)}" alt="게시물 이미지 ${index + 1}" loading="lazy" onclick="openLightbox(${index})">
         </div>`;
     });
     html += `</div>`;
@@ -1771,7 +1772,7 @@ window.toggleSearchPanel = function() {
       const url = post.author_profile_image.includes('?')
         ? `${post.author_profile_image}&v=${Date.now()}`
         : `${post.author_profile_image}?v=${Date.now()}`;
-      avatarInnerHtml = `<img src="${url}" alt="${escapeHtml(post.author)}">`;
+      avatarInnerHtml = `<img src="${escapeHtml(url)}" alt="${escapeHtml(post.author)}">`;
     }
     
     const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="author-avatar">${avatarInnerHtml}</div></div>`;
@@ -1799,7 +1800,7 @@ window.toggleSearchPanel = function() {
     contentDiv.innerHTML = `
       <div class="post-detail-card">
         <div class="post-detail-header">
-          <div class="author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
+          <div class="author-info" data-uid="${escapeHtml(String(post.author_id))}" data-nick="${escapeHtml(post.author)}" onclick="goToProfile(this.dataset.uid, this.dataset.nick)">
             ${avatarHTML}
             <div class="author-details">
               <div class="author-name">
@@ -2011,7 +2012,7 @@ window.toggleSearchPanel = function() {
         const url = profileImages[userId].includes('?')
           ? `${profileImages[userId]}&v=${Date.now()}`
           : `${profileImages[userId]}?v=${Date.now()}`;
-        avatarInner = `<img src="${url}" alt="${escapeHtml(userName)}">`;
+        avatarInner = `<img src="${escapeHtml(url)}" alt="${escapeHtml(userName)}">`;
       }
       const hasStory = recentStoryAuthors.has(userId);
       return `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="comment-avatar">${avatarInner}</div></div>`;
@@ -2064,7 +2065,7 @@ window.toggleSearchPanel = function() {
             return `
               <div class="reply-item">
                 <div class="comment-header">
-                  <div class="comment-author-wrapper" onclick="goToProfile('${r.user_id}', '${escapeHtml(r.user_name)}')">
+                  <div class="comment-author-wrapper" data-uid="${escapeHtml(String(r.user_id))}" data-nick="${escapeHtml(r.user_name)}" onclick="goToProfile(this.dataset.uid, this.dataset.nick)">
                     ${rAvatarContent}
                     <span class="comment-author">
                       ${escapeHtml(r.user_name)}
@@ -2083,7 +2084,7 @@ window.toggleSearchPanel = function() {
       
       return `
         <div class="comment-header">
-          <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
+          <div class="comment-author-wrapper" data-uid="${escapeHtml(String(c.user_id))}" data-nick="${escapeHtml(c.user_name)}" onclick="goToProfile(this.dataset.uid, this.dataset.nick)">
             ${avatarContent}
             <span class="comment-author">
               ${escapeHtml(c.user_name)}

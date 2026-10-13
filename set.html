@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <script src="sharer-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>설정 : Sharer</title>
   <link rel="icon" type="image/svg+xml" href="./logo.svg">
@@ -886,8 +887,9 @@
     const newPwd = document.getElementById('newPasswordInput').value;
     const cfmPwd = document.getElementById('confirmPasswordInput').value;
 
-    if (!curPwd || !newPwd || !cfmPwd) {
-      alert('모든 비밀번호 입력 필드를 채워주세요.');
+    // (구글/카카오 계정은 현재 비밀번호가 없으므로 비워둘 수 있음 — 서버가 확인)
+    if (!newPwd || !cfmPwd) {
+      alert('새 비밀번호 입력 필드를 채워주세요.');
       return;
     }
 
@@ -897,18 +899,6 @@
     NProgress.start();
 
     try {
-      // 보안을 위해 실제 DB에서 현재 비밀번호 확인
-      const userRes = await api(`/users?id=eq.${encodeURIComponent(loggedInUser.id)}&select=password`);
-      const actualPassword = userRes[0].password;
-
-      if (actualPassword && actualPassword !== curPwd) {
-        alert('현재 비밀번호가 일치하지 않습니다.');
-        btn.disabled = false;
-        btn.textContent = "비밀번호 변경";
-        NProgress.done();
-        return;
-      }
-
       if (newPwd !== cfmPwd) {
         alert('새로 입력하신 비밀번호가 서로 일치하지 않습니다.');
         btn.disabled = false;
@@ -925,12 +915,20 @@
         return;
       }
 
-      // DB 비밀번호 업데이트
-      await api(`/users?id=eq.${encodeURIComponent(loggedInUser.id)}`, {
-        method: "PATCH",
-        body: JSON.stringify({ password: newPwd }),
-        headers: { "Prefer": "return=minimal" }
+      // 현재 비밀번호 확인과 변경은 서버가 처리 (비밀번호는 브라우저로 내려오지 않음)
+      const pwRes = await fetch(API_BASE + '/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ current_password: curPwd, new_password: newPwd })
       });
+      const pwData = await pwRes.json().catch(() => ({}));
+      if (!pwRes.ok) {
+        alert(pwData.error || '비밀번호 변경 중 오류가 발생했습니다.');
+        btn.disabled = false;
+        btn.textContent = "비밀번호 변경";
+        NProgress.done();
+        return;
+      }
 
       // 입력창 초기화
       document.getElementById('currentPasswordInput').value = '';
@@ -1021,20 +1019,15 @@
     NProgress.start();
 
     try {
-      const response = await fetch(EMAIL_WORKER_URL + 'verify', {
+      const response = await fetch(API_BASE + '/auth/change-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: pendingEmail, code })
       });
-      const data = await response.json();
+      const data = { success: response.ok };
 
       if(data.success) {
-        // 실제 DB에 반영
-        await api(`/users?id=eq.${encodeURIComponent(loggedInUser.id)}`, {
-          method: "PATCH",
-          body: JSON.stringify({ email: pendingEmail }),
-          headers: { "Prefer": "return=minimal" }
-        });
+        // 인증 확인과 DB 반영은 서버가 처리했습니다
         
         // 상태 업데이트
         loggedInUser.email = pendingEmail;

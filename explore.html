@@ -21,6 +21,7 @@
   <link rel="canonical" href="https://sharer.r-e.kr/explore.html">
 
   <meta charset="UTF-8">
+  <script src="sharer-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <meta name="description" content="Sharer의 다양한 게시물들을 끊임없이 탐색해 보세요">
@@ -1369,13 +1370,12 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('message', (event) => {
-
-
-  if (type === 'toggleSearch') {
-    window.toggleSearchPanel();
-  }
-
+    // type 을 먼저 꺼낸 뒤 사용 (이전에는 선언 전에 사용해서 에러가 났음)
     const { type, page } = event.data || {};
+
+    if (type === 'toggleSearch') {
+      window.toggleSearchPanel();
+    }
   if (type === 'navigate') {
     if (page === 'home') location.href = 'index.html';
     if (page === 'explore') location.href = 'explore.html';
@@ -1600,7 +1600,7 @@ window.addEventListener('DOMContentLoaded', () => {
     
     if (authorProfileUrl) {
       const cacheBuster = authorProfileUrl.includes('?') ? '&' : '?';
-      avatarInnerHtml = `<img src="${authorProfileUrl}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(post.author)}">`;
+      avatarInnerHtml = `<img src="${escapeHtml(authorProfileUrl)}${cacheBuster}v=${Date.now()}" alt="${escapeHtml(post.author)}">`;
     }
     const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="short-avatar">${avatarInnerHtml}</div></div>`;
 
@@ -1613,7 +1613,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const linkedContent = parseMarkdown(post.content);
       contentHTML = `
         <div class="short-content">
-          <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
+          <img src="${escapeHtml(post.image_url)}" class="short-image" alt="게시글 이미지">
           <div class="short-caption">
             <div class="short-caption-text">${linkedContent}</div>
           </div>
@@ -1622,7 +1622,7 @@ window.addEventListener('DOMContentLoaded', () => {
     } else if (hasImage && !hasContent) {
       contentHTML = `
         <div class="short-content">
-          <img src="${post.image_url}" class="short-image" alt="게시글 이미지">
+          <img src="${escapeHtml(post.image_url)}" class="short-image" alt="게시글 이미지">
         </div>
       `;
     } else if (!hasImage && hasContent) {
@@ -1643,7 +1643,7 @@ window.addEventListener('DOMContentLoaded', () => {
     shortItem.innerHTML = `
       ${contentHTML}
       <div class="short-info-bar">
-        <div class="short-author-info" onclick="goToProfile('${post.author_id}', '${escapeHtml(post.author)}')">
+        <div class="short-author-info" data-uid="${escapeHtml(String(post.author_id))}" data-nick="${escapeHtml(post.author)}" onclick="goToProfile(this.dataset.uid, this.dataset.nick)">
           ${avatarHTML}
           <div class="short-author-name">
             ${escapeHtml(post.author)}
@@ -1822,7 +1822,7 @@ window.addEventListener('DOMContentLoaded', () => {
           const url = profileMap[userId].includes('?')
             ? `${profileMap[userId]}&v=${Date.now()}`
             : `${profileMap[userId]}?v=${Date.now()}`;
-          avatarInner = `<img src="${url}" alt="${escapeHtml(userName)}">`;
+          avatarInner = `<img src="${escapeHtml(url)}" alt="${escapeHtml(userName)}">`;
         }
         const hasStory = recentStoryAuthors.has(userId);
         return `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}"><div class="comment-avatar">${avatarInner}</div></div>`;
@@ -1873,7 +1873,7 @@ window.addEventListener('DOMContentLoaded', () => {
               return `
                 <div class="reply-item">
                   <div class="comment-header">
-                    <div class="comment-author-wrapper" onclick="goToProfile('${r.user_id}', '${escapeHtml(r.user_name)}')">
+                    <div class="comment-author-wrapper" data-uid="${escapeHtml(String(r.user_id))}" data-nick="${escapeHtml(r.user_name)}" onclick="goToProfile(this.dataset.uid, this.dataset.nick)">
                       ${rAvatarContent}
                       <span class="comment-author">
                         ${escapeHtml(r.user_name)}
@@ -1892,7 +1892,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         return `
           <div class="comment-header">
-            <div class="comment-author-wrapper" onclick="goToProfile('${c.user_id}', '${escapeHtml(c.user_name)}')">
+            <div class="comment-author-wrapper" data-uid="${escapeHtml(String(c.user_id))}" data-nick="${escapeHtml(c.user_name)}" onclick="goToProfile(this.dataset.uid, this.dataset.nick)">
               ${avatarContent}
               <span class="comment-author">
                 ${escapeHtml(c.user_name)}
@@ -2060,6 +2060,12 @@ window.addEventListener('DOMContentLoaded', () => {
   window.goToProfile = function(userId, nickname) {
     window.location.href = `user.html?id=${userId}&nickname=${encodeURIComponent(nickname)}`;
   };
+
+  function escapeHtml(unsafe) {
+    return String(unsafe == null ? '' : unsafe)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
 
   function showNoPosts() {
     const msg = catFilter === 'all'
