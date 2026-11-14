@@ -24,8 +24,8 @@
   }
   function kinds() {
     var labels = {
-      all: '전체', text: '텍스트', photo: '사진', gif: '짧은 동영상',
-      game: '게임', dday: '디데이', recommend: '추천 사용자', search: '검색', notify: '알림', profile: '프로필'
+      all: '전체', text: '텍스트', photo: '사진', gif: '짧은 동영상(GIF)',
+      game: 'HTML5 게임', dday: '디데이', recommend: '추천 사용자', search: '검색', notify: '알림', profile: '프로필'
     };
     return feedIds().concat(['recommend', 'search', 'notify', 'profile']).map(function (id) {
       return { id: id, label: labels[id] || id, feed: feedIds().indexOf(id) >= 0 };
@@ -47,7 +47,14 @@
   }
 
   function defaults() {
-    return { v: 2, showAll: true, columns: [{ id: 'all', w: 'wide' }, { id: 'search', w: 'mid' }] };
+    return {
+      v: 2, showAll: true,
+      columns: [
+        { id: 'all', w: 'wide' },
+        { id: 'notify', w: 'mid' },
+        { id: 'recommend', w: 'narrow' }
+      ]
+    };
   }
 
   function column(id, w) {
@@ -74,10 +81,29 @@
     return { v: 2, showAll: !(raw && raw.showAll === false), columns: columns };
   }
 
+  var mobileQuery = window.matchMedia('(max-width: 768px)');
+  var mobileCat = 'all';
+  function isMobile() { return mobileQuery.matches; }
   function visible(cfg) {
     cfg = normalize(cfg);
+    if (isMobile()) return [{ id: isFeed(mobileCat) ? mobileCat : 'all', w: 'wide' }];
     if (!cfg.showAll && cfg.columns.length > 1) return [cfg.columns[0]];
     return cfg.columns.slice();
+  }
+  function mobileChips(active) {
+    var list = [{ id: 'all', label: '전체', icon: '' }].concat(
+      (window.SharerCategory && SharerCategory.CATEGORIES) || [
+        { id: 'text', label: '텍스트', icon: '📝' },
+        { id: 'photo', label: '사진', icon: '📷' },
+        { id: 'gif', label: '짧은 동영상(GIF)', icon: '🎞️' },
+        { id: 'dday', label: '디데이', icon: '📅' },
+        { id: 'game', label: 'HTML5 게임', icon: '🎮' }
+      ]
+    );
+    return '<div class="sf-mchips">' + list.map(function (c) {
+      return '<button type="button" class="sf-mchip' + (c.id === active ? ' on' : '') + '" data-mcat="' + c.id + '">' +
+        (c.icon ? c.icon + ' ' : '') + esc(c.label) + '</button>';
+    }).join('') + '</div>';
   }
 
   function getLocal() {
@@ -138,7 +164,12 @@
       '.sf-profile-av{width:72px;height:72px;font-size:28px}',
       '.sf-profile-btn{margin-top:10px;border:1px solid var(--border2,#2a2a2a);background:var(--bg3,#1a1a1a);color:var(--t1,#fff);font:inherit;font-size:14px;font-weight:650;padding:10px 14px;border-radius:12px;cursor:pointer}',
       '.sf-empty a{color:var(--t1,#fff)}',
-      '.sf-menu{position:fixed;z-index:80;min-width:220px;max-width:260px;padding:6px;background:var(--bg2,#161616);border:1px solid var(--border2,#2a2a2a);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.45)}',
+      '.sf-menu{position:fixed;z-index:80;min-width:220px;max-width:280px;max-height:min(70vh,520px);overflow-y:auto;padding:6px;background:var(--bg2,#161616);border:1px solid var(--border2,#2a2a2a);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.45);transform-origin:top right;animation:sfPop .2s cubic-bezier(.2,1.2,.32,1) both}',
+      '@keyframes sfPop{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}',
+      '.sf-mchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;width:100%;padding:2px 0 4px}',
+      '.sf-mchips::-webkit-scrollbar{display:none}',
+      '.sf-mchip{flex:0 0 auto;border:0;background:var(--bg3,#1a1a1a);color:var(--t1,#fff);font:inherit;font-size:14px;font-weight:650;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}',
+      '.sf-mchip.on{background:var(--t1,#fff);color:var(--bg,#000)}',
       '.sf-menu button{display:flex;width:100%;text-align:left;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:0;color:var(--t1,#fff);font:inherit;font-size:14px;padding:9px 10px;border-radius:10px;cursor:pointer}',
       '.sf-menu button:hover{background:var(--bg4,#222)}',
       '.sf-menu button.on{font-weight:700}',
@@ -167,7 +198,7 @@
       '.sf-noti:hover{background:var(--bg2,#111)}',
       '.sf-noti-detail{font-size:14px;line-height:1.45}',
       '.sf-noti-time{font-size:12px;color:var(--t3,#444);margin-top:4px}',
-      '@media (max-width:768px){.feed-board{scroll-snap-type:x mandatory}.sf-col{flex:0 0 100% !important;max-width:none !important;min-width:100%;scroll-snap-align:start}.sf-plus{bottom:calc(78px + env(safe-area-inset-bottom,0px))}}'
+      '@media (max-width:768px){.feed-board{overflow-x:hidden}.sf-col,.feed-board.count-1 .sf-col{flex:1 1 auto !important;max-width:none !important;min-width:0;width:100%;border-right:none}.sf-plus,.sf-col-menu{display:none !important}.sf-col-head{display:block;padding:12px 12px 8px}}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -188,6 +219,7 @@
     if (top < 8) top = 8;
     menu.style.left = left + 'px';
     menu.style.top = top + 'px';
+    menu.style.transformOrigin = above ? 'bottom right' : 'top right';
   }
 
   function withColumn(cfg, id) {
@@ -207,8 +239,6 @@
     var menu = document.createElement('div');
     menu.className = 'sf-menu';
     menuEl = menu;
-    var direct = ['search', 'notify', 'profile'];
-    var feeds = kinds().filter(function (k) { return direct.indexOf(k.id) < 0; });
     function row(k) {
       var taken = cfg.columns.some(function (c, i) { return i !== index && c.id === k.id; });
       if (taken) return '';
@@ -219,9 +249,7 @@
     var widths = WIDTHS.map(function (w) {
       return '<button type="button" data-act="width" data-w="' + w.id + '"' + (col.w === w.id ? ' class="on"' : '') + '>' + esc(w.label) + '</button>';
     }).join('');
-    menu.innerHTML =
-      '<button type="button" data-act="feeds">기타 피드</button>' +
-      direct.map(function (id) { return row(kindOf(id)); }).join('') +
+    menu.innerHTML = kinds().map(row).join('') +
       '<div class="sf-rule"></div><div class="sf-widths">' + widths + '</div>' +
       (cfg.columns.length > 1 ? '<div class="sf-rule"></div><button type="button" data-act="close">이 열 닫기</button>' : '');
     placeMenu(menu, btn, false);
@@ -230,15 +258,6 @@
       var b = e.target.closest('button');
       if (!b || b.disabled) return;
       var act = b.getAttribute('data-act');
-      if (act === 'feeds') {
-        menu.innerHTML = '<button type="button" data-act="back">기타 피드</button><div class="sf-rule"></div>' +
-          feeds.map(row).join('');
-        return;
-      }
-      if (act === 'back') {
-        openMenu(btn, cfg, index, onChange);
-        return;
-      }
       var next = normalize(JSON.parse(JSON.stringify(cfg)));
       var meta = { widthOnly: false };
       if (act === 'kind') next.columns[index].id = b.getAttribute('data-id');
@@ -270,21 +289,13 @@
       '<button type="button" data-act="toggle">열 ' + n + '개 표시<span class="sf-switch' + (on ? ' on' : '') + '"><i></i></span></button>' +
       '<div class="sf-rule"></div>' +
       '<button type="button" data-act="add-free"' + (cfg.columns.length >= MAX ? ' disabled' : '') + '>열 추가</button>' +
-      item('search', '검색') + item('notify', '알림') + item('profile', '프로필') +
-      '<button type="button" data-act="feeds">기타 피드</button>';
+      kinds().map(function (k) { return item(k.id, k.label); }).join('');
     placeMenu(menu, btn, true);
     menu.addEventListener('click', function (e) {
       e.stopPropagation();
       var b = e.target.closest('button');
       if (!b || b.disabled) return;
       var act = b.getAttribute('data-act');
-      if (act === 'feeds') {
-        var feeds = kinds().filter(function (k) { return ['search', 'notify', 'profile'].indexOf(k.id) < 0; });
-        menu.innerHTML = '<button type="button" data-act="back">기타 피드</button><div class="sf-rule"></div>' +
-          feeds.map(function (k) { return item(k.id, k.label); }).join('');
-        return;
-      }
-      if (act === 'back') { openAddMenu(btn, cfg, onChange); return; }
       var next = null;
       if (act === 'toggle') {
         next = normalize(JSON.parse(JSON.stringify(cfg)));
@@ -331,15 +342,26 @@
     host.className = 'feed-board count-' + shown.length;
     var html = shown.map(function (c) {
       var i = cfg.columns.findIndex(function (x) { return x.id === c.id; });
+      var head = isMobile()
+        ? mobileChips(c.id)
+        : '<h2>' + esc(labelOf(c.id)) + '</h2>' +
+          '<button type="button" class="sf-col-menu" aria-label="이 열 바꾸기" data-i="' + i + '">' +
+          '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1.5" y="2" width="5" height="12" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9.5" y="2" width="5" height="12" rx="1.2" stroke="currentColor" stroke-width="1.4"/></svg>' +
+          '</button>';
       return '<section class="sf-col w-' + widthOf(c.w).id + '" data-i="' + i + '">' +
-        '<header class="sf-col-head"><h2>' + esc(labelOf(c.id)) + '</h2>' +
-        '<button type="button" class="sf-col-menu" aria-label="이 열 바꾸기" data-i="' + i + '">' +
-        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1.5" y="2" width="5" height="12" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9.5" y="2" width="5" height="12" rx="1.2" stroke="currentColor" stroke-width="1.4"/></svg>' +
-        '</button></header><div class="sf-col-body" data-sf-body></div></section>';
+        '<header class="sf-col-head">' + head + '</header><div class="sf-col-body" data-sf-body></div></section>';
     }).join('');
-    html += '<button type="button" class="sf-plus" aria-label="열 추가">+</button>';
+    if (!isMobile()) html += '<button type="button" class="sf-plus" aria-label="열 추가">+</button>';
     host.innerHTML = html;
+    host._onChange = onChange;
     host.onclick = function (e) {
+      var chip = e.target.closest('[data-mcat]');
+      if (chip) {
+        e.stopPropagation();
+        mobileCat = chip.getAttribute('data-mcat');
+        onChange(host._sfCfg, { mobile: true });
+        return;
+      }
       var menuBtn = e.target.closest('.sf-col-menu');
       if (menuBtn) {
         e.stopPropagation();
@@ -365,6 +387,12 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeMenu();
   });
+  if (mobileQuery.addEventListener) {
+    mobileQuery.addEventListener('change', function () {
+      var host = document.getElementById('feedBoard');
+      if (host && host._onChange) host._onChange(host._sfCfg || getLocal(), { mobile: true });
+    });
+  }
 
   window.SharerFeed = {
     MAX: MAX,

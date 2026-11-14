@@ -2011,6 +2011,13 @@ async function fillNotify(body) {
 }
 
 function applyFeedConfig(cfg, persistRemote, meta) {
+  if (meta && meta.mobile) {
+    const shown = SharerFeed.visible(feedCfg);
+    if (shown[0] && window.SharerCategory) SharerCategory.save(shown[0].id);
+    buildBoard();
+    loadPosts();
+    return;
+  }
   const prev = feedCfg;
   feedCfg = SharerFeed.normalize(cfg);
   SharerFeed.saveLocal(feedCfg);
