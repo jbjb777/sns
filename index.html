@@ -1892,7 +1892,8 @@ window.nextFeedSlide = function(btn) {
 let feedCfg = SharerFeed.getLocal();
 let panes = [];
 let recUsersCache = null;
-const FEED_PAGE = 8;
+const FEED_PAGE = 5;
+const FEED_SPINNER = '<svg class="sf-spin" viewBox="0 0 48 48" aria-label="불러오는 중"><circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="78 36"></circle></svg>';
 const FEED_SKELETON = '<div class="skeleton-post"><div class="skeleton-post-header"><div class="skeleton skeleton-avatar"></div><div class="skeleton skeleton-username"></div></div><div class="skeleton skeleton-post-image"></div><div class="skeleton skeleton-text text-long"></div><div class="skeleton skeleton-text text-medium"></div></div>';
 
 async function getRecUsers(force) {
@@ -2058,6 +2059,7 @@ function buildBoard() {
       body.appendChild(el);
       const more = document.createElement('div');
       more.className = 'sf-more';
+      more.innerHTML = FEED_SPINNER;
       body.appendChild(more);
       const pane = { c: col.id, el, more, seq: 0, offset: 0, done: false, loading: false, io: null };
       more._pane = pane;
@@ -2087,6 +2089,20 @@ function nearEnd(pane) {
   return pane.more.getBoundingClientRect().top < root.getBoundingClientRect().bottom + 480;
 }
 
+function showPageSpinner(pane) {
+  pane.el.classList.remove('sf-lift');
+  void pane.el.offsetWidth;
+  pane.el.classList.add('sf-lift');
+  pane.more.classList.add('on');
+  const root = pane.el.closest('.sf-col-body');
+  if (root) root.scrollTo({ top: root.scrollTop + 72, behavior: 'smooth' });
+}
+
+function hidePageSpinner(pane) {
+  pane.more.classList.remove('on');
+  pane.el.classList.remove('sf-lift');
+}
+
 async function loadPane(pane, more) {
   if (pane.loading || (more && (pane.done || pane.offset === 0))) return;
   const feedDiv = pane.el;
@@ -2099,13 +2115,13 @@ async function loadPane(pane, more) {
   const seq = pane.seq;
   const offset = pane.offset;
   pane.loading = true;
-  if (more) pane.more.textContent = '불러오는 중';
+  if (more) showPageSpinner(pane);
   try {
     const posts = await api("/posts?select=id,author_id,author,content,image_url,created_at,type,category,dday_date,dday_color&access=not.in.(private,link)" + SharerCategory.queryFor(catFilter) + "&order=created_at.desc&limit=" + FEED_PAGE + "&offset=" + offset);
     if (seq !== pane.seq) return;
     if (!posts?.length) {
       pane.done = true;
-      pane.more.textContent = '';
+      hidePageSpinner(pane);
       if (offset === 0) {
         feedDiv.innerHTML = catFilter === 'all'
           ? '<div class="no-posts"><div class="no-posts-icon"> </div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요</div></div>'
@@ -2215,12 +2231,12 @@ async function loadPane(pane, more) {
     });
     pane.offset += posts.length;
     pane.done = posts.length < FEED_PAGE;
-    pane.more.textContent = '';
+    hidePageSpinner(pane);
   } catch (err) {
     console.error('게시물 로드 오류:', err);
     if (seq !== pane.seq) return;
+    hidePageSpinner(pane);
     if (offset === 0) feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
-    else pane.more.textContent = '더 불러오지 못했습니다';
   } finally {
     if (seq === pane.seq) {
       pane.loading = false;
