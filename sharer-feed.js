@@ -216,7 +216,7 @@
       '.sf-noti:hover{background:var(--bg2,#111)}',
       '.sf-noti-detail{font-size:14px;line-height:1.45}',
       '.sf-noti-time{font-size:12px;color:var(--t3,#444);margin-top:4px}',
-      '@media (max-width:768px){.feed-board{overflow-x:hidden}.sf-col,.feed-board.count-1 .sf-col{flex:1 1 auto !important;max-width:none !important;min-width:0;width:100%;border-right:none}.sf-plus,.sf-col-menu{display:none !important}.sf-col-head{display:block;padding:12px 12px 8px}}'
+      '@media (max-width:768px){.feed-board{overflow-x:hidden}.sf-col,.feed-board.count-1 .sf-col{flex:1 1 auto !important;max-width:none !important;min-width:0;width:100%;border-right:none}.sf-plus,.sf-col-menu{display:none !important}.sf-col-head{display:block;padding:12px 12px 8px}.sf-col-body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}}'
     ].join('');
     document.head.appendChild(st);
   }
