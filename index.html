@@ -1496,10 +1496,15 @@ let recentStoryAuthors = new Set();
 async function fetchRecentStories() {
   try {
     const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    const posts = await api(`/posts?created_at=gte.${twoDaysAgo}&select=author_id`);
+    const posts = await api(`/posts?created_at=gte.${twoDaysAgo}&select=author_id&limit=200`);
     if (posts) {
       posts.forEach(p => {
         if (p.author_id) recentStoryAuthors.add(p.author_id);
+      });
+      document.querySelectorAll('.post-author-info[data-uid]').forEach(el => {
+        if (!recentStoryAuthors.has(el.dataset.uid)) return;
+        const ring = el.querySelector('.story-ring-wrapper');
+        if (ring) ring.classList.add('has-story');
       });
     }
   } catch (e) {
@@ -1887,12 +1892,13 @@ window.nextFeedSlide = function(btn) {
 let feedCfg = SharerFeed.getLocal();
 let panes = [];
 let recUsersCache = null;
+const FEED_PAGE = 8;
 const FEED_SKELETON = '<div class="skeleton-post"><div class="skeleton-post-header"><div class="skeleton skeleton-avatar"></div><div class="skeleton skeleton-username"></div></div><div class="skeleton skeleton-post-image"></div><div class="skeleton skeleton-text text-long"></div><div class="skeleton skeleton-text text-medium"></div></div>';
 
 async function getRecUsers(force) {
   if (!force && recUsersCache) return recUsersCache;
   let users = [];
-  try { users = (await api("/users?select=id,nickname,profile_image")) || []; } catch (e) {}
+  try { users = (await api("/users?select=id,nickname,profile_image&limit=40")) || []; } catch (e) {}
   users = users.filter(u => !currentUser || u.id !== currentUser.id);
   for (let i = users.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -2033,6 +2039,7 @@ function applyFeedConfig(cfg, persistRemote, meta) {
 }
 
 function buildBoard() {
+  panes.forEach(p => { if (p.io) p.io.disconnect(); });
   const host = document.getElementById('feedBoard');
   panes = [];
   SharerFeed.mount(host, feedCfg, (cfg, meta) => applyFeedConfig(cfg, true, meta));
@@ -2049,7 +2056,17 @@ function buildBoard() {
       const el = document.createElement('div');
       el.innerHTML = FEED_SKELETON;
       body.appendChild(el);
-      panes.push({ c: col.id, el, seq: 0 });
+      const more = document.createElement('div');
+      more.className = 'sf-more';
+      body.appendChild(more);
+      const pane = { c: col.id, el, more, seq: 0, offset: 0, done: false, loading: false, io: null };
+      more._pane = pane;
+      pane.io = new IntersectionObserver((entries) => {
+        entries.forEach(en => { if (en.isIntersecting) loadPane(pane, true); });
+      }, { root: body, rootMargin: '480px' });
+      pane.io.observe(more);
+      body.addEventListener('scroll', () => { if (nearEnd(pane)) loadPane(pane, true); }, { passive: true });
+      panes.push(pane);
     } else if (col.id === 'recommend') fillRecommend(body);
     else if (col.id === 'search') fillSearch(body);
     else if (col.id === 'notify') fillNotify(body);
@@ -2060,21 +2077,40 @@ function buildBoard() {
 
 async function loadPosts() {
   if (!panes.length) return;
-  await Promise.all(panes.map(loadPane));
+  await Promise.all(panes.map(p => loadPane(p, false)));
   applyFadeEffect();
 }
 
-async function loadPane(pane) {
+function nearEnd(pane) {
+  const root = pane.el.closest('.sf-col-body');
+  if (!root || !pane.more) return false;
+  return pane.more.getBoundingClientRect().top < root.getBoundingClientRect().bottom + 480;
+}
+
+async function loadPane(pane, more) {
+  if (pane.loading || (more && (pane.done || pane.offset === 0))) return;
   const feedDiv = pane.el;
   const catFilter = pane.c;
-  const seq = ++pane.seq;
+  if (!more) {
+    pane.offset = 0;
+    pane.done = false;
+    pane.seq += 1;
+  }
+  const seq = pane.seq;
+  const offset = pane.offset;
+  pane.loading = true;
+  if (more) pane.more.textContent = '불러오는 중';
   try {
-    const posts = await api("/posts?select=*&access=not.in.(private,link)" + SharerCategory.queryFor(catFilter) + "&order=created_at.desc");
+    const posts = await api("/posts?select=id,author_id,author,content,image_url,created_at,type,category,dday_date,dday_color&access=not.in.(private,link)" + SharerCategory.queryFor(catFilter) + "&order=created_at.desc&limit=" + FEED_PAGE + "&offset=" + offset);
     if (seq !== pane.seq) return;
     if (!posts?.length) {
-      feedDiv.innerHTML = catFilter === 'all'
-        ? '<div class="no-posts"><div class="no-posts-icon"> </div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요</div></div>'
-        : '<div class="no-posts"><div class="no-posts-icon"> </div><div>이 카테고리에는 아직 게시물이 없습니다.</div></div>';
+      pane.done = true;
+      pane.more.textContent = '';
+      if (offset === 0) {
+        feedDiv.innerHTML = catFilter === 'all'
+          ? '<div class="no-posts"><div class="no-posts-icon"> </div><div>아직 게시물이 없습니다.<br>첫 번째 게시물을 작성해보세요</div></div>'
+          : '<div class="no-posts"><div class="no-posts-icon"> </div><div>이 카테고리에는 아직 게시물이 없습니다.</div></div>';
+      }
       return;
     }
     posts.forEach(p => { postAuthorIdMap[p.id] = p.author_id; });
@@ -2105,7 +2141,7 @@ async function loadPane(pane) {
     const commentCountMap = {};
     (allComments || []).forEach(c => { commentCountMap[c.post_id] = (commentCountMap[c.post_id] || 0) + 1; });
 
-    feedDiv.innerHTML = '';
+    if (offset === 0) feedDiv.innerHTML = '';
     posts.forEach((post, idx) => {
       const userInfo = usersMap[post.author_id] || null;
       const authorNickname = userInfo?.nickname || post.author || '알 수 없음';
@@ -2143,7 +2179,7 @@ async function loadPane(pane) {
 
       const postCard = document.createElement('div');
       postCard.className = isAdminPost ? 'post-card admin-post' : 'post-card';
-      postCard.style.animationDelay = `${Math.min(idx, 7) * 0.07}s`;
+      postCard.style.animationDelay = `${offset === 0 ? Math.min(idx, 7) * 0.07 : 0}s`;
       postCard.innerHTML = `
         <div class="post-header">
           <div class="post-author-info" data-uid="${escapeHtml(String(post.author_id))}" data-nick="${escapeHtml(authorNickname)}" onclick="event.stopPropagation(); goToProfile(this.dataset.uid, this.dataset.nick)">
@@ -2177,10 +2213,19 @@ async function loadPane(pane) {
       };
       feedDiv.appendChild(postCard);
     });
-
+    pane.offset += posts.length;
+    pane.done = posts.length < FEED_PAGE;
+    pane.more.textContent = '';
   } catch (err) {
     console.error('게시물 로드 오류:', err);
-    feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+    if (seq !== pane.seq) return;
+    if (offset === 0) feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
+    else pane.more.textContent = '더 불러오지 못했습니다';
+  } finally {
+    if (seq === pane.seq) {
+      pane.loading = false;
+      if (!pane.done && nearEnd(pane)) loadPane(pane, true);
+    }
   }
 }
 
@@ -2222,7 +2267,8 @@ if (currentUser) {
   });
 }
 
-fetchRecentStories().then(() => loadPosts());
+fetchRecentStories();
+loadPosts();
 
 (function() {
   const scroller = document.querySelector('.main-content');
