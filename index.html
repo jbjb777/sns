@@ -1972,6 +1972,20 @@ async function runSearch(q, input, out) {
   });
 }
 
+function fillProfile(body) {
+  if (!currentUser) {
+    body.innerHTML = '<div class="sf-empty">로그인하면 내 프로필을 볼 수 있어요.<br><a href="login.html">로그인</a></div>';
+    return;
+  }
+  const av = currentUser.profile_image
+    ? `<img src="${escapeHtml(currentUser.profile_image)}" alt="">`
+    : escapeHtml((currentUser.nickname || currentUser.id || '?').charAt(0).toUpperCase());
+  body.innerHTML = `<div class="sf-profile"><div class="sf-user-av sf-profile-av">${av}</div><div class="sf-user-name">${escapeHtml(currentUser.nickname || currentUser.id)}</div><div class="sf-user-sub">@${escapeHtml(currentUser.id)}</div><button type="button" class="sf-profile-btn">프로필 보기</button></div>`;
+  body.querySelector('.sf-profile-btn').onclick = () => {
+    window.location.href = `user.html?id=${encodeURIComponent(currentUser.id)}&nickname=${encodeURIComponent(currentUser.nickname || '')}`;
+  };
+}
+
 async function fillNotify(body) {
   if (!currentUser) {
     body.innerHTML = '<div class="sf-empty">로그인하면 알림을 볼 수 있어요.</div>';
@@ -2001,7 +2015,7 @@ function applyFeedConfig(cfg, persistRemote, meta) {
   feedCfg = SharerFeed.normalize(cfg);
   SharerFeed.saveLocal(feedCfg);
   syncFeedCategory();
-  const sameKind = prev.columns.length === feedCfg.columns.length && prev.columns.every((c, i) => c.id === feedCfg.columns[i].id);
+  const sameKind = prev.showAll === feedCfg.showAll && prev.columns.length === feedCfg.columns.length && prev.columns.every((c, i) => c.id === feedCfg.columns[i].id);
   if (meta && meta.widthOnly && sameKind) {
     SharerFeed.applyWidths(document.getElementById('feedBoard'), feedCfg);
   } else {
@@ -2017,7 +2031,7 @@ function buildBoard() {
   SharerFeed.mount(host, feedCfg, (cfg, meta) => applyFeedConfig(cfg, true, meta));
   const bodies = host.querySelectorAll('[data-sf-body]');
   let composePlaced = false;
-  feedCfg.columns.forEach((col, i) => {
+  SharerFeed.visible(feedCfg).forEach((col, i) => {
     const body = bodies[i];
     if (!body) return;
     if (SharerFeed.isFeed(col.id)) {
@@ -2032,6 +2046,7 @@ function buildBoard() {
     } else if (col.id === 'recommend') fillRecommend(body);
     else if (col.id === 'search') fillSearch(body);
     else if (col.id === 'notify') fillNotify(body);
+    else if (col.id === 'profile') fillProfile(body);
   });
   updateFeedCompose();
 }

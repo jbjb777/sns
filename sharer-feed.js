@@ -25,9 +25,9 @@
   function kinds() {
     var labels = {
       all: '전체', text: '텍스트', photo: '사진', gif: '짧은 동영상',
-      game: '게임', dday: '디데이', recommend: '추천 사용자', search: '검색', notify: '알림'
+      game: '게임', dday: '디데이', recommend: '추천 사용자', search: '검색', notify: '알림', profile: '프로필'
     };
-    return feedIds().concat(['recommend', 'search', 'notify']).map(function (id) {
+    return feedIds().concat(['recommend', 'search', 'notify', 'profile']).map(function (id) {
       return { id: id, label: labels[id] || id, feed: feedIds().indexOf(id) >= 0 };
     });
   }
@@ -47,7 +47,7 @@
   }
 
   function defaults() {
-    return { v: 2, columns: [{ id: 'all', w: 'wide' }, { id: 'search', w: 'mid' }] };
+    return { v: 2, showAll: true, columns: [{ id: 'all', w: 'wide' }, { id: 'search', w: 'mid' }] };
   }
 
   function column(id, w) {
@@ -71,7 +71,13 @@
       columns.push(column(c.id, c.w));
     });
     if (!columns.length) return defaults();
-    return { v: 2, columns: columns };
+    return { v: 2, showAll: !(raw && raw.showAll === false), columns: columns };
+  }
+
+  function visible(cfg) {
+    cfg = normalize(cfg);
+    if (!cfg.showAll && cfg.columns.length > 1) return [cfg.columns[0]];
+    return cfg.columns.slice();
   }
 
   function getLocal() {
@@ -121,8 +127,17 @@
       '.sf-col-menu{width:34px;height:34px;border-radius:10px;border:1px solid var(--border2,#2a2a2a);background:var(--bg2,#111);color:var(--t1,#fff);cursor:pointer;display:flex;align-items:center;justify-content:center}',
       '.sf-col-menu:hover,.sf-col-menu.open{background:var(--bg4,#222)}',
       '.sf-col-body{flex:1;min-height:0;overflow-y:auto;padding:0 16px 28px}',
-      '.sf-add{flex:0 0 64px;margin:12px 10px;border:1px dashed var(--border2,#2a2a2a);border-radius:16px;background:transparent;color:var(--t2,#888);cursor:pointer;font:inherit;font-size:13px;font-weight:600}',
-      '.sf-add:hover{color:var(--t1,#fff);border-color:var(--t2,#888)}',
+      '.sf-plus{position:fixed;right:22px;bottom:22px;z-index:45;width:52px;height:52px;border-radius:16px;border:1px solid var(--border2,#2a2a2a);background:var(--bg2,#111);color:var(--t1,#fff);font:inherit;font-size:28px;line-height:1;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.35)}',
+      '.sf-plus:hover{background:var(--bg4,#222)}',
+      '.sf-switch{width:36px;height:22px;border-radius:999px;background:var(--bg4,#333);position:relative;flex:0 0 auto}',
+      '.sf-switch.on{background:var(--t1,#fff)}',
+      '.sf-switch i{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff}',
+      '.sf-switch.on i{left:16px;background:var(--bg,#000)}',
+      '.sf-menu button:disabled{opacity:.35;cursor:default}',
+      '.sf-profile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:8px 2px 16px}',
+      '.sf-profile-av{width:72px;height:72px;font-size:28px}',
+      '.sf-profile-btn{margin-top:10px;border:1px solid var(--border2,#2a2a2a);background:var(--bg3,#1a1a1a);color:var(--t1,#fff);font:inherit;font-size:14px;font-weight:650;padding:10px 14px;border-radius:12px;cursor:pointer}',
+      '.sf-empty a{color:var(--t1,#fff)}',
       '.sf-menu{position:fixed;z-index:80;min-width:220px;max-width:260px;padding:6px;background:var(--bg2,#161616);border:1px solid var(--border2,#2a2a2a);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.45)}',
       '.sf-menu button{display:flex;width:100%;text-align:left;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:0;color:var(--t1,#fff);font:inherit;font-size:14px;padding:9px 10px;border-radius:10px;cursor:pointer}',
       '.sf-menu button:hover{background:var(--bg4,#222)}',
@@ -152,7 +167,7 @@
       '.sf-noti:hover{background:var(--bg2,#111)}',
       '.sf-noti-detail{font-size:14px;line-height:1.45}',
       '.sf-noti-time{font-size:12px;color:var(--t3,#444);margin-top:4px}',
-      '@media (max-width:768px){.feed-board{scroll-snap-type:x mandatory}.sf-col{flex:0 0 100% !important;max-width:none !important;min-width:100%;scroll-snap-align:start}.sf-add{display:none}}'
+      '@media (max-width:768px){.feed-board{scroll-snap-type:x mandatory}.sf-col{flex:0 0 100% !important;max-width:none !important;min-width:100%;scroll-snap-align:start}.sf-plus{bottom:calc(78px + env(safe-area-inset-bottom,0px))}}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -160,9 +175,31 @@
   var menuEl = null;
   function closeMenu() {
     if (menuEl) { menuEl.remove(); menuEl = null; }
-    document.querySelectorAll('.sf-col-menu.open').forEach(function (b) { b.classList.remove('open'); });
+    document.querySelectorAll('.sf-col-menu.open,.sf-plus.open').forEach(function (b) { b.classList.remove('open'); });
   }
 
+  function placeMenu(menu, btn, above) {
+    document.body.appendChild(menu);
+    var r = btn.getBoundingClientRect();
+    var mw = menu.offsetWidth;
+    var left = Math.min(window.innerWidth - mw - 8, Math.max(8, above ? r.right - mw : r.left));
+    var top = above ? r.top - menu.offsetHeight - 8 : r.bottom + 8;
+    if (!above && top + menu.offsetHeight > window.innerHeight - 8) top = Math.max(8, r.top - menu.offsetHeight - 8);
+    if (top < 8) top = 8;
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+  }
+
+  function withColumn(cfg, id) {
+    var next = normalize(JSON.parse(JSON.stringify(cfg)));
+    next.showAll = true;
+    if (next.columns.some(function (c) { return c.id === id; })) return normalize(next);
+    if (next.columns.length >= MAX) return null;
+    next.columns.push(column(id, 'mid'));
+    return normalize(next);
+  }
+
+  /* 열 오른쪽 버튼: 이 열만 바꾼다 */
   function openMenu(btn, cfg, index, onChange) {
     closeMenu();
     btn.classList.add('open');
@@ -170,58 +207,113 @@
     var menu = document.createElement('div');
     menu.className = 'sf-menu';
     menuEl = menu;
-    var items = kinds().map(function (k) {
+    var direct = ['search', 'notify', 'profile'];
+    var feeds = kinds().filter(function (k) { return direct.indexOf(k.id) < 0; });
+    function row(k) {
       var taken = cfg.columns.some(function (c, i) { return i !== index && c.id === k.id; });
       if (taken) return '';
       var on = k.id === col.id;
       return '<button type="button" data-act="kind" data-id="' + k.id + '"' + (on ? ' class="on"' : '') + '>' +
         esc(k.label) + (on ? '<span class="sf-check">표시 중</span>' : '') + '</button>';
-    }).join('');
+    }
     var widths = WIDTHS.map(function (w) {
       return '<button type="button" data-act="width" data-w="' + w.id + '"' + (col.w === w.id ? ' class="on"' : '') + '>' + esc(w.label) + '</button>';
     }).join('');
-    var extra = '';
-    if (cfg.columns.length < MAX && nextFree(cfg)) extra += '<button type="button" data-act="add">열 추가</button>';
-    if (cfg.columns.length > 1) extra += '<button type="button" data-act="close">이 열 닫기</button>';
-    menu.innerHTML = items + '<div class="sf-rule"></div><div class="sf-widths">' + widths + '</div>' +
-      (extra ? '<div class="sf-rule"></div>' + extra : '');
-    document.body.appendChild(menu);
-    var r = btn.getBoundingClientRect();
-    var mw = menu.offsetWidth;
-    var left = Math.min(window.innerWidth - mw - 8, Math.max(8, r.right - mw));
-    var top = r.bottom + 8;
-    if (top + menu.offsetHeight > window.innerHeight - 8) top = Math.max(8, r.top - menu.offsetHeight - 8);
-    menu.style.left = left + 'px';
-    menu.style.top = top + 'px';
+    menu.innerHTML =
+      '<button type="button" data-act="feeds">기타 피드</button>' +
+      direct.map(function (id) { return row(kindOf(id)); }).join('') +
+      '<div class="sf-rule"></div><div class="sf-widths">' + widths + '</div>' +
+      (cfg.columns.length > 1 ? '<div class="sf-rule"></div><button type="button" data-act="close">이 열 닫기</button>' : '');
+    placeMenu(menu, btn, false);
     menu.addEventListener('click', function (e) {
+      e.stopPropagation();
       var b = e.target.closest('button');
-      if (!b) return;
-      var next = normalize(JSON.parse(JSON.stringify(cfg)));
+      if (!b || b.disabled) return;
       var act = b.getAttribute('data-act');
-      var meta = { widthOnly: false };
-      if (act === 'kind') {
-        next.columns[index].id = b.getAttribute('data-id');
-      } else if (act === 'width') {
-        next.columns[index].w = b.getAttribute('data-w');
-        meta.widthOnly = next.columns.every(function (c, i) { return c.id === cfg.columns[i].id; });
-      } else if (act === 'add') {
-        var id = nextFree(next);
-        if (!id) return;
-        next.columns.push(column(id, 'mid'));
-      } else if (act === 'close') {
-        next.columns.splice(index, 1);
+      if (act === 'feeds') {
+        menu.innerHTML = '<button type="button" data-act="back">기타 피드</button><div class="sf-rule"></div>' +
+          feeds.map(row).join('');
+        return;
       }
+      if (act === 'back') {
+        openMenu(btn, cfg, index, onChange);
+        return;
+      }
+      var next = normalize(JSON.parse(JSON.stringify(cfg)));
+      var meta = { widthOnly: false };
+      if (act === 'kind') next.columns[index].id = b.getAttribute('data-id');
+      else if (act === 'width') {
+        next.columns[index].w = b.getAttribute('data-w');
+        meta.widthOnly = true;
+      } else if (act === 'close') next.columns.splice(index, 1);
       closeMenu();
       onChange(normalize(next), meta);
+    });
+  }
+
+  /* 오른쪽 아래 +: 열을 추가하거나, 몇 개나 보여줄지 고른다 */
+  function openAddMenu(btn, cfg, onChange) {
+    closeMenu();
+    btn.classList.add('open');
+    var menu = document.createElement('div');
+    menu.className = 'sf-menu';
+    menuEl = menu;
+    var n = Math.max(2, cfg.columns.length);
+    var on = cfg.columns.length > 1 && cfg.showAll !== false;
+    function item(id, label) {
+      var has = cfg.columns.some(function (c) { return c.id === id; });
+      var full = !has && cfg.columns.length >= MAX;
+      return '<button type="button" data-act="add" data-id="' + id + '"' + (full ? ' disabled' : '') + '>' +
+        esc(label) + (has ? '<span class="sf-check">있음</span>' : '') + '</button>';
+    }
+    menu.innerHTML =
+      '<button type="button" data-act="toggle">열 ' + n + '개 표시<span class="sf-switch' + (on ? ' on' : '') + '"><i></i></span></button>' +
+      '<div class="sf-rule"></div>' +
+      '<button type="button" data-act="add-free"' + (cfg.columns.length >= MAX ? ' disabled' : '') + '>열 추가</button>' +
+      item('search', '검색') + item('notify', '알림') + item('profile', '프로필') +
+      '<button type="button" data-act="feeds">기타 피드</button>';
+    placeMenu(menu, btn, true);
+    menu.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var b = e.target.closest('button');
+      if (!b || b.disabled) return;
+      var act = b.getAttribute('data-act');
+      if (act === 'feeds') {
+        var feeds = kinds().filter(function (k) { return ['search', 'notify', 'profile'].indexOf(k.id) < 0; });
+        menu.innerHTML = '<button type="button" data-act="back">기타 피드</button><div class="sf-rule"></div>' +
+          feeds.map(function (k) { return item(k.id, k.label); }).join('');
+        return;
+      }
+      if (act === 'back') { openAddMenu(btn, cfg, onChange); return; }
+      var next = null;
+      if (act === 'toggle') {
+        next = normalize(JSON.parse(JSON.stringify(cfg)));
+        if (next.columns.length < 2) {
+          var id = nextFree(next);
+          if (!id) return;
+          next.columns.push(column(id, 'mid'));
+          next.showAll = true;
+        } else next.showAll = !next.showAll;
+      } else if (act === 'add-free') {
+        var free = nextFree(cfg);
+        if (!free) return;
+        next = withColumn(cfg, free);
+      } else if (act === 'add') {
+        next = withColumn(cfg, b.getAttribute('data-id'));
+      }
+      if (!next) return;
+      closeMenu();
+      onChange(next, { widthOnly: false });
     });
   }
 
   function applyWidths(host, cfg) {
     cfg = normalize(cfg);
     host._sfCfg = cfg;
-    host.className = 'feed-board count-' + cfg.columns.length;
+    var shown = visible(cfg);
+    host.className = 'feed-board count-' + shown.length;
     var cols = host.querySelectorAll('.sf-col');
-    cfg.columns.forEach(function (c, i) {
+    shown.forEach(function (c, i) {
       if (!cols[i]) return;
       cols[i].classList.remove('w-narrow', 'w-mid', 'w-wide');
       cols[i].classList.add('w-' + widthOf(c.w).id);
@@ -235,15 +327,17 @@
     closeMenu();
     cfg = normalize(cfg);
     host._sfCfg = cfg;
-    host.className = 'feed-board count-' + cfg.columns.length;
-    var html = cfg.columns.map(function (c, i) {
+    var shown = visible(cfg);
+    host.className = 'feed-board count-' + shown.length;
+    var html = shown.map(function (c) {
+      var i = cfg.columns.findIndex(function (x) { return x.id === c.id; });
       return '<section class="sf-col w-' + widthOf(c.w).id + '" data-i="' + i + '">' +
         '<header class="sf-col-head"><h2>' + esc(labelOf(c.id)) + '</h2>' +
         '<button type="button" class="sf-col-menu" aria-label="이 열 바꾸기" data-i="' + i + '">' +
         '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1.5" y="2" width="5" height="12" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9.5" y="2" width="5" height="12" rx="1.2" stroke="currentColor" stroke-width="1.4"/></svg>' +
         '</button></header><div class="sf-col-body" data-sf-body></div></section>';
     }).join('');
-    if (cfg.columns.length < MAX) html += '<button type="button" class="sf-add" data-act="add">+ 열</button>';
+    html += '<button type="button" class="sf-plus" aria-label="열 추가">+</button>';
     host.innerHTML = html;
     host.onclick = function (e) {
       var menuBtn = e.target.closest('.sf-col-menu');
@@ -254,20 +348,18 @@
         else openMenu(menuBtn, host._sfCfg, i, onChange);
         return;
       }
-      if (e.target.closest('.sf-add')) {
-        var live = host._sfCfg;
-        var id = nextFree(live);
-        if (!id) return;
-        var next = normalize(JSON.parse(JSON.stringify(live)));
-        next.columns.push(column(id, 'mid'));
-        onChange(normalize(next), { widthOnly: false });
+      var plus = e.target.closest('.sf-plus');
+      if (plus) {
+        e.stopPropagation();
+        if (menuEl && plus.classList.contains('open')) closeMenu();
+        else openAddMenu(plus, host._sfCfg, onChange);
       }
     };
   }
 
   document.addEventListener('click', function (e) {
     if (!menuEl) return;
-    if (e.target.closest('.sf-menu') || e.target.closest('.sf-col-menu')) return;
+    if (e.target.closest('.sf-menu') || e.target.closest('.sf-col-menu') || e.target.closest('.sf-plus')) return;
     closeMenu();
   });
   document.addEventListener('keydown', function (e) {
@@ -280,6 +372,7 @@
     normalize: normalize,
     labelOf: labelOf,
     isFeed: isFeed,
+    visible: visible,
     getLocal: getLocal,
     saveLocal: saveLocal,
     loadRemote: loadRemote,
