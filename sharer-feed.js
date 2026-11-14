@@ -1,235 +1,291 @@
-/* sharer-feed.js — 홈 피드 맞춤설정 (피드 최대 3개 배치)
- * 설정 모양:
- *   { v:1,
- *     feeds:[{c:'all'},{c:'game'},{c:'photo'}],      // 1~3개, c = 'all' 또는 카테고리 id (중복 불가)
- *     layout:'tabs' | 'columns',                      // 탭으로 전환 / 나란히(넓은 화면)
- *     recommend:{ pos:'side'|'top'|'inline'|'hidden', every:8 } }  // 추천 사용자 위치
- * 저장: localStorage('sharerFeedLayout') + 로그인 상태면 users.feed_layout(jsonb)
+/* sharer-feed.js — 홈을 가로 열로 배치 (최대 3개)
+ * 설정:
+ *   { v:2, columns:[{ id:'all', w:'wide' }, { id:'search', w:'mid' }] }
+ *   id: all | text | photo | gif | game | dday | recommend | search | notify
+ *   w : narrow | mid | wide
+ * 저장: localStorage('sharerFeedLayout') + 로그인 시 users.feed_layout
+ * 예전 { feeds, layout, recommend } 설정도 열로 옮긴다.
  */
 (function () {
   'use strict';
   var MAX = 3;
   var LS = 'sharerFeedLayout';
-  var POS = [
-    { id: 'side',   label: '오른쪽 옆 (PC)' },
-    { id: 'top',    label: '피드 위 가로 목록' },
-    { id: 'inline', label: '피드 중간에 끼워넣기' },
-    { id: 'hidden', label: '숨기기' }
+  var WIDTHS = [
+    { id: 'narrow', label: '좁게', grow: 0.72 },
+    { id: 'mid', label: '보통', grow: 1 },
+    { id: 'wide', label: '넓게', grow: 1.4 }
   ];
-  var EVERY = [5, 8, 12];
 
-  function cats() {
-    return [{ id: 'all', label: '전체' }].concat(
-      (window.SharerCategory ? SharerCategory.CATEGORIES : []).map(function (c) { return { id: c.id, label: c.label }; })
-    );
+  function feedIds() {
+    var extra = (window.SharerCategory && SharerCategory.CATEGORIES) || [
+      { id: 'text' }, { id: 'photo' }, { id: 'gif' }, { id: 'dday' }, { id: 'game' }
+    ];
+    return ['all'].concat(extra.map(function (c) { return c.id; }));
+  }
+  function kinds() {
+    var labels = {
+      all: '전체', text: '텍스트', photo: '사진', gif: '짧은 동영상',
+      game: '게임', dday: '디데이', recommend: '추천 사용자', search: '검색', notify: '알림'
+    };
+    return feedIds().concat(['recommend', 'search', 'notify']).map(function (id) {
+      return { id: id, label: labels[id] || id, feed: feedIds().indexOf(id) >= 0 };
+    });
+  }
+  function kindOf(id) {
+    return kinds().filter(function (k) { return k.id === id; })[0] || null;
   }
   function labelOf(id) {
-    var f = cats().filter(function (c) { return c.id === id; })[0];
-    return f ? f.label : '';
+    var k = kindOf(id);
+    return k ? k.label : '';
+  }
+  function isFeed(id) { return feedIds().indexOf(id) >= 0; }
+  function widthOf(id) {
+    return WIDTHS.filter(function (w) { return w.id === id; })[0] || WIDTHS[1];
   }
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
 
   function defaults() {
-    return { v: 1, feeds: [{ c: 'all' }], layout: 'tabs', recommend: { pos: 'side', every: 8 } };
+    return { v: 2, columns: [{ id: 'all', w: 'wide' }, { id: 'search', w: 'mid' }] };
   }
 
-  /* 어떤 값이 들어와도 안전한 설정으로 정리 */
+  function column(id, w) {
+    return { id: kindOf(id) ? id : 'all', w: widthOf(w).id };
+  }
+
   function normalize(raw) {
-    var d = defaults();
-    if (!raw || typeof raw !== 'object') return d;
-    var valid = cats().map(function (c) { return c.id; });
+    var src = [];
+    if (raw && Array.isArray(raw.columns)) {
+      src = raw.columns.map(function (c) { return { id: c && c.id, w: c && c.w }; });
+    } else if (raw && Array.isArray(raw.feeds)) {
+      src = raw.feeds.map(function (f) { return { id: f && f.c, w: 'mid' }; });
+      var pos = raw.recommend && raw.recommend.pos;
+      if (pos && pos !== 'hidden') src.push({ id: 'recommend', w: 'narrow' });
+    }
     var seen = {};
-    var feeds = [];
-    (Array.isArray(raw.feeds) ? raw.feeds : []).forEach(function (f) {
-      var c = f && f.c;
-      if (valid.indexOf(c) >= 0 && !seen[c] && feeds.length < MAX) { seen[c] = 1; feeds.push({ c: c }); }
+    var columns = [];
+    src.forEach(function (c) {
+      if (!c || !kindOf(c.id) || seen[c.id] || columns.length >= MAX) return;
+      seen[c.id] = 1;
+      columns.push(column(c.id, c.w));
     });
-    if (!feeds.length) feeds = d.feeds;
-    var layout = raw.layout === 'columns' ? 'columns' : 'tabs';
-    var rec = raw.recommend || {};
-    var pos = POS.some(function (p) { return p.id === rec.pos; }) ? rec.pos : 'side';
-    var every = EVERY.indexOf(rec.every) >= 0 ? rec.every : 8;
-    return { v: 1, feeds: feeds, layout: layout, recommend: { pos: pos, every: every } };
+    if (!columns.length) return defaults();
+    return { v: 2, columns: columns };
   }
 
   function getLocal() {
     try { return normalize(JSON.parse(localStorage.getItem(LS))); } catch (e) { return defaults(); }
   }
-  function saveLocal(cfg) { try { localStorage.setItem(LS, JSON.stringify(cfg)); } catch (e) {} }
+  function saveLocal(cfg) { try { localStorage.setItem(LS, JSON.stringify(normalize(cfg))); } catch (e) {} }
 
   function loadRemote(api, userId) {
     if (!userId) return Promise.resolve(null);
     return api('/users?id=eq.' + encodeURIComponent(userId) + '&select=feed_layout').then(function (rows) {
       var v = rows && rows[0] && rows[0].feed_layout;
       return v ? normalize(v) : null;
-    }).catch(function () { return null; });   // 컬럼이 아직 없으면 조용히 무시
+    }).catch(function () { return null; });
   }
   function saveRemote(api, userId, cfg) {
     if (!userId) return Promise.resolve(false);
     return api('/users?id=eq.' + encodeURIComponent(userId), {
-      method: 'PATCH', body: JSON.stringify({ feed_layout: cfg }), headers: { Prefer: 'return=minimal' }
+      method: 'PATCH', body: JSON.stringify({ feed_layout: normalize(cfg) }), headers: { Prefer: 'return=minimal' }
     }).then(function () { return true; }).catch(function () { return false; });
   }
 
-  /* ---------- 스타일 ---------- */
+  function unused(cfg, except) {
+    var taken = cfg.columns.map(function (c) { return c.id; }).filter(function (id) { return id !== except; });
+    return kinds().filter(function (k) { return taken.indexOf(k.id) < 0; });
+  }
+  function nextFree(cfg) {
+    var order = ['search', 'recommend', 'notify', 'text', 'photo', 'gif', 'game', 'dday', 'all'];
+    var free = unused(cfg, null).map(function (k) { return k.id; });
+    for (var i = 0; i < order.length; i++) if (free.indexOf(order[i]) >= 0) return order[i];
+    return free[0] || null;
+  }
+
   function injectStyle() {
     if (document.getElementById('sf-style')) return;
     var st = document.createElement('style');
     st.id = 'sf-style';
     st.textContent = [
-      '.sf-tabs{display:flex;align-items:center;gap:8px;margin:0 0 14px}',
-      '.sf-tabs .sf-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex:1}',
-      '.sf-tabs .sf-scroll::-webkit-scrollbar{display:none}',
-      '.sf-tab{flex:0 0 auto;border:1px solid var(--border2,#2a2a2a);background:var(--bg3,#1a1a1a);color:var(--t2,#888);font:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}',
-      '.sf-tab.active{background:var(--t1,#fff);color:var(--bg,#000);border-color:var(--t1,#fff)}',
-      '.sf-gear{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--border2,#2a2a2a);background:var(--bg3,#1a1a1a);color:var(--t1,#fff);cursor:pointer;font-size:15px}',
-      '.sf-gear:hover{background:var(--bg4,#222)}',
-      '.sf-columns{display:grid;gap:16px;align-items:start}',
-      '.sf-col-head{font-size:13px;font-weight:700;color:var(--t2,#888);margin:0 0 10px;padding-left:2px}',
-      '.sf-rec-strip{margin:0 0 14px;padding:12px;border:1px solid var(--border,#1e1e1e);border-radius:18px;background:var(--bg2,#111)}',
-      '.sf-rec-title{font-size:12px;font-weight:700;color:var(--t2,#888);margin:0 0 10px}',
-      '.sf-rec-row{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none}',
-      '.sf-rec-row::-webkit-scrollbar{display:none}',
-      '.sf-rec-item{flex:0 0 auto;width:68px;text-align:center;cursor:pointer}',
-      '.sf-rec-av{width:52px;height:52px;border-radius:50%;margin:0 auto 6px;background:var(--bg4,#222);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--t1,#fff);overflow:hidden}',
-      '.sf-rec-av img{width:100%;height:100%;object-fit:cover}',
-      '.sf-rec-nick{font-size:11px;color:var(--t2,#888);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.sf-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}',
-      '.sf-box{width:100%;max-width:440px;max-height:90vh;overflow-y:auto;background:var(--bg2,#111);color:var(--t1,#fff);border:1px solid var(--border2,#2a2a2a);border-radius:20px;padding:22px}',
-      '.sf-box h3{font-size:17px;margin:0 0 4px}',
-      '.sf-box .sf-sub{font-size:12px;color:var(--t2,#888);margin:0 0 16px}',
-      '.sf-sec{margin:0 0 18px}',
-      '.sf-sec-title{font-size:12px;font-weight:700;color:var(--t2,#888);margin:0 0 8px}',
-      '.sf-row{display:flex;align-items:center;gap:8px;margin:0 0 8px}',
-      '.sf-row select{flex:1;background:var(--bg3,#1a1a1a);color:var(--t1,#fff);border:1px solid var(--border2,#2a2a2a);border-radius:10px;padding:9px 10px;font:inherit;font-size:14px}',
-      '.sf-mini{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2,#2a2a2a);background:var(--bg3,#1a1a1a);color:var(--t1,#fff);cursor:pointer;font:inherit}',
-      '.sf-mini:disabled{opacity:.35;cursor:default}',
-      '.sf-btn{border:1px solid var(--border2,#2a2a2a);background:var(--bg3,#1a1a1a);color:var(--t1,#fff);font:inherit;font-size:13px;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer}',
-      '.sf-btn.primary{background:var(--t1,#fff);color:var(--bg,#000);border-color:var(--t1,#fff)}',
-      '.sf-actions{display:flex;gap:8px;justify-content:space-between;margin-top:6px;flex-wrap:wrap}',
-      '.sf-radio{display:flex;flex-direction:column;gap:6px}',
-      '.sf-radio label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}',
-      '@media (max-width:900px){.sf-columns{display:block}.sf-columns>.sf-col{margin-bottom:24px}}'
+      '.feed-board{display:flex;align-items:stretch;gap:0;width:100%;height:100%;min-height:0;overflow-x:auto;overflow-y:hidden}',
+      '.feed-board.count-1{justify-content:center}',
+      '.sf-col{min-width:280px;height:100%;display:flex;flex-direction:column;border-right:1px solid var(--border,#1e1e1e);background:var(--bg,#000)}',
+      '.feed-board.count-1 .sf-col{border-right:none;width:min(640px,100%)}',
+      '.sf-col.w-narrow{flex:0.72 1 0;max-width:420px}',
+      '.sf-col.w-mid{flex:1 1 0;max-width:560px}',
+      '.sf-col.w-wide{flex:1.4 1 0;max-width:680px}',
+      '.sf-col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px 10px;flex:0 0 auto}',
+      '.sf-col-head h2{font-size:16px;font-weight:700;letter-spacing:-0.3px}',
+      '.sf-col-menu{width:34px;height:34px;border-radius:10px;border:1px solid var(--border2,#2a2a2a);background:var(--bg2,#111);color:var(--t1,#fff);cursor:pointer;display:flex;align-items:center;justify-content:center}',
+      '.sf-col-menu:hover,.sf-col-menu.open{background:var(--bg4,#222)}',
+      '.sf-col-body{flex:1;min-height:0;overflow-y:auto;padding:0 16px 28px}',
+      '.sf-add{flex:0 0 64px;margin:12px 10px;border:1px dashed var(--border2,#2a2a2a);border-radius:16px;background:transparent;color:var(--t2,#888);cursor:pointer;font:inherit;font-size:13px;font-weight:600}',
+      '.sf-add:hover{color:var(--t1,#fff);border-color:var(--t2,#888)}',
+      '.sf-menu{position:fixed;z-index:80;min-width:220px;max-width:260px;padding:6px;background:var(--bg2,#161616);border:1px solid var(--border2,#2a2a2a);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.45)}',
+      '.sf-menu button{display:flex;width:100%;text-align:left;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:0;color:var(--t1,#fff);font:inherit;font-size:14px;padding:9px 10px;border-radius:10px;cursor:pointer}',
+      '.sf-menu button:hover{background:var(--bg4,#222)}',
+      '.sf-menu button.on{font-weight:700}',
+      '.sf-menu .sf-rule{height:1px;background:var(--border,#1e1e1e);margin:4px 6px}',
+      '.sf-menu .sf-widths{display:flex;gap:4px;padding:4px}',
+      '.sf-menu .sf-widths button{justify-content:center;border:1px solid var(--border2,#2a2a2a);border-radius:999px;padding:6px 0}',
+      '.sf-menu .sf-widths button.on{background:var(--t1,#fff);color:var(--bg,#000)}',
+      '.sf-check{font-size:12px;color:var(--t2,#888)}',
+      '.sf-search{width:100%;background:var(--bg3,#1a1a1a);border:1px solid var(--border2,#2a2a2a);color:var(--t1,#fff);border-radius:999px;padding:11px 14px;font:inherit;font-size:14px;outline:none;margin:4px 0 14px}',
+      '.sf-search:focus{border-color:var(--border3,#333)}',
+      '.sf-sec-label{font-size:12px;font-weight:700;color:var(--t2,#888);margin:4px 0 8px}',
+      '.sf-user{display:flex;gap:10px;align-items:center;padding:8px 4px;cursor:pointer;border-radius:12px}',
+      '.sf-user:hover{background:var(--bg3,#1a1a1a)}',
+      '.sf-user-av{width:40px;height:40px;border-radius:50%;overflow:hidden;background:var(--bg4,#222);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;color:var(--t1,#fff)}',
+      '.sf-user-av img{width:100%;height:100%;object-fit:cover;display:block}',
+      '.sf-user-name{font-size:14px;font-weight:650;color:var(--t1,#fff)}',
+      '.sf-user-sub{font-size:12px;color:var(--t2,#888);margin-top:2px}',
+      '.sf-empty,.sf-note{color:var(--t2,#888);font-size:13px;line-height:1.5}',
+      '.sf-empty{text-align:center;padding:28px 8px}',
+      '.sf-note{padding:0 2px 12px}',
+      '.sf-hit{padding:12px 2px;border-bottom:1px solid var(--border,#1e1e1e);cursor:pointer}',
+      '.sf-hit:hover{background:var(--bg2,#111)}',
+      '.sf-hit-title{font-size:14px;font-weight:650}',
+      '.sf-hit-sub{font-size:13px;color:var(--t2,#888);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
+      '.sf-noti{padding:12px 2px;border-bottom:1px solid var(--border,#1e1e1e);cursor:pointer}',
+      '.sf-noti:hover{background:var(--bg2,#111)}',
+      '.sf-noti-detail{font-size:14px;line-height:1.45}',
+      '.sf-noti-time{font-size:12px;color:var(--t3,#444);margin-top:4px}',
+      '@media (max-width:768px){.feed-board{scroll-snap-type:x mandatory}.sf-col{flex:0 0 100% !important;max-width:none !important;min-width:100%;scroll-snap-align:start}.sf-add{display:none}}'
     ].join('');
     document.head.appendChild(st);
   }
 
-  /* ---------- 탭 바 (피드가 1개면 탭 없이 ⚙ 만 표시) ---------- */
-  function tabBar(host, cfg, activeIdx, handlers) {
+  var menuEl = null;
+  function closeMenu() {
+    if (menuEl) { menuEl.remove(); menuEl = null; }
+    document.querySelectorAll('.sf-col-menu.open').forEach(function (b) { b.classList.remove('open'); });
+  }
+
+  function openMenu(btn, cfg, index, onChange) {
+    closeMenu();
+    btn.classList.add('open');
+    var col = cfg.columns[index];
+    var menu = document.createElement('div');
+    menu.className = 'sf-menu';
+    menuEl = menu;
+    var items = kinds().map(function (k) {
+      var taken = cfg.columns.some(function (c, i) { return i !== index && c.id === k.id; });
+      if (taken) return '';
+      var on = k.id === col.id;
+      return '<button type="button" data-act="kind" data-id="' + k.id + '"' + (on ? ' class="on"' : '') + '>' +
+        esc(k.label) + (on ? '<span class="sf-check">표시 중</span>' : '') + '</button>';
+    }).join('');
+    var widths = WIDTHS.map(function (w) {
+      return '<button type="button" data-act="width" data-w="' + w.id + '"' + (col.w === w.id ? ' class="on"' : '') + '>' + esc(w.label) + '</button>';
+    }).join('');
+    var extra = '';
+    if (cfg.columns.length < MAX && nextFree(cfg)) extra += '<button type="button" data-act="add">열 추가</button>';
+    if (cfg.columns.length > 1) extra += '<button type="button" data-act="close">이 열 닫기</button>';
+    menu.innerHTML = items + '<div class="sf-rule"></div><div class="sf-widths">' + widths + '</div>' +
+      (extra ? '<div class="sf-rule"></div>' + extra : '');
+    document.body.appendChild(menu);
+    var r = btn.getBoundingClientRect();
+    var mw = menu.offsetWidth;
+    var left = Math.min(window.innerWidth - mw - 8, Math.max(8, r.right - mw));
+    var top = r.bottom + 8;
+    if (top + menu.offsetHeight > window.innerHeight - 8) top = Math.max(8, r.top - menu.offsetHeight - 8);
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    menu.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      var next = normalize(JSON.parse(JSON.stringify(cfg)));
+      var act = b.getAttribute('data-act');
+      var meta = { widthOnly: false };
+      if (act === 'kind') {
+        next.columns[index].id = b.getAttribute('data-id');
+      } else if (act === 'width') {
+        next.columns[index].w = b.getAttribute('data-w');
+        meta.widthOnly = next.columns.every(function (c, i) { return c.id === cfg.columns[i].id; });
+      } else if (act === 'add') {
+        var id = nextFree(next);
+        if (!id) return;
+        next.columns.push(column(id, 'mid'));
+      } else if (act === 'close') {
+        next.columns.splice(index, 1);
+      }
+      closeMenu();
+      onChange(normalize(next), meta);
+    });
+  }
+
+  function applyWidths(host, cfg) {
+    cfg = normalize(cfg);
+    host._sfCfg = cfg;
+    host.className = 'feed-board count-' + cfg.columns.length;
+    var cols = host.querySelectorAll('.sf-col');
+    cfg.columns.forEach(function (c, i) {
+      if (!cols[i]) return;
+      cols[i].classList.remove('w-narrow', 'w-mid', 'w-wide');
+      cols[i].classList.add('w-' + widthOf(c.w).id);
+      var title = cols[i].querySelector('h2');
+      if (title) title.textContent = labelOf(c.id);
+    });
+  }
+
+  function mount(host, cfg, onChange) {
     injectStyle();
-    var tabs = cfg.feeds.length > 1 && cfg.layout === 'tabs'
-      ? '<div class="sf-scroll">' + cfg.feeds.map(function (f, i) {
-          return '<button type="button" class="sf-tab' + (i === activeIdx ? ' active' : '') + '" data-i="' + i + '">' + esc(labelOf(f.c)) + '</button>';
-        }).join('') + '</div>'
-      : '<div class="sf-scroll"></div>';
-    host.className = 'sf-tabs';
-    host.innerHTML = tabs + '<button type="button" class="sf-gear" title="피드 맞춤 설정" aria-label="피드 맞춤 설정">⚙</button>';
+    closeMenu();
+    cfg = normalize(cfg);
+    host._sfCfg = cfg;
+    host.className = 'feed-board count-' + cfg.columns.length;
+    var html = cfg.columns.map(function (c, i) {
+      return '<section class="sf-col w-' + widthOf(c.w).id + '" data-i="' + i + '">' +
+        '<header class="sf-col-head"><h2>' + esc(labelOf(c.id)) + '</h2>' +
+        '<button type="button" class="sf-col-menu" aria-label="이 열 바꾸기" data-i="' + i + '">' +
+        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1.5" y="2" width="5" height="12" rx="1.2" stroke="currentColor" stroke-width="1.4"/><rect x="9.5" y="2" width="5" height="12" rx="1.2" stroke="currentColor" stroke-width="1.4"/></svg>' +
+        '</button></header><div class="sf-col-body" data-sf-body></div></section>';
+    }).join('');
+    if (cfg.columns.length < MAX) html += '<button type="button" class="sf-add" data-act="add">+ 열</button>';
+    host.innerHTML = html;
     host.onclick = function (e) {
-      var t = e.target.closest('.sf-tab');
-      if (t) return handlers.onSelect(parseInt(t.getAttribute('data-i'), 10));
-      if (e.target.closest('.sf-gear')) handlers.onSettings();
+      var menuBtn = e.target.closest('.sf-col-menu');
+      if (menuBtn) {
+        e.stopPropagation();
+        var i = parseInt(menuBtn.getAttribute('data-i'), 10);
+        if (menuEl && menuBtn.classList.contains('open')) closeMenu();
+        else openMenu(menuBtn, host._sfCfg, i, onChange);
+        return;
+      }
+      if (e.target.closest('.sf-add')) {
+        var live = host._sfCfg;
+        var id = nextFree(live);
+        if (!id) return;
+        var next = normalize(JSON.parse(JSON.stringify(live)));
+        next.columns.push(column(id, 'mid'));
+        onChange(normalize(next), { widthOnly: false });
+      }
     };
   }
 
-  /* ---------- 추천 사용자 가로 목록 ---------- */
-  function recStrip(users, onClick) {
-    injectStyle();
-    var items = users.map(function (u) {
-      var av = u.profile_image
-        ? '<img src="' + esc(u.profile_image) + '" alt="">'
-        : esc((u.nickname || '?').charAt(0).toUpperCase());
-      return '<div class="sf-rec-item" data-uid="' + esc(u.id) + '" data-nick="' + esc(u.nickname) + '">' +
-        '<div class="sf-rec-av">' + av + '</div><div class="sf-rec-nick">' + esc(u.nickname) + '</div></div>';
-    }).join('');
-    var el = document.createElement('div');
-    el.className = 'sf-rec-strip';
-    el.innerHTML = '<div class="sf-rec-title">추천 프로필</div><div class="sf-rec-row">' + items + '</div>';
-    el.addEventListener('click', function (e) {
-      var it = e.target.closest('.sf-rec-item');
-      if (it) onClick(it.getAttribute('data-uid'), it.getAttribute('data-nick'));
-    });
-    return el;
-  }
-
-  /* ---------- 설정 창 ---------- */
-  function openEditor(current, onSave) {
-    injectStyle();
-    var cfg = normalize(JSON.parse(JSON.stringify(current)));
-    var modal = document.createElement('div');
-    modal.className = 'sf-modal';
-    document.body.appendChild(modal);
-
-    function used() { return cfg.feeds.map(function (f) { return f.c; }); }
-
-    function render() {
-      var rows = cfg.feeds.map(function (f, i) {
-        var opts = cats().filter(function (c) { return c.id === f.c || used().indexOf(c.id) < 0; })
-          .map(function (c) { return '<option value="' + c.id + '"' + (c.id === f.c ? ' selected' : '') + '>' + esc(c.label) + '</option>'; }).join('');
-        return '<div class="sf-row" data-i="' + i + '">' +
-          '<select class="sf-sel">' + opts + '</select>' +
-          '<button type="button" class="sf-mini" data-act="up"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
-          '<button type="button" class="sf-mini" data-act="down"' + (i === cfg.feeds.length - 1 ? ' disabled' : '') + '>↓</button>' +
-          '<button type="button" class="sf-mini" data-act="del"' + (cfg.feeds.length === 1 ? ' disabled' : '') + '>✕</button></div>';
-      }).join('');
-      var canAdd = cfg.feeds.length < MAX && cats().some(function (c) { return used().indexOf(c.id) < 0; });
-      var posRadios = POS.map(function (p) {
-        return '<label><input type="radio" name="sfpos" value="' + p.id + '"' + (cfg.recommend.pos === p.id ? ' checked' : '') + '> ' + esc(p.label) + '</label>';
-      }).join('');
-      var everyOpts = EVERY.map(function (n) { return '<option value="' + n + '"' + (cfg.recommend.every === n ? ' selected' : '') + '>' + n + '개마다</option>'; }).join('');
-      modal.innerHTML =
-        '<div class="sf-box" role="dialog" aria-label="피드 맞춤 설정">' +
-        '<h3>피드 맞춤 설정</h3><p class="sf-sub">피드는 최대 ' + MAX + '개까지 배치할 수 있어요.</p>' +
-        '<div class="sf-sec"><div class="sf-sec-title">내 피드 (' + cfg.feeds.length + '/' + MAX + ')</div>' + rows +
-          '<button type="button" class="sf-btn" data-act="add"' + (canAdd ? '' : ' disabled style="opacity:.35"') + '>＋ 피드 추가</button></div>' +
-        '<div class="sf-sec"><div class="sf-sec-title">배치 방식</div><div class="sf-radio">' +
-          '<label><input type="radio" name="sflay" value="tabs"' + (cfg.layout === 'tabs' ? ' checked' : '') + '> 탭으로 전환</label>' +
-          '<label><input type="radio" name="sflay" value="columns"' + (cfg.layout === 'columns' ? ' checked' : '') + '> 나란히 보기 (넓은 화면에서만, 좁으면 세로로)</label></div></div>' +
-        '<div class="sf-sec"><div class="sf-sec-title">추천 사용자 위치</div><div class="sf-radio">' + posRadios + '</div>' +
-          '<div class="sf-row" style="margin-top:8px"><select class="sf-every"' + (cfg.recommend.pos === 'inline' ? '' : ' disabled') + '>' + everyOpts + '</select></div></div>' +
-        '<div class="sf-actions"><button type="button" class="sf-btn" data-act="reset">기본값</button>' +
-        '<span><button type="button" class="sf-btn" data-act="cancel">취소</button> <button type="button" class="sf-btn primary" data-act="save">저장</button></span></div></div>';
-    }
-
-    function close() { modal.remove(); }
-
-    modal.addEventListener('click', function (e) {
-      if (e.target === modal) return close();
-      var b = e.target.closest('[data-act]');
-      if (!b || b.disabled) return;
-      var act = b.getAttribute('data-act');
-      var row = b.closest('.sf-row');
-      var i = row ? parseInt(row.getAttribute('data-i'), 10) : -1;
-      if (act === 'up' && i > 0) { var t = cfg.feeds[i]; cfg.feeds[i] = cfg.feeds[i - 1]; cfg.feeds[i - 1] = t; render(); }
-      else if (act === 'down' && i < cfg.feeds.length - 1) { var t2 = cfg.feeds[i]; cfg.feeds[i] = cfg.feeds[i + 1]; cfg.feeds[i + 1] = t2; render(); }
-      else if (act === 'del' && cfg.feeds.length > 1) { cfg.feeds.splice(i, 1); render(); }
-      else if (act === 'add' && cfg.feeds.length < MAX) {
-        var free = cats().filter(function (c) { return used().indexOf(c.id) < 0; })[0];
-        if (free) { cfg.feeds.push({ c: free.id }); render(); }
-      }
-      else if (act === 'reset') { cfg = defaults(); render(); }
-      else if (act === 'cancel') close();
-      else if (act === 'save') { close(); onSave(normalize(cfg)); }
-    });
-    modal.addEventListener('change', function (e) {
-      var t = e.target;
-      if (t.classList.contains('sf-sel')) {
-        var i = parseInt(t.closest('.sf-row').getAttribute('data-i'), 10);
-        cfg.feeds[i] = { c: t.value };
-      } else if (t.name === 'sflay') cfg.layout = t.value;
-      else if (t.name === 'sfpos') { cfg.recommend.pos = t.value; render(); }
-      else if (t.classList.contains('sf-every')) cfg.recommend.every = parseInt(t.value, 10);
-    });
-    document.addEventListener('keydown', function esc2(e) {
-      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc2); }
-    });
-    render();
-  }
+  document.addEventListener('click', function (e) {
+    if (!menuEl) return;
+    if (e.target.closest('.sf-menu') || e.target.closest('.sf-col-menu')) return;
+    closeMenu();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeMenu();
+  });
 
   window.SharerFeed = {
-    MAX: MAX, POS: POS, defaults: defaults, normalize: normalize, labelOf: labelOf,
-    getLocal: getLocal, saveLocal: saveLocal, loadRemote: loadRemote, saveRemote: saveRemote,
-    tabBar: tabBar, recStrip: recStrip, openEditor: openEditor
+    MAX: MAX,
+    defaults: defaults,
+    normalize: normalize,
+    labelOf: labelOf,
+    isFeed: isFeed,
+    getLocal: getLocal,
+    saveLocal: saveLocal,
+    loadRemote: loadRemote,
+    saveRemote: saveRemote,
+    mount: mount,
+    applyWidths: applyWidths,
+    closeMenu: closeMenu
   };
 })();

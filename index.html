@@ -126,7 +126,8 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--t1);
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       -webkit-font-smoothing: antialiased;
@@ -268,15 +269,19 @@ opacity: 1;
       display: flex;
       flex-direction: column;
       flex: 1;
+      height: 100vh;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .main-content {
       flex: 1;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 36px 28px;
-      overflow-y: auto;
+      justify-content: stretch;
+      align-items: stretch;
+      padding: 0;
+      min-height: 0;
+      overflow: hidden;
       opacity: 0;
       transform: translateY(16px);
       animation: contentReveal 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s forwards;
@@ -715,10 +720,10 @@ opacity: 1;
 
     .footer {
       border-top: 1px solid var(--border);
-      padding: 24px;
+      padding: 10px 16px;
       text-align: center;
       font-size: 12px;
-      margin-top: auto;
+      flex: 0 0 auto;
     }
     .footer-links { margin-bottom: 8px; }
     .footer-links a { color: var(--t2); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.15s; }
@@ -1045,8 +1050,14 @@ opacity: 1;
         z-index: 90;
       }
 
-      .main-wrapper { margin-left: 0; width: 100%; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
-      .main-content { padding: 20px 16px; }
+      .main-wrapper {
+        margin-left: 0;
+        width: 100%;
+        height: calc(100vh - 56px - 64px - env(safe-area-inset-bottom, 0px));
+        padding-bottom: 0;
+      }
+      .main-content { padding: 0; }
+      .footer { display: none; }
       .post-image-nav {
         width: 36px;
         height: 36px;
@@ -1382,46 +1393,7 @@ opacity: 1;
   </div>
 
   <div class="main-content">
-    <div class="feed-container">
-      <div class="feed-compose" id="feedCompose" onclick="handleCreatePost()" style="display:none;">
-        <div class="compose-avatar" id="composeAvatar"></div>
-        <div class="compose-placeholder">나의 생각을 입력해봐요</div>
-      </div>
-      <div id="feedTabs"></div>
-      <div id="recTop"></div>
-      <div id="postsFeed">
-        <div class="skeleton-post">
-          <div class="skeleton-post-header">
-            <div class="skeleton skeleton-avatar"></div>
-            <div class="skeleton skeleton-username"></div>
-          </div>
-          <div class="skeleton skeleton-post-image"></div>
-          <div class="skeleton skeleton-text text-long"></div>
-          <div class="skeleton skeleton-text text-medium"></div>
-          <div class="skeleton skeleton-text text-short"></div>
-        </div>
-        <div class="skeleton-post">
-          <div class="skeleton-post-header">
-            <div class="skeleton skeleton-avatar"></div>
-            <div class="skeleton skeleton-username"></div>
-          </div>
-          <div class="skeleton skeleton-post-image"></div>
-          <div class="skeleton skeleton-text text-long"></div>
-          <div class="skeleton skeleton-text text-long"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="recommend-container" id="recommendProfiles">
-      <div class="recommend-title">프로필 추천</div>
-      <div id="recommendSkeleton">
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-        <div class="skeleton-profile-item"><div class="skeleton skeleton-profile-avatar"></div><div class="skeleton skeleton-profile-nickname"></div></div>
-      </div>
-    </div>
+    <div class="feed-board" id="feedBoard"></div>
   </div>
 
   <div class="footer">
@@ -1692,7 +1664,7 @@ window.addEventListener('message', (event) => {
       setTimeout(() => { window.location.href = `view.html?id=${id}`; }, 350);
     } else {
       // 성공 피드백 - 기존 UI에 살짝 표시
-      const feed = document.getElementById('postsFeed');
+      const feed = panes[0]?.el || document.querySelector('.sf-col-body');
       if (feed) {
         // 맨 위에 잠깐 성공 배너
         const banner = document.createElement('div');
@@ -1911,18 +1883,11 @@ window.nextFeedSlide = function(btn) {
   carousel.scrollBy({ left: carousel.clientWidth, behavior: 'smooth' });
 };
 
-// ===== 피드 맞춤설정 (피드 최대 3개, 탭/나란히, 추천 사용자 위치) =====
+// ===== 홈 열 (최대 3개, 열 메뉴에서 내용·너비 변경) =====
 let feedCfg = SharerFeed.getLocal();
-let activeFeed = 0;
-try { activeFeed = parseInt(sessionStorage.getItem('sharerFeedActive'), 10) || 0; } catch (e) {}
-let panes = [];            // 화면에 그려진 피드들 { c: 카테고리, el, seq }
+let panes = [];
 let recUsersCache = null;
-
-function effectiveRecPos() {
-  // 나란히 보기(2개 이상)에서는 옆 목록이 자리를 차지하지 않도록 위쪽 가로 목록으로 대체
-  if (feedCfg.layout === 'columns' && feedCfg.feeds.length > 1 && feedCfg.recommend.pos === 'side') return 'top';
-  return feedCfg.recommend.pos;
-}
+const FEED_SKELETON = '<div class="skeleton-post"><div class="skeleton-post-header"><div class="skeleton skeleton-avatar"></div><div class="skeleton skeleton-username"></div></div><div class="skeleton skeleton-post-image"></div><div class="skeleton skeleton-text text-long"></div><div class="skeleton skeleton-text text-medium"></div></div>';
 
 async function getRecUsers(force) {
   if (!force && recUsersCache) return recUsersCache;
@@ -1937,87 +1902,144 @@ async function getRecUsers(force) {
   return users;
 }
 
-function makeRecStrip(users) {
-  return SharerFeed.recStrip(users.slice(0, 10), (id, nick) => goToProfile(id, nick));
+function syncFeedCategory() {
+  const feed = feedCfg.columns.find(c => SharerFeed.isFeed(c.id));
+  if (feed) SharerCategory.save(feed.id);
 }
 
-async function renderRecTop() {
-  const host = document.getElementById('recTop');
-  host.innerHTML = '';
-  if (effectiveRecPos() !== 'top') return;
-  const users = await getRecUsers();
-  if (users.length && effectiveRecPos() === 'top') host.appendChild(makeRecStrip(users));
+function userRows(users) {
+  if (!users?.length) return '<div class="sf-empty">사용자가 없습니다.</div>';
+  return users.map(u => {
+    const av = u.profile_image
+      ? `<img src="${escapeHtml(u.profile_image)}" alt="">`
+      : escapeHtml((u.nickname || '?').charAt(0).toUpperCase());
+    return `<div class="sf-user" data-uid="${escapeHtml(u.id)}" data-nick="${escapeHtml(u.nickname || '')}"><div class="sf-user-av">${av}</div><div><div class="sf-user-name">${escapeHtml(u.nickname || u.id)}</div><div class="sf-user-sub">@${escapeHtml(u.id)}</div></div></div>`;
+  }).join('');
 }
 
-function applyFeedUI() {
-  const pos = effectiveRecPos();
-  const side = document.getElementById('recommendProfiles');
-  if (side) side.style.display = pos === 'side' ? '' : 'none';
-  const wide = feedCfg.layout === 'columns' && feedCfg.feeds.length > 1;
-  const fc = document.querySelector('.feed-container');
-  if (fc) fc.style.maxWidth = wide ? (feedCfg.feeds.length === 2 ? '920px' : '1240px') : '';
-  if (activeFeed >= feedCfg.feeds.length) activeFeed = 0;
-  SharerFeed.tabBar(document.getElementById('feedTabs'), feedCfg, activeFeed, {
-    onSelect: (i) => {
-      activeFeed = i;
-      try { sessionStorage.setItem('sharerFeedActive', String(i)); } catch (e) {}
-      SharerCategory.save(feedCfg.feeds[i].c);   // 탐색 화면도 같은 카테고리를 따라감
-      panes = [];
-      document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
-      applyFeedUI();
-      loadPosts();
-    },
-    onSettings: openFeedSettings
+function bindUserRows(root) {
+  root.querySelectorAll('.sf-user').forEach(el => {
+    el.onclick = () => window.goToProfile(el.dataset.uid, el.dataset.nick);
   });
 }
 
-function applyFeedConfig(cfg, persistRemote) {
+async function fillRecommend(body) {
+  body.innerHTML = '<div class="sf-sec-label">추천 사용자</div><div class="sf-note">불러오는 중...</div>';
+  const users = (await getRecUsers()).slice(0, 12);
+  body.innerHTML = '<div class="sf-sec-label">추천 사용자</div>' + userRows(users);
+  bindUserRows(body);
+}
+
+function fillSearch(body) {
+  body.innerHTML = '<input class="sf-search" type="search" placeholder="검색" aria-label="검색"><div class="sf-search-out"></div>';
+  const input = body.querySelector('.sf-search');
+  const out = body.querySelector('.sf-search-out');
+  let timer = null;
+  const showSuggest = async () => {
+    const users = (await getRecUsers()).slice(0, 8);
+    if (input.value.trim()) return;
+    out.innerHTML = '<div class="sf-sec-label">추천 사용자</div>' + userRows(users);
+    bindUserRows(out);
+  };
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if (!q) { showSuggest(); return; }
+    timer = setTimeout(() => runSearch(q, input, out), 250);
+  });
+  showSuggest();
+}
+
+async function runSearch(q, input, out) {
+  const enc = encodeURIComponent(q);
+  const [users, posts] = await Promise.all([
+    api(`/users?or=(id.ilike.*${enc}*,nickname.ilike.*${enc}*)&select=id,nickname,profile_image&limit=8`).catch(() => []),
+    api(`/posts?content=ilike.*${enc}*&access=not.in.(private,link)&order=created_at.desc&limit=12`).catch(() => [])
+  ]);
+  if (input.value.trim() !== q) return;
+  let html = '';
+  if (users?.length) html += '<div class="sf-sec-label">사용자</div>' + userRows(users);
+  if (posts?.length) {
+    html += '<div class="sf-sec-label">게시물</div>' + posts.map(p => {
+      const text = String(p.content || '').replace(/<[^>]+>/g, '');
+      return `<div class="sf-hit" data-id="${escapeHtml(String(p.id))}"><div class="sf-hit-title">${escapeHtml(p.author || '게시물')}</div><div class="sf-hit-sub">${escapeHtml(text || (p.image_url ? '사진 · 동영상' : '게시물'))}</div></div>`;
+    }).join('');
+  }
+  out.innerHTML = html || '<div class="sf-empty">검색 결과가 없습니다.</div>';
+  bindUserRows(out);
+  out.querySelectorAll('.sf-hit').forEach(el => {
+    el.onclick = () => { window.location.href = `view.html?id=${el.dataset.id}`; };
+  });
+}
+
+async function fillNotify(body) {
+  if (!currentUser) {
+    body.innerHTML = '<div class="sf-empty">로그인하면 알림을 볼 수 있어요.</div>';
+    return;
+  }
+  body.innerHTML = '<div class="sf-note">불러오는 중...</div>';
+  try {
+    const rows = await api(`/notification?user=eq.${encodeURIComponent(currentUser.id)}&select=detail,created_at,link,isread&order=created_at.desc&limit=30`);
+    if (!rows?.length) {
+      body.innerHTML = '<div class="sf-empty">새 알림이 없습니다.</div>';
+      return;
+    }
+    body.innerHTML = rows.map(n => {
+      const link = (typeof n.link === 'string' && !/^\s*(javascript|data):/i.test(n.link)) ? n.link : '';
+      return `<div class="sf-noti" data-link="${escapeHtml(link)}"><div class="sf-noti-detail">${escapeHtml(n.detail || '알림')}</div><div class="sf-noti-time">${formatPostTime(n.created_at)}</div></div>`;
+    }).join('');
+    body.querySelectorAll('.sf-noti').forEach(el => {
+      el.onclick = () => { if (el.dataset.link) window.location.href = el.dataset.link; };
+    });
+  } catch (e) {
+    body.innerHTML = '<div class="sf-empty">알림을 불러오지 못했습니다.</div>';
+  }
+}
+
+function applyFeedConfig(cfg, persistRemote, meta) {
+  const prev = feedCfg;
   feedCfg = SharerFeed.normalize(cfg);
   SharerFeed.saveLocal(feedCfg);
-  activeFeed = 0;
-  try { sessionStorage.setItem('sharerFeedActive', '0'); } catch (e) {}
-  SharerCategory.save(feedCfg.feeds[0].c);
-  panes = [];
-  document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
-  applyFeedUI();
-  renderRecTop();
-  loadPosts();
+  syncFeedCategory();
+  const sameKind = prev.columns.length === feedCfg.columns.length && prev.columns.every((c, i) => c.id === feedCfg.columns[i].id);
+  if (meta && meta.widthOnly && sameKind) {
+    SharerFeed.applyWidths(document.getElementById('feedBoard'), feedCfg);
+  } else {
+    buildBoard();
+    loadPosts();
+  }
   if (persistRemote && currentUser) SharerFeed.saveRemote(api, currentUser.id, feedCfg);
 }
 
-function openFeedSettings() {
-  SharerFeed.openEditor(feedCfg, (cfg) => applyFeedConfig(cfg, true));
-}
-
-function buildPanes() {
-  const wrap = document.getElementById('postsFeed');
-  wrap.innerHTML = '';
+function buildBoard() {
+  const host = document.getElementById('feedBoard');
   panes = [];
-  const columns = feedCfg.layout === 'columns' && feedCfg.feeds.length > 1;
-  const list = columns ? feedCfg.feeds : [feedCfg.feeds[Math.min(activeFeed, feedCfg.feeds.length - 1)]];
-  wrap.className = columns ? 'sf-columns' : '';
-  wrap.style.gridTemplateColumns = columns ? `repeat(${list.length}, minmax(0, 1fr))` : '';
-  list.forEach(f => {
-    const col = document.createElement('div');
-    col.className = 'sf-col';
-    if (columns) {
-      const h = document.createElement('div');
-      h.className = 'sf-col-head';
-      h.textContent = SharerFeed.labelOf(f.c);
-      col.appendChild(h);
-    }
-    const el = document.createElement('div');
-    el.innerHTML = defaultFeedSkeleton;
-    col.appendChild(el);
-    wrap.appendChild(col);
-    panes.push({ c: f.c, el, seq: 0 });
+  SharerFeed.mount(host, feedCfg, (cfg, meta) => applyFeedConfig(cfg, true, meta));
+  const bodies = host.querySelectorAll('[data-sf-body]');
+  let composePlaced = false;
+  feedCfg.columns.forEach((col, i) => {
+    const body = bodies[i];
+    if (!body) return;
+    if (SharerFeed.isFeed(col.id)) {
+      if (!composePlaced) {
+        composePlaced = true;
+        body.insertAdjacentHTML('beforeend', '<div class="feed-compose" id="feedCompose" onclick="handleCreatePost()"><div class="compose-avatar" id="composeAvatar"></div><div class="compose-placeholder">나의 생각을 입력해봐요</div></div>');
+      }
+      const el = document.createElement('div');
+      el.innerHTML = FEED_SKELETON;
+      body.appendChild(el);
+      panes.push({ c: col.id, el, seq: 0 });
+    } else if (col.id === 'recommend') fillRecommend(body);
+    else if (col.id === 'search') fillSearch(body);
+    else if (col.id === 'notify') fillNotify(body);
   });
+  updateFeedCompose();
 }
 
 async function loadPosts() {
-  const wrap = document.getElementById('postsFeed');
-  if (!panes.length || !wrap.contains(panes[0].el)) buildPanes();
+  if (!panes.length) return;
   await Promise.all(panes.map(loadPane));
+  applyFadeEffect();
 }
 
 async function loadPane(pane) {
@@ -2053,9 +2075,6 @@ async function loadPane(pane) {
       currentUser ? api(`/likes?post_id=in.(${postIdFilter})&user_id=eq.${currentUser.id}&select=post_id`).catch(() => []) : Promise.resolve([]),
       api(`/comments?post_id=in.(${postIdFilter})&select=post_id`).catch(() => [])
     ]);
-    if (seq !== pane.seq) return;
-    const inlineRec = effectiveRecPos() === 'inline';
-    const recUsers = inlineRec ? await getRecUsers() : [];
     if (seq !== pane.seq) return;
 
     const likeCountMap = {};
@@ -2135,56 +2154,11 @@ async function loadPane(pane) {
         }
       };
       feedDiv.appendChild(postCard);
-      if (inlineRec && recUsers.length && (idx + 1) % feedCfg.recommend.every === 0 && idx + 1 < posts.length) {
-        feedDiv.appendChild(makeRecStrip(recUsers));
-      }
     });
 
   } catch (err) {
     console.error('게시물 로드 오류:', err);
     feedDiv.innerHTML = '<div class="no-posts">게시물을 불러오는데 실패했습니다.</div>';
-  }
-}
-
-async function loadRecommendedProfiles() {
-  const container = document.getElementById('recommendProfiles');
-  const skeleton = document.getElementById('recommendSkeleton');
-  try {
-    let users = [...(await getRecUsers(true))];
-    if (!users?.length) {
-      skeleton?.remove();
-      container.innerHTML += '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">사용자 없음</div>';
-      return;
-    }
-    for (let i = users.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [users[i], users[j]] = [users[j], users[i]];
-    }
-    users = users.slice(0, 7);
-    skeleton?.remove();
-    users.forEach((user, idx) => {
-      const hasStory = recentStoryAuthors.has(user.id);
-      
-      const avatarInnerHtml = user.profile_image
-        ? `<img src="${escapeHtml(user.profile_image)}" class="profile-avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt="${escapeHtml(user.nickname)}">`
-        : `<div class="profile-avatar">${(user.nickname?.[0] || '?').toUpperCase()}</div>`;
-        
-      const avatarHTML = `<div class="story-ring-wrapper ${hasStory ? 'has-story' : ''}">${avatarInnerHtml}</div>`;
-
-      const item = document.createElement('div');
-      item.className = 'profile-item';
-      item.style.cssText = `opacity:0; transform:translateX(8px); transition: opacity 0.3s ease ${idx * 0.05}s, transform 0.3s cubic-bezier(0.22,1,0.36,1) ${idx * 0.05}s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);`;
-      item.innerHTML = `${avatarHTML}<span class="profile-nickname">${escapeHtml(user.nickname)}</span>`;
-      item.onclick = () => { window.location.href = `user.html?id=${user.id}&nickname=${encodeURIComponent(user.nickname)}`; };
-      container.appendChild(item);
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        item.style.opacity = '1';
-        item.style.transform = 'translateX(0)';
-      }));
-    });
-  } catch (err) {
-    console.error('추천 프로필 로드 오류:', err);
-    if (skeleton) skeleton.innerHTML = '<div style="text-align:center; color:var(--t3); padding:12px 0; font-size:13px;">로드 실패</div>';
   }
 }
 
@@ -2213,26 +2187,20 @@ function escapeHtml(unsafe) {
     .replace(/'/g, "&#039;");
 }
 
-const defaultFeedSkeleton = document.getElementById('postsFeed').innerHTML;
-applyFeedUI();
-renderRecTop();
+buildBoard();
 window.addEventListener('message', (e) => {
-  if (e.origin === location.origin && e.data && e.data.type === 'openFeedSettings') openFeedSettings();
+  if (e.origin === location.origin && e.data && e.data.type === 'openFeedSettings') {
+    const btn = document.querySelector('.sf-col-menu');
+    if (btn) btn.click();
+  }
 });
-// 로그인 상태면 서버에 저장된 내 피드 설정을 불러와 적용 (다른 기기에서 바꾼 설정 반영)
 if (currentUser) {
   SharerFeed.loadRemote(api, currentUser.id).then(c => {
     if (c && JSON.stringify(c) !== JSON.stringify(feedCfg)) applyFeedConfig(c, false);
   });
 }
-const defaultRecommendSkeleton = document.getElementById('recommendProfiles').innerHTML;
 
-fetchRecentStories().then(() => {
-  loadPosts().then(() => {
-    applyFadeEffect();
-  });
-  loadRecommendedProfiles();
-});
+fetchRecentStories().then(() => loadPosts());
 
 (function() {
   const scroller = document.querySelector('.main-content');
@@ -2244,8 +2212,9 @@ fetchRecentStories().then(() => {
   let isLoading = false;
 
   function isScrollTop() {
-    const windowScrollY = window.scrollY || document.documentElement.scrollTop;
-    return windowScrollY <= 5 && scroller.scrollTop <= 5;
+    const bodies = document.querySelectorAll('.sf-col-body');
+    for (const b of bodies) if (b.scrollTop > 5) return false;
+    return (window.scrollY || 0) <= 5 && (!scroller || scroller.scrollTop <= 5);
   }
 
   window.addEventListener('touchstart', e => {
@@ -2296,16 +2265,11 @@ fetchRecentStories().then(() => {
       refreshEl.style.transition = 'top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
       refreshEl.style.top = '24px';
 
-      document.getElementById('postsFeed').innerHTML = defaultFeedSkeleton;
-      const recommendContainer = document.getElementById('recommendProfiles');
-      if (recommendContainer && defaultRecommendSkeleton) {
-        recommendContainer.innerHTML = defaultRecommendSkeleton;
-      }
+      buildBoard();
 
       try {
         await fetchRecentStories();
         await loadPosts();
-        await loadRecommendedProfiles();
       } catch (err) {
         console.error("새로고침 중 오류:", err);
       } finally {
