@@ -203,12 +203,12 @@
     });
   }
 
-  function badge(post) {
-    var c = normalize(post);
-    if (c === 'text') return '';
-    var short = { photo: '사진', gif: 'GIF', dday: '디데이', game: '게임' }[c];
-    return '<span class="sc-badge">' + short + '</span>';
-  }
+//  function badge(post) {
+//    var c = normalize(post);
+//    if (c === 'text') return '';
+//    var short = { photo: '사진', gif: 'GIF', dday: '디데이', game: '게임' }[c];
+//    return '<span class="sc-badge">' + short + '</span>';
+//  }
 
   /* 카테고리별 추가 영역(디데이 카드 / 게임 카드) */
   function extra(post, cls) {
