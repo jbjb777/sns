@@ -533,6 +533,20 @@
       color: var(--t2);
       line-height: 1.6;
     }
+    .search-panel {
+      position: fixed; top: 0; left: 72px; width: 380px; max-width: calc(100vw - 72px); height: 100vh;
+      background: var(--bg); border-right: 1px solid var(--border); z-index: 90;
+      transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex; flex-direction: column; opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    .search-panel.open { transform: translateX(0); opacity: 1; visibility: visible; pointer-events: auto; }
+    .search-panel-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .search-panel-header h2 { font-size: 16px; font-weight: 650; }
+    .search-close-btn { background: none; border: 0; color: var(--t2); font-size: 18px; cursor: pointer; }
+    .search-panel iframe { width: 100%; flex: 1; border: none; }
+    @media (max-width: 768px) {
+      .search-panel { left: 0; width: 100%; max-width: 100%; height: calc(100vh - 64px - env(safe-area-inset-bottom, 0px)); }
+    }
   </style>
 </head>
 <body>
@@ -540,6 +554,13 @@
 
   <div class="sidebar-container">
     <iframe src="sidebar.html" id="sidebarFrame" frameborder="0"></iframe>
+  </div>
+  <div id="searchPanel" class="search-panel">
+    <div class="search-panel-header">
+      <h2>검색</h2>
+      <button class="search-close-btn" type="button" onclick="toggleSearchPanel()">✕</button>
+    </div>
+    <iframe src="search.html" frameborder="0"></iframe>
   </div>
   <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
 
@@ -763,7 +784,20 @@
       location.href = 'index.html';
     }
     if (type === 'requestUserInfo') updateSidebar();
+    if (type === 'toggleSearch') window.toggleSearchPanel();
   });
+
+  let searchPanelOpen = false;
+  window.toggleSearchPanel = function() {
+    const panel = document.getElementById('searchPanel');
+    if (!panel) return;
+    searchPanelOpen = !searchPanelOpen;
+    panel.classList.toggle('open', searchPanelOpen);
+    const frame = document.getElementById('sidebarFrame');
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.postMessage({ type: 'activateSearch', active: searchPanelOpen }, '*');
+    }
+  };
 
   window.onSharerProfileLogout = function () {
     localStorage.removeItem('snsUser');

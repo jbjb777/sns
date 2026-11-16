@@ -21,7 +21,7 @@
   <link rel="canonical" href="https://sharer.r-e.kr/explore.html">
 
   <meta charset="UTF-8">
-  <script src="sharer-auth.js"></script>
+  <script src="sharer-auth.js?v=4"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="sharer-ui.css">
 
@@ -219,42 +219,86 @@ opacity: 1;
       position: relative;
       scroll-snap-align: start;
       scroll-snap-stop: always;
-      padding: 20px 20px calc(120px + env(safe-area-inset-bottom)) 20px;
+      padding: 24px 24px 24px 24px;
+    }
+    .short-stage {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      max-width: 520px;
+      width: 100%;
+      height: min(88svh, 880px);
+    }
+    .short-frame {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      background: #000;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
     }
     .short-content {
-      max-width: 500px;
       width: 100%;
-      max-height: 90vh;
-      position: relative;
+      height: 100%;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
     }
-    .short-image {
-      max-width: 100%;
-      max-height: 65vh;
-      width: auto;
-      height: auto;
-      border-radius: 16px;
-      object-fit: contain;
-      box-shadow: 0 8px 24px var(--shadow);
-    }
-    .short-text-only {
-      background: linear-gradient(135deg, var(--bg2), var(--bg3));
-      border: 1px solid var(--border3);
-      border-radius: 16px;
-      padding: 40px;
-      max-width: 500px;
+    .short-image, .ex-slide img {
       width: 100%;
-      max-height: 70vh;
-      overflow-y: auto;
-      box-shadow: 0 8px 24px var(--shadow);
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+    .ex-carousel {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+    .ex-carousel::-webkit-scrollbar { display: none; }
+    .ex-slide { flex: 0 0 100%; height: 100%; scroll-snap-align: start; }
+    .ex-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 3;
+    }
+    .ex-nav.prev { left: 10px; }
+    .ex-nav.next { right: 10px; }
+    .ex-dots {
+      position: absolute;
+      top: 14px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      z-index: 3;
+    }
+    .ex-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+    .ex-dots i.on { background: #fff; }
+    .short-text-only {
+      width: 100%;
+      height: 100%;
+      padding: 48px 28px 120px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
+      overflow-y: auto;
     }
     .short-text-content {
       font-size: 20px;
@@ -271,56 +315,36 @@ opacity: 1;
       color: #53b6f9;
     }
     .short-caption {
-      padding: 16px 20px;
-      background: var(--overlay-bg);
-      border-radius: 12px;
-      max-width: 500px;
-      width: 100%;
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
+      margin-top: 8px;
+      max-height: 72px;
+      overflow: hidden;
     }
     .short-caption-text {
-      font-size: 15px;
-      line-height: 1.5;
-      color: var(--t1);
-      white-space: pre-wrap;
-      word-break: break-word;
+      font-size: 14px;
+      line-height: 1.45;
+      color: #fff;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-    .short-caption-text a {
-      color: #00bfff;
-      text-decoration: underline;
-    }
-    .short-caption-text a:hover {
-      color: #53b6f9;
-    }
-    .short-info-bar {
+    .short-overlay {
       position: absolute;
-      bottom: 20px;
-      left: 20px;
-      right: 80px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      pointer-events: auto;
-      padding-bottom: env(safe-area-inset-bottom);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 48px 14px 16px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.72));
+      z-index: 2;
     }
+    .short-info-bar { display: none; }
     .short-author-info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       cursor: pointer;
-      background: var(--overlay-bg);
-      padding: 8px 16px 8px 8px;
-      border-radius: 30px;
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--overlay-border);
-      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .short-author-info:hover {
-      background: rgba(54, 99, 255, 0.8);
-      border-color: #3663FF;
-      transform: scale(1.05);
-    }
+    .short-author-info:hover { opacity: 0.85; }
     .short-avatar {
       width: 40px;
       height: 40px;
@@ -342,13 +366,12 @@ opacity: 1;
       object-fit: cover;
     }
     .short-author-name {
-      font-weight: 600;
-      font-size: 15px;
+      font-weight: 650;
+      font-size: 14px;
       display: flex;
       align-items: center;
       gap: 6px;
-      color: var(--t1);
-      text-shadow: var(--text-shadow);
+      color: #fff;
     }
     .verification-badge {
       display: inline-block;
@@ -361,58 +384,30 @@ opacity: 1;
       background-position: center;
     }
     .short-actions {
-      position: absolute;
-      right: 20px;
-      bottom: 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
       align-items: center;
-      padding-bottom: env(safe-area-inset-bottom);
+      flex-shrink: 0;
+      padding-bottom: 8px;
     }
     .action-btn {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: var(--overlay-bg);
-      border: 2px solid var(--overlay-border);
-      backdrop-filter: blur(10px);
+      background: none;
+      border: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      gap: 4px;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      color: var(--t1);
-      font-size: 24px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 650;
     }
-    .action-btn:hover {
-      transform: scale(1.15);
-      background: rgba(54, 99, 255, 0.8);
-      border-color: #3663FF;
-    }
-    .action-btn:active {
-      transform: scale(0.85);
-      transition: transform 0.1s;
-    }
-    @keyframes springBounce {
-      0% { transform: scale(1); }
-      40% { transform: scale(1.3); }
-      70% { transform: scale(0.9); }
-      100% { transform: scale(1); }
-    }
-    .action-btn.animate-bounce {
-      animation: springBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .action-btn.liked {
-      background: rgba(54, 99, 255, 0.8);
-      border-color: #3663FF;
-    }
-    .action-count {
-      font-size: 11px;
-      font-weight: 600;
-      margin-top: 2px;
-    }
+    .action-btn svg { width: 28px; height: 28px; }
+    .action-btn.liked { color: #fff; }
+    .action-btn.liked svg { color: var(--pink, #ff6b6b); fill: currentColor; stroke: currentColor; }
+    .action-btn:active { transform: scale(0.92); }
+    .action-count { font-size: 12px; font-weight: 650; }
     .nav-buttons {
       position: fixed;
       right: 100px;
@@ -951,64 +946,45 @@ opacity: 1;
         overflow-y: auto;
       }
       .short-item {
-        height: auto;
         min-height: 100svh;
-        min-height: 100vh;
-        padding: 10px 10px 100px 10px;
+        padding: 12px 12px calc(84px + env(safe-area-inset-bottom, 0px));
       }
-      .skeleton-short-item {
-        height: auto;
-        min-height: 100svh;
-        min-height: 100vh;
-        padding: 10px 10px 100px 10px;
-      }
-      .short-content {
-        max-width: 100%;
-        width: 100%;
-      }
-      .short-image {
-        max-height: 70vh;
-      }
-      .short-text-only {
-        max-width: 100%;
-        width: 100%;
-        padding: 30px 20px;
-      }
-      .short-text-content {
-        font-size: 18px;
-      }
-      .short-info-bar {
-        left: 10px;
-        right: 75px;
-        bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-      }
-      .short-author-info {
-        padding: 6px 12px 6px 6px;
-      }
-      .short-avatar {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
-      }
-      .short-author-name {
-        font-size: 14px;
-      }
+      .short-stage { position: relative; display: block; height: min(78svh, 760px); }
+      .short-frame { width: 100%; border-radius: 14px; }
+      .short-overlay { padding-right: 68px; }
       .short-actions {
+        position: absolute;
         right: 10px;
-        bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+        bottom: 14px;
+        z-index: 4;
         gap: 12px;
+        padding-bottom: 0;
       }
       .action-btn {
         width: 48px;
         height: 48px;
-        font-size: 20px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        border: 0;
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+        justify-content: center;
+        gap: 1px;
+        color: #fff;
+        box-shadow: none;
       }
-      .short-caption {
-        padding: 12px 16px;
+      .action-btn.liked {
+        background: rgba(255, 255, 255, 0.18);
+        border: 0;
+        color: #fff;
       }
-      .short-caption-text {
-        font-size: 14px;
-      }
+      .action-btn.liked svg { color: #ff6b6b; fill: #ff6b6b; stroke: #ff6b6b; }
+      html[data-theme="light"] .action-btn,
+      html[data-theme="light"] .action-btn.liked { background: rgba(0, 0, 0, 0.12); color: #111; }
+      html[data-theme="light"] .action-count { color: #111; }
+      .action-btn svg { width: 20px; height: 20px; }
+      .action-count { font-size: 10px; line-height: 1; color: #fff; }
+      .short-avatar { width: 32px; height: 32px; font-size: 14px; }
       .skeleton-author-bar {
         left: 10px;
         bottom: calc(72px + env(safe-area-inset-bottom, 0px));
@@ -1099,17 +1075,6 @@ opacity: 1;
     })();
   </script>
   <div class="sidebar-container">
-
-
-
-  <div id="searchPanel" class="search-panel">
-    <div class="search-panel-header">
-      <h2>검색</h2>
-      <button class="search-close-btn" onclick="toggleSearchPanel()">✕</button>
-    </div>
-    <iframe src="search.html" frameborder="0"></iframe>
-  </div>
-
     <iframe
       src="sidebar.html"
       id="sidebarFrame"
@@ -1117,6 +1082,13 @@ opacity: 1;
       height="100%"
       frameborder="0"
     ></iframe>
+  </div>
+  <div id="searchPanel" class="search-panel">
+    <div class="search-panel-header">
+      <h2>검색</h2>
+      <button class="search-close-btn" onclick="toggleSearchPanel()">✕</button>
+    </div>
+    <iframe src="search.html" frameborder="0"></iframe>
   </div>
   <div id="sharerProfileSheetHost" class="sharer-profile-sheet-host" hidden></div>
   <div id="categoryFilter"></div>
@@ -1168,10 +1140,8 @@ opacity: 1;
       <div class="comment-modal-title">댓글 <span id="commentCountTitle">0</span>개</div>
       <button class="comment-close-btn" onclick="closeComments()">✕</button>
     </div>
-    <div class="comment-modal-list" id="commentList">
-      <div style="text-align: center; color: var(--t3); padding: 40px 20px;">
-        댓글을 불러오는 중...
-      </div>
+      <div class="comment-modal-list" id="commentList">
+      <div class="sharer-dots-row" role="status" aria-label="불러오는 중"><i></i><i></i><i></i></div>
     </div>
     <div class="comment-input-wrapper">
       <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요..." maxlength="500"></textarea>
@@ -1319,7 +1289,9 @@ window.addEventListener('DOMContentLoaded', () => {
           created_at: new Date().toISOString()
         })
       });
-    } catch (e) {}
+    } catch (e) {
+      console.error('알림 생성 실패:', e);
+    }
   }
 
   function getPostById(postId) {
@@ -1607,64 +1579,74 @@ window.addEventListener('DOMContentLoaded', () => {
 
     let contentHTML = '';
     const sCat = SharerCategory.normalize(post);
+    const media = hasImage ? renderExploreImages(post.image_url, post.id) : '';
+    const caption = hasImage && hasContent ? `<div class="short-caption"><div class="short-caption-text">${parseMarkdown(post.content)}</div></div>` : '';
+    const overlay = `
+      <div class="short-overlay">
+        <div class="short-author-info" data-uid="${escapeHtml(String(post.author_id))}" data-nick="${escapeHtml(post.author)}" onclick="goToProfile(this.dataset.uid, this.dataset.nick)">
+          ${avatarHTML}
+          <div class="short-author-name">${escapeHtml(post.author)}${isVerified ? '<span class="verification-badge"></span>' : ''}</div>
+        </div>
+        ${caption}
+      </div>`;
     if (sCat === 'dday' || sCat === 'game') {
-      const caption = hasContent ? `<div class="short-caption"><div class="short-caption-text">${parseMarkdown(post.content)}</div></div>` : '';
-      contentHTML = `<div class="short-content">${SharerCategory.extra(post, 'explore')}${caption}</div>`;
-    } else if (hasImage && hasContent) {
-      const linkedContent = parseMarkdown(post.content);
-      contentHTML = `
-        <div class="short-content">
-          <img src="${escapeHtml(post.image_url)}" class="short-image" alt="게시글 이미지">
-          <div class="short-caption">
-            <div class="short-caption-text">${linkedContent}</div>
-          </div>
-        </div>
-      `;
-    } else if (hasImage && !hasContent) {
-      contentHTML = `
-        <div class="short-content">
-          <img src="${escapeHtml(post.image_url)}" class="short-image" alt="게시글 이미지">
-        </div>
-      `;
-    } else if (!hasImage && hasContent) {
-      const linkedContent = parseMarkdown(post.content);
-      contentHTML = `
-        <div class="short-content">
-          <div class="short-text-only">
-            <div class="short-text-content">${linkedContent}</div>
-          </div>
-        </div>
-      `;
+      contentHTML = `<div class="short-content">${SharerCategory.extra(post, 'explore')}</div>${overlay}`;
+    } else if (hasImage) {
+      contentHTML = `<div class="short-content">${media}</div>${overlay}`;
+    } else if (hasContent) {
+      contentHTML = `<div class="short-content"><div class="short-text-only"><div class="short-text-content">${parseMarkdown(post.content)}</div></div></div>${overlay}`;
     }
+
+    const heart = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9z"/></svg>`;
+    const comment = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 0 1-8 8H7l-4 3V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg>`;
 
     const shortItem = document.createElement('div');
     shortItem.className = 'short-item';
     shortItem.dataset.postId = post.id;
+    shortItem.dataset.author = post.author_id || '';
     shortItem.dataset.index = index;
     shortItem.innerHTML = `
-      ${contentHTML}
-      <div class="short-info-bar">
-        <div class="short-author-info" data-uid="${escapeHtml(String(post.author_id))}" data-nick="${escapeHtml(post.author)}" onclick="goToProfile(this.dataset.uid, this.dataset.nick)">
-          ${avatarHTML}
-          <div class="short-author-name">
-            ${escapeHtml(post.author)}
-            ${isVerified ? '<span class="verification-badge"></span>' : ''}
-          </div>
-        </div>
-      </div>
-      <div class="short-actions">
-        <div class="action-btn" onclick="toggleLike('${post.id}')" data-like-btn="${post.id}">
-          👍
-          <div class="action-count" data-like-count="${post.id}">0</div>
-        </div>
-        <div class="action-btn" onclick="openComments('${post.id}')">
-          💬
-          <div class="action-count" data-comment-count="${post.id}">0</div>
+      <div class="short-stage">
+        <div class="short-frame">${contentHTML}</div>
+        <div class="short-actions">
+          <button type="button" class="action-btn" onclick="toggleLike('${post.id}')" data-like-btn="${post.id}">
+            ${heart}
+            <span class="action-count" data-like-count="${post.id}">0</span>
+          </button>
+          <button type="button" class="action-btn" onclick="openComments('${post.id}')">
+            ${comment}
+            <span class="action-count" data-comment-count="${post.id}">0</span>
+          </button>
         </div>
       </div>
     `;
     return shortItem;
   }
+
+  function renderExploreImages(imageUrl, postId) {
+    const urls = String(imageUrl || '').split(',').map(u => u.trim()).filter(Boolean);
+    if (!urls.length) return '';
+    const slides = urls.map(url => `<div class="ex-slide"><img src="${escapeHtml(url)}" alt=""></div>`).join('');
+    const dots = urls.length > 1
+      ? `<div class="ex-dots" id="exdots-${postId}">${urls.map((_, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</div>`
+      : '';
+    const nav = urls.length > 1
+      ? `<button type="button" class="ex-nav prev" onclick="event.stopPropagation(); exSlide('${postId}', -1)">‹</button><button type="button" class="ex-nav next" onclick="event.stopPropagation(); exSlide('${postId}', 1)">›</button>`
+      : '';
+    return `<div class="ex-carousel" id="excar-${postId}" onscroll="exDots('${postId}')">${slides}</div>${nav}${dots}`;
+  }
+  window.exSlide = function(id, dir) {
+    const car = document.getElementById('excar-' + id);
+    if (!car) return;
+    car.scrollBy({ left: dir * car.clientWidth, behavior: 'smooth' });
+  };
+  window.exDots = function(id) {
+    const car = document.getElementById('excar-' + id);
+    const dots = document.getElementById('exdots-' + id);
+    if (!car || !dots) return;
+    const i = Math.round(car.scrollLeft / Math.max(car.clientWidth, 1));
+    dots.querySelectorAll('i').forEach((dot, n) => dot.classList.toggle('on', n === i));
+  };
 
   async function loadLikesAndComments() {
     try {
@@ -1707,23 +1689,16 @@ window.addEventListener('DOMContentLoaded', () => {
       }
       return;
     }
-    
-    // Play bounce animation
     const btn = document.querySelector(`[data-like-btn="${postId}"]`);
-    if (btn) {
-      btn.classList.remove('animate-bounce');
-      void btn.offsetWidth; // trigger reflow
-      btn.classList.add('animate-bounce');
-    }
-
+    if (!btn || btn.classList.contains('sharer-busy') || btn.classList.contains('sharer-done')) return;
+    window.SharerBusy?.(btn, true);
+    let ok = false;
     try {
       const likes = await api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`);
 
       if (likes?.length > 0) {
-        // 이미 좋아요 → 삭제
         await api(`/likes?id=eq.${likes[0].id}`, { method: "DELETE" });
       } else {
-        // 좋아요 추가
         await api("/likes", {
           method: "POST",
           body: JSON.stringify({
@@ -1731,31 +1706,34 @@ window.addEventListener('DOMContentLoaded', () => {
             user_id: currentUser.id
           })
         });
-        const post = getPostById(postId);
-        createNotification(post?.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
+        const authorId = btn.closest('.short-item')?.dataset.author || getPostById(postId)?.author_id;
+        await createNotification(authorId, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
       }
 
-      // 업데이트된 좋아요 목록 가져오기
       const updatedLikes = await api(`/likes?post_id=eq.${postId}&select=user_id`);
       updateLikeUI(postId, updatedLikes || []);
+      ok = true;
     } catch (e) {
       console.error('좋아요 토글 오류:', e);
+    } finally {
+      window.SharerBusy?.(btn, false, ok);
     }
   };
 
   window.openComments = async function(postId) {
-    // Play bounce animation
-    const btn = document.querySelector(`[data-like-btn="${postId}"]`).nextElementSibling;
-    if (btn) {
-      btn.classList.remove('animate-bounce');
-      void btn.offsetWidth; // trigger reflow
-      btn.classList.add('animate-bounce');
-    }
-
+    const btn = document.querySelector(`[data-like-btn="${postId}"]`)?.nextElementSibling;
+    if (btn && (btn.classList.contains('sharer-busy') || btn.classList.contains('sharer-done'))) return;
+    window.SharerBusy?.(btn, true);
     currentCommentPostId = postId;
     document.getElementById('commentOverlay').classList.add('active');
     document.getElementById('commentModal').classList.add('active');
-    await loadComments(postId);
+    let ok = false;
+    try {
+      await loadComments(postId);
+      ok = true;
+    } finally {
+      window.SharerBusy?.(btn, false, ok);
+    }
   };
 
   window.closeComments = function() {
@@ -1779,7 +1757,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   async function loadComments(postId) {
     const listDiv = document.getElementById('commentList');
-    listDiv.innerHTML = '<div style="text-align: center; color: var(--t3); padding: 40px 20px;">댓글을 불러오는 중...</div>';
+    listDiv.innerHTML = '<div class="sharer-dots-row" role="status" aria-label="불러오는 중"><i></i><i></i><i></i></div>';
     try {
       const comments = await api(`/comments?post_id=eq.${postId}&select=*&order=created_at.desc`);
 
@@ -1949,11 +1927,14 @@ window.addEventListener('DOMContentLoaded', () => {
   window.submitReply = async function(parentId) {
     const input = document.getElementById(`replyInput-${parentId}`);
     const text = input?.value?.trim() || '';
+    const replyBtn = document.querySelector(`#replyCompose-${parentId} .reply-submit-btn`);
     if (!currentUser) {
       if (confirm('로그인이 필요합니다. 홈으로 이동하시겠습니까?')) window.location.href = 'index.html';
       return;
     }
-    if (!text) return;
+    if (!text || replyBtn?.classList.contains('sharer-busy') || replyBtn?.classList.contains('sharer-done')) return;
+    window.SharerBusy?.(replyBtn, true);
+    let ok = false;
     try {
       await api("/comments", {
         method: "POST",
@@ -1967,9 +1948,9 @@ window.addEventListener('DOMContentLoaded', () => {
         })
       });
       const parentComment = await getCommentById(parentId);
-      const post = getPostById(currentCommentPostId);
-      const targetUserId = parentComment?.user_id || post?.author_id;
-      createNotification(targetUserId, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${currentCommentPostId}`);
+      const item = document.querySelector(`.short-item[data-post-id="${currentCommentPostId}"]`);
+      const targetUserId = parentComment?.user_id || item?.dataset.author || getPostById(currentCommentPostId)?.author_id;
+      await createNotification(targetUserId, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${currentCommentPostId}`);
       if (input) input.value = '';
       const compose = document.getElementById(`replyCompose-${parentId}`);
       if (compose) compose.style.display = 'none';
@@ -1977,9 +1958,12 @@ window.addEventListener('DOMContentLoaded', () => {
       await loadComments(currentCommentPostId);
       const countEl = document.querySelector(`[data-comment-count="${currentCommentPostId}"]`);
       if (countEl) countEl.textContent = parseInt(countEl.textContent || '0') + 1;
+      ok = true;
     } catch (e) {
       console.error('답글 작성 실패:', e);
       alert('답글 작성에 실패했습니다.');
+    } finally {
+      window.SharerBusy?.(replyBtn, false, ok);
     }
   };
 
@@ -2011,7 +1995,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const text = input.value.trim();
     if (!text) return;
     const submitBtn = document.getElementById('commentSubmitBtn');
-    submitBtn.disabled = true;
+    if (submitBtn.classList.contains('sharer-busy') || submitBtn.classList.contains('sharer-done')) return;
+    window.SharerBusy?.(submitBtn, true);
+    let ok = false;
     try {
       await api("/comments", {
         method: "POST",
@@ -2025,8 +2011,9 @@ window.addEventListener('DOMContentLoaded', () => {
         })
       });
 
-      const post = getPostById(currentCommentPostId);
-      createNotification(post?.author_id, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${currentCommentPostId}`);
+      const item = document.querySelector(`.short-item[data-post-id="${currentCommentPostId}"]`);
+      const authorId = item?.dataset.author || getPostById(currentCommentPostId)?.author_id;
+      await createNotification(authorId, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${currentCommentPostId}`);
 
       input.value = '';
       await loadComments(currentCommentPostId);
@@ -2035,11 +2022,12 @@ window.addEventListener('DOMContentLoaded', () => {
       if (countEl) {
         countEl.textContent = parseInt(countEl.textContent || '0') + 1;
       }
+      ok = true;
     } catch (e) {
       console.error('댓글 업로드 오류:', e);
       alert('댓글 업로드에 실패했습니다.');
     } finally {
-      submitBtn.disabled = false;
+      window.SharerBusy?.(submitBtn, false, ok);
     }
   };
 

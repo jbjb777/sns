@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <script src="sharer-auth.js"></script>
+  <script src="sharer-auth.js?v=4"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="sharer-ui.css">
 
@@ -415,16 +415,16 @@ opacity: 1;
       font-family: inherit;
       transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .like-btn:hover { border-color: var(--pink); color: var(--pink); background: rgba(255,107,107,0.06); }
+    .like-btn:hover { color: var(--t2); }
+    .like-btn:hover .like-heart { color: var(--pink); transform: scale(1.3); }
     .like-btn:active { transform: scale(0.92); }
-    .like-btn.liked { border-color: var(--pink); color: var(--pink); background: rgba(255,107,107,0.08); }
+    .like-btn.liked { color: var(--t2); background: none; }
+    .like-btn.liked .like-heart { color: var(--pink); transform: scale(1.15); }
     .like-heart {
       width: 16px; height: 16px;
       fill: currentColor;
       transition: transform 0.25s cubic-bezier(0.34,1.7,0.64,1);
     }
-    .like-btn:hover .like-heart { transform: scale(1.3); }
-    .like-btn.liked .like-heart { transform: scale(1.15); }
     /* ─── DELETE BTN ─── */
     .delete-btn {
       background: transparent;
@@ -1385,7 +1385,7 @@ opacity: 1;
           <textarea id="commentInput" class="comment-input" placeholder="댓글을 입력하세요 (최대 500자)" maxlength="500"></textarea>
           <button class="comment-submit-btn" onclick="addComment()">업로드</button>
         </div>
-        <div id="commentList" class="comment-list"></div>
+        <div id="commentList" class="comment-list"><div class="sharer-dots-row" role="status" aria-label="불러오는 중"><i></i><i></i><i></i></div></div>
       </div>
     </div>
 
@@ -1498,7 +1498,9 @@ opacity: 1;
           created_at: new Date().toISOString()
         })
       });
-    } catch (e) {}
+    } catch (e) {
+      console.error('알림 생성 실패:', e);
+    }
   }
 
   async function getCommentById(commentId) {
@@ -1918,7 +1920,9 @@ window.toggleSearchPanel = function() {
 
     const btn = document.getElementById('likeBtn');
     const countEl = document.getElementById('likeCount');
-    
+    if (!btn || btn.classList.contains('sharer-busy') || btn.classList.contains('sharer-done')) return;
+    window.SharerBusy?.(btn, true);
+    let ok = false;
     try {
       const [likeRecords, likeCountResult] = await Promise.all([
         api(`/likes?post_id=eq.${postId}&user_id=eq.${currentUser.id}&select=id`),
@@ -1948,11 +1952,12 @@ window.toggleSearchPanel = function() {
         });
         btn.classList.add('liked');
         countEl.textContent = currentServerCount + 1;
-        createNotification(currentPost.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
+        await createNotification(currentPost.author_id, `${currentUser.nickname}님이 좋아요를 눌렀습니다`, `view.html?id=${postId}`);
       }
 
       const finalCount = await api(`/likes?post_id=eq.${postId}&select=count`);
       countEl.textContent = Math.max(0, finalCount?.[0]?.count || 0);
+      ok = true;
     } catch (err) {
       console.error("좋아요 처리 오류:", err);
       try {
@@ -1963,10 +1968,16 @@ window.toggleSearchPanel = function() {
         btn.classList.toggle('liked', records?.length > 0);
         countEl.textContent = Math.max(0, countRes?.[0]?.count || 0);
       } catch (recoveryErr) { console.error("복구 실패:", recoveryErr); }
+    } finally {
+      window.SharerBusy?.(btn, false, ok);
     }
   };
 
   async function listenComments(postId) {
+    const list = document.getElementById('commentList');
+    if (list && !list.querySelector('.comment-item')) {
+      list.innerHTML = '<div class="sharer-dots-row" role="status" aria-label="불러오는 중"><i></i><i></i><i></i></div>';
+    }
     try {
       const comments = await api(`/comments?post_id=eq.${postId}&select=*&order=created_at.desc`);
       const userIds = [...new Set(comments.map(c => c.user_id))];
@@ -2161,9 +2172,11 @@ window.toggleSearchPanel = function() {
   window.addComment = async function() {
     const input = document.getElementById('commentInput');
     const text = input.value.trim();
+    const submitBtn = document.querySelector('.comment-input-wrapper .comment-submit-btn');
     if (!currentUser) return showLoginAlert();
-    if (!text || !currentPost) return;
-
+    if (!text || !currentPost || submitBtn?.classList.contains('sharer-busy') || submitBtn?.classList.contains('sharer-done')) return;
+    window.SharerBusy?.(submitBtn, true);
+    let ok = false;
     try {
       await api("/comments", {
         method: "POST",
@@ -2176,10 +2189,12 @@ window.toggleSearchPanel = function() {
           created_at: new Date().toISOString()
         })
       });
-      createNotification(currentPost.author_id, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${postId}`);
+      await createNotification(currentPost.author_id, `${currentUser.nickname}님이 댓글을 남겼습니다`, `view.html?id=${postId}`);
       input.value = '';
       listenComments(postId);
+      ok = true;
     } catch (e) { alert('댓글 작성 실패'); }
+    finally { window.SharerBusy?.(submitBtn, false, ok); }
   };
   
   window.openReplyComposer = function(commentId) {
@@ -2201,9 +2216,11 @@ window.toggleSearchPanel = function() {
   window.submitReply = async function(parentId) {
     const input = document.getElementById(`replyInput-${parentId}`);
     const text = input?.value?.trim() || '';
+    const replyBtn = document.querySelector(`#replyCompose-${parentId} .reply-submit-btn`);
     if (!currentUser) return showLoginAlert();
-    if (!text || !currentPost) return;
-    
+    if (!text || !currentPost || replyBtn?.classList.contains('sharer-busy') || replyBtn?.classList.contains('sharer-done')) return;
+    window.SharerBusy?.(replyBtn, true);
+    let ok = false;
     try {
       await api("/comments", {
         method: "POST",
@@ -2218,14 +2235,16 @@ window.toggleSearchPanel = function() {
       });
       const parentComment = await getCommentById(parentId);
       const targetUserId = parentComment?.user_id || currentPost.author_id;
-      createNotification(targetUserId, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${postId}`);
+      await createNotification(targetUserId, `${currentUser.nickname}님이 답글을 남겼습니다`, `view.html?id=${postId}`);
 
       if (input) input.value = '';
       const compose = document.getElementById(`replyCompose-${parentId}`);
       if (compose) compose.style.display = 'none';
       openReplyThreads.add(parentId);
       listenComments(postId);
+      ok = true;
     } catch (e) { alert('답글 작성 실패'); }
+    finally { window.SharerBusy?.(replyBtn, false, ok); }
   };
   
   window.toggleReplies = function(commentId) {
