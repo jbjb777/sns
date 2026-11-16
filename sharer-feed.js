@@ -53,7 +53,7 @@
       columns: [
         { id: 'all', w: 'wide' },
         { id: 'notify', w: 'mid' },
-        { id: 'recommend', w: 'narrow' }
+        { id: 'search', w: 'narrow' }
       ]
     };
   }
