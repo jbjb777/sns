@@ -1,0 +1,19 @@
+/* index.html과 같은 스크롤바. 트랙은 비우고, 막대만 가늘게 둔다. */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border2, #2a2a2a);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border3, #333);
+}
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2, #2a2a2a) transparent;
+}

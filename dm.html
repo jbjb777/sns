@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <script src="sharer-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="stylesheet" href="sharer-ui.css">
   <title>메시지 : Sharer</title>
   <style>@view-transition { navigation: auto; }</style>
   <script type="speculationrules">
@@ -134,6 +135,7 @@
   body.chat-room-active .main-wrapper {
     margin-left: 0;
     width: 100%;
+    height: 100dvh;
   }
 
   /* 입력창도 왼쪽 끝부터 시작하게 */
@@ -145,12 +147,12 @@
     .header {
       background: var(--bg);
       border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
+      padding: 12px 12px 12px 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
-      z-index: 50;
+      gap: 8px;
     }
     .header-left { display: flex; align-items: center; gap: 14px; }
     .back-btn {
@@ -200,25 +202,28 @@
       background: var(--bg);
     }
     .rooms-scroll-area { flex: 1; overflow-y: auto; }
-    .rooms-scroll-area::-webkit-scrollbar { width: 6px; }
-    .rooms-scroll-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
     .room-item {
       display: flex;
       align-items: center;
-      padding: 16px 20px;
-      gap: 14px;
+      padding: 12px 16px;
+      gap: 12px;
       cursor: pointer;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.2s;
+      transition: background 0.15s;
     }
     .room-item:hover { background: var(--bg2); }
     .room-item.active { background: var(--bg3); }
+    .room-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
+    .room-time { font-size: 12px; color: var(--t3); flex-shrink: 0; }
+    .room-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .room-name { font-size: 15px; font-weight: 650; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .room-last-msg { font-size: 13px; color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dm-empty { color: var(--t2); font-size: 14px; line-height: 1.6; text-align: center; padding: 48px 24px; }
 
     /* 카카오톡 스타일 멀티 프로필 아바타 */
     .room-avatar {
       width: 48px; height: 48px;
-      border-radius: 18px;
+      border-radius: 50%;
       background: var(--bg4);
       position: relative;
       overflow: hidden;
@@ -238,24 +243,23 @@
       justify-content: center; font-size: 14px; font-weight: 600; color: var(--t1); background: var(--bg4);
     }
 
-    .room-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-    .room-name { font-size: 15px; font-weight: 600; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .room-last-msg { font-size: 13px; color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .room-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 
     /* 오른쪽 패널 (채팅창) */
     .chat-pane {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: var(--bg2);
+      background: var(--bg);
       position: relative;
     }
     .chat-empty-state {
       position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; background: var(--bg); color: var(--t3); z-index: 10;
+      align-items: center; justify-content: center; background: var(--bg); color: var(--t2); z-index: 10;
     }
     .chat-empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5; }
-    .chat-empty-state p { font-size: 15px; font-weight: 500; }
+    .chat-empty-state p { font-size: 15px; font-weight: 650; color: var(--t1); }
+    .chat-empty-state span { font-size: 13px; color: var(--t2); margin-top: 6px; }
 
     .chat-header {
       padding: 16px 24px;
@@ -280,8 +284,6 @@
     .chat-messages {
       flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
     }
-    .chat-messages::-webkit-scrollbar { width: 6px; }
-    .chat-messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
     .message-wrapper { display: flex; flex-direction: column; max-width: 70%; }
     .message-wrapper.me { align-self: flex-end; align-items: flex-end; }
@@ -290,7 +292,7 @@
     .message-sender { font-size: 11px; color: var(--t3); margin-bottom: 4px; margin-left: 4px; margin-right: 4px; }
     .message-bubble { padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.5; word-break: break-all; }
     
-    .message-wrapper.me .message-bubble { background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
+    .message-wrapper.me .message-bubble { background: var(--t1); color: var(--bg); border-bottom-right-radius: 4px; }
     .message-wrapper.other .message-bubble { background: var(--bg3); color: var(--t1); border: 1px solid var(--border2); border-bottom-left-radius: 4px; }
     
     .message-time { font-size: 10px; color: var(--t3); margin-top: 4px; margin-left: 4px; margin-right: 4px; display: flex; align-items: center; gap: 2px;}
@@ -383,26 +385,6 @@
       .sidebar-container { left: 0; right: 0; top: auto; bottom: 0; width: 100%; min-width: 0; height: calc(64px + env(safe-area-inset-bottom, 0px)); }
       .sidebar-container iframe { width: 100% !important; height: 100% !important; }
       .main-wrapper { margin-left: 0; width: 100%; height: calc(100dvh - 64px - env(safe-area-inset-bottom, 0px)); }
-  .dm-container {
-    padding-bottom: 72px; /* 사이드바 높이만큼 */
-    box-sizing: border-box;
-  }
-  .message-input-container {
-    position: fixed;
-    bottom: 0;
-    left: 72px; /* 사이드바 너비만큼 띄움 */
-    right: 0;
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    padding: 12px 16px;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom)); /* iOS 하단바 대응 */
-    z-index: 101; /* 사이드바 z-index: 100보다 높게 */
-  }
-    .message-list {
-    padding-bottom: 80px; /* 입력창 높이 + 여유 */
-    height: calc(100dvh - 65px); /* 헤더 높이 빼기 */
-    overflow-y: auto;
-  }
       .room-list-pane { width: 100%; flex: 1; border-right: none; }
       .chat-pane { display: none; position: absolute; inset: 0; z-index: 60; }
       .dm-container.room-active .room-list-pane { display: none; }
@@ -637,11 +619,10 @@
     .unread-blue-dot {
       width: 8px;
       height: 8px;
-      background: var(--blue);
+      background: var(--t1);
       border-radius: 50%;
       flex-shrink: 0;
       margin-left: 8px;
-      box-shadow: 0 0 10px rgba(62,59,246,0.7);
       display: none;
     }
     .unread-blue-dot.show { display: block; }
@@ -662,18 +643,16 @@
     .composer-card {
       width: 100%;
       max-width: 100%;
-      background: #2a2a2c;
+      background: var(--bg3);
+      border: 1px solid var(--border);
       border-radius: 24px;
       overflow: hidden;
-      transition: background 0.2s, box-shadow 0.2s;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.25);
       display: flex;
       flex-direction: column;
     }
     html[data-theme="light"] .composer-card {
-      background: #f0f0f2;
-      box-shadow: 0 1px 8px rgba(0,0,0,0.08);
-      border: 1px solid rgba(0,0,0,0.06);
+      background: var(--bg2);
+      border-color: var(--border);
     }
 
     .reply-preview-bar {
@@ -822,20 +801,20 @@
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: var(--blue);
+      background: var(--t1);
       border: none;
-      color: #fff;
+      color: var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      transition: transform 0.15s, opacity 0.15s, background 0.2s;
+      transition: transform 0.15s, opacity 0.15s;
     }
-    .send-btn:hover { opacity: 0.9; }
+    .send-btn:hover { opacity: 0.88; }
     .send-btn:active { transform: scale(0.92); }
-    .send-btn:disabled { background: #3a3a3c; color: #6e6e73; cursor: not-allowed; opacity: 1; }
-    html[data-theme="light"] .send-btn:disabled { background: #e5e5e7; color: #aeaeb2; }
+    .send-btn:disabled { background: var(--bg4); color: var(--t3); cursor: not-allowed; opacity: 1; }
+    html[data-theme="light"] .send-btn:disabled { background: var(--bg4); color: var(--t3); }
 
     .composer-card.has-reply {
       border-radius: 22px;
@@ -859,7 +838,13 @@
     }
 
     .message-bubble.has-reply { padding:0; overflow:hidden; border-radius:18px; }
-    .message-wrapper.me .message-bubble.has-reply { background: var(--blue); border-bottom-right-radius:4px; color:#fff; }
+    .message-wrapper.me .message-bubble.has-reply { background: var(--t1); color: var(--bg); border-bottom-right-radius: 4px; }
+    .message-wrapper.me .reply-origin { background: rgba(0,0,0,0.06); border-bottom-color: rgba(0,0,0,0.08); }
+    .message-wrapper.me .reply-to-label { color: var(--bg); }
+    .message-wrapper.me .reply-to-content { color: rgba(0,0,0,0.62); }
+    html[data-theme="light"] .message-wrapper.me .reply-origin { background: rgba(255,255,255,0.1); border-bottom-color: rgba(255,255,255,0.14); }
+    html[data-theme="light"] .message-wrapper.me .reply-to-label,
+    html[data-theme="light"] .message-wrapper.me .reply-to-content { color: rgba(255,255,255,0.86); }
     .message-wrapper.other .message-bubble.has-reply { background: var(--bg3); border:1px solid var(--border2); border-bottom-left-radius:4px; }
     .reply-origin { padding:9px 12px 8px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.18); transition: background 0.15s; }
     html[data-theme="light"] .reply-origin { background: rgba(0,0,0,0.04); border-bottom-color: rgba(0,0,0,0.08); }
@@ -991,8 +976,6 @@
     .reaction-summary-chip.active { background:var(--blue); border-color:var(--blue); color:#fff; }
     .reaction-summary-chip img { width:18px; height:18px; object-fit:contain; }
     .reaction-detail-list { max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
-    .reaction-detail-list::-webkit-scrollbar { width:6px; }
-    .reaction-detail-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:4px; }
     .reaction-detail-item { display:flex; align-items:center; justify-content:space-between; padding:10px 8px; border-radius:12px; transition:background 0.15s; }
     .reaction-detail-item:hover { background:var(--bg3); }
     .reaction-detail-user { display:flex; align-items:center; gap:11px; }
@@ -1189,6 +1172,51 @@
     .user-chip .chip-remove:hover { background: rgba(255,107,107,0.18); color: #ff6b6b; transform: scale(1.1); }
     .user-chip .chip-remove:active { transform: scale(0.92); }
 
+    .picker-sheet { display: flex; flex-direction: column; width: min(440px, 92%); max-height: min(78vh, 680px); }
+    .picker-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .picker-head .modal-close { position: static; }
+    .picker-head .modal-title { flex: 1; margin: 0; text-align: center; font-size: 16px; }
+    .picker-go {
+      border: 0; background: transparent; color: var(--t1);
+      font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; padding: 6px 2px;
+    }
+    .picker-go:disabled { color: var(--t3); cursor: default; }
+    .picker-to {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      padding: 8px 0 12px; border-bottom: 1px solid var(--border); margin-bottom: 6px;
+    }
+    .picker-to-label { color: var(--t2); font-size: 14px; flex: 0 0 auto; }
+    .picker-chips { display: contents; }
+    .picker-to input {
+      flex: 1; min-width: 120px; border: 0; outline: none; background: transparent;
+      color: var(--t1); font: inherit; font-size: 14px; padding: 6px 0;
+    }
+    .picker-name { margin: 8px 0 4px; }
+    .picker-name input { width: 100%; }
+    .picker-list { flex: 1; min-height: 240px; overflow-y: auto; margin: 0 -8px; }
+    .pick-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 8px; border-radius: 12px; cursor: pointer;
+    }
+    .pick-row:hover { background: var(--bg3); }
+    .pick-main { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+    .pick-av {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--bg4);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0; font-weight: 700; color: var(--t1);
+    }
+    .pick-av img { width: 100%; height: 100%; object-fit: cover; }
+    .pick-name { font-size: 14px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pick-id { font-size: 12px; color: var(--t2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pick-check {
+      width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border3);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--bg);
+    }
+    .pick-row.on .pick-check { background: var(--t1); border-color: var(--t1); }
+    .pick-check svg { display: none; }
+    .pick-row.on .pick-check svg { display: block; }
+    .pick-empty { padding: 36px 16px; text-align: center; color: var(--t2); font-size: 13px; line-height: 1.5; }
+
     .user-search-trigger-btn {
       width: 100%;
       margin-top: 10px;
@@ -1265,8 +1293,6 @@
       padding: 0 24px 8px;
       background: transparent;
     }
-    .us-results-list::-webkit-scrollbar { width: 6px; }
-    .us-results-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
     .us-user-item {
       display:flex; align-items:center; justify-content:space-between;
@@ -1409,20 +1435,19 @@
   </div>
 
   <div class="main-wrapper">
-    <div class="header">
-      <div class="header-left">
-        <button class="back-btn" onclick="window.location.href='index.html'">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <span class="header-title">다이렉트 메시지</span>
-      </div>
-      <div class="header-right">
-        <button class="action-btn" onclick="openCreateRoomModal()">+ 새 채팅방</button>
-      </div>
-    </div>
-
     <div class="dm-container" id="dmContainer">
       <div class="room-list-pane">
+        <div class="header">
+          <div class="header-left">
+            <button class="back-btn" onclick="window.location.href='index.html'">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <span class="header-title">메시지</span>
+          </div>
+          <div class="header-right">
+            <button class="action-btn" onclick="openCreateRoomModal()">새 채팅</button>
+          </div>
+        </div>
         <div class="rooms-scroll-area" id="roomList"></div>
       </div>
 
@@ -1431,7 +1456,8 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
-          <p>채팅방을 선택하거나 새로 만들어보세요.</p>
+          <p>대화를 선택하세요</p>
+          <span>새 채팅으로 시작할 수도 있어요</span>
         </div>
 
         <div class="chat-header" id="chatHeader" style="display: none;">
@@ -1479,49 +1505,43 @@
 
     <!-- 방 만들기 모달 - 개선된 사용자 선택 UI -->
   <div class="modal" id="createRoomModal">
-    <div class="modal-content">
+    <div class="modal-content picker-sheet">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close" onclick="closeModals()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <div class="modal-title">새 채팅방</div>
-      <div class="form-group">
-        <label>채팅방 이름</label>
-        <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요">
-      </div>
-      <div class="form-group" style="flex:1; min-height:0; display:flex; flex-direction:column;">
-        <label>선택한 사용자 <span id="createSelectedCount" style="color:var(--t2); font-weight:400; font-size:12px; margin-left:4px;">0명</span></label>
-        <div class="selected-users-box" id="createSelectedBox">
-          <div class="empty-placeholder"><b>선택된 사용자가 없어요</b><br>아래 버튼을 눌러 추가해보아요</div>
-        </div>
-        <button type="button" class="user-search-trigger-btn" onclick="openUserSearch('create')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          사용자 검색
+      <div class="picker-head">
+        <button class="modal-close" onclick="closeModals()" aria-label="닫기">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
+        <div class="modal-title">새 메시지</div>
+        <button class="picker-go" id="createRoomBtn" onclick="createRoom()" disabled>채팅</button>
       </div>
-      <button class="modal-btn" id="createRoomBtn" onclick="createRoom()">만들기</button>
+      <div class="picker-to">
+        <span class="picker-to-label">받는 사람:</span>
+        <div class="picker-chips" id="createSelectedBox"></div>
+        <input id="createUserFilter" type="text" placeholder="검색" autocomplete="off" oninput="filterPicker('create', this.value)">
+      </div>
+      <div class="form-group picker-name" id="createNameGroup" hidden>
+        <input type="text" id="newRoomName" placeholder="그룹 이름">
+      </div>
+      <div class="picker-list" id="createUserList"></div>
     </div>
   </div>
 
-  <!-- 사용자 초대 모달 - 개선된 사용자 선택 UI -->
   <div class="modal" id="inviteModal">
-    <div class="modal-content">
+    <div class="modal-content picker-sheet">
       <div class="sheet-drag-area"><div class="sheet-handle"></div></div>
-      <button class="modal-close" onclick="closeModals()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <div class="modal-title">사용자 초대</div>
-      <div class="form-group" style="flex:1; min-height:0; display:flex; flex-direction:column;">
-        <label>선택한 사용자 <span id="inviteSelectedCount" style="color:var(--t2); font-weight:400; font-size:12px; margin-left:4px;">0명</span></label>
-        <div class="selected-users-box" id="inviteSelectedBox">
-          <div class="empty-placeholder"><b>선택된 사용자가 없어요</b><br>아래 버튼을 눌러 추가해보아요</div>
-        </div>
-        <button type="button" class="user-search-trigger-btn" onclick="openUserSearch('invite')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          사용자 검색
+      <div class="picker-head">
+        <button class="modal-close" onclick="closeModals()" aria-label="닫기">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
+        <div class="modal-title">초대</div>
+        <button class="picker-go" id="inviteBtn" onclick="inviteUsers()" disabled>초대</button>
       </div>
-      <button class="modal-btn" id="inviteBtn" onclick="inviteUsers()">초대하기</button>
+      <div class="picker-to">
+        <span class="picker-to-label">받는 사람:</span>
+        <div class="picker-chips" id="inviteSelectedBox"></div>
+        <input id="inviteUserFilter" type="text" placeholder="검색" autocomplete="off" oninput="filterPicker('invite', this.value)">
+      </div>
+      <div class="picker-list" id="inviteUserList"></div>
     </div>
   </div>
 
@@ -1886,13 +1906,23 @@
     }
 
 
+    function shortRoomTime(iso) {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      const now = new Date();
+      if (d.toDateString() === now.toDateString()) {
+        return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+      }
+      return (d.getMonth() + 1) + '월 ' + d.getDate() + '일';
+    }
+
     async function loadRooms(silent = false) {
       if (!silent) renderRoomSkeleton(); // 최초 로딩에만 스켈레톤, 폴링(silent)時は 스켈레톤 생략
       
       try {
         const myMemberships = await api(`/dm_room_members?user_id=eq.${encodeURIComponent(currentUser.id)}`);
         if (!myMemberships || myMemberships.length === 0) {
-          document.getElementById('roomList').innerHTML = '<div style="padding:20px; color:var(--t3); text-align:center;">참여중인 채팅방이 없습니다.</div>';
+          document.getElementById('roomList').innerHTML = '<div class="dm-empty">참여 중인 대화가 없습니다.<br>새 채팅으로 시작할 수 있어요.</div>';
           return;
         }
 
@@ -1911,7 +1941,7 @@
         renderRoomList(rooms || []);
       } catch (e) {
         console.error("채팅방 로드 오류", e);
-        document.getElementById('roomList').innerHTML = '<div style="padding:20px; color:var(--pink); text-align:center;">채팅방을 불러올 수 없습니다.</div>';
+        document.getElementById('roomList').innerHTML = '<div class="dm-empty">대화를 불러오지 못했습니다.</div>';
       }
     }
 
@@ -1937,7 +1967,10 @@
         div.innerHTML = `
           <div id="avatarContainer-${room.id}"></div>
           <div class="room-info">
-            <div class="room-name">${escapeHTML(displayRoomName)} <span style="font-size:12px; font-weight:400; color:var(--t3);">${members.length}</span></div>
+            <div class="room-top">
+              <div class="room-name">${escapeHTML(displayRoomName)}</div>
+              <div class="room-time" id="roomTime-${room.id}"></div>
+            </div>
             <div class="room-last-msg" id="lastMsg-${room.id}">대화를 시작해보세요</div>
           </div>
           <div class="unread-blue-dot" id="unreadDot-${room.id}"></div>
@@ -1956,6 +1989,8 @@
                 if(text.startsWith('[SYSTEM] ')) text = text.replace('[SYSTEM] ', '');
                 el.textContent = text;
               }
+              const timeEl = document.getElementById(`roomTime-${room.id}`);
+              if (timeEl && msgs[0].created_at) timeEl.textContent = shortRoomTime(msgs[0].created_at);
               const lastMsg = msgs[0];
               // 내가 보낸 메시지거나 시스템 메시지는 안읽음 처리 안함
               if (lastMsg.sender_id === currentUser.id || lastMsg.content.startsWith('[SYSTEM] ')) {
@@ -2934,14 +2969,82 @@ document.querySelector('.back-btn').addEventListener('click', () => {
     function openCreateRoomModal() {
       openSheetModal('createRoomModal');
       document.getElementById('newRoomName').value = '';
+      const filter = document.getElementById('createUserFilter');
+      if (filter) filter.value = '';
       selectedUserIds.clear();
       updateSelectedDisplay('create');
+      renderPicker('create', '');
     }
 
     function openInviteModal() {
       openSheetModal('inviteModal');
+      const filter = document.getElementById('inviteUserFilter');
+      if (filter) filter.value = '';
       selectedUserIds.clear();
       updateSelectedDisplay('invite');
+      renderPicker('invite', '');
+    }
+
+    let pickerTimer = null;
+    function filterPicker(caller, value) {
+      if (pickerTimer) clearTimeout(pickerTimer);
+      pickerTimer = setTimeout(() => renderPicker(caller, (value || '').trim()), 220);
+    }
+
+    async function renderPicker(caller, keyword) {
+      const list = document.getElementById(caller === 'create' ? 'createUserList' : 'inviteUserList');
+      if (!list) return;
+      const requestId = ++userSearchRequestId;
+      let users = [];
+      try {
+        if (keyword) {
+          users = await api(`/users?or=(id.ilike.*${encodeURIComponent(keyword)}*,nickname.ilike.*${encodeURIComponent(keyword)}*)&select=id,nickname,profile_image&limit=30`) || [];
+          users.forEach(u => { if (u && u.id) usersCache[u.id] = u; });
+        } else {
+          users = Object.values(usersCache);
+        }
+      } catch (e) {
+        if (requestId !== userSearchRequestId) return;
+        list.innerHTML = '<div class="pick-empty">사용자를 불러오지 못했습니다.</div>';
+        return;
+      }
+      if (requestId !== userSearchRequestId) return;
+      const members = (caller === 'invite' && activeRoomId && roomMembersMap[activeRoomId]) ? roomMembersMap[activeRoomId] : [];
+      const kw = (keyword || '').toLowerCase();
+      users = users.filter(u => {
+        if (!u || !u.id || u.id === currentUser.id) return false;
+        if (members.includes(u.id)) return false;
+        if (!kw) return true;
+        return (u.nickname || '').toLowerCase().includes(kw) || (u.id || '').toLowerCase().includes(kw);
+      }).sort((a, b) => (a.nickname || '').localeCompare(b.nickname || ''));
+      if (!users.length) {
+        list.innerHTML = '<div class="pick-empty">해당하는 사용자가 없습니다.</div>';
+        return;
+      }
+      const mark = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+      list.innerHTML = '';
+      users.forEach(u => {
+        const on = selectedUserIds.has(u.id);
+        const row = document.createElement('div');
+        row.className = 'pick-row' + (on ? ' on' : '');
+        const av = u.profile_image ? `<img src="${u.profile_image}" alt="">` : escapeHTML((u.nickname || '?')[0]);
+        row.innerHTML = `
+          <div class="pick-main">
+            <div class="pick-av">${av}</div>
+            <div style="min-width:0">
+              <div class="pick-name">${escapeHTML(u.nickname || u.id)}</div>
+              <div class="pick-id">@${escapeHTML(u.id)}</div>
+            </div>
+          </div>
+          <div class="pick-check">${mark}</div>`;
+        row.onclick = () => {
+          if (selectedUserIds.has(u.id)) selectedUserIds.delete(u.id);
+          else selectedUserIds.add(u.id);
+          updateSelectedDisplay(caller);
+          row.classList.toggle('on', selectedUserIds.has(u.id));
+        };
+        list.appendChild(row);
+      });
     }
 
     // ===== NEW: 사용자 검색 2차 팝업 로직 (search.html 방식 차용) =====
@@ -3139,19 +3242,14 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 
     function updateSelectedDisplay(caller){
       const boxId = caller==='create' ? 'createSelectedBox' : 'inviteSelectedBox';
-      const countId = caller==='create' ? 'createSelectedCount' : 'inviteSelectedCount';
       const box = document.getElementById(boxId);
-      const countEl = document.getElementById(countId);
+      const go = document.getElementById(caller === 'create' ? 'createRoomBtn' : 'inviteBtn');
+      const nameGroup = caller === 'create' ? document.getElementById('createNameGroup') : null;
       if(!box) return;
       box.innerHTML='';
       const ids = Array.from(selectedUserIds);
-      if(countEl) countEl.textContent = `${ids.length}명`;
-      if(ids.length===0){
-        box.classList.remove('has-users');
-        box.innerHTML = `<div class="empty-placeholder"><b>선택된 사용자가 없어요</b><br>아래 버튼을 눌러 추가해보아요</div>`;
-        return;
-      }
-      box.classList.add('has-users');
+      if (go) go.disabled = ids.length === 0;
+      if (nameGroup) nameGroup.hidden = ids.length < 2;
       ids.forEach(uid=>{
         const u = getUserInfo(uid);
         const chip = document.createElement('div');
@@ -3176,6 +3274,14 @@ document.querySelector('.back-btn').addEventListener('click', () => {
       if(selectedUserIds.has(userId)) selectedUserIds.delete(userId);
       if(tempSelectedIds.has(userId)) tempSelectedIds.delete(userId);
       updateSelectedDisplay(caller);
+      const list = document.getElementById(caller === 'create' ? 'createUserList' : 'inviteUserList');
+      if (list) {
+        list.querySelectorAll('.pick-row').forEach(row => {
+          const idEl = row.querySelector('.pick-id');
+          const id = idEl ? idEl.textContent.replace(/^@/, '') : '';
+          row.classList.toggle('on', selectedUserIds.has(id));
+        });
+      }
       updateSearchBadge();
       // 검색 결과가 열려있으면 해당 아이템 상태도 갱신
       const results = document.getElementById('userSearchResults');
@@ -3354,8 +3460,17 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     async function createRoom() {
-      const name = document.getElementById('newRoomName').value.trim() || '새 채팅방';
       const selectedIds = Array.from(selectedUserIds);
+      if (!selectedIds.length) {
+        showAlert('받는 사람을 선택해주세요.');
+        return;
+      }
+      let name = document.getElementById('newRoomName').value.trim();
+      if (!name) {
+        name = selectedIds.length === 1
+          ? (getUserInfo(selectedIds[0]).nickname || '새 채팅방')
+          : '새 채팅방';
+      }
       
       const btn = document.getElementById('createRoomBtn');
       btn.disabled = true;

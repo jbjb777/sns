@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <script src="sharer-auth.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="sharer-ui.css">
   <style>
     html, body {
       margin: 0;
@@ -34,7 +35,7 @@
       box-sizing: border-box;
       position: relative;
       scrollbar-width: thin;
-      scrollbar-color: #444 transparent;
+      scrollbar-color: var(--border2, #2a2a2a) transparent;
     }
    .logo-container {
       margin: 0 auto 32px;
@@ -320,11 +321,17 @@
       height: 20px!important;
     }
    .sidebar::-webkit-scrollbar {
-      width: 3px;
+      width: 4px;
+    }
+   .sidebar::-webkit-scrollbar-track {
+      background: transparent;
     }
    .sidebar::-webkit-scrollbar-thumb {
-      background: #555;
-      border-radius: 10px;
+      background: var(--border2, #2a2a2a);
+      border-radius: 2px;
+    }
+   .sidebar::-webkit-scrollbar-thumb:hover {
+      background: var(--border3, #333);
     }
 
     /* TOOLTIP (Desktop only) */
@@ -582,10 +589,13 @@
 
     /* ─── 라이트 모드 전용 통합 테마 정의 스타일 ─── */
     body.light-mode.sidebar {
-      scrollbar-color: #bbb transparent;
+      scrollbar-color: #cccccc transparent;
     }
     body.light-mode.sidebar::-webkit-scrollbar-thumb {
-      background: #bbb;
+      background: #cccccc;
+    }
+    body.light-mode.sidebar::-webkit-scrollbar-thumb:hover {
+      background: #a3a3a3;
     }
     @media (min-width: 200px) {
       body.light-mode.sidebar {
