@@ -1760,11 +1760,11 @@ window.toggleSearchPanel = function() {
     const timeStr = new Date(post.created_at).toLocaleString('ko-KR', {
       year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
-    const isVerified = ["JB777", "진정오"].includes(post.author);
+    const isVerified = ["JBJB", "진정오"].includes(post.author);
     const canDelete = currentUser && (
       currentUser.nickname === post.author ||
       currentUser.id === post.author_id ||
-      (currentUser.nickname === "JB777" && currentUser.isVerified)
+      (currentUser.nickname === "JBJB" && currentUser.isVerified)
     );
     
     // 작성자 스토리 상태 확인 후 HTML 구성
@@ -2035,7 +2035,7 @@ window.toggleSearchPanel = function() {
       const date = new Date(c.created_at).toLocaleString('ko-KR', {
         year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
       });
-      const isVerified = ["JB777", "진정오"].includes(c.user_name);
+      const isVerified = ["JBJB", "진정오"].includes(c.user_name);
       const avatarContent = renderAvatar(c.user_name, c.user_id);
       const linkedText = parseMarkdown(c.text);
       const replyCount = (repliesByParent[c.id] || []).length;
@@ -2070,7 +2070,7 @@ window.toggleSearchPanel = function() {
             const rDate = new Date(r.created_at).toLocaleString('ko-KR', {
               year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
             });
-            const rIsVerified = ["JB777", "진정오"].includes(r.user_name);
+            const rIsVerified = ["JBJB", "진정오"].includes(r.user_name);
             const rAvatarContent = renderAvatar(r.user_name, r.user_id);
             const rLinkedText = parseMarkdown(r.text);
 
