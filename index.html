@@ -2173,9 +2173,9 @@ async function loadPane(pane, more) {
       const userInfo = usersMap[post.author_id] || null;
       const authorNickname = userInfo?.nickname || post.author || '알 수 없음';
       const authorAvatar = userInfo?.profile_image || null;
-      const isVerified = authorNickname === "JB777";
+      const isVerified = authorNickname === "JBJB";
       const timeStr = formatPostTime(post.created_at);
-      const canDelete = currentUser?.nickname === "JB777";
+      const canDelete = currentUser?.nickname === "JBJB";
       const likeCount = likeCountMap[post.id] || 0;
       const commentCount = commentCountMap[post.id] || 0;
       const liked = myLikeSet.has(post.id);

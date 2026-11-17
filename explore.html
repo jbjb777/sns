@@ -1562,7 +1562,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   async function createShortItem(post, index) {
-    const isVerified = ["JB777", "진정오"].includes(post.author);
+    const isVerified = ["JBJB", "진정오"].includes(post.author);
     const hasImage = !!post.image_url;
     const hasContent = !!post.content?.trim();
 
@@ -1812,7 +1812,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const date = new Date(c.created_at).toLocaleString('ko-KR', {
           year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
-        const isVerified = ["JB777", "진정오"].includes(c.user_name);
+        const isVerified = ["JBJB", "진정오"].includes(c.user_name);
         const avatarContent = renderAvatar(c.user_name, c.user_id);
         const linkedText = parseMarkdown(c.text);
 
@@ -1846,7 +1846,7 @@ window.addEventListener('DOMContentLoaded', () => {
               const rDate = new Date(r.created_at).toLocaleString('ko-KR', {
                 year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
               });
-              const rIsVerified = ["JB777", "진정오"].includes(r.user_name);
+              const rIsVerified = ["JBJB", "진정오"].includes(r.user_name);
               const rAvatarContent = renderAvatar(r.user_name, r.user_id);
               const rLinkedText = parseMarkdown(r.text);
               return `

@@ -1324,7 +1324,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       let users = await api(`/users?id=eq.${encodeURIComponent(userId)}&select=*`);
       if (users?.length === 0) {
-        if (userId === "JB777" || userId === "진정오") {
+        if (userId === "JBJB" || userId === "진정오") {
           users = [{ id: userId, nickname: userId, isVerified: true, message: null, profile_image: null }];
         } else {
           showError('사용자를 찾을 수 없습니다.');
@@ -1348,7 +1348,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   async function displayProfile(user) {
     const contentDiv = document.getElementById('profileContent');
-    const isVerified = user.isVerified || user.nickname === "JB777" || user.nickname === "진정오";
+    const isVerified = user.isVerified || user.nickname === "JBJB" || user.nickname === "진정오";
     const isOwnProfile = currentUser && currentUser.nickname === user.nickname;
     const userPosts = await api(`/posts?author=eq.${encodeURIComponent(user.nickname)}&select=id,access`);
     
