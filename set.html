@@ -626,8 +626,11 @@
           
           <div class="form-group">
             <label>이름 (닉네임)</label>
-            <input type="text" id="userNicknameInput" disabled>
-            <div class="input-hint">닉네임은 보안상 변경할 수 없습니다.</div>
+            <div style="display:flex; gap:10px;">
+              <input type="text" id="userNicknameInput" maxlength="20" style="flex:1;">
+              <button class="secondary-btn" id="nicknameSaveBtn" onclick="changeNickname()">변경</button>
+            </div>
+            <div class="input-hint" id="nicknameHint">1~20자, 특수문자 &lt; &gt; " ' ` &amp; \ 사용 불가</div>
           </div>
           
           <div style="display:flex; justify-content:flex-end; margin-top:32px;">
@@ -915,6 +918,66 @@
       e.target.value = '';
     }
   });
+
+  // ─── 2.5. 닉네임 변경 ───
+  async function changeNickname() {
+    const input = document.getElementById('userNicknameInput');
+    const hint = document.getElementById('nicknameHint');
+    const btn = document.getElementById('nicknameSaveBtn');
+    const newNick = input.value.trim();
+
+    if (!newNick || newNick.length < 1 || newNick.length > 20) {
+      hint.textContent = '! 닉네임은 1~20자여야 합니다.';
+      hint.style.color = 'var(--pink)';
+      return;
+    }
+    if (/[<>"'`&\\\u0000-\u001f]/.test(newNick)) {
+      hint.textContent = '! 사용할 수 없는 특수문자가 포함되어 있습니다.';
+      hint.style.color = 'var(--pink)';
+      return;
+    }
+    if (newNick === (loggedInUser.nickname || '')) {
+      hint.textContent = '현재 닉네임과 동일합니다.';
+      hint.style.color = 'var(--t3)';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '변경 중...';
+    NProgress.start();
+
+    try {
+      await api(`/users?id=eq.${encodeURIComponent(loggedInUser.id)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ nickname: newNick }),
+        headers: { 'Prefer': 'return=minimal' }
+      });
+
+      loggedInUser.nickname = newNick;
+      localStorage.setItem('snsUser', JSON.stringify(loggedInUser));
+      document.getElementById('displayUsername').textContent = newNick;
+      updateAvatarPreview(loggedInUser.profile_image, newNick);
+      updateSidebar();
+
+      hint.textContent = '✓ 닉네임이 변경되었습니다.';
+      hint.style.color = 'var(--green)';
+    } catch (e) {
+      console.error(e);
+      const msg = e.message || '';
+      if (msg.includes('409') || msg.includes('이미 사용 중')) {
+        hint.textContent = '! 이미 사용 중인 닉네임입니다.';
+      } else if (msg.includes('400')) {
+        hint.textContent = '! 사용할 수 없는 닉네임입니다.';
+      } else {
+        hint.textContent = '! 닉네임 변경 중 오류가 발생했습니다.';
+      }
+      hint.style.color = 'var(--pink)';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '변경';
+      NProgress.done();
+    }
+  }
 
   // ─── 3. 실제 DB 비밀번호 변경 구현 ───
   async function changePassword() {
